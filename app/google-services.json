@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "464327756223",
+    "project_id": "squash-social",
+    "storage_bucket": "squash-social.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464327756223:android:325177019fe670d4d7b90a",
+        "android_client_info": {
+          "package_name": "dev.kaua.squash"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "464327756223-6blrdc8m085peqp4qpe7p4nmf78p6c4l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.kaua.squash",
+            "certificate_hash": "2d9d8b8039eda675b0119773710ff2a5ac3c77be"
+          }
+        },
+        {
+          "client_id": "464327756223-qacad080gsvpg313rfncmqo6r40jhe4d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTey4_YxkDh6V2Yff6ToFNqEK5FLT_DoM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "464327756223-qacad080gsvpg313rfncmqo6r40jhe4d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
