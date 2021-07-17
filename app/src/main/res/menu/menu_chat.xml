@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/account_chat"
+        android:title="@string/my_account"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/starred_messages_chat"
+        android:title="@string/starred_messages"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/setting_chat"
+        android:title="@string/setting"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/logout"
+        android:title="@string/logout"
+        app:showAsAction="never"/>
+
+</menu>

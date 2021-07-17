@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Squash" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.Squash" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -9,8 +9,57 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="colorAccent">@color/base_color</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/BarColor</item>
+        <item name="android:navigationBarColor" tools:targetApi="l">@color/BarColor</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <!-- Start BottomSheet Theme -->
+    <style name="BottomSheetTheme" parent="Theme.Design.BottomSheetDialog">
+
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+
+        <item name="android:background">@android:color/transparent</item>
+
+    </style>
+
+    <style name="EditsLoginAndSignUp" parent="Theme.AppCompat.Light">
+        <item name="android:textColorHint">@color/white</item>
+    </style>
+
+    <style name="Theme.Squash.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.River.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.River.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <!-- End BottomSheet Theme -->
+
+    <style name="MenuStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:background">@color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryDark">@color/white</item>
+        <item name="colorAccent">@color/white</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="ToolbarColored" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColorSecondary">@color/white</item>
+    </style>
+
+    <style name="popup_window_animation">
+        <item name="android:windowEnterAnimation">@anim/slide_left_to_right</item>
+        <item name="android:windowExitAnimation">@anim/slide_right_to_left</item>
+    </style>
+
 </resources>

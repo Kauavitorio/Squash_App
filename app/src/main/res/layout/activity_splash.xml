@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_splash"
+    android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen"
+    tools:context=".Activitys.SplashActivity">
+
+    <!-- Text to app name and version -->
+    <TextView
+        android:id="@+id/app_version_splash"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:text="@string/app_name"
+        android:textSize="24sp"
+        android:layout_marginTop="50dp"
+        android:textColor="#8DFFFFFF"
+        android:textStyle="bold"
+        android:gravity="center"
+        />
+
+    <!-- Screen Load -->
+    <ProgressBar
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="115dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:indeterminate="true" />
+
+</RelativeLayout>

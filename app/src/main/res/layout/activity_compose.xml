@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activitys.ComposeActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:padding="2dp"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/btn_close_compose"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ic_close"
+            tools:ignore="ContentDescription" />
+
+        <!-- Btn Post -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_post"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            app:cardBackgroundColor="@color/base_color"
+            app:cardCornerRadius="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:text="@string/post"
+                android:layout_gravity="center"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_height="wrap_content"/>
+
+        </androidx.cardview.widget.CardView>
+
+
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/edit_compose_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="200dp"
+        android:hint="@string/whats_happening"
+        android:inputType="text|textCapSentences|textMultiLine"
+        android:background="@drawable/custom_edit_register"
+        tools:ignore="Autofill" />
+
+</LinearLayout>

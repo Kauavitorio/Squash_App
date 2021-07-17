@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    android:layout_height="wrap_content">
+
+    <!-- Container Main -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="10dp"
+        android:background="@drawable/background_users_chat_list"
+        tools:ignore="UselessParent">
+
+        <!-- User Icon Image -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/profile_image_users"
+            android:src="@mipmap/ic_launcher"/>
+
+        <!-- Text UserName -->
+        <TextView
+            android:id="@+id/user_name_users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:layout_toEndOf="@id/profile_image_users"
+            android:layout_marginStart="10dp"
+            android:layout_centerVertical="true"/>
+
+        <!-- Image Status On -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_on"
+            android:visibility="gone"
+            android:src="@mipmap/ic_launcher"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            app:civ_border_width="10dp"
+            app:civ_border_color="#05df29"
+            android:layout_below="@id/user_name_users"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="-15dp"
+            android:layout_toEndOf="@id/profile_image_users"/>
+
+        <!-- Image Status Off -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_off"
+            android:visibility="gone"
+            android:src="@mipmap/ic_launcher"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            app:civ_border_width="10dp"
+            app:civ_border_color="#bfbfbf"
+            android:layout_below="@id/user_name_users"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="-15dp"
+            android:layout_toEndOf="@id/profile_image_users"/>
+
+        <!-- Text Last message -->
+        <TextView
+            android:id="@+id/last_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/user_name_users"
+            android:layout_toEndOf="@id/profile_image_users"
+            android:paddingTop="5dp"
+            android:textColor="@color/hint"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:maxLines="1"
+            android:maxLength="38" />
+
+        <!-- Card un read message -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_no_read_ic"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/base_color"
+            app:cardCornerRadius="10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"/>
+
+        <!-- Image Pined chat -->
+        <ImageView
+            android:id="@+id/ic_pinned_chat"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:visibility="gone"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_pinned"
+            tools:ignore="ContentDescription" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

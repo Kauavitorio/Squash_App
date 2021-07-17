@@ -12,13 +12,50 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activitys.ComposeActivity"/>
+        <activity android:name=".Activitys.MessageActivity" />
+        <activity android:name=".Activitys.SignInActivity" />
+        <activity android:name=".Activitys.IntroActivity" />
+        <activity android:name=".Activitys.SignUpActivity" />
+        <activity android:name=".Activitys.MainActivity" />
+        <activity android:name=".Activitys.ValidateEmailActivity" />
+        <activity android:name=".Activitys.TermsAccountActivity" />
+        <activity android:name=".Activitys.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+
+            <!-- Filter to email validation URL -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="dev-river-api.herokuapp.com"
+                    android:scheme="http" />
+                <data android:scheme="https" />
+            </intent-filter>
+        </activity> <!-- Start Service to message notification -->
+        <service
+            android:name=".Notifications.MyFirebaseIdService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".Notifications.MyFirebaseMessaging"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <!-- Performance Monitoring plugin -->
         <meta-data

@@ -1,3 +1,91 @@
 <resources>
-    <string name="app_name">Squash</string>
+
+    <!-- Natural Text -->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="ok">OK</string> <!-- End Natural Text -->
+
+    <string name="app_name">River</string>
+    <string name="intro_description">Choose a way to start your navigation.</string>
+    <string name="create_account">Create account</string>
+    <string name="have_an_account_already"><font color='#504F4F'>Have an account already?</font> <font color='#10ace0'>Log in</font></string>
+    <string name="create_your_account">Create your account</string>
+    <string name="name">Name</string>
+    <string name="email_address">Email address</string>
+    <string name="please_enter_a_valid_email">Please enter a valid email.</string>
+    <string name="phone">Phone</string>
+    <string name="password">Password</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="age_warning">Minimum age to create an account is 13 years old.</string>
+    <string name="password_cannot_contain_spaces">Password cannot contain spaces</string>
+    <string name="password_needs">Your password needs at least 8 characters, 1 letter, 1 number and a special character.</string>
+    <string name="next">Next</string>
+    <string name="please_enter_a_valid_phone_number">Please enter a valid phone number.</string>
+    <string name="it_is_necessary_last_name">It is necessary to enter at least your last name.</string>
+    <string name="customize_your_experience">Customize your experience</string>
+    <string name="get_more_out_to_river">Get more out to River</string>
+    <string name="receive_email_terms">Receive email about your River activity and recommendations.</string>
+    <string name="personalize_based_on_your_inferred">Personalize based on your inferred identity</string>
+    <string name="desc_personalize_based_inferred">River will always personalize your experience based on information you\'ve provided, as well as the devices you\'ve used to log in. When this setting is enabled, River may also personalize based on other inferences about your identity, like devices and browsers you haven\'t used to log in to River or email addresses and phone numbers similar to those linked to your River account.</string>
+
+    <string name="account_was_created">Your River account has been successfully created. To proceed with the app, you need to confirm your email. We send an email with an explanation of the email explanation via verification code.</string>
+    <string name="email_is_already_used">This email has already been used in another account, please change the email provided.</string>
+    <string name="phone_is_already_used">This mobile number is already in use, please change the number entered.</string>
+    <string name="bad_username">The specified username is not suitable, please change the username.</string>
+    <string name="weHaveAProblem">Servers have temporary failures, please try starting the app again later.</string>
+    <string name="default_bio">Hi, I\'m new here at River.</string>
+    <string name="we_sent_you_a_code">We sent you a code</string>
+    <string name="the_code_has_been_sent">The code has been sent to %1$s, enter it below to verify your account.</string>
+    <string name="the_code_has_been_sent_no_email">When this account was created a verification email was sent but the account was not validated as the code was not entered in the field below, please enter the validation code in the box below.</string>
+    <string name="validation_code">Validation code</string>
+    <string name="did_not_receive_email">Didn\'t receive email?</string>
+    <string name="resend_code">Resend code</string>
+    <string name="resend_code_desc">If you have not obtained the validation code in your email, just click on the <font color='#10ace0'>resend code</font> button to receive the code.</string>
+    <string name="the_validation_code_is_invalid">The validation code is invalid.</string>
+    <string name="unable_to_login">We were unable to log into your account due to your email being pending.</string>
+    <string name="account_will_not_be_validated_leave">If you leave this page your account will not be validated and you will not be able to login.\nReally want to leave?</string>
+    <string name="phone_email_or_username">Phone, email or username.</string>
+    <string name="login_to_river">Log in to River.</string>
+    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="login_or_password_invalid">Login or password invalid.</string>
+    <string name="river_corporation">River Corporation</string>
+    <string name="your_story">Your Story</string>
+    <string name="under_development">Under Development</string>
+    <string name="share">Share</string>
+    <string name="search_with_dots">Search…</string>
+    <string name="following">Following</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="followers">Followers</string>
+    <string name="follow">Follow</string>
+    <string name="you_are_without_internet">You are without internet connection</string>
+    <string name="navigating_" translatable="false">Navigating…</string>
+    <string name="or">Or</string>
+    <string name="login">Log in</string>
+    <string name="logout">Logout</string>
+    <string name="type_a_message">Type a message…</string>
+    <string name="the_message_cannot_be_empty">The message cannot be empty.</string>
+    <string name="seen">Seen</string>
+    <string name="delivered">Delivered</string>
+    <string name="online" translatable="false">Online</string>
+    <string name="new_message">New message</string>
+    <string name="chats">Chats</string>
+    <string name="typing">typing…</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="setting">Settings</string>
+    <string name="starred_messages">Starred messages</string>
+    <string name="my_account">My account</string>
+    <string name="pin">Pin</string>
+    <string name="post">Post</string>
+    <string name="whats_happening">What\'s happening?</string>
+    <string name="user_not_found">User not found</string>
+    <string name="no_posts_yet">No posts yet</string>
+    <string name="not_possible_start_a_chat">It is not possible to start a conversation with this user at time.</string>
+    <string name="replied_to_yourself">Replied to yourself</string>
+    <string name="reply_to">Reply to</string>
+    <string name="delete_message_for_everyone">Delete message for everyone?</string>
+    <string name="cancel">Cancel</string>
+    <string name="view_profile">View profile</string>
+    <string name="medias">Medias</string>
+    <string name="wallpaper" translatable="false">Wallpaper</string>
 </resources>
