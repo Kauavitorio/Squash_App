@@ -50,6 +50,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class SignUpActivity extends AppCompatActivity {
     private ImageView btn_back_signUp;
     private TextInputEditText edit_name, edit_email, edit_phone, edit_bornDate, edit_password;

@@ -6,6 +6,13 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class KeyboardUtils {
 
     public static void hideKeyboard(Activity activity) {

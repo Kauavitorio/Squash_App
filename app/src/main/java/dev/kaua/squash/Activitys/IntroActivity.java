@@ -12,6 +12,13 @@ import androidx.core.app.ActivityOptionsCompat;
 
 import dev.kaua.squash.R;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class IntroActivity extends AppCompatActivity {
     CardView btn_create_account;
     ConstraintLayout btn_login_intro;

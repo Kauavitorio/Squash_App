@@ -50,11 +50,17 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
 
 public abstract class Methods extends MainActivity {
 
     //  Base API URL
-    private static final String BASE_URL = "https://dev-river-api.herokuapp.com/";
+    public static final String BASE_URL = "https://dev-river-api.herokuapp.com/";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
 
@@ -139,8 +145,10 @@ public abstract class Methods extends MainActivity {
         });
     }
 
+    //  Method "NumberTrick" is for change number
+    //  For example 1000 to 1K and 10000 to 10K
     public static String NumberTrick(int number) {
-        String numberString = "";
+        String numberString;
         if (Math.abs(number / 1000000) > 1)
             numberString = (number / 1000000) + "m";
         else if (Math.abs(number / 1000) > 1)
@@ -150,6 +158,7 @@ public abstract class Methods extends MainActivity {
         return numberString;
     }
 
+    //  Method to know if user is has internet connection
     public static boolean isOnline(Context context) {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return manager.getActiveNetworkInfo() != null &&
@@ -171,8 +180,8 @@ public abstract class Methods extends MainActivity {
         strBuilder.removeSpan(span);
     }
 
-    public static void setTextViewHTML(Context context, TextView text, String html)
-    {
+    public static void setTextViewHTML(Context context, TextView text, String html) {
+        //noinspection deprecation
         CharSequence sequence = Html.fromHtml(html);
         SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
         URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
@@ -190,7 +199,7 @@ public abstract class Methods extends MainActivity {
         context.startActivity(i);
     }
 
-
+    //  Method to set new user status for chat system
     public static void status_chat(String status){
         Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
@@ -208,6 +217,7 @@ public abstract class Methods extends MainActivity {
         }
     }
 
+    //  Method to update typing status for chat system
     public static void typingTo_chat_Status(String typing){
         firebaseUser = ConfFirebase.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
@@ -217,6 +227,7 @@ public abstract class Methods extends MainActivity {
         reference.updateChildren(hashMap);
     }
 
+    //  Method to load last seen
     public static String loadLastSeen(Context context, String get_date_time){
         Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");

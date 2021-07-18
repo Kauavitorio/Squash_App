@@ -34,6 +34,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class ValidateEmailActivity extends AppCompatActivity {
     private TextView txt_who_is_sent;
     private TextInputEditText edit_verification_code;

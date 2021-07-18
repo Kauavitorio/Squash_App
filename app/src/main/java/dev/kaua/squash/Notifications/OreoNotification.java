@@ -11,6 +11,13 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class OreoNotification extends ContextWrapper {
 
     private static final String CHANNEL_ID = "dev.kaua.river";
@@ -21,9 +28,8 @@ public class OreoNotification extends ContextWrapper {
     public OreoNotification(Context base) {
         super(base);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel();
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

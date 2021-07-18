@@ -1,6 +1,5 @@
 package dev.kaua.squash.Notifications;
 
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -29,6 +28,13 @@ import java.util.Map;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Firebase.ConfFirebase;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class MyFirebaseMessaging extends FirebaseMessagingService {
 
     @Override
@@ -44,10 +50,11 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
     private void updateToken(String newToken) {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
-        Token token = new Token(newToken);
-        reference.child(firebaseUser.getUid()).setValue(token);
+        if(firebaseUser != null){
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
+            Token token = new Token(newToken);
+            reference.child(firebaseUser.getUid()).setValue(token);
+        }
     }
 
     @Override
@@ -141,9 +148,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
         int i=0;
-        if (j>0) {
-            i=j;
-        }
+        if (j>0) i = j;
 
         notificationManager.notify(i, builder.build());
     }

@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -40,6 +42,13 @@ import retrofit2.Retrofit;
 
 import static android.content.Context.MODE_PRIVATE;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public abstract class Login {
     @SuppressLint("StaticFieldLeak")
     private static LoadingDialog loadingDialog;
@@ -48,12 +57,15 @@ public abstract class Login {
     //  Set preferences
     private static SharedPreferences mPrefs;
     private static final String PREFS_NAME = "myPrefs";
+    private static FirebaseAnalytics mFirebaseAnalytics;
 
     static final Retrofit retrofitUser = Methods.GetRetrofitBuilder();
 
     public static void DoLogin(Context context, String login_method, String password){
         loadingDialog = new LoadingDialog((Activity) context);
         loadingDialog.startLoading();
+
+        //  Getting user mobile information and date time
         String device_login = Build.MANUFACTURER + ", " + Build.MODEL;
         Calendar c = Calendar.getInstance();
         Log.d("DateTime", "Current time => "+c.getTime());
@@ -107,10 +119,20 @@ public abstract class Login {
                     if(currentUser != null) mAuth.signOut();
 
                     mAuth = ConfFirebase.getFirebaseAuth();
+                    mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(context);
+
+                    //  Login user in firebase to get user instance
                     mAuth.signInWithEmailAndPassword(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail())), Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
                             .addOnCompleteListener(task -> {
                                 Log.d("Auth", "Login Ok");
                                 Log.d("Auth", "User " + mAuth.getUid());
+
+                                //  Creating analytic for login event
+                                Bundle bundle_Analytics = new Bundle();
+                                bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, mAuth.getUid());
+                                bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
+                                bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+                                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle_Analytics);
 
                                 //  Go To main
                                 Intent i = new Intent(context, MainActivity.class);

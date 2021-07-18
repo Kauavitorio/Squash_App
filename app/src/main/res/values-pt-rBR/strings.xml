@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">River</string>
+    <string name="app_name">Squash</string>
     <string name="intro_description">Escolha uma forma de iniciar sua navegação.</string>
     <string name="create_account">Criar Conta</string>
     <string name="have_an_account_already"><font color='#504F4F'>Já possui uma conta?</font> <font color='#10ace0'>Conecte-se</font></string>

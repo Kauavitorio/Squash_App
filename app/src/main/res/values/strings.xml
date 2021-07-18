@@ -5,7 +5,7 @@
     <string name="no">No</string>
     <string name="ok">OK</string> <!-- End Natural Text -->
 
-    <string name="app_name">River</string>
+    <string name="app_name">Squash</string>
     <string name="intro_description">Choose a way to start your navigation.</string>
     <string name="create_account">Create account</string>
     <string name="have_an_account_already"><font color='#504F4F'>Have an account already?</font> <font color='#10ace0'>Log in</font></string>

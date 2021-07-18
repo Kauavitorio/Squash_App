@@ -11,6 +11,13 @@ import com.airbnb.lottie.LottieAnimationView;
 
 import dev.kaua.squash.R;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class LoadingDialog {
 
     private final Activity activity;
@@ -29,7 +36,7 @@ public class LoadingDialog {
         dialog.setContentView(R.layout.adapter_custom_loading);
         LottieAnimationView progressBarDialog = dialog.findViewById(R.id.progressBarDialog);
 
-        timer.postDelayed(() -> progressBarDialog.setSpeed((float) 2.5),7000);
+        timer.postDelayed(() -> progressBarDialog.setSpeed((float) 2.5),6000);
 
         dialog.show();
     }

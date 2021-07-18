@@ -1,5 +1,12 @@
 package dev.kaua.squash.Notifications;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class Data {
     private String user;
     private int icon;

@@ -13,11 +13,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.Fragments.FragmentPageAdapter;
 import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout container_btn_profile_main;
     private static ViewPager viewPager;
     private FragmentPageAdapter adapter;
+    private static FirebaseAnalytics mFirebaseAnalytics;
 
 
     private Bundle bundle;
@@ -68,8 +71,6 @@ public class MainActivity extends AppCompatActivity {
         // the view pager
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1, true);
-
-
 
         //  Get all SharedPreferences
         mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -214,14 +215,23 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void Ids() {
+        getUserInformation();
+        mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
         instance = this;
         getWindow().setStatusBarColor(getColor(R.color.BarColor));
         getWindow().setNavigationBarColor(getColor(R.color.BarColor));
-        viewPager = (ViewPager)findViewById(R.id.viewpager_main);
+        viewPager = findViewById(R.id.viewpager_main);
         btn_profile_main = findViewById(R.id.btn_profile_main);
         btn_search_main = findViewById(R.id.btn_search_main);
         btn_home_main = findViewById(R.id.btn_home_main);
         container_btn_profile_main = findViewById(R.id.container_btn_profile_main);
+
+        //  Creating analytic for open app event
+        Bundle bundle_Analytics = new Bundle();
+        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, ConfFirebase.getFirebaseUser().getUid());
+        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(account.getUsername()));
+        bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle_Analytics);
     }
 
     @SuppressWarnings("unchecked")

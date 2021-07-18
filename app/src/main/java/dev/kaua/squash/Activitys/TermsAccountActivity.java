@@ -14,6 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.LoadingDialog;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class TermsAccountActivity extends AppCompatActivity {
 
     private ImageView btn_back_terms;

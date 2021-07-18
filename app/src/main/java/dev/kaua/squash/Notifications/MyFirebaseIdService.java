@@ -11,6 +11,13 @@ import org.jetbrains.annotations.NotNull;
 
 import dev.kaua.squash.Firebase.ConfFirebase;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class MyFirebaseIdService extends FirebaseMessagingService {
 
     @Override

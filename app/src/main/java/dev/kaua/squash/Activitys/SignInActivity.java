@@ -19,6 +19,13 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.Warnings;
 
+/**
+ *  Copyright (c) 2021 Kauã Vitório
+ *  Official repository https://github.com/Kauavitorio/Squash_App
+ *  Responsible developer: https://github.com/Kauavitorio
+ *  @author Kaua Vitorio
+ **/
+
 public class SignInActivity extends AppCompatActivity {
     private static SignInActivity instance;
     private Button btn_next;

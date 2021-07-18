@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dev.kaua.squash">
 
+    <!--
+    *  Copyright (c) 2021 Kauã Vitório
+    *  Official repository https://github.com/Kauavitorio/Squash_App
+    *  Responsible developer: https://github.com/Kauavitorio
+    *  @author Kaua Vitorio
+    -->
+
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -64,3 +71,10 @@
     </application>
 
 </manifest>
+
+    <!--
+    *  Copyright (c) 2021 Kauã Vitório
+    *  Official repository https://github.com/Kauavitorio/Squash_App
+    *  Responsible developer: https://github.com/Kauavitorio
+    *  @author Kaua Vitorio
+    -->
