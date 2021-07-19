@@ -22,6 +22,7 @@ import androidx.core.app.ActivityOptionsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -62,6 +63,7 @@ public class SignUpActivity extends AppCompatActivity {
     private TextInputEditText edit_name, edit_email, edit_phone, edit_bornDate, edit_password;
     private TextInputLayout email_tl_signUp, phone_tl_signUp, bornDate_tl_signUp, password_tl_signUp;
     private Button btn_next, btn_signUp;
+    private static FirebaseAnalytics mFirebaseAnalytics;
     private Timer timer = new Timer();
     private final Handler timerHandler = new Handler();
     private final long DELAY = 1000; // in ms
@@ -181,6 +183,8 @@ public class SignUpActivity extends AppCompatActivity {
             FirebaseUser currentUser = mAuth.getCurrentUser();
             if(currentUser != null) mAuth.signOut();
 
+            mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
+
             mAuth.createUserWithEmailAndPassword(EncryptHelper.decrypt(account.getEmail()), token)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -197,6 +201,13 @@ public class SignUpActivity extends AppCompatActivity {
                                     loadingDialog.dismissDialog();
                                     if(response.code() == 201){
                                         String userId = user.getUid();
+
+                                        //  Creating analytic for sign up event
+                                        Bundle bundle_Analytics = new Bundle();
+                                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, userId);
+                                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
+                                        bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+                                        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle_Analytics);
 
                                         //  Register new user on Firebase Database
                                         reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);

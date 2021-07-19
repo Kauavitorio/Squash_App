@@ -215,8 +215,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void Ids() {
-        getUserInformation();
-        mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
         instance = this;
         getWindow().setStatusBarColor(getColor(R.color.BarColor));
         getWindow().setNavigationBarColor(getColor(R.color.BarColor));
@@ -225,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
         btn_search_main = findViewById(R.id.btn_search_main);
         btn_home_main = findViewById(R.id.btn_home_main);
         container_btn_profile_main = findViewById(R.id.container_btn_profile_main);
+        mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
 
         //  Creating analytic for open app event
         Bundle bundle_Analytics = new Bundle();
@@ -232,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
         bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(account.getUsername()));
         bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle_Analytics);
+        getUserInformation();
     }
 
     @SuppressWarnings("unchecked")

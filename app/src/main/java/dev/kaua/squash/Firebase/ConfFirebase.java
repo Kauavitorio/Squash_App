@@ -13,16 +13,14 @@ public class ConfFirebase {
     private static FirebaseUser firebaseUser;
 
     public static FirebaseAnalytics getFirebaseAnalytics(Context context){
-        if (firebaseAnalytics == null){
+        if (firebaseAnalytics == null)
             firebaseAnalytics = FirebaseAnalytics.getInstance(context);
-        }
         return firebaseAnalytics;
     }
 
     public static FirebaseAuth getFirebaseAuth(){
-        if (firebaseAuth == null){
+        if (firebaseAuth == null)
             firebaseAuth = FirebaseAuth.getInstance();
-        }
         return firebaseAuth;
     }
 

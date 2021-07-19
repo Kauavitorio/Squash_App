@@ -60,7 +60,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public abstract class Methods extends MainActivity {
 
     //  Base API URL
-    public static final String BASE_URL = "https://dev-river-api.herokuapp.com/";
+    public static final String BASE_URL = "https://squash-social.herokuapp.com/";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
 

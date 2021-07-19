@@ -43,7 +43,7 @@ public class SplashActivity extends AppCompatActivity {
         Uri data = intent.getData();
         if(data != null){
             String UrlGetFrom = data.toString();
-            UrlGetFrom = UrlGetFrom.replace("https://dev-river-api.herokuapp.com/", "").replace("http://dev-river-api.herokuapp.com/", "");
+            UrlGetFrom = UrlGetFrom.replace("https://squash-social.herokuapp.com/", "").replace("http://squash-social.herokuapp.com/", "");
             String[] KnowContent = UrlGetFrom.split("/");
             if (KnowContent[0].equals("verify-account")){
                 if(KnowContent[1] != null && KnowContent[1].length() > 3 ){

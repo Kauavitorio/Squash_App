@@ -15,7 +15,6 @@ import androidx.core.app.ActivityOptionsCompat;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -83,6 +82,8 @@ public abstract class Login {
             @Override
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                 loadingDialog.dismissDialog();
+
+                //  Checking api return code
                 if(response.code() == 200){
                     //  Clear all prefs before login user
                     mPrefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -115,10 +116,9 @@ public abstract class Login {
 
                     //  Log in User On Firebase
                     mAuth = ConfFirebase.getFirebaseAuth();
-                    FirebaseUser currentUser = mAuth.getCurrentUser();
-                    if(currentUser != null) mAuth.signOut();
+                    mAuth.signOut();
 
-                    mAuth = ConfFirebase.getFirebaseAuth();
+                    //  Init Analytics
                     mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(context);
 
                     //  Login user in firebase to get user instance
@@ -140,7 +140,6 @@ public abstract class Login {
                                 ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
                                 ((Activity) context).finish();
                             });
-
                 }else if(response.code() == 206){
                     mPrefs = context.getSharedPreferences("myPrefs", MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
@@ -170,7 +169,6 @@ public abstract class Login {
                 Warnings.showWeHaveAProblem(context);
             }
         });
-
     }
 
     static Handler timer = new Handler();
