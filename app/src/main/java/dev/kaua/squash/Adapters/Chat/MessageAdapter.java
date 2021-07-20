@@ -40,6 +40,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     public static final int MSG_TYPE_LEFT = 0;
     public static final int MSG_TYPE_RIGHT = 1;
+    public static final int MSG_TYPE_START = -1;
     private final Context mContext;
     private static List<DtoMessage> mMessages;
     private final String imageURL;
@@ -67,6 +68,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         View view;
         if(viewType == MSG_TYPE_RIGHT){
             view = LayoutInflater.from(mContext).inflate(R.layout.adapter_chat_item_right, parent, false);
+            return new ViewHolder(view);
+        }
+        else if(viewType == MSG_TYPE_START){
+            view = LayoutInflater.from(mContext).inflate(R.layout.adapter_start_chat, parent, false);
             return new ViewHolder(view);
         }
         else{
@@ -182,11 +187,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public int getItemViewType(int position) {
         fUser = ConfFirebase.getFirebaseUser();
-        if(mMessages.get(position).getSender().equals(fUser.getUid())) {
-            return MSG_TYPE_RIGHT;
-        }
-        else {
-            return MSG_TYPE_LEFT;
-        }
+        if(mMessages.get(position).getSender().equals(fUser.getUid())) return MSG_TYPE_RIGHT;
+        else if(mMessages.get(position).getSender().equals("base_start"))
+            return MSG_TYPE_START;
+        else return MSG_TYPE_LEFT;
     }
 }

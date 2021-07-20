@@ -83,4 +83,5 @@
     <string name="view_profile">Ver perfil</string>
     <string name="medias">Mídias</string>
     <string name="select_an_image">Selecione uma imagem</string>
+    <string name="desc_encrypted_message_chat">As mensagens são todas criptografadas. Ninguém fora deste chat, nem mesmo Squash, pode ler para eles.</string>
 </resources>

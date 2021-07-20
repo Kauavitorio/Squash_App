@@ -335,6 +335,9 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
                 mMessage.clear();
+                DtoMessage messageBase = new DtoMessage();
+                messageBase.setSender("base_start");
+                mMessage.add(messageBase);
                 for (DataSnapshot snapshot : datasnapshot.getChildren()){
                     DtoMessage message = snapshot.getValue(DtoMessage.class);
                     if(message != null)
@@ -344,10 +347,12 @@ public class MessageActivity extends AppCompatActivity {
                                 mMessage.add(message);
                     }
                 }
-                messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, MainActivity.getInstance().getUserInformation().getUsername(), user_im_chat.getUsername());
-                if(joinNow <= 100) joinNow++;
-                else joinNow = 1;
-                recycler_view_msg.setAdapter(messageAdapter);
+                if(mMessage.size() > 1){
+                    messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, MainActivity.getInstance().getUserInformation().getUsername(), user_im_chat.getUsername());
+                    if(joinNow <= 100) joinNow++;
+                    else joinNow = 1;
+                    recycler_view_msg.setAdapter(messageAdapter);
+                }
             }
 
             @Override

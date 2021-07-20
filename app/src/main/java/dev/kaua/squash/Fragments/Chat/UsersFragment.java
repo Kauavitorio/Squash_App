@@ -42,10 +42,7 @@ public class UsersFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_users, container, false);
-        recycler_view_users = view.findViewById(R.id.recycler_view_users);
-        search_users = view.findViewById(R.id.search_users);
-        recycler_view_users.setHasFixedSize(true);
-        recycler_view_users.setLayoutManager(new LinearLayoutManager(requireContext()));
+        Ids(view);
 
         mAccounts = new ArrayList<>();
         readAccounts();
@@ -62,6 +59,16 @@ public class UsersFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void Ids(View view) {
+        recycler_view_users = view.findViewById(R.id.recycler_view_users);
+        search_users = view.findViewById(R.id.search_users);
+        recycler_view_users.setHasFixedSize(true);
+        recycler_view_users.setItemViewCacheSize(20);
+        recycler_view_users.setDrawingCacheEnabled(true);
+        recycler_view_users.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        recycler_view_users.setLayoutManager(new LinearLayoutManager(requireContext()));
     }
 
     private void searchUsers(String str) {

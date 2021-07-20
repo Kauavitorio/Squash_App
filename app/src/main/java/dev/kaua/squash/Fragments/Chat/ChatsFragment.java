@@ -43,9 +43,7 @@ public class ChatsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
-        recycler_myMsg = view.findViewById(R.id.recycler_myMsg);
-        recycler_myMsg.setHasFixedSize(true);
-        recycler_myMsg.setLayoutManager(new LinearLayoutManager(getContext()));
+        Ids(view);
 
         fUser = ConfFirebase.getFirebaseUser();
         usersList = new ArrayList<>();
@@ -78,6 +76,15 @@ public class ChatsFragment extends Fragment {
 
 
         return view;
+    }
+
+    private void Ids(View view) {
+        recycler_myMsg = view.findViewById(R.id.recycler_myMsg);
+        recycler_myMsg.setHasFixedSize(true);
+        recycler_myMsg.setItemViewCacheSize(20);
+        recycler_myMsg.setDrawingCacheEnabled(true);
+        recycler_myMsg.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        recycler_myMsg.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     private void updateToken(String token){

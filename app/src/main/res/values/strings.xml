@@ -89,4 +89,5 @@
     <string name="medias">Medias</string>
     <string name="wallpaper" translatable="false">Wallpaper</string>
     <string name="select_an_image">Select an image</string>
+    <string name="desc_encrypted_message_chat">Messages are all encrypted. No one outside of this chat, not even Squash, can read to them.</string>
 </resources>
