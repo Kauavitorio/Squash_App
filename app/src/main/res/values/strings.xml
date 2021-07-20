@@ -88,4 +88,5 @@
     <string name="view_profile">View profile</string>
     <string name="medias">Medias</string>
     <string name="wallpaper" translatable="false">Wallpaper</string>
+    <string name="select_an_image">Select an image</string>
 </resources>

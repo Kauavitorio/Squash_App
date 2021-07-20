@@ -59,7 +59,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     public void onBindViewHolder(@NonNull @NotNull UserChatAdapter.ViewHolder holder, int position) {
         DtoAccount account = mAccounts.get(position);
         holder.user_name.setText(account.getName_user());
-        if(account.getImageURL().equals("default")) holder.profile_image.setImageResource(R.mipmap.ic_launcher);
+        if(account.getImageURL().equals("default")) holder.profile_image.setImageResource(R.drawable.pumpkin_default_image);
         else Picasso.get().load(EncryptHelper.decrypt(account.getImageURL())).into(holder.profile_image);
 
 

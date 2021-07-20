@@ -261,15 +261,20 @@ public abstract class Methods extends MainActivity {
         Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
         String formattedDate = df_time.format(c.getTime());
-        String[] splitDate = formattedDate.split(" ");
-        String[] splitDateGet = get_date_time.split(" ");
-        int day = Integer.parseInt(splitDate[0]) - Integer.parseInt(splitDateGet[0]);
+        try {
+            String[] splitDate = formattedDate.split(" ");
+            String[] splitDateGet = get_date_time.split(" ");
+            int day = Integer.parseInt(splitDate[0]) - Integer.parseInt(splitDateGet[0]);
 
-        if(splitDate[0].equals(splitDateGet[0]) && splitDate[1].equals(splitDateGet[1]) && splitDate[2].equals(splitDateGet[2]))
-            return context.getString(R.string.today) + " " + splitDateGet[3];
-        else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && splitDate[2].equals(splitDateGet[2]))
-            return context.getString(R.string.yesterday) + " "  + splitDateGet[3];
-        else return get_date_time;
+            if(splitDate[0].equals(splitDateGet[0]) && splitDate[1].equals(splitDateGet[1]) && splitDate[2].equals(splitDateGet[2]))
+                return context.getString(R.string.today) + " " + splitDateGet[3];
+            else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && splitDate[2].equals(splitDateGet[2]))
+                return context.getString(R.string.yesterday) + " "  + splitDateGet[3];
+            else return get_date_time;
+        }catch (Exception ex){
+            Log.d("LastSeen", ex.toString());
+            return get_date_time;
+        }
     }
 
     private static SharedPreferences mPrefs;

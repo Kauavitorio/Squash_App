@@ -134,7 +134,7 @@ public class MessageActivity extends AppCompatActivity {
                 user_im_chat = snapshot.getValue(DtoAccount.class);
                 if(user_im_chat != null){
                     txt_user_name.setText(user_im_chat.getName_user());
-                    if(user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.mipmap.ic_launcher);
+                    if(user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
                     else Picasso.get().load(EncryptHelper.decrypt(user_im_chat.getImageURL())).into(profile_image);
                     readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
 
@@ -297,7 +297,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
                 for (DataSnapshot snapshot : datasnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fUser.getUid(), R.mipmap.ic_launcher, username+": "+ message, getString(R.string.new_message), userId);
+                    Data data = new Data(fUser.getUid(), R.drawable.pumpkin_default_image, username+": "+ message, getString(R.string.new_message), userId);
 
                     assert token != null;
                     Sender sender = new Sender(data, token.getToken());

@@ -86,7 +86,7 @@ public class ChatFragment extends Fragment {
                 account_info = snapshot.getValue(DtoAccount.class);
                 assert account_info != null;
                 txt_username_chat.setText(account_info.getName_user());
-                if(account_info.getImageURL().equals("default")) profile_image.setImageResource(R.mipmap.ic_launcher);
+                if(account_info.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
                 else Picasso.get().load(EncryptHelper.decrypt(account_info.getImageURL())).into(profile_image);
             }
 
@@ -142,7 +142,7 @@ public class ChatFragment extends Fragment {
                     account_info = snapshot.getValue(DtoAccount.class);
                     assert account_info != null;
                     txt_username_chat.setText(account_info.getName_user());
-                    if(account_info.getImageURL().equals("default")) profile_image.setImageResource(R.mipmap.ic_launcher);
+                    if(account_info.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
                     else Picasso.get().load(EncryptHelper.decrypt(account_info.getImageURL())).into(profile_image);
                 }
 

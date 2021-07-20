@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dev.kaua.squash">
-
     <!--
     *  Copyright (c) 2021 Kauã Vitório
     *  Official repository https://github.com/Kauavitorio/Squash_App
     *  Responsible developer: https://github.com/Kauavitorio
     *  @author Kaua Vitorio
     -->
-
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -19,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash">
-        <activity android:name=".Activitys.ComposeActivity"/>
+        <activity android:name=".Activitys.EditProfileActivity"/>
+        <activity android:name=".Activitys.ComposeActivity" />
         <activity android:name=".Activitys.MessageActivity" />
         <activity android:name=".Activitys.SignInActivity" />
         <activity android:name=".Activitys.IntroActivity" />
@@ -62,19 +62,9 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
-        </service>
-
-        <!-- Performance Monitoring plugin -->
+        </service> <!-- Performance Monitoring plugin -->
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
     </application>
-
 </manifest>
-
-    <!--
-    *  Copyright (c) 2021 Kauã Vitório
-    *  Official repository https://github.com/Kauavitorio/Squash_App
-    *  Responsible developer: https://github.com/Kauavitorio
-    *  @author Kaua Vitorio
-    -->

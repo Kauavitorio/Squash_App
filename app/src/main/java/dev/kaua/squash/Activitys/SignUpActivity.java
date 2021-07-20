@@ -209,6 +209,10 @@ public class SignUpActivity extends AppCompatActivity {
                                         bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
                                         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle_Analytics);
 
+                                        Calendar c = Calendar.getInstance();
+                                        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
+                                        String formattedDate = df_time.format(c.getTime());
+
                                         //  Register new user on Firebase Database
                                         reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
                                         HashMap<String, String> hashMap = new HashMap<>();
@@ -220,6 +224,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         hashMap.put("account_id_cry", response.body().getAccount_id_cry());
                                         hashMap.put("imageURL", "default");
                                         hashMap.put("status_chat", "offline");
+                                        hashMap.put("last_seen", formattedDate);
                                         hashMap.put("typingTo", "noOne");
 
                                         reference.setValue(hashMap).addOnCompleteListener(task1 -> {

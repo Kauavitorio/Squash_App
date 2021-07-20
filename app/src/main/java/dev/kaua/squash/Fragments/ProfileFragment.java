@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Activitys.EditProfileActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
@@ -94,6 +95,7 @@ public class ProfileFragment extends Fragment {
         btn_follow_following_profile.setOnClickListener(v -> {
             String follow = getString(R.string.follow);
             String following = getString(R.string.following);
+            String edit_profile = getString(R.string.edit_profile);
             int actual = Integer.parseInt(txt_amount_followers_profile.getText().toString());
             if(btn_follow_following_profile.getText().toString().equals(follow)){
                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
@@ -148,6 +150,10 @@ public class ProfileFragment extends Fragment {
                         Warnings.showWeHaveAProblem(requireActivity());
                     }
                 });
+            }
+            else if(btn_follow_following_profile.getText().toString().equals(edit_profile)){
+                Intent i = new Intent(requireContext(), EditProfileActivity.class);
+                startActivity(i);
             }
         });
 

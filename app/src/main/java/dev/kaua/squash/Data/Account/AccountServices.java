@@ -9,6 +9,9 @@ public interface    AccountServices {
     @POST("user/register")
     Call<DtoAccount> registerUser (@Body DtoAccount account);
 
+    @POST("user/edit")
+    Call<DtoAccount> edit (@Body DtoAccount account);
+
     @POST("user/login")
     Call<DtoAccount> login (@Body DtoAccount account);
 

@@ -65,6 +65,9 @@ dependencies {
     // Declare the dependency for the Performance Monitoring library
     implementation 'com.google.firebase:firebase-perf'
 
+    // Declare the dependency for the Cloud Storage library
+    implementation 'com.google.firebase:firebase-storage'
+
     /***** End Firebase Dependencies ******/
 
     /*--------------- Start Retrofit Dependencies  ---------------*/
