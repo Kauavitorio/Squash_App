@@ -201,6 +201,7 @@
 
                         <!-- Icon Heart -->
                         <ImageView
+                            android:id="@+id/img_heart_like_post"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_gravity="center"

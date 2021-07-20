@@ -71,7 +71,7 @@ public class RecommendedPosts {
                 public void onResponse(@NotNull Call<ArrayList<DtoPost>> call, @NotNull Response<ArrayList<DtoPost>> response) {
                     //swipe_main.setRefreshing(false);
                     ArrayList<DtoPost> list = response.body();
-                    daoPosts.DropTable();
+                    daoPosts.DropTable(0);
                     if(list != null){
                         if(list.get(0).getPosts() != null){
                             for (int i = 0; i < Objects.requireNonNull(list).get(0).getPosts().size(); i++){

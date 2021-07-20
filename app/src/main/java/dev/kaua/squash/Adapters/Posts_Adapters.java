@@ -1,6 +1,7 @@
 package dev.kaua.squash.Adapters;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -19,25 +21,41 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;
+import dev.kaua.squash.Data.Post.PostServices;
 import dev.kaua.squash.Fragments.ProfileFragment;
+import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.Warnings;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
+@SuppressLint("UseCompatLoadingForDrawables")
 public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolderPosts> {
     ArrayList<DtoPost> list;
-    Context context;
+    static Context mContext;
     static int selectedItem = 0;
+    static DaoPosts daoPosts;
 
-    public Posts_Adapters(ArrayList<DtoPost> ArrayList, Context context) {
+    final Retrofit retrofit = Methods.GetRetrofitBuilder();
+
+    public Posts_Adapters(ArrayList<DtoPost> ArrayList, Context mContext) {
         this.list = ArrayList;
-        this.context = context;
+        Posts_Adapters.mContext = mContext;
+        daoPosts = new DaoPosts(mContext);
     }
 
     @NonNull
@@ -53,9 +71,9 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         if(Integer.parseInt(Objects.requireNonNull(list.get(position).getVerification_level())) != 0){
             holder.ic_account_badge.setVisibility(View.VISIBLE);
             if (Integer.parseInt(Objects.requireNonNull(list.get(position).getVerification_level())) == 1)
-                holder.ic_account_badge.setImageDrawable(context.getDrawable(R.drawable.ic_verified_account));
+                holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
             else
-                holder.ic_account_badge.setImageDrawable(context.getDrawable(R.drawable.ic_verified_employee_account));
+                holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
 
         }else holder.ic_account_badge.setVisibility(View.GONE);
         holder.img_secondImage_post.setVisibility(View.GONE);
@@ -63,10 +81,12 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         Picasso.get().load(list.get(position).getProfile_image()).into(holder.icon_user_profile_post);
         holder.txt_name_user_post.setText(list.get(position).getName_user());
         holder.txt_username_post.setText( "| @" + list.get(position).getUsername());
-        Methods.setTextViewHTML(context, holder.txt_post_content, list.get(position).getPost_content());
+        Methods.setTextViewHTML(mContext, holder.txt_post_content, list.get(position).getPost_content());
 
-        holder.txt_likes_post.setText(Methods.NumberTrick(Integer.parseInt(list.get(position).getPost_likes())));
-        holder.txt_comments_post.setText(Methods.NumberTrick(Integer.parseInt(list.get(position).getPost_comments_amount())));
+        Check_Like(holder, position);
+
+        holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(list.get(position).getPost_likes())));
+        holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(list.get(position).getPost_comments_amount())));
 
         if(list.get(position).getPost_images() != null && list.get(position).getPost_images().size() > 0 && !list.get(position).getPost_images().get(0).equals("NaN")){
             int ImagesAmount = list.get(position).getPost_images().size();
@@ -118,6 +138,50 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             MainActivity.getInstance().CallProfile();
             ProfileFragment.getInstance().LoadAnotherUser();
         });
+
+        holder.btn_like_post.setOnClickListener(v -> Like_Un_Like_A_Post(holder, position, list.get(position).getPost_id()));
+    }
+
+    private void Check_Like(@NotNull MyHolderPosts holder, int position) {
+        DtoAccount user = MainActivity.getInstance().getUserInformation();
+        boolean result_like = daoPosts.get_A_Like(Long.parseLong(list.get(position).getPost_id()), Long.parseLong(user.getAccount_id() + ""));
+        if(result_like) holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
+        else holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
+    }
+
+    private void Like_Un_Like_A_Post(@NotNull MyHolderPosts holder, long position, String post_id) {
+        //  Get User info
+        DtoAccount user = MainActivity.getInstance().getUserInformation();
+
+        boolean result_like = daoPosts.get_A_Like(Long.parseLong(post_id), Long.parseLong(user.getAccount_id() + ""));
+        if(result_like) {
+            holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
+            long like_now = Long.parseLong(list.get((int) position).getPost_likes());
+            like_now = like_now - 1;
+            holder.txt_likes_post.setText(Methods.NumberTrick(like_now));
+        }else{
+            holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
+            long like_now = Long.parseLong(list.get((int) position).getPost_likes());
+            like_now = like_now + 1;
+            holder.txt_likes_post.setText(Methods.NumberTrick(like_now));
+        }
+
+        //  Do Like or Un Like
+        DtoPost dtoPost = new DtoPost();
+        dtoPost.setPost_id(EncryptHelper.encrypt(post_id));
+        dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
+        PostServices services = retrofit.create(PostServices.class);
+        Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
+        call.enqueue(new Callback<DtoPost>() {
+            @Override
+            public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) mContext , Long.parseLong(user.getAccount_id() + ""));
+                //noinspection unchecked
+                async.execute();
+            }
+            @Override
+            public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(mContext); }
+        });
     }
 
     @Override
@@ -127,19 +191,22 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         CircleImageView icon_user_profile_post;
         TextView txt_name_user_post, txt_username_post, txt_post_content, txt_images_amount_post;
         TextView txt_likes_post, txt_comments_post;
-        ImageView img_firstImage_post, img_secondImage_post, img_thirdImage_post, ic_account_badge;
+        ImageView img_firstImage_post, img_secondImage_post, img_thirdImage_post, ic_account_badge, img_heart_like;
         RelativeLayout container_third_img;
         ConstraintLayout container_blur_post;
+        LinearLayout btn_like_post;
 
         public MyHolderPosts(@NonNull View itemView) {
             super(itemView);
             icon_user_profile_post = itemView.findViewById(R.id.icon_user_profile_post);
             txt_name_user_post = itemView.findViewById(R.id.txt_name_user_post);
+            img_heart_like = itemView.findViewById(R.id.img_heart_like_post);
             txt_username_post = itemView.findViewById(R.id.txt_username_post);
             txt_post_content = itemView.findViewById(R.id.txt_post_content);
             img_firstImage_post = itemView.findViewById(R.id.img_firstImage_post);
             img_secondImage_post = itemView.findViewById(R.id.img_secondImage_post);
             container_third_img = itemView.findViewById(R.id.container_third_img_posts);
+            btn_like_post = itemView.findViewById(R.id.btn_like_post);
             img_thirdImage_post = itemView.findViewById(R.id.img_thirdImage_post);
             ic_account_badge = itemView.findViewById(R.id.ic_account_badge);
             container_blur_post = itemView.findViewById(R.id.container_blur_post);

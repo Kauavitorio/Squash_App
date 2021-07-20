@@ -19,6 +19,8 @@ public class DtoPost {
 
     private String account_id;
 
+    private String account_id_cry;
+
     private String name_user;
 
     private String username;
@@ -47,6 +49,14 @@ public class DtoPost {
 
     public void setVerification_level(String verification_level) {
         this.verification_level = verification_level;
+    }
+
+    public String getAccount_id_cry() {
+        return account_id_cry;
+    }
+
+    public void setAccount_id_cry(String account_id_cry) {
+        this.account_id_cry = account_id_cry;
     }
 
     public String getName_user() {

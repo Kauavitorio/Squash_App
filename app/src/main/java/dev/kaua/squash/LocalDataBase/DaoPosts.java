@@ -16,11 +16,12 @@ import java.util.Objects;
 import dev.kaua.squash.Data.Post.DtoPost;
 
 public class DaoPosts extends SQLiteOpenHelper {
-    private final String TABLE = "TBL_POSTS";
+    private final String TABLE_POSTS = "TBL_POSTS";
+    private final String TABLE_LIKES = "TBL_POSTS_LIKES";
 
 
     public DaoPosts(@Nullable Context context) {
-        super(context, "DB_POSTS", null, 3);
+        super(context, "DB_POSTS", null, 1);
     }
 
     @Override
@@ -30,7 +31,7 @@ public class DaoPosts extends SQLiteOpenHelper {
 
     private void createTable(SQLiteDatabase db) {
         //  Create Table
-        String command = "CREATE TABLE " + TABLE + "(" +
+        String command = "CREATE TABLE " + TABLE_POSTS + "(" +
                 "post_id bigint primary key," +
                 "account_id bigint not null," +
                 "verification_level varchar(500) not null," +
@@ -46,13 +47,19 @@ public class DaoPosts extends SQLiteOpenHelper {
                 "post_topic varchar(500) not null)";
 
         db.execSQL(command);
+
+        String command_likes = "CREATE TABLE " + TABLE_LIKES + "(" +
+                "post_id bigint not null," +
+                "account_id bigint not null)";
+
+        db.execSQL(command_likes);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if(oldVersion < newVersion){
             // Drop older table if existed
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_POSTS);
 
             // Create tables again
             onCreate(db);
@@ -80,12 +87,24 @@ public class DaoPosts extends SQLiteOpenHelper {
             values.put("post_topic", post.get(i).getPost_topic());
             Log.d("InsertPost", post.get(i).getName_user());
 
-            getWritableDatabase().insert(TABLE, null, values);
+            getWritableDatabase().insert(TABLE_POSTS, null, values);
+        }
+    }
+
+    public void Register_Likes(ArrayList<DtoPost> post){
+        DropTable(1);
+        if(post != null && post.size() > 0)
+        for (int i = 0; i< post.size(); i++){
+            ContentValues values = new ContentValues();
+            values.put("post_id", Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id())));
+            values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
+
+            getWritableDatabase().insert(TABLE_LIKES, null, values);
         }
     }
 
     public ArrayList<DtoPost> get_post(long account_id){
-        String command = "SELECT * FROM " + TABLE + " WHERE account_id > ?";
+        String command = "SELECT * FROM " + TABLE_POSTS + " WHERE account_id > ?";
         String[] params = {account_id + ""};
         Cursor cursor = getWritableDatabase().rawQuery(command, params);
         ArrayList<DtoPost> dtoPosts = new ArrayList<>();
@@ -110,9 +129,21 @@ public class DaoPosts extends SQLiteOpenHelper {
         return dtoPosts;
     }
 
-    public void DropTable(){
+    public boolean get_A_Like(long post_id, long account_id){
+        String command = "SELECT * FROM " + TABLE_LIKES + " WHERE  post_id = ? and account_id = ?";
+        String[] params = {String.valueOf(post_id), String.valueOf(account_id)};
+        Cursor cursor = getWritableDatabase().rawQuery(command, params);
+
+
+        return cursor.moveToFirst();
+    }
+
+    public void DropTable(int type){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE,null,null);
+        if(type == 0)
+            db.delete(TABLE_POSTS,null,null);
+        else
+            db.delete(TABLE_LIKES,null,null);
         Log.d("InsertPost", "Dropped");
         //createTable(db);
     }

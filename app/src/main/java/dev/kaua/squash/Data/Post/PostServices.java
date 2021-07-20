@@ -15,6 +15,9 @@ public interface PostServices {
     @POST("post/list/an-user")
     Call<ArrayList<DtoPost>> getUserPosts(@Body DtoAccount account );
 
+    @POST("post/action/like")
+    Call<DtoPost> like_Un_Like_A_Post(@Body DtoPost post );
+
     @POST("user/post/new/")
     Call<DtoPost> do_new_post(@Body DtoPost post );
 }

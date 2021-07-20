@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("ConstantConditions")
     public DtoAccount getUserInformation(){
         SharedPreferences sp = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        account.setAccount_id(Integer.parseInt(EncryptHelper.decrypt(sp.getString("pref_account_id", null))));
+        account.setAccount_id(Long.parseLong(EncryptHelper.decrypt(sp.getString("pref_account_id", null))));
         account.setName_user(EncryptHelper.decrypt(sp.getString("pref_name_user", null)));
         account.setUsername(EncryptHelper.decrypt(sp.getString("pref_username", null)));
         account.setEmail(EncryptHelper.decrypt(sp.getString("pref_email", null)));

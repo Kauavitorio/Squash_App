@@ -33,9 +33,12 @@ import org.jetbrains.annotations.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
@@ -80,11 +83,21 @@ public abstract class Methods extends MainActivity {
     //  The only parameter is the number of characters it will return.
     private static final Random rand = new Random();
     private static final char[] letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$!@#$!@#$".toCharArray();
+    private static final char[] lettersWithoutSpecials = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
     public static String RandomCharacters (int CharactersAmount) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < CharactersAmount; i++) {
             int ch = rand.nextInt (letters.length);
             sb.append (letters [ch]);
+        }
+        return sb.toString();
+    }
+
+    public static String RandomCharactersWithoutSpecials (int CharactersAmount) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < CharactersAmount; i++) {
+            int ch = rand.nextInt (lettersWithoutSpecials.length);
+            sb.append (lettersWithoutSpecials [ch]);
         }
         return sb.toString();
     }
@@ -147,15 +160,31 @@ public abstract class Methods extends MainActivity {
 
     //  Method "NumberTrick" is for change number
     //  For example 1000 to 1K and 10000 to 10K
-    public static String NumberTrick(int number) {
-        String numberString;
-        if (Math.abs(number / 1000000) > 1)
-            numberString = (number / 1000000) + "m";
-        else if (Math.abs(number / 1000) > 1)
-            numberString = (number / 1000) + "k";
-        else
-            numberString = number + "";
-        return numberString;
+
+
+    private static final NavigableMap<Long, String> suffixes = new TreeMap<>();
+    static {
+        suffixes.put(1_000L, "k");
+        suffixes.put(1_000_000L, "M");
+        suffixes.put(1_000_000_000L, "B");
+        suffixes.put(1_000_000_000_000L, "T");
+        suffixes.put(1_000_000_000_000_000L, "P");
+        suffixes.put(1_000_000_000_000_000_000L, "E");
+    }
+
+    public static String NumberTrick(long value) {
+        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        if (value == Long.MIN_VALUE) return NumberTrick(Long.MIN_VALUE + 1);
+        if (value < 0) return "-" + NumberTrick(-value);
+        if (value < 1000) return Long.toString(value); //deal with easy case
+
+        Map.Entry<Long, String> e = suffixes.floorEntry(value);
+        Long divideBy = e.getKey();
+        String suffix = e.getValue();
+
+        long truncated = value / (divideBy / 10); //the number part of the output times 10
+        boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
+        return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }
 
     //  Method to know if user is has internet connection

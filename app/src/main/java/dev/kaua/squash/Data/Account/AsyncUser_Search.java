@@ -15,6 +15,7 @@ import dev.kaua.squash.Adapters.SearchItemArrayAdapter;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.JsonHandler;
+import dev.kaua.squash.Tools.Methods;
 
 @SuppressWarnings({"rawtypes", "deprecation", "unchecked"})
 @SuppressLint("StaticFieldLeak")
@@ -35,7 +36,7 @@ public class AsyncUser_Search extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        String json =  JsonHandler.getJson("https://dev-river-api.herokuapp.com/user/action/search");
+        String json =  JsonHandler.getJson( Methods.BASE_URL + "user/action/search");
         try {
             JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("Search");
