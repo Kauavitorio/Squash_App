@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,7 +58,22 @@ public class SplashActivity extends AppCompatActivity {
                         DoValidation(KnowContent[1]);
                     }
                 }
-            }
+            } else if(KnowContent[0].equals("share")){
+                try {
+                    Log.d("ShareLink", KnowContent[3]);
+                    int indexBase = KnowContent[3].indexOf("?");
+                    String post_id = KnowContent[3].substring(0, indexBase);
+                    Log.d("ShareLink", post_id);
+                    finish();
+                    Intent i = new Intent(this, PostDetailsActivity.class);
+                    i.putExtra("post_id", Long.parseLong(post_id));
+                    startActivity(i);
+                }catch (Exception ex){
+                    Log.d("ShareLink", ex.toString());
+                    finishAffinity();
+                    verifyIfUsersLogged();
+                }
+            }else verifyIfUsersLogged();
         }else verifyIfUsersLogged();
 
     }
@@ -91,7 +107,7 @@ public class SplashActivity extends AppCompatActivity {
         goto_main.putExtra("shortcut", 0);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
-        finish();
+        finishAffinity();
     }
 
     private void GoToIntro(){
@@ -99,6 +115,6 @@ public class SplashActivity extends AppCompatActivity {
         goto_intro.putExtra("shortcut", 0);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goto_intro, activityOptionsCompat.toBundle());
-        finish();
+        finishAffinity();
     }
 }

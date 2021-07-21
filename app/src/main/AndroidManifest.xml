@@ -11,14 +11,16 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <application android:hardwareAccelerated="true"
+    <application
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash">
-        <activity android:name=".Activitys.EditProfileActivity"/>
+        <activity android:name=".Activitys.PostDetailsActivity"/>
+        <activity android:name=".Activitys.EditProfileActivity" />
         <activity android:name=".Activitys.ComposeActivity" />
         <activity android:name=".Activitys.MessageActivity" />
         <activity android:name=".Activitys.SignInActivity" />
@@ -35,16 +37,25 @@
             </intent-filter>
 
             <!-- Filter to email validation URL -->
-            <intent-filter android:autoVerify="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="squash-social.herokuapp.com"
-                    android:scheme="http" />
-                <data android:scheme="https" />
+                    android:scheme="http"
+                    android:host="squash-social.herokuapp.com" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="squash-social.herokuapp.com" />
             </intent-filter>
         </activity> <!-- Start Service to message notification -->
         <service
@@ -67,4 +78,5 @@
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
     </application>
+
 </manifest>

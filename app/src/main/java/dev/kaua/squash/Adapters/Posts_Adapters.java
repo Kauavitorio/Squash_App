@@ -3,6 +3,7 @@ package dev.kaua.squash.Adapters;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -47,7 +48,6 @@ import retrofit2.Retrofit;
 public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolderPosts> {
     ArrayList<DtoPost> list;
     static Context mContext;
-    static int selectedItem = 0;
     static DaoPosts daoPosts;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
@@ -139,6 +139,15 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             ProfileFragment.getInstance().LoadAnotherUser();
         });
 
+        holder.btn_share_post.setOnClickListener(v -> {
+            Intent myIntent = new Intent(Intent.ACTION_SEND);
+            myIntent.setType("text/plain");
+            String body = Methods.BASE_URL + "share/" + list.get(position).getUsername() + "/post/" +  list.get(position).getPost_id()
+                    + "?s=" + Methods.RandomCharactersWithoutSpecials(3);
+            myIntent.putExtra(Intent.EXTRA_TEXT,body);
+            mContext.startActivity(Intent.createChooser(myIntent, "Share Using"));
+        });
+
         holder.btn_like_post.setOnClickListener(v -> Like_Un_Like_A_Post(holder, position, list.get(position).getPost_id()));
     }
 
@@ -194,7 +203,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         ImageView img_firstImage_post, img_secondImage_post, img_thirdImage_post, ic_account_badge, img_heart_like;
         RelativeLayout container_third_img;
         ConstraintLayout container_blur_post;
-        LinearLayout btn_like_post;
+        LinearLayout btn_like_post, btn_share_post;
 
         public MyHolderPosts(@NonNull View itemView) {
             super(itemView);
@@ -206,6 +215,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             img_firstImage_post = itemView.findViewById(R.id.img_firstImage_post);
             img_secondImage_post = itemView.findViewById(R.id.img_secondImage_post);
             container_third_img = itemView.findViewById(R.id.container_third_img_posts);
+            btn_share_post = itemView.findViewById(R.id.btn_share_post);
             btn_like_post = itemView.findViewById(R.id.btn_like_post);
             img_thirdImage_post = itemView.findViewById(R.id.img_thirdImage_post);
             ic_account_badge = itemView.findViewById(R.id.ic_account_badge);

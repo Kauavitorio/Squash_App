@@ -38,7 +38,7 @@ public class AsyncLikes_Posts extends AsyncTask {
     @Override
     protected Object doInBackground(Object[] objects) {
         String json =  JsonHandler.getJson( Methods.BASE_URL + "post/list/likes?account_id=" + EncryptHelper.encrypt(account_id + "") + "&key="
-                + EncryptHelper.encrypt("squash" + account_id ));
+                + Methods.RandomCharactersWithoutSpecials(10));
         try {
             JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("Search");
