@@ -43,6 +43,7 @@ import java.util.TreeMap;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
@@ -132,6 +133,11 @@ public abstract class Methods extends MainActivity {
     }
 
     public static void LoadFollowersAndFollowing(Context context){
+        SharedPreferences sp_First = context.getSharedPreferences("myPrefs", MODE_PRIVATE);
+        AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
+        //noinspection unchecked
+        async.execute();
+
         final Retrofit retrofitUser = GetRetrofitBuilder();
         SharedPreferences sp = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         DtoAccount account = new DtoAccount();

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_splash"
+    android:background="@color/base_color"
     android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen"
     tools:context=".Activitys.SplashActivity">
 
@@ -16,13 +16,22 @@
         android:text="@string/app_name"
         android:textSize="24sp"
         android:layout_marginTop="50dp"
-        android:textColor="#8DFFFFFF"
+        android:textColor="#72FFFFFF"
         android:textStyle="bold"
         android:gravity="center"
         />
 
+    <!-- Image Logo -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:src="@drawable/logo_with_name"
+        android:layout_centerVertical="true"
+        tools:ignore="ContentDescription" />
+
     <!-- Screen Load -->
     <ProgressBar
+        android:id="@+id/progress_splash"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginBottom="115dp"

@@ -57,7 +57,7 @@
                 android:id="@+id/txt_login_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/login_to_river"
+                android:text="@string/login_to_squash"
                 android:layout_marginTop="10dp"
                 android:textAlignment="center"
                 android:layout_centerHorizontal="true"

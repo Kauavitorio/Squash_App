@@ -24,7 +24,7 @@
     <color name="hint_default_button">#B5B5B5</color>
     <color name="white">#FFFFFFFF</color>
     <color name="BarColor">#DDDADA</color>
-    <color name="base_color">#f29c1f</color>
+    <color name="base_color">#FF6C26</color>
     <color name="stroke_chat_left">#0562D0</color>
     <color name="background_my_message">#1D84FE</color>
     <color name="background_post_color">#E5E5E5</color>

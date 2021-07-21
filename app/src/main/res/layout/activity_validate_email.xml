@@ -12,8 +12,8 @@
         android:id="@+id/container_header_signUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="30dp"
-        android:layout_marginTop="10dp"
+        android:minHeight="70dp"
+        android:background="@drawable/background_common_top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -21,14 +21,30 @@
         <!-- Img Arrow -->
         <ImageView
             android:id="@+id/btn_back_validate_email"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/ic_arrow_back"
             android:layout_marginStart="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
+
+        <!-- Text Tittle -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="200dp"
+            android:text="@string/we_sent_you_a_code"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginStart="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/btn_back_validate_email"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -50,10 +66,9 @@
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginBottom="5dp"
                 android:fillViewport="true"
                 android:scrollbarSize="1dp"
-                app:layout_constraintBottom_toTopOf="@+id/container_bottom_validate_email"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <!-- Container To Scroll -->
@@ -62,15 +77,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Text Tittle -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/we_sent_you_a_code"
-                        android:textColor="@color/black"
-                        android:textSize="25sp"
-                        android:textStyle="bold" />
-
                     <!-- Text Who is sent -->
                     <TextView
                         android:id="@+id/txt_who_is_sent_validate_email"
@@ -78,7 +84,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/the_code_has_been_sent"
-                        android:textColor="@color/hint"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
                         android:textSize="15sp" />
 
                     <!-- Edit Text Verification Code -->
@@ -86,7 +93,7 @@
                         android:id="@+id/edit_ls_verification_code_validate_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="20dp"
                         android:maxWidth="320dp"
                         android:minWidth="320dp"
                         app:hintEnabled="false"
@@ -97,13 +104,16 @@
                         <!-- Edit Text -->
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_verification_code_validate_email"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center"
                             android:backgroundTint="@color/base_color"
                             android:hint="@string/validation_code"
                             android:inputType="numberDecimal"
+                            android:maxWidth="237dp"
                             android:maxLength="6"
                             android:minHeight="50dp"
+                            android:textAlignment="center"
                             android:textSize="20sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -113,42 +123,30 @@
                         android:id="@+id/txt_didNot_receive_email_validate_email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:minHeight="50dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:minHeight="40dp"
                         android:text="@string/did_not_receive_email"
-                        android:textColor="@color/base_color_click"
+                        android:textColor="@color/base_color"
                         android:textSize="19sp" />
+
+                    <!-- Button Next -->
+                    <Button
+                        android:id="@+id/btn_next_validate_email"
+                        android:layout_width="200dp"
+                        android:layout_height="50dp"
+                        android:text="@string/next"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:enabled="false"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="1dp"
+                        android:background="@drawable/custom_button_disable_next"
+                        android:layout_gravity="center"/>
 
                 </LinearLayout>
 
             </ScrollView>
-
-            <!-- Container Bottom -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/container_bottom_validate_email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:background="@color/transparent"
-                app:layout_constraintBottom_toBottomOf="parent">
-
-                <!-- Button Next -->
-                <Button
-                    android:id="@+id/btn_next_validate_email"
-                    android:layout_width="100dp"
-                    android:layout_height="35dp"
-                    android:text="@string/next"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:enabled="false"
-                    android:layout_marginTop="1dp"
-                    android:layout_marginBottom="1dp"
-                    android:background="@drawable/custom_button_disable_next"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -13,10 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import java.util.Objects;
-
 import dev.kaua.squash.BuildConfig;
-import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.Methods;
@@ -37,8 +34,8 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        getWindow().setStatusBarColor(getColor(R.color.header_splash_color));
-        getWindow().setNavigationBarColor(getColor(R.color.bottom_splash_color));
+        getWindow().setStatusBarColor(getColor(R.color.base_color));
+        getWindow().setNavigationBarColor(getColor(R.color.base_color));
         TextView app_version_splash = findViewById(R.id.app_version_splash);
         app_version_splash.setText( getString(R.string.app_name) + " - " + BuildConfig.VERSION_NAME);
 
@@ -85,10 +82,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void LoadBaseInfoAndMain() {
-        SharedPreferences sp_First = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        AsyncLikes_Posts async = new AsyncLikes_Posts(this , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
-        //noinspection unchecked
-        async.execute();
         Methods.LoadFollowersAndFollowing(this);
         timer.postDelayed(this::GoToMain, 300);
     }
