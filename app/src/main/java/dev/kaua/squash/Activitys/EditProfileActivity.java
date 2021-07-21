@@ -8,6 +8,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,8 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
+import dev.kaua.squash.Adapters.Profile.Profile_Image;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.ConfFirebase;
@@ -42,14 +45,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class EditProfileActivity extends AppCompatActivity {
-    CircleImageView ic_edit_ProfileUser;
+    public static CircleImageView ic_edit_ProfileUser;
     EditText edit_name, edit_username, edit_bio;
     Button btn_edit_profile;
-    DtoAccount user;
-    String new_image;
-    StorageReference storageReference;
-    int PICK_IMAGE_REQUEST = 111;
+    public static DtoAccount user;
+    public static String new_image;
+    public static StorageReference storageReference;
+    public static int PICK_IMAGE_REQUEST = 111;
+    public static final int PIC_CROP = 1;
     private static SharedPreferences mPrefs;
+    public static EditProfileActivity instance;
     private static final String PREFS_NAME = "myPrefs";
     private DatabaseReference reference;
     private LoadingDialog loadingDialog;
@@ -137,7 +142,7 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         loadingDialog = new LoadingDialog(this);
-        storageReference = ConfFirebase.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
+        /*storageReference = ConfFirebase.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
                 "_" + ConfFirebase.getFirebaseAuth().getUid());
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri filePath = data.getData();
@@ -175,6 +180,20 @@ public class EditProfileActivity extends AppCompatActivity {
                 Log.d("ProfileUpload", ex.toString());
             }
         }
+*/
+        if (requestCode == PIC_CROP) {
+            if (data != null) {
+                // get the returned data
+                Bundle extras = data.getExtras();
+                // get the cropped bitmap
+                Bitmap selectedBitmap = extras.getParcelable("data");
+                Profile_Image.uploadFile(selectedBitmap);
+            }
+        }
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Profile_Image.SendToCrop(this, data);
+        }
     }
 
 
@@ -188,6 +207,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void Ids() {
+        instance = this;
         loadingDialog = new LoadingDialog(this);
         ic_edit_ProfileUser = findViewById(R.id.ic_edit_ProfileUser);
         edit_name = findViewById(R.id.edit_name);

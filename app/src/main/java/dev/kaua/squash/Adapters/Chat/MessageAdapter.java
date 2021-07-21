@@ -98,8 +98,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             holder.reply_content.setText(EncryptHelper.decrypt(message.getReply_content()));
         }
 
-        if(imageURL == null || imageURL.equals("default")) holder.profile_image_item.setImageResource(R.drawable.pumpkin_default_image);
-        else Picasso.get().load(EncryptHelper.decrypt(imageURL)).into(holder.profile_image_item);
+        //Disable to future updates
+        //if(imageURL == null || imageURL.equals("default")) holder.profile_image_item.setImageResource(R.drawable.pumpkin_default_image);
+        //else Picasso.get().load(EncryptHelper.decrypt(imageURL)).into(holder.profile_image_item);
 
         holder.container_msg.setVisibility(View.VISIBLE);
         if(position == mMessages.size() -1){

@@ -1,10 +1,16 @@
 package dev.kaua.squash.Activitys;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,11 +18,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +32,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,10 +40,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,11 +56,13 @@ import java.util.List;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
 import dev.kaua.squash.Adapters.Chat.MessageAdapter;
 import dev.kaua.squash.Adapters.Chat.SwipeReply;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.APIService;
 import dev.kaua.squash.Notifications.Client;
 import dev.kaua.squash.Notifications.Data;
@@ -60,6 +72,7 @@ import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.KeyboardUtils;
+import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
@@ -77,6 +90,8 @@ import retrofit2.Response;
 public class MessageActivity extends AppCompatActivity {
 
     private CircleImageView profile_image;
+    public static ImageView background_chat;
+    public static MessageActivity instance;
     private TextView txt_user_name, txt_isOnline_chat, txtQuotedMsg;
     private static RecyclerView recycler_view_msg;
     private EditText text_send;
@@ -87,17 +102,21 @@ public class MessageActivity extends AppCompatActivity {
     ConstraintLayout container_bottom_msg;
     private ImageView cancelButton;
     private ValueEventListener seenListener;
-    private DtoAccount user_im_chat;
+    public static DtoAccount user_im_chat;
 
-    FirebaseUser fUser;
+    public static FirebaseUser fUser;
     DatabaseReference reference;
     MessageAdapter messageAdapter;
     List<DtoMessage> mMessage;
     String userId;
+    String another_user_image = "";
 
     APIService apiService;
 
     boolean notify = false;
+    public static final int PIC_CROP = 1;
+    public static final int PICK_IMAGE_REQUEST = 111;
+    public static StorageReference storageReference;
 
     Intent intent;
 
@@ -106,6 +125,7 @@ public class MessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         Ids();
+        DaoChat daoChat = new DaoChat(MessageActivity.this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -120,6 +140,10 @@ public class MessageActivity extends AppCompatActivity {
         fUser = ConfFirebase.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
 
+        String img = daoChat.get_BG("bg_" + fUser.getUid() + "_"
+                + userId);
+        if(img != null) BackgroundHelper.LoadBackground(img);
+
         btn_send.setOnClickListener(v -> {
             notify = true;
             String msg = text_send.getText().toString();
@@ -133,9 +157,13 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 user_im_chat = snapshot.getValue(DtoAccount.class);
                 if(user_im_chat != null){
+
                     txt_user_name.setText(user_im_chat.getName_user());
-                    if(user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
-                    else Picasso.get().load(EncryptHelper.decrypt(user_im_chat.getImageURL())).into(profile_image);
+                    if(!another_user_image.equals(user_im_chat.getImageURL())){
+                        another_user_image = user_im_chat.getImageURL();
+                        if(user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
+                        else Picasso.get().load(EncryptHelper.decrypt(another_user_image)).into(profile_image);
+                    }
                     readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
 
                     //  check typing status
@@ -144,7 +172,6 @@ public class MessageActivity extends AppCompatActivity {
                         txt_isOnline_chat.setText(getString(R.string.typing));
                     }
                     else{
-                        Animation Anim = AnimationUtils.loadAnimation(MessageActivity.this, R.anim.slide_donw);
                         if(user_im_chat.getStatus_chat().equals("online")){
                             txt_isOnline_chat.setVisibility(View.VISIBLE);
                             txt_isOnline_chat.setText(getString(R.string.online));
@@ -175,15 +202,16 @@ public class MessageActivity extends AppCompatActivity {
 
         seenMessage(userId);
         setRecyclerSwipe();
-
     }
 
     private void Ids() {
+        instance = this;
         profile_image = findViewById(R.id.profile_image_chat);
         txt_user_name = findViewById(R.id.txt_username_chat);
         recycler_view_msg = findViewById(R.id.recycler_view_msg);
         txt_isOnline_chat = findViewById(R.id.txt_isOnline_chat);
         reply_layout = findViewById(R.id.reply_layout);
+        background_chat = findViewById(R.id.background_chat);
         container_bottom_msg = findViewById(R.id.container_bottom_msg);
         txtQuotedMsg = findViewById(R.id.txtQuotedMsg);
         cancelButton = findViewById(R.id.cancelButton);
@@ -328,6 +356,8 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     int joinNow = 0;
+    boolean base_load = true;
+    List<DtoMessage> mMessageFinal = new ArrayList<>();
     private void readMessage(String myID, String userId, String imageURl){
         mMessage = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference().child("Chats");
@@ -348,10 +378,27 @@ public class MessageActivity extends AppCompatActivity {
                     }
                 }
                 if(mMessage.size() > 1){
-                    messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, MainActivity.getInstance().getUserInformation().getUsername(), user_im_chat.getUsername());
-                    if(joinNow <= 100) joinNow++;
-                    else joinNow = 1;
-                    recycler_view_msg.setAdapter(messageAdapter);
+                    if(mMessageFinal.size() != mMessage.size()) {
+                        Log.d("Chat", "OKAY not need to reset");
+                        if(joinNow <= 100) joinNow++;
+                        else joinNow = 1;
+                    } else joinNow = 0;
+
+                    if(mMessageFinal.size() > 0 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())){
+                        Log.d("Chat", "OKAY NEW MSG");
+                        mMessageFinal.clear();
+                        mMessageFinal.addAll(mMessage);
+                        messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, MainActivity.getInstance().getUserInformation().getUsername(), user_im_chat.getUsername());
+                        recycler_view_msg.setAdapter(messageAdapter);
+                        base_load = false;
+                    }
+
+                    if(base_load){
+                        mMessageFinal.clear();
+                        mMessageFinal.addAll(mMessage);
+                        messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, MainActivity.getInstance().getUserInformation().getUsername(), user_im_chat.getUsername());
+                        recycler_view_msg.setAdapter(messageAdapter);
+                    }
                 }
             }
 
@@ -398,13 +445,34 @@ public class MessageActivity extends AppCompatActivity {
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
-        //noinspection SwitchStatementWithTooFewBranches
         switch (item.getItemId()){
             case R.id.pin_message:
                 Methods.PinAUser_Chat(MessageActivity.this, userId);
                 return true;
+            case R.id.wallpaper_profile:
+                BackgroundHelper.OpenGallery();
+                return true;
         }
         return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PIC_CROP) {
+            if (data != null) {
+                // get the returned data
+                Bundle extras = data.getExtras();
+                // get the cropped bitmap
+                Bitmap selectedBitmap = extras.getParcelable("data");
+                BackgroundHelper.uploadFile(selectedBitmap);
+            }
+        }
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            BackgroundHelper.SendToCrop(this, data);
+        }
     }
 
     @Override
