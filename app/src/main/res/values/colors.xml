@@ -13,8 +13,8 @@
     <color name="textColor">#1A1616</color>
     <color name="background_menu_sheet">#444B54</color>
     <color name="hint_line">#20171717</color>
-    <color name="header_intro_color">#d6dee4</color>
-    <color name="bottom_intro_color">#0f608f</color>
+    <color name="header_intro_color">#FD6A3B</color>
+    <color name="bottom_intro_color">#030237</color>
     <color name="header_splash_color">#009abf</color>
     <color name="bottom_splash_color">#01847c</color>
     <color name="border_button_following">#44BFFF</color>
