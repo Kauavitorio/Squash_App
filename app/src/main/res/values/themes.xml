@@ -30,7 +30,7 @@
     </style>
 
     <style name="EditsLoginAndSignUp" parent="Theme.AppCompat.Light">
-        <item name="android:textColorHint">@color/white</item>
+        <item name="android:textColorHint">@color/hint</item>
     </style>
 
     <style name="Theme.Squash.NoActionBar">

@@ -16,33 +16,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/ic_logo_intro"
-            android:layout_width="58dp"
-            android:layout_height="60dp"
-            android:src="@drawable/ic_logo"
-            android:layout_marginTop="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription" />
-
         <!-- Text Intro Description -->
         <TextView
+            android:id="@+id/textView"
             android:layout_width="244dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
             android:layout_marginTop="40dp"
-            android:layout_marginBottom="10dp"
             android:text="@string/intro_description"
+            android:textAlignment="center"
             android:textAllCaps="true"
-            android:textColor="@color/black_intro"
+            android:textColor="@color/white"
             android:textSize="28sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/guideline_intro_app"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ic_logo_intro"
-            app:layout_constraintVertical_bias="0.3" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ic_logo_intro"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintBottom_toTopOf="@+id/guideline_intro_app"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            tools:ignore="ContentDescription" />
 
         <!-- CardView btn Sign In -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -98,7 +97,7 @@
             android:minWidth="218dp"
             android:minHeight="44dp"
             android:layout_marginTop="10dp"
-            app:cardBackgroundColor="@color/white"
+            app:cardBackgroundColor="@color/base_color"
             app:cardCornerRadius="22dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -119,7 +118,7 @@
                     android:text="@string/create_account"
                     android:textAlignment="center"
                     android:textAllCaps="true"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="19sp"
                     android:textStyle="bold" />
 

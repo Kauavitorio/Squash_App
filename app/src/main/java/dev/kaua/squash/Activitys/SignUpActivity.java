@@ -393,6 +393,8 @@ public class SignUpActivity extends AppCompatActivity {
         btn_next = findViewById(R.id.btn_next_signUp);
         btn_signUp = findViewById(R.id.btn_signUp_signUp);
         btn_signUp.setVisibility(View.GONE);
+        getWindow().setStatusBarColor(getColor(R.color.base_color));
+        getWindow().setNavigationBarColor(getColor(R.color.base_color));
     }
 
     private void ShowCalendar(){

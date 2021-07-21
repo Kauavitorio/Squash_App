@@ -6,7 +6,7 @@
     <string name="ok">OK</string> <!-- End Natural Text -->
 
     <string name="app_name" translatable="false">Squash</string>
-    <string name="intro_description">Choose a way to start your navigation.</string>
+    <string name="intro_description">Choose a way to start.</string>
     <string name="create_account">Create account</string>
     <string name="have_an_account_already"><font color='#504F4F'>Have an account already?</font> <font color='#10ace0'>Log in</font></string>
     <string name="create_your_account">Create your account</string>

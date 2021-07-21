@@ -87,6 +87,8 @@ public class SignInActivity extends AppCompatActivity {
         edit_password = findViewById(R.id.edit_password_signIn);
         btn_next = findViewById(R.id.btn_next_signIn);
         btn_back = findViewById(R.id.btn_back_signIn);
+        getWindow().setStatusBarColor(getColor(R.color.base_color));
+        getWindow().setNavigationBarColor(getColor(R.color.base_color));
     }
 
     public static SignInActivity getInstance(){ return instance; }

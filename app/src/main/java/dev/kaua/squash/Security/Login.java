@@ -81,8 +81,6 @@ public abstract class Login {
         call.enqueue(new Callback<DtoAccount>() {
             @Override
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                loadingDialog.dismissDialog();
-
                 //  Checking api return code
                 if(response.code() == 200){
                     //  Clear all prefs before login user
@@ -124,6 +122,7 @@ public abstract class Login {
                     //  Login user in firebase to get user instance
                     mAuth.signInWithEmailAndPassword(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail())), Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
                             .addOnCompleteListener(task -> {
+                                loadingDialog.dismissDialog();
                                 Log.d("Auth", "Login Ok");
                                 Log.d("Auth", "User " + mAuth.getUid());
 
@@ -141,6 +140,7 @@ public abstract class Login {
                                 ((Activity) context).finish();
                             });
                 }else if(response.code() == 206){
+                    loadingDialog.dismissDialog();
                     mPrefs = context.getSharedPreferences("myPrefs", MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
                     Intent i = new Intent(context, ValidateEmailActivity.class);
@@ -153,6 +153,7 @@ public abstract class Login {
                     ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
                     ((Activity) context).finish();
                 }else if(response.code() == 401) {
+                    loadingDialog.dismissDialog();
                     mPrefs = context.getSharedPreferences("myPrefs", MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
                     try {
@@ -161,7 +162,10 @@ public abstract class Login {
                         Warnings.showWeHaveAProblem(context);
                     }
                 }
-                else Warnings.showWeHaveAProblem(context);
+                else {
+                    loadingDialog.dismissDialog();
+                    Warnings.showWeHaveAProblem(context);
+                }
             }
             @Override
             public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {

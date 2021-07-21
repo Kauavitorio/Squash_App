@@ -142,45 +142,6 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         loadingDialog = new LoadingDialog(this);
-        /*storageReference = ConfFirebase.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
-                "_" + ConfFirebase.getFirebaseAuth().getUid());
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            Uri filePath = data.getData();
-            try {
-                //getting image from gallery
-                if(filePath != null) {
-                    loadingDialog.startLoading();
-
-                    //uploading the image
-                    storageReference .putFile(filePath).continueWithTask(task -> {
-                        if (!task.isSuccessful()) {
-                            loadingDialog.dismissDialog();
-                            Log.d("ProfileUpload", Objects.requireNonNull(task.getException()).toString());
-                        }
-                        return storageReference.getDownloadUrl();
-                    }).addOnCompleteListener(task -> {
-                        loadingDialog.dismissDialog();
-                        if (task.isSuccessful()) {
-                            Uri downloadUri = task.getResult();
-                            new_image = downloadUri+"";
-                            Picasso.get().load(new_image).into(ic_edit_ProfileUser);
-
-                        } else {
-                            new_image = user.getProfile_image();
-                            ToastHelper.toast(this, task.getException().toString(), 0);
-                            Log.d("ProfileUpload", Objects.requireNonNull(task.getException()).getMessage());
-                            loadingDialog.dismissDialog();
-                        }
-                    });
-                }
-                else
-                    ToastHelper.toast(EditProfileActivity.this, getString(R.string.select_an_image), 0);
-            } catch (Exception ex) {
-                Warnings.showWeHaveAProblem(this);
-                Log.d("ProfileUpload", ex.toString());
-            }
-        }
-*/
         if (requestCode == PIC_CROP) {
             if (data != null) {
                 // get the returned data
@@ -191,9 +152,8 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         }
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null)
             Profile_Image.SendToCrop(this, data);
-        }
     }
 
 
