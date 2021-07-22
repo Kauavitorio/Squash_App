@@ -230,7 +230,7 @@ public class ProfileFragment extends Fragment {
             loadingPanel_profile.setVisibility(View.VISIBLE);
             recyclerView_Posts_profile.setVisibility(View.GONE);
             control = bundle.getInt("control");
-            if(bundle.getString("account_id") != null && Integer.parseInt(bundle.getString("account_id")) != account.getAccount_id()){
+            if(bundle.getString("account_id") != null && Long.parseLong(bundle.getString("account_id")) != account.getAccount_id()){
                 LoadingDialog loadingDialog = new LoadingDialog(requireActivity());
                 loadingDialog.startLoading();
                 btn_plus_story_profile.setVisibility(View.GONE);

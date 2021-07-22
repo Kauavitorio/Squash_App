@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,6 +28,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -58,6 +61,7 @@ import dev.kaua.squash.Adapters.Chat.SwipeReply;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.APIService;
 import dev.kaua.squash.Notifications.Client;
@@ -108,7 +112,7 @@ public class MessageActivity extends AppCompatActivity {
     DatabaseReference reference;
     MessageAdapter messageAdapter;
     List<DtoMessage> mMessage;
-    List<String> medias_pin = new ArrayList<>();;
+    List<String> medias_pin = new ArrayList<>();
     String userId;
     String another_user_image = "";
 
@@ -275,7 +279,7 @@ public class MessageActivity extends AppCompatActivity {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
-        hashMap.put("id_msg", Methods.RandomCharactersWithoutSpecials(13) + formattedDate_id.replace("-","")
+        hashMap.put("id_msg", Methods.RandomCharactersWithoutSpecials(8) + formattedDate_id.replace("-","")
                 .replace(" ","").replace(":","") + fUser.getUid());
         if(message_to_reply != null && message_to_reply.length() > 0){
             hashMap.put("reply_from", reply_from);
@@ -468,6 +472,34 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
         switch (item.getItemId()){
+            case R.id.see_profile:
+                finish();
+                try {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
+                    bundle.putInt("control", 0);
+                    MainActivity.getInstance().GetBundleProfile(bundle);
+                    MainActivity.getInstance().CallProfile();
+                    ProfileFragment.getInstance().LoadAnotherUser();
+                }catch (Exception ex){
+                    Intent goto_main = new Intent(this, MainActivity.class);
+                    goto_main.putExtra("shortcut", 0);
+                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
+                    ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
+                    finishAffinity();
+                    Handler timer = new Handler();
+                    timer.postDelayed(() -> {
+                        Bundle bundle_profile = new Bundle();
+                        bundle_profile.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
+                        bundle_profile.putInt("control", 0);
+                        MainActivity.getInstance().GetBundleProfile(bundle_profile);
+                        MainActivity.getInstance().CallProfile();
+                        ProfileFragment.getInstance().LoadAnotherUser();
+                    },500);
+                }
+                return true;
+            case R.id.medias_profile:
+                return true;
             case R.id.pin_message:
                 Methods.PinAUser_Chat(MessageActivity.this, userId);
                 return true;
