@@ -192,7 +192,6 @@ public class ProfileFragment extends Fragment {
                             }
                         }
                     }
-
                     @Override
                     public void onCancelled(@NonNull @NotNull DatabaseError error) {}
                 });
@@ -267,6 +266,7 @@ public class ProfileFragment extends Fragment {
                                         ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
                                     ic_account_badge_profile.setVisibility(View.VISIBLE);
                                 }
+                                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, loadingPanel_profile, noPost_profile, account);
 
                                 DaoFollowing daoFollowing = new DaoFollowing(getContext());
                                 ArrayList<DtoAccount> accounts = daoFollowing.get_followers_following(account_id, Long.parseLong(bundle.getString("account_id")));

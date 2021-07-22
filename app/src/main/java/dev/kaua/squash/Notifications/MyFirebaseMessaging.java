@@ -27,6 +27,7 @@ import java.util.Map;
 
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.R;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -89,6 +90,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         String user = remoteMessage.getData().get("user");
         String icon = remoteMessage.getData().get("icon");
+        //String icon = remoteMessage.getData().get("icon");
         String title = remoteMessage.getData().get("title");
         String body = remoteMessage.getData().get("body");
 
@@ -138,7 +140,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         assert icon != null;
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(Integer.parseInt(icon))
+                .setSmallIcon(R.drawable.pumpkin_default_image)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setAutoCancel(true)
