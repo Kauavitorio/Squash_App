@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sheet_menu_did_not_receive_email"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:background="@drawable/background_sheet_base"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Main Text -->
+    <TextView
+        android:id="@+id/txt_main_text_sheet_did_not_receive_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:maxWidth="350dp"
+        android:text="@string/account_was_created"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+
+    <!-- Btn Login Now -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btn_positive_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:minWidth="130dp"
+        android:minHeight="50dp"
+        app:cardBackgroundColor="@color/base_color"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Text Yes -->
+        <TextView
+            android:id="@+id/txt_positive_button_sheet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/yes"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Btn No -->
+    <LinearLayout
+        android:id="@+id/btn_negative_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:minWidth="130dp"
+        android:minHeight="50dp"
+        android:background="@drawable/background_continue_intro"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/hint"
+            android:textSize="17sp"
+            android:text="@string/no"/>
+
+    </LinearLayout>
+
+</LinearLayout>

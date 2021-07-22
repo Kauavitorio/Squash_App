@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activitys.WebActivity">
+
+    <!-- Header -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/header_web"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Toolbar Container -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_web"
+            app:theme="@style/ToolbarColoredWeb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:titleTextColor="@color/black"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:popupTheme="@style/MenuStyle">
+
+            <!-- Header Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/toolbar_web"
+                android:orientation="vertical">
+
+                <!-- Text WebSite Title -->
+                <TextView
+                    android:id="@+id/status_web"
+                    android:layout_width="wrap_content"
+                    android:textSize="15sp"
+                    android:textColor="@color/black"
+                    android:layout_height="wrap_content"
+                    android:text="@string/edit_profile"/>
+
+                <!-- Container Connection Status -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <!-- Image Connection Status -->
+                    <ImageView
+                        android:id="@+id/secure_status_web"
+                        android:layout_width="13dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_not_secure_lock"
+                        tools:ignore="ContentDescription" />
+
+                    <!-- Text Connection Status -->
+                    <TextView
+                        android:id="@+id/url_web"
+                        android:textSize="13sp"
+                        android:textColor="@color/hint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLength="46"
+                        android:text="@string/app_name"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Linear progress indicator -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress_web"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:indicatorColor="@color/base_color"
+        app:layout_constraintTop_toBottomOf="@+id/header_web" />
+
+    <!-- Main action WebView -->
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progress_web" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

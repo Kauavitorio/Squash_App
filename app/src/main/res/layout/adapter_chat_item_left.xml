@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:maxWidth="300dp"
+    android:padding="8dp"
+    android:orientation="vertical"
+    android:layout_height="wrap_content">
+
+    <!-- Container Reply -->
+    <LinearLayout
+        android:id="@+id/container_reply"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="6dp"
+        android:visibility="gone"
+        android:layout_height="wrap_content">
+
+        <!-- Line Reply -->
+        <LinearLayout
+            android:layout_width="2dp"
+            android:background="@color/hint_line"
+            android:layout_height="match_parent"/>
+
+        <!-- Container Reply info -->
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:layout_height="wrap_content">
+
+            <!-- Text Reply From -->
+            <TextView
+                android:id="@+id/txt_reply_from"
+                android:layout_width="wrap_content"
+                android:text="@string/starred_messages"
+                android:layout_marginStart="2dp"
+                android:textColor="@color/hint"
+                android:textSize="10sp"
+                android:layout_alignParentTop="true"
+                android:layout_height="wrap_content"
+                tools:ignore="SmallSp" />
+
+            <!-- Card Container Reply content -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_container_reply_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="3dp"
+                android:layout_below="@+id/txt_reply_from"
+                android:layout_centerVertical="true"
+                app:cardBackgroundColor="@color/replyBackground">
+
+                <!-- Content Reply Content -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:padding="5dp"
+                    android:layout_height="match_parent">
+
+                    <!-- Text Reply Content -->
+                    <TextView
+                        android:id="@+id/reply_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:textColor="@color/hint"
+                        android:text="@string/account_will_not_be_validated_leave"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <!-- Container Body -->
+    <LinearLayout
+        android:id="@+id/container_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:orientation="vertical"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
+        android:background="@drawable/background_left_msg">
+
+        <!-- Container Message Main -->
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <!-- User Image -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_image_chat_item"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:visibility="gone"
+                android:src="@mipmap/ic_launcher"/>
+
+            <!-- Message Content -->
+            <TextView
+                android:id="@+id/msg_chat_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="2dp"
+                android:layout_toEndOf="@id/profile_image_chat_item"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="5dp"
+                android:textSize="16sp"
+                android:visibility="visible"
+                android:gravity="center"
+                android:textColor="@color/black"/>
+
+            <!-- Img for medias -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_media_img_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="260dp"
+                android:maxWidth="220dp"
+                android:visibility="visible"
+                android:layout_below="@id/msg_chat_item"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="5dp">
+
+                <ProgressBar
+                    android:id="@+id/progress_media_img_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/media_img"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:maxHeight="260dp"
+                    android:maxWidth="220dp"
+                    android:minHeight="260dp"
+                    android:minWidth="220dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="5dp"
+                    android:adjustViewBounds="true"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:maxHeight="260dp"
+                android:maxWidth="220dp"
+                android:visibility="gone"
+                android:layout_below="@id/msg_chat_item"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="5dp">
+
+                <!-- Video for medias -->
+                <VideoView
+                    android:id="@+id/media_video"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </RelativeLayout>
+
+        <!-- Text Message Time -->
+        <TextView
+            android:id="@+id/msgTime_chat_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:gravity="center"
+            android:layout_marginEnd="8dp"
+            android:text="@string/app_name"
+            android:textSize="12sp"
+            android:textColor="@color/black"/>
+
+    </LinearLayout>
+
+    <!-- Text Seen -->
+    <TextView
+        android:id="@+id/txt_seen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+</LinearLayout>

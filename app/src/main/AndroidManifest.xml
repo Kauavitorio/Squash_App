@@ -1,21 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dev.kaua.squash">
+    <!--
+    *  Copyright (c) 2021 Kauã Vitório
+    *  Official repository https://github.com/Kauavitorio/Squash_App
+    *  Responsible developer: https://github.com/Kauavitorio
+    *  @author Kaua Vitorio
+    -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activitys.WebActivity"/>
+        <activity android:name=".Activitys.PostDetailsActivity" />
+        <activity android:name=".Activitys.EditProfileActivity" />
+        <activity android:name=".Activitys.ComposeActivity" />
+        <activity android:name=".Activitys.MessageActivity" />
+        <activity android:name=".Activitys.SignInActivity" />
+        <activity android:name=".Activitys.IntroActivity" />
+        <activity android:name=".Activitys.SignUpActivity" />
+        <activity android:name=".Activitys.MainActivity" />
+        <activity android:name=".Activitys.ValidateEmailActivity" />
+        <activity android:name=".Activitys.TermsAccountActivity" />
+        <activity android:name=".Activitys.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+
+            <!-- Filter to email validation URL -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="squash-social.herokuapp.com"
+                    android:scheme="http" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="squash-social.herokuapp.com"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity> <!-- Start Service to message notification -->
+        <service
+            android:name=".Notifications.MyFirebaseIdService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".Notifications.MyFirebaseMessaging"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service> <!-- Performance Monitoring plugin -->
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="true" />
     </application>
 
 </manifest>
