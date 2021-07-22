@@ -4,15 +4,84 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".Activitys.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewpager_main"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/container_bottom_main"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Bottom Menu -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container_bottom_main"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="30dp"
+        android:paddingStart="30dp"
+        android:background="@drawable/background_bottom_main"
+        android:layout_alignParentBottom="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!-- Btn Home -->
+        <ImageView
+            android:id="@+id/btn_home_main"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/ic_home"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <!-- Btn Search -->
+        <ImageView
+            android:id="@+id/btn_search_main"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/ic_search"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/container_btn_profile_main"
+            app:layout_constraintStart_toEndOf="@+id/btn_home_main"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <LinearLayout
+            android:id="@+id/container_btn_profile_main"
+            android:layout_width="35dp"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Img User With Profile btn -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/btn_profile_main"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_profile_default"
+                app:civ_border_color="@color/base_color"
+                app:civ_border_width="0dp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/base_color"
+                app:cardCornerRadius="10dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

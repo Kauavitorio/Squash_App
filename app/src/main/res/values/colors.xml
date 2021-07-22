@@ -1,10 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="transparent">#00FFFFFF</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
+    <color name="purple_700">#504F4F</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
+    <color name="black_intro">#333333</color>
+    <color name="hint">#C1171717</color>
+    <color name="replyBackground">#DADADA</color>
+    <color name="textColor">#1A1616</color>
+    <color name="background_menu_sheet">#444B54</color>
+    <color name="hint_line">#20171717</color>
+    <color name="header_intro_color">#FD6A3B</color>
+    <color name="bottom_intro_color">#030237</color>
+    <color name="header_splash_color">#009abf</color>
+    <color name="bottom_splash_color">#01847c</color>
+    <color name="border_button_following">#44BFFF</color>
+    <color name="background_adapter_search">#C9ECFF</color>
+    <color name="third_or_plus_img">#9F000000</color>
+    <color name="custom_toast">#DF202020</color>
+    <color name="hint_default_button">#B5B5B5</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="BarColor">#DDDADA</color>
+    <color name="base_color">#FF6C26</color>
+    <color name="stroke_chat_left">#0562D0</color>
+    <color name="background_my_message">#1D84FE</color>
+    <color name="background_post_color">#E5E5E5</color>
+    <color name="cards_background">#F89B28</color>
+    <color name="tab_background_selected">#10ace0</color>
+    <color name="tab_background_unselected">#10ace0</color>
+    <color name="base_color_disable">#B248C5EF</color>
+    <color name="base_color_click">#0F9CCC</color>
 </resources>
