@@ -24,7 +24,10 @@
         android:layout_height="0dp"
         android:background="@drawable/background_chat_container"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -94,6 +97,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Recycler Chat -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_msg"
         android:layout_width="match_parent"
@@ -102,20 +106,32 @@
         app:layout_constraintBottom_toTopOf="@+id/container_edits_chat"
         app:layout_constraintTop_toBottomOf="@+id/bar_layout" />
 
+    <!-- Btn More Medias -->
+    <ImageView
+        android:id="@+id/btn_more_medias"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginStart="5dp"
+        android:src="@drawable/ic_plus"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="ContentDescription" />
+
     <!-- Container Edit and Send Button -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container_edits_chat"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
+        android:layout_marginStart="3dp"
         android:background="@drawable/custom_edit_chat"
         android:minHeight="40dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toEndOf="@+id/btn_more_medias">
 
         <LinearLayout
             android:layout_width="0dp"

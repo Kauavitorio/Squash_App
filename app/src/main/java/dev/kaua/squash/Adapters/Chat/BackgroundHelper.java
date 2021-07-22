@@ -112,39 +112,6 @@ public abstract class BackgroundHelper extends MessageActivity {
             Warnings.showWeHaveAProblem(context);
             Log.d("ProfileUpload", ex.toString());
         }
-        /*Uri filePath = data.getData();
-        try {
-            //getting image from gallery
-            if(filePath != null) {
-                try {
-                    Intent cropIntent = new Intent("com.android.camera.action.CROP");
-                    // indicate image type and Uri
-                    cropIntent.setDataAndType(filePath, "image/*");
-                    // set crop properties here
-                    cropIntent.putExtra("crop", true);
-                    // indicate aspect of desired crop
-                    cropIntent.putExtra("aspectX", 1);
-                    cropIntent.putExtra("aspectY", 1);
-                    // indicate output X and Y
-                    cropIntent.putExtra("outputX", 158);
-                    cropIntent.putExtra("outputY", 158);
-                    // retrieve data on return
-                    cropIntent.putExtra("return-data", true);
-                    // start the activity - we handle returning in onActivityResult
-                    context.startActivityForResult(cropIntent, PIC_CROP);
-                }
-                // respond to users whose devices do not support the crop action
-                catch (ActivityNotFoundException ex) {
-                    // display an error message
-                    String errorMessage = "Whoops - your device doesn't support the crop action!";
-                    Toast toast = Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-            }
-        } catch (Exception ex) {
-            Warnings.showWeHaveAProblem(context);
-            Log.d("DEBUG_CHAT", ex.toString());
-        }*/
     }
 
     public static void uploadFile(Bitmap bitmap) {

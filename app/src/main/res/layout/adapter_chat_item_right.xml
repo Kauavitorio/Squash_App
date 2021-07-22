@@ -95,9 +95,44 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_gravity="end"
+                android:visibility="visible"
                 android:text="@string/app_name"
                 android:textSize="16sp"
                 android:textColor="@color/white"/>
+
+            <!-- Img for medias -->
+            <ImageView
+                android:id="@+id/media_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/logo_no_bg"
+                android:maxHeight="260dp"
+                android:maxWidth="220dp"
+                android:visibility="gone"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="5dp"
+                android:adjustViewBounds="true"
+                tools:ignore="ContentDescription" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_video"
+                android:layout_width="220dp"
+                android:visibility="gone"
+                android:layout_height="260dp">
+
+                <!-- Video for medias -->
+                <VideoView
+                    android:id="@+id/media_video"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Text Message Time -->
             <TextView

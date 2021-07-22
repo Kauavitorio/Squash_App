@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Activitys.WebActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
@@ -229,7 +230,7 @@ public abstract class Methods extends MainActivity {
 
     public static void browseTo(Context context, String url){
         if (!url.startsWith("http://") && !url.startsWith("https://")) url = "http://" + url;
-        Intent i = new Intent(Intent.ACTION_VIEW);
+        Intent i = new Intent(context, WebActivity.class);
         i.setData(Uri.parse(url));
         context.startActivity(i);
     }

@@ -1,9 +1,12 @@
 package dev.kaua.squash.Activitys;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -12,6 +15,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,10 +32,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -50,7 +56,9 @@ import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -71,10 +79,12 @@ import dev.kaua.squash.Notifications.Sender;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.KeyboardUtils;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
+import dev.kaua.squash.Tools.UserPermissions;
 import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -91,6 +101,7 @@ public class MessageActivity extends AppCompatActivity {
 
     private CircleImageView profile_image;
     public static ImageView background_chat;
+    public static ImageView btn_more_medias;
     public static MessageActivity instance;
     private TextView txt_user_name, txt_isOnline_chat, txtQuotedMsg;
     private static RecyclerView recycler_view_msg;
@@ -103,11 +114,13 @@ public class MessageActivity extends AppCompatActivity {
     private ImageView cancelButton;
     private ValueEventListener seenListener;
     public static DtoAccount user_im_chat;
+    private static final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
 
     public static FirebaseUser fUser;
     DatabaseReference reference;
     MessageAdapter messageAdapter;
     List<DtoMessage> mMessage;
+    List<String> medias_pin = new ArrayList<>();;
     String userId;
     String another_user_image = "";
 
@@ -116,6 +129,7 @@ public class MessageActivity extends AppCompatActivity {
     boolean notify = false;
     public static final int PIC_CROP = 1;
     public static final int PICK_IMAGE_REQUEST = 111;
+    public static final int PICK_IMAGE_REQUEST_MEDIA = 222;
     public static StorageReference storageReference;
 
     Intent intent;
@@ -200,6 +214,17 @@ public class MessageActivity extends AppCompatActivity {
 
         cancelButton.setOnClickListener(v -> hideReplayLayout());
 
+        btn_more_medias.setOnClickListener(v -> {
+            UserPermissions.validatePermissions(permissions, instance, 189);
+            int GalleryPermission = ContextCompat.checkSelfPermission(instance, Manifest.permission.READ_EXTERNAL_STORAGE);
+            if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
+                Intent openGallery = new Intent();
+                openGallery.setType("image/*");
+                openGallery.setAction(Intent.ACTION_PICK);
+                startActivityForResult(Intent.createChooser(openGallery, "Select Image"), PICK_IMAGE_REQUEST_MEDIA);
+            }
+        });
+
         seenMessage(userId);
         setRecyclerSwipe();
     }
@@ -207,6 +232,7 @@ public class MessageActivity extends AppCompatActivity {
     private void Ids() {
         instance = this;
         profile_image = findViewById(R.id.profile_image_chat);
+        btn_more_medias = findViewById(R.id.btn_more_medias);
         txt_user_name = findViewById(R.id.txt_username_chat);
         recycler_view_msg = findViewById(R.id.recycler_view_msg);
         txt_isOnline_chat = findViewById(R.id.txt_isOnline_chat);
@@ -253,11 +279,15 @@ public class MessageActivity extends AppCompatActivity {
     private void sendMessage(String sender, String receiver, String message){
         Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("HH:mm a");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_id = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
         String formattedDate = df_time.format(c.getTime());
+        String formattedDate_id = df_time_id.format(c.getTime());
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
+        hashMap.put("id_msg", Methods.RandomCharactersWithoutSpecials(13) + formattedDate_id.replace("-","")
+                .replace(" ","").replace(":","") + fUser.getUid());
         if(message_to_reply != null && message_to_reply.length() > 0){
             hashMap.put("reply_from", reply_from);
             hashMap.put("reply_content", EncryptHelper.encrypt(message_to_reply));
@@ -269,8 +299,11 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("message", EncryptHelper.encrypt(message));
         hashMap.put("isSeen", 0);
         hashMap.put("time", EncryptHelper.encrypt(formattedDate));
+        hashMap.put("media", medias_pin);
 
         reference.child("Chats").push().setValue(hashMap);
+        medias_pin.clear();
+        text_send.setText("");
 
         //  add User to chat fragment
         final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatslist")
@@ -473,6 +506,70 @@ public class MessageActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             BackgroundHelper.SendToCrop(this, data);
         }
+
+        if (requestCode == PICK_IMAGE_REQUEST_MEDIA && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            LoadingDialog loadingDialog = new LoadingDialog(this);
+            loadingDialog.startLoading();
+            Uri filePath = data.getData();
+            try {
+                //getting image from gallery
+                if(filePath != null) {
+
+                    //uploading the image
+                    storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
+                            + getFileName(filePath) + "_" + Methods.RandomCharactersWithoutSpecials(3));
+                    storageReference .putFile(filePath).continueWithTask(task -> {
+                        if (!task.isSuccessful()) {
+                            Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
+                        }
+                        return storageReference.getDownloadUrl();
+                    }).addOnCompleteListener(task -> {
+                        loadingDialog.dismissDialog();
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            medias_pin = new ArrayList<>();
+                            medias_pin.add(downloadUri.toString());
+                            sendMessage(fUser.getUid(), userId, text_send.getText().toString());
+
+                        } else {
+                            loadingDialog.dismissDialog();
+                            ToastHelper.toast(this, task.getException().toString(), 0);
+                            Log.d("ProfileUpload", Objects.requireNonNull(task.getException()).getMessage());
+                        }
+                    });
+                }
+                else{
+                    ToastHelper.toast(this, getString(R.string.select_an_image), 0);
+                    loadingDialog.dismissDialog();
+                }
+            } catch (Exception ex) {
+                loadingDialog.dismissDialog();
+                Warnings.showWeHaveAProblem(this);
+                Log.d("ProfileUpload", ex.toString());
+            }
+        }
+    }
+
+    public String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
     }
 
     @Override

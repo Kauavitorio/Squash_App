@@ -40,6 +40,41 @@
         android:layout_height="wrap_content"
         tools:ignore="UselessParent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:maxHeight="260dp"
+            android:maxWidth="220dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="5dp">
+
+            <!-- Video for medias -->
+            <VideoView
+                android:id="@+id/media_video"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Img for medias -->
+        <ImageView
+            android:id="@+id/media_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo_no_bg"
+            android:maxHeight="250dp"
+            android:maxWidth="200dp"
+            android:visibility="gone"
+            android:adjustViewBounds="true"
+            tools:ignore="ContentDescription" />
+
         <!-- Text User Image -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_image_chat_item"
