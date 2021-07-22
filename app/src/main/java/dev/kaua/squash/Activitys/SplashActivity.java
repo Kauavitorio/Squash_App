@@ -14,6 +14,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.util.ArrayList;
+
 import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -42,6 +44,8 @@ public class SplashActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Uri data = intent.getData();
+        String action = intent.getAction();
+        String type = intent.getType();
         if(data != null){
             String UrlGetFrom = data.toString();
             UrlGetFrom = UrlGetFrom.replace("https://squash-social.herokuapp.com/", "").replace("http://squash-social.herokuapp.com/", "");
@@ -74,8 +78,45 @@ public class SplashActivity extends AppCompatActivity {
                     verifyIfUsersLogged();
                 }
             }else verifyIfUsersLogged();
-        }else verifyIfUsersLogged();
+        }else if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type))
+                handleSendText(intent); // Handle text being sent
+            else if (type.startsWith("image/"))
+                handleSendImage(intent); // Handle single image being sent
+        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
+            if (type.startsWith("image/"))
+                handleSendMultipleImages(intent); // Handle multiple images being sent
+        } else verifyIfUsersLogged();
 
+    }
+
+    void handleSendText(Intent intent) {
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (sharedText != null) {
+            Log.d("SPLASH_HANDLER", "Text -> " + sharedText);
+            Intent goto_main = new Intent(this, MainActivity.class);
+            goto_main.putExtra("shortcut", 0);
+            goto_main.putExtra("shared", 1);
+            goto_main.putExtra("shared_type", 1);
+            goto_main.putExtra("shared_content", sharedText);
+            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
+            ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
+            finishAffinity();
+        }
+    }
+
+    void handleSendImage(Intent intent) {
+        Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+            Log.d("SPLASH_HANDLER", "image -> " + imageUri);
+        }
+    }
+
+    void handleSendMultipleImages(Intent intent) {
+        ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+        if (imageUris != null) {
+            Log.d("SPLASH_HANDLER", imageUris + "");
+        }
     }
 
     private void DoValidation(String value) {
@@ -105,6 +146,7 @@ public class SplashActivity extends AppCompatActivity {
     private void GoToMain(){
         Intent goto_main = new Intent(this, MainActivity.class);
         goto_main.putExtra("shortcut", 0);
+        goto_main.putExtra("shared", 0);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
         finishAffinity();

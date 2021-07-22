@@ -27,6 +27,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private static MainActivity instance;
     //  Set preferences
     private SharedPreferences mPrefs;
-    public static final String PREFS_NAME = "myPrefs";
 
     private static final DtoAccount account = new DtoAccount();
 
@@ -73,11 +73,22 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setCurrentItem(1, true);
 
         //  Get all SharedPreferences
-        mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        SharedPreferences sp = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         bundle = getIntent().getExtras();
         if (sp.contains("pref_account_id") && sp.contains("pref_username")) StartNavigation();
         else Login.LogOut(this, 1);
+
+        if(bundle != null){
+            if(bundle.getInt("shared") == 1){
+                Intent i = new Intent(this, ShareContentActivity.class);
+                if(bundle.getInt("shared_type") == 1){
+                    i.putExtra("shared_type", bundle.getInt("shared_type"));
+                    i.putExtra("shared_content", bundle.getString("shared_content"));
+                }
+                startActivity(i);
+            }
+        }
 
         btn_search_main.setOnClickListener(v -> LoadSearchFragment());
         btn_home_main.setOnClickListener(v -> LoadMainFragment());
@@ -169,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings("ConstantConditions")
     public DtoAccount getUserInformation(){
-        SharedPreferences sp = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         account.setAccount_id(Long.parseLong(EncryptHelper.decrypt(sp.getString("pref_account_id", null))));
         account.setName_user(EncryptHelper.decrypt(sp.getString("pref_name_user", null)));
         account.setUsername(EncryptHelper.decrypt(sp.getString("pref_username", null)));
@@ -184,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         account.setFollowers(EncryptHelper.decrypt(sp.getString("pref_followers", null)));
         account.setBorn_date(EncryptHelper.decrypt(sp.getString("pref_born_date", null)));
         account.setJoined_date(EncryptHelper.decrypt(sp.getString("pref_joined_date", null)));
+        account.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
         account.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
         account.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
 
@@ -239,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         getUserInformation();
+        Login.ReloadUserinfo(this, getUserInformation().getEmail(), getUserInformation().getPassword());
         Methods.status_chat("online");
         Methods.LoadFollowersAndFollowing(this);
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());

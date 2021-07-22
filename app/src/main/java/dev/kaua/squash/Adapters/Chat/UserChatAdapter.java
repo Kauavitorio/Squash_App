@@ -1,6 +1,7 @@
 package dev.kaua.squash.Adapters.Chat;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -28,6 +29,7 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MessageActivity;
+import dev.kaua.squash.Activitys.ShareContentActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
@@ -38,13 +40,15 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
 
     private Context mContext;
     private List<DtoAccount> mAccounts;
-    private boolean isChat;
+    private final boolean isChat;
+    private final boolean share;
     String theLastMessage;
 
-    public UserChatAdapter(Context mContext, List<DtoAccount> mAccounts, boolean isChat){
+    public UserChatAdapter(Context mContext, List<DtoAccount> mAccounts, boolean isChat, boolean share){
         this.mContext = mContext;
         this.mAccounts = mAccounts;
         this.isChat = isChat;
+        this.share = share;
     }
 
     @NonNull
@@ -70,6 +74,14 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(mContext, MessageActivity.class);
             intent.putExtra("userId", account.getId());
+            if(share){
+                int shareType = ShareContentActivity.getInstance().GetShareType();
+                intent.putExtra("shared", 1);
+                intent.putExtra("shared_type", shareType);
+                if(shareType == 1)
+                intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
+                ((Activity)mContext).finish();
+            }else intent.putExtra("shared", 0);
             mContext.startActivity(intent);
         });
 

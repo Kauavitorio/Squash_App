@@ -28,6 +28,7 @@ import java.util.Map;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.MyPrefs;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -41,12 +42,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
-
         FirebaseUser firebaseUser = ConfFirebase.getFirebaseUser();
-
-        if (firebaseUser != null) {
-            updateToken(s);
-        }
+        if (firebaseUser != null) updateToken(s);
     }
 
     private void updateToken(String newToken) {
@@ -67,7 +64,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 //      String sented = remoteMessage.getData().get("sented");
         String user = remoteMessage.getData().get("user");
 
-        SharedPreferences preferences  = getSharedPreferences("PREFS", MODE_PRIVATE);
+        SharedPreferences preferences  = getSharedPreferences(MyPrefs.PREFS_NOTIFICATION, MODE_PRIVATE);
         String currentuser = preferences.getString("currentUser", "none");
         Log.d("Current", currentuser);
 
@@ -76,11 +73,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         if (firebaseUser != null && data_notify.size() > 0) {
             if (!currentuser.equals(user)) {
                 Log.d("Current", user);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    sendOreoNotification(remoteMessage);
-                } else {
-                    sendNotification(remoteMessage);
-                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) sendOreoNotification(remoteMessage);
+                else sendNotification(remoteMessage);
             }
         }
     }
@@ -96,6 +90,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         RemoteMessage.Notification notification  = remoteMessage.getNotification();
 
+        assert user != null;
         int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
 
         Intent intent = new Intent(this, MessageActivity.class);
@@ -112,9 +107,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent, defaultSound, icon);
 
         int i = 0;
-        if ( j > 0) {
-            i=j;
-        }
+        if (j > 0) i=j;
 
         oreoNotification.getManager().notify(i, builder.build());
     }
@@ -127,6 +120,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         RemoteMessage.Notification notification  = remoteMessage.getNotification();
 
+        assert user != null;
         int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
 
         Intent intent = new Intent(this, MessageActivity.class);

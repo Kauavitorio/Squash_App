@@ -74,6 +74,7 @@ import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.KeyboardUtils;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.UserPermissions;
 import dev.kaua.squash.Tools.Warnings;
@@ -88,7 +89,7 @@ import retrofit2.Response;
  *  @author Kaua Vitorio
  **/
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "StaticFieldLeak", "FieldCanBeLocal"})
 public class MessageActivity extends AppCompatActivity {
 
     private CircleImageView profile_image;
@@ -102,18 +103,19 @@ public class MessageActivity extends AppCompatActivity {
     private String message_to_reply;
     private String reply_from;
     private ConstraintLayout reply_layout;
-    ConstraintLayout container_bottom_msg;
+    private ConstraintLayout container_bottom_msg;
     private ImageView cancelButton;
     private ValueEventListener seenListener;
     public static DtoAccount user_im_chat;
+    public static DtoAccount mUser = new DtoAccount();
     private static final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
 
     public static FirebaseUser fUser;
-    DatabaseReference reference;
-    MessageAdapter messageAdapter;
-    List<DtoMessage> mMessage;
-    List<String> medias_pin = new ArrayList<>();
-    String userId;
+    private DatabaseReference reference;
+    private MessageAdapter messageAdapter;
+    private List<DtoMessage> mMessage;
+    private List<String> medias_pin = new ArrayList<>();
+    private String userId;
     String another_user_image = "";
 
     APIService apiService;
@@ -146,10 +148,13 @@ public class MessageActivity extends AppCompatActivity {
         fUser = ConfFirebase.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
 
+        CheckShared();
+
         String img = daoChat.get_BG("bg_" + fUser.getUid() + "_"
                 + userId);
         if(img != null) BackgroundHelper.LoadBackground(img);
 
+        //  Send msg click
         btn_send.setOnClickListener(v -> {
             notify = true;
             String msg = text_send.getText().toString();
@@ -158,6 +163,7 @@ public class MessageActivity extends AppCompatActivity {
             text_send.setText("");
         });
 
+        //  Loop to get user who user having a chat information
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -219,6 +225,14 @@ public class MessageActivity extends AppCompatActivity {
 
         seenMessage(userId);
         setRecyclerSwipe();
+    }
+
+    private void CheckShared() {
+        Bundle bundle = getIntent().getExtras();
+        if(bundle.getInt("shared") == 1){
+            if(bundle.getInt("shared_type") == 1)
+                text_send.setText(bundle.getString("shared_content"));
+        }
     }
 
     private void Ids() {
@@ -338,7 +352,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void currentUser(String userId){
-        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = getSharedPreferences( MyPrefs.PREFS_NOTIFICATION, MODE_PRIVATE).edit();
         editor.putString("currentUser", userId);
         editor.apply();
     }
@@ -410,27 +424,27 @@ public class MessageActivity extends AppCompatActivity {
                         else joinNow = 1;
                     } else joinNow = 0;
 
-                    if(mMessageFinal.size() > 0 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())){
-                        Log.d("Chat", "OKAY NEW MSG");
-                        mMessageFinal.clear();
-                        mMessageFinal.addAll(mMessage);
-                        messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, MainActivity.getInstance().getUserInformation().getUsername(), user_im_chat.getUsername());
-                        recycler_view_msg.setAdapter(messageAdapter);
+                    if(mMessageFinal.size() > 0 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())
+                            || mMessageFinal.size() > 0 && mMessageFinal.get(mMessageFinal.size() -1).getIsSeen() != mMessage.get(mMessage.size() -1).getIsSeen()){
+                        Log.d("Chat", "OKAY NEW MSG OR IS SEEN");
+                        LoadAdapter(imageURl);
                         base_load = false;
                     }
 
-                    if(base_load){
-                        mMessageFinal.clear();
-                        mMessageFinal.addAll(mMessage);
-                        messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, MainActivity.getInstance().getUserInformation().getUsername(), user_im_chat.getUsername());
-                        recycler_view_msg.setAdapter(messageAdapter);
-                    }
+                    if(base_load) LoadAdapter(imageURl);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
+    }
+
+    private void LoadAdapter(String imageURl) {
+        mMessageFinal.clear();
+        mMessageFinal.addAll(mMessage);
+        messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, getUserInformation().getUsername(), user_im_chat.getUsername());
+        recycler_view_msg.setAdapter(messageAdapter);
     }
 
     @Override
@@ -466,6 +480,29 @@ public class MessageActivity extends AppCompatActivity {
         if(reply_layout.getVisibility() == ConstraintLayout.VISIBLE)
             KeyboardUtils.hideKeyboard(this);
         reply_layout.setVisibility(View.GONE);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public DtoAccount getUserInformation(){
+        SharedPreferences sp = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+        mUser.setAccount_id(Long.parseLong(EncryptHelper.decrypt(sp.getString("pref_account_id", null))));
+        mUser.setName_user(EncryptHelper.decrypt(sp.getString("pref_name_user", null)));
+        mUser.setUsername(EncryptHelper.decrypt(sp.getString("pref_username", null)));
+        mUser.setEmail(EncryptHelper.decrypt(sp.getString("pref_email", null)));
+        mUser.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
+        mUser.setBanner_user(EncryptHelper.decrypt(sp.getString("pref_banner_user", null)));
+        mUser.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
+        mUser.setProfile_image(EncryptHelper.decrypt(sp.getString("pref_profile_image", null)));
+        mUser.setBio_user(EncryptHelper.decrypt(sp.getString("pref_bio_user", null)));
+        mUser.setUrl_user(EncryptHelper.decrypt(sp.getString("pref_url_user", null)));
+        mUser.setFollowing(EncryptHelper.decrypt(sp.getString("pref_following", null)));
+        mUser.setFollowers(EncryptHelper.decrypt(sp.getString("pref_followers", null)));
+        mUser.setBorn_date(EncryptHelper.decrypt(sp.getString("pref_born_date", null)));
+        mUser.setJoined_date(EncryptHelper.decrypt(sp.getString("pref_joined_date", null)));
+        mUser.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
+        mUser.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
+        mUser.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
+        return mUser;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -524,9 +561,8 @@ public class MessageActivity extends AppCompatActivity {
             }
         }
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null)
             BackgroundHelper.SendToCrop(this, data);
-        }
 
         if (requestCode == PICK_IMAGE_REQUEST_MEDIA && resultCode == RESULT_OK && data != null && data.getData() != null) {
             LoadingDialog loadingDialog = new LoadingDialog(this);
@@ -538,8 +574,8 @@ public class MessageActivity extends AppCompatActivity {
 
                     //uploading the image
                     storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
-                            + getFileName(filePath) + "_" + Methods.RandomCharactersWithoutSpecials(3));
-                    storageReference .putFile(filePath).continueWithTask(task -> {
+                            + getFileName(filePath).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(3));
+                    storageReference.putFile(filePath).continueWithTask(task -> {
                         if (!task.isSuccessful()) {
                             Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
                         }
@@ -554,8 +590,8 @@ public class MessageActivity extends AppCompatActivity {
 
                         } else {
                             loadingDialog.dismissDialog();
-                            ToastHelper.toast(this, task.getException().toString(), 0);
-                            Log.d("ProfileUpload", Objects.requireNonNull(task.getException()).getMessage());
+                            Warnings.showWeHaveAProblem(MessageActivity.this);
+                            Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
                         }
                     });
                 }
@@ -566,7 +602,7 @@ public class MessageActivity extends AppCompatActivity {
             } catch (Exception ex) {
                 loadingDialog.dismissDialog();
                 Warnings.showWeHaveAProblem(this);
-                Log.d("ProfileUpload", ex.toString());
+                Log.d("MediaUpload", ex.toString());
             }
         }
     }
@@ -575,17 +611,14 @@ public class MessageActivity extends AppCompatActivity {
         String result = null;
         if (uri.getScheme().equals("content")) {
             try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
-                if (cursor != null && cursor.moveToFirst()) {
+                if (cursor != null && cursor.moveToFirst())
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
             }
         }
         if (result == null) {
             result = uri.getPath();
             int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
-            }
+            if (cut != -1) result = result.substring(cut + 1);
         }
         return result;
     }
