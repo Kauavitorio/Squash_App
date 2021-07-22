@@ -119,19 +119,40 @@
                 android:textColor="@color/black"/>
 
             <!-- Img for medias -->
-            <ImageView
-                android:id="@+id/media_img"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_media_img_chat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/logo_no_bg"
                 android:maxHeight="260dp"
                 android:maxWidth="220dp"
+                android:visibility="visible"
                 android:layout_below="@id/msg_chat_item"
                 android:layout_marginTop="2dp"
-                android:layout_marginBottom="5dp"
-                android:visibility="gone"
-                android:adjustViewBounds="true"
-                tools:ignore="ContentDescription" />
+                android:layout_marginBottom="5dp">
+
+                <ProgressBar
+                    android:id="@+id/progress_media_img_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/media_img"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:maxHeight="260dp"
+                    android:maxWidth="220dp"
+                    android:minHeight="260dp"
+                    android:minWidth="220dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="5dp"
+                    android:adjustViewBounds="true"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_video"

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/report_webSite"
+        android:title="@string/report_website"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/refresh_web"
+        android:title="@string/refresh"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/open_with_web"
+        android:title="@string/open_with"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/copy_link_web"
+        android:title="@string/copy_link"
+        app:showAsAction="never"/>
+
+</menu>

@@ -57,6 +57,10 @@
         <item name="android:textColorSecondary">@color/white</item>
     </style>
 
+    <style name="ToolbarColoredWeb" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColorSecondary">@color/black</item>
+    </style>
+
     <style name="popup_window_animation">
         <item name="android:windowEnterAnimation">@anim/slide_left_to_right</item>
         <item name="android:windowExitAnimation">@anim/slide_right_to_left</item>
