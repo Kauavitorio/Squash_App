@@ -16,6 +16,7 @@ import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Data.Account.AsyncUser_Search;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.MyPrefs;
 
 @SuppressWarnings("FieldCanBeLocal")
 @SuppressLint("StaticFieldLeak")
@@ -75,7 +76,7 @@ public class SearchFragment extends Fragment {
 
     private void Ids(View view) {
         instance = this;
-        account = MainActivity.getInstance().getUserInformation();
+        account = MyPrefs.getUserInformation(requireContext());
         edit_search = view.findViewById(R.id.edit_Search_Main);
     }
 }

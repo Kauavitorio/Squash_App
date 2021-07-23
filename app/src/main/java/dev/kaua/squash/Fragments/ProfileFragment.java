@@ -46,6 +46,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
@@ -300,7 +301,7 @@ public class ProfileFragment extends Fragment {
         ic_account_badge_profile.setVisibility(View.GONE);
         btn_go_chat_profile.setVisibility(View.GONE);
         btn_plus_story_profile.setVisibility(View.VISIBLE);
-        DtoAccount user = MainActivity.getInstance().getUserInformation();
+        DtoAccount user = MyPrefs.getUserInformation(requireContext());
         account_id = user.getAccount_id();
         account.setAccount_id(account_id);
         account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
@@ -333,7 +334,7 @@ public class ProfileFragment extends Fragment {
 
     private void Ids(View view) {
         instance = this;
-        account = MainActivity.getInstance().getUserInformation();
+        account = MyPrefs.getUserInformation(requireContext());
         img_banner_profile = view.findViewById(R.id.img_banner_profile);
         loadingPanel_profile = view.findViewById(R.id.loadingPanel_profile);
         btn_go_chat_profile = view.findViewById(R.id.btn_go_chat_profile);

@@ -45,6 +45,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 
 @SuppressLint("StaticFieldLeak")
@@ -195,7 +196,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void Ids(View view) {
-        account_info = MainActivity.getInstance().getUserInformation();
+        account_info = MyPrefs.getUserInformation(requireContext());
         instance = this;
         txt_username_chat = view.findViewById(R.id.txt_username_chat);
         profile_image = view.findViewById(R.id.profile_image_chat);

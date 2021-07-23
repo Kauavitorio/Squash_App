@@ -141,6 +141,7 @@ public abstract class Login {
                                 ((Activity) context).finish();
                             });
                 }else if(response.code() == 206){
+                    Log.d("LoginActions", "Email not validated");
                     loadingDialog.dismissDialog();
                     mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
@@ -181,12 +182,13 @@ public abstract class Login {
         //  Getting user mobile information and date time
         String device_login = Build.MANUFACTURER + ", " + Build.MODEL;
         Calendar c = Calendar.getInstance();
-        Log.d("DateTime", "Current time => "+c.getTime());
+        Log.d("DateTime", "Current time => "+ c.getTime());
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("MMMM dd");
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("HH:mm a z");
         String formattedDate = df.format(c.getTime()) + " at " + df_time.format(c.getTime());
         Log.d("DateTime", "Current date => "+ formattedDate);
+        Log.d("LoginActions", "Device => "+ device_login);
 
         DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), EncryptHelper.encrypt(password),
                 EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))), EncryptHelper.encrypt("0-river"), EncryptHelper.encrypt(formattedDate), 0);
@@ -195,37 +197,40 @@ public abstract class Login {
         call.enqueue(new Callback<DtoAccount>() {
             @Override
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                Log.d("LoginActions", "Login Status => " + response.code());
                 //  Checking api return code
                 if(response.code() == 200){
-                    //  Clear all prefs before login user
-                    mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-                    mPrefs.edit().clear().apply();
+                    if(response.body() != null){
+                        //  Clear all prefs before login user
+                        mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+                        mPrefs.edit().clear().apply();
 
-                    //  Add User prefs
-                    SharedPreferences.Editor editor = mPrefs.edit();
-                    assert response.body() != null;
-                    editor.putString("pref_account_id", response.body().getAccount_id_cry());
-                    editor.putString("pref_uid", response.body().getUID());
-                    editor.putString("pref_name_user", response.body().getName_user());
-                    editor.putString("pref_username", response.body().getUsername());
-                    editor.putString("pref_email", response.body().getEmail());
-                    editor.putString("pref_phone_user", response.body().getPhone_user());
-                    editor.putString("pref_banner_user", response.body().getBanner_user());
-                    editor.putString("pref_profile_image", response.body().getProfile_image());
-                    editor.putString("pref_bio_user", response.body().getBio_user());
-                    editor.putString("pref_url_user", response.body().getUrl_user());
-                    editor.putString("pref_following", response.body().getFollowing());
-                    editor.putString("pref_followers", response.body().getFollowers());
-                    editor.putString("pref_born_date", response.body().getBorn_date());
-                    editor.putString("pref_joined_date", response.body().getJoined_date());
-                    editor.putString("pref_token", response.body().getToken());
-                    editor.putString("pref_password", EncryptHelper.encrypt(password));
-                    editor.putString("pref_verification_level", response.body().getVerification_level());
-                    editor.apply();
+                        //  Add User prefs
+                        SharedPreferences.Editor editor = mPrefs.edit();
+                        editor.putString("pref_account_id", response.body().getAccount_id_cry());
+                        editor.putString("pref_uid", response.body().getUID());
+                        editor.putString("pref_name_user", response.body().getName_user());
+                        editor.putString("pref_username", response.body().getUsername());
+                        editor.putString("pref_email", response.body().getEmail());
+                        editor.putString("pref_phone_user", response.body().getPhone_user());
+                        editor.putString("pref_banner_user", response.body().getBanner_user());
+                        editor.putString("pref_profile_image", response.body().getProfile_image());
+                        editor.putString("pref_bio_user", response.body().getBio_user());
+                        editor.putString("pref_url_user", response.body().getUrl_user());
+                        editor.putString("pref_following", response.body().getFollowing());
+                        editor.putString("pref_followers", response.body().getFollowers());
+                        editor.putString("pref_born_date", response.body().getBorn_date());
+                        editor.putString("pref_joined_date", response.body().getJoined_date());
+                        editor.putString("pref_token", response.body().getToken());
+                        editor.putString("pref_password", EncryptHelper.encrypt(password));
+                        editor.putString("pref_verification_level", response.body().getVerification_level());
+                        editor.apply();
 
-                    //  Getting Followers and Followings
-                    Methods.LoadFollowersAndFollowing(context);
+                        //  Getting Followers and Followings
+                        Methods.LoadFollowersAndFollowing(context);
+                    }
                 }else if(response.code() == 206){
+                    Log.d("LoginActions", "Email not validated");
                     mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
                     Intent i = new Intent(context, ValidateEmailActivity.class);
@@ -238,21 +243,13 @@ public abstract class Login {
                     ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
                     ((Activity) context).finish();
                 }else if(response.code() == 401) {
-                    mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-                    mPrefs.edit().clear().apply();
-                    try {
-                        SignInActivity.getInstance().Invalid_email_or_password();
-                    }catch (Exception ex){
-                        Warnings.showWeHaveAProblem(context);
-                    }
+                    Log.d("LoginActions", "Login Method or Password is not valid");
+                    loadingDialog.dismissDialog();
+                    LogOut(context, 1);
                 }
-                else
-                    Warnings.showWeHaveAProblem(context);
             }
             @Override
-            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
-                Warnings.showWeHaveAProblem(context);
-            }
+            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) { Log.d("LoginActions", t.getMessage()); }
         });
     }
 

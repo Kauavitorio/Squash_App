@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     //  Set preferences
     private SharedPreferences mPrefs;
 
-    private static final DtoAccount account = new DtoAccount();
+    private static DtoAccount account = new DtoAccount();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void StartNavigation() {
-        getUserInformation();
+        getUserInformationAndLoadProfile();
         LoadMainFragment();
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());
         //noinspection unchecked
@@ -178,29 +178,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(compose);
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public DtoAccount getUserInformation(){
-        SharedPreferences sp = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        account.setAccount_id(Long.parseLong(EncryptHelper.decrypt(sp.getString("pref_account_id", null))));
-        account.setName_user(EncryptHelper.decrypt(sp.getString("pref_name_user", null)));
-        account.setUsername(EncryptHelper.decrypt(sp.getString("pref_username", null)));
-        account.setEmail(EncryptHelper.decrypt(sp.getString("pref_email", null)));
-        account.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
-        account.setBanner_user(EncryptHelper.decrypt(sp.getString("pref_banner_user", null)));
-        account.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
-        account.setProfile_image(EncryptHelper.decrypt(sp.getString("pref_profile_image", null)));
-        account.setBio_user(EncryptHelper.decrypt(sp.getString("pref_bio_user", null)));
-        account.setUrl_user(EncryptHelper.decrypt(sp.getString("pref_url_user", null)));
-        account.setFollowing(EncryptHelper.decrypt(sp.getString("pref_following", null)));
-        account.setFollowers(EncryptHelper.decrypt(sp.getString("pref_followers", null)));
-        account.setBorn_date(EncryptHelper.decrypt(sp.getString("pref_born_date", null)));
-        account.setJoined_date(EncryptHelper.decrypt(sp.getString("pref_joined_date", null)));
-        account.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
-        account.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
-        account.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
-
+    public void getUserInformationAndLoadProfile(){
+        account = MyPrefs.getUserInformation(this);
         Picasso.get().load(account.getProfile_image()).into(btn_profile_main);
-        return account;
     }
 
     private void LoadMainFragment() {
@@ -243,15 +223,15 @@ public class MainActivity extends AppCompatActivity {
         bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(account.getUsername()));
         bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle_Analytics);
-        getUserInformation();
+        getUserInformationAndLoadProfile();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected void onResume() {
         super.onResume();
-        getUserInformation();
-        Login.ReloadUserinfo(this, getUserInformation().getEmail(), getUserInformation().getPassword());
+        getUserInformationAndLoadProfile();
+        Login.ReloadUserinfo(this, MyPrefs.getUserInformation(this).getEmail(), MyPrefs.getUserInformation(this).getPassword());
         Methods.status_chat("online");
         Methods.LoadFollowersAndFollowing(this);
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());

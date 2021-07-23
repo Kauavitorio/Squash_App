@@ -38,6 +38,7 @@ import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -152,7 +153,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     }
 
     private void Check_Like(@NotNull MyHolderPosts holder, int position) {
-        DtoAccount user = MainActivity.getInstance().getUserInformation();
+        DtoAccount user = MyPrefs.getUserInformation(mContext);
         boolean result_like = daoPosts.get_A_Like(Long.parseLong(list.get(position).getPost_id()), Long.parseLong(user.getAccount_id() + ""));
         if(result_like) holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
         else holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
@@ -160,7 +161,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     private void Like_Un_Like_A_Post(@NotNull MyHolderPosts holder, long position, String post_id) {
         //  Get User info
-        DtoAccount user = MainActivity.getInstance().getUserInformation();
+        DtoAccount user = MyPrefs.getUserInformation(mContext);
 
         boolean result_like = daoPosts.get_A_Like(Long.parseLong(post_id), Long.parseLong(user.getAccount_id() + ""));
         if(result_like) {

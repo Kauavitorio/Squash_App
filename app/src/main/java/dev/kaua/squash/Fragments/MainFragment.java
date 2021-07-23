@@ -36,6 +36,7 @@ import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 
 /**
@@ -120,7 +121,7 @@ public class MainFragment extends Fragment {
         instance = requireActivity();
         requireActivity().getWindow().setStatusBarColor(requireActivity().getColor(R.color.background_menu_sheet));
         firebaseUser = ConfFirebase.getFirebaseUser();
-        account = MainActivity.getInstance().getUserInformation();
+        account = MyPrefs.getUserInformation(requireContext());
         loadingPanel = view.findViewById(R.id.loadingPanel);
         icon_ProfileUser_main = view.findViewById(R.id.icon_ProfileUser_main);
         btn_create_new_story_main = view.findViewById(R.id.btn_create_new_story_main);

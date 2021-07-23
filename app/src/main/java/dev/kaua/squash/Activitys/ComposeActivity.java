@@ -23,6 +23,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -94,7 +95,7 @@ public class ComposeActivity extends AppCompatActivity {
     }
 
     private void Ids() {
-        userAccount = MainActivity.getInstance().getUserInformation();
+        userAccount = MyPrefs.getUserInformation(this);
         btn_post = findViewById(R.id.btn_post);
         btn_close_compose = findViewById(R.id.btn_close_compose);
         edit_compose_msg = findViewById(R.id.edit_compose_msg);

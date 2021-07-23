@@ -20,6 +20,7 @@ import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -48,7 +49,7 @@ public class SplashActivity extends AppCompatActivity {
         String type = intent.getType();
         if(data != null){
             String UrlGetFrom = data.toString();
-            UrlGetFrom = UrlGetFrom.replace("https://squash-social.herokuapp.com/", "").replace("http://squash-social.herokuapp.com/", "");
+            UrlGetFrom = UrlGetFrom.replace(Methods.BASE_URL, "").replace("http://squash-social.herokuapp.com/", "");
             String[] KnowContent = UrlGetFrom.split("/");
             if (KnowContent[0].equals("verify-account")){
                 if(KnowContent[1] != null && KnowContent[1].length() > 3 ){
@@ -120,7 +121,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void DoValidation(String value) {
-        SharedPreferences sp_First = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        SharedPreferences sp_First = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         Intent i = new Intent(this, ValidateEmailActivity.class);
         i.putExtra("account_id", EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)));
         i.putExtra("password", EncryptHelper.decrypt(sp_First.getString("pref_password", null)));
@@ -133,7 +134,7 @@ public class SplashActivity extends AppCompatActivity {
 
     public void verifyIfUsersLogged() {
         //  Verification of user preference information
-        SharedPreferences sp_First = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        SharedPreferences sp_First = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         if (sp_First.contains("pref_token")) LoadBaseInfoAndMain();
         else timer.postDelayed(this::GoToIntro, 1500);
     }

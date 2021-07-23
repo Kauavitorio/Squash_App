@@ -185,21 +185,22 @@ public class SignUpActivity extends AppCompatActivity {
 
             mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
 
-            mAuth.createUserWithEmailAndPassword(EncryptHelper.decrypt(account.getEmail()), token)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
 
-                            // Sign in success, now go to register user into API
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Log.w("Auth", "OK" + user);
+            AccountServices services = retrofitUser.create(AccountServices.class);
+            Call<DtoAccount> call = services.registerUser(account);
+            call.enqueue(new Callback<DtoAccount>() {
+                @Override
+                public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                    if(response.code() == 201){
+                        mAuth.createUserWithEmailAndPassword(EncryptHelper.decrypt(account.getEmail()), token)
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        loadingDialog.dismissDialog();
 
-                            AccountServices services = retrofitUser.create(AccountServices.class);
-                            Call<DtoAccount> call = services.registerUser(account);
-                            call.enqueue(new Callback<DtoAccount>() {
-                                @Override
-                                public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                                    loadingDialog.dismissDialog();
-                                    if(response.code() == 201){
+                                        // Sign in success, now go to register user into API
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                        Log.w("Auth", "OK" + user);
+
                                         String userId = user.getUid();
 
                                         //  Creating analytic for sign up event
@@ -246,31 +247,33 @@ public class SignUpActivity extends AppCompatActivity {
                                         i.putExtra("type_validate", 0);
                                         ActivityCompat.startActivity(SignUpActivity.this, i, activityOptionsCompat.toBundle());
                                         finish();
-                                    }else if(response.code() == 401)
+
+                                    } else {
+                                        loadingDialog.dismissDialog();
                                         //  Email is already used
                                         ReloadPage(401);
-                                    else if(response.code() == 423)
-                                        //  Phone is already used
-                                        ReloadPage(423);
-                                    else if(response.code() == 406)
-                                        //  BadWord in user name
-                                        ReloadPage(406);
-                                    else
-                                        Warnings.showWeHaveAProblem(SignUpActivity.this);
-                                }
+                                        Log.d("Auth", "Error " + task.getException());
+                                    }
+                                });
+                    }else if(response.code() == 401)
+                        //  Email is already used
+                        ReloadPage(401);
+                    else if(response.code() == 423)
+                        //  Phone is already used
+                        ReloadPage(423);
+                    else if(response.code() == 406)
+                        //  BadWord in user name
+                        ReloadPage(406);
+                    else
+                        Warnings.showWeHaveAProblem(SignUpActivity.this);
+                }
 
-                                @Override
-                                public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
-                                    loadingDialog.dismissDialog();
-                                    Warnings.showWeHaveAProblem(SignUpActivity.this);
-                                }
-                            });
-                        } else {
-                            //  Email is already used
-                            ReloadPage(401);
-                            Log.d("Auth", "Error " + task.getException());
-                        }
-                    });
+                @Override
+                public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
+                    loadingDialog.dismissDialog();
+                    Warnings.showWeHaveAProblem(SignUpActivity.this);
+                }
+            });
         });
 
     }
@@ -292,6 +295,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     // Method to reload Pag when register get error
     private void ReloadPage(int error_code){
+        loadingDialog.dismissDialog();
         Intent goTo_SignUp = new Intent(this, SignUpActivity.class);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
         goTo_SignUp.putExtra("error_code", error_code);
