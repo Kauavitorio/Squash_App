@@ -87,6 +87,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         Check_Like(holder, position);
 
         holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(list.get(position).getPost_likes())));
+        holder.txt_date_time_post.setText(" • " + list.get(position).getPost_time());
         holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(list.get(position).getPost_comments_amount())));
 
         if(list.get(position).getPost_images() != null && list.get(position).getPost_images().size() > 0 && !list.get(position).getPost_images().get(0).equals("NaN")){
@@ -199,7 +200,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     static class MyHolderPosts extends RecyclerView.ViewHolder{
         CircleImageView icon_user_profile_post;
-        TextView txt_name_user_post, txt_username_post, txt_post_content, txt_images_amount_post;
+        TextView txt_name_user_post, txt_username_post, txt_post_content, txt_images_amount_post, txt_date_time_post;
         TextView txt_likes_post, txt_comments_post;
         ImageView img_firstImage_post, img_secondImage_post, img_thirdImage_post, ic_account_badge, img_heart_like;
         RelativeLayout container_third_img;
@@ -208,6 +209,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
         public MyHolderPosts(@NonNull View itemView) {
             super(itemView);
+            txt_date_time_post = itemView.findViewById(R.id.txt_date_time_post);
             icon_user_profile_post = itemView.findViewById(R.id.icon_user_profile_post);
             txt_name_user_post = itemView.findViewById(R.id.txt_name_user_post);
             img_heart_like = itemView.findViewById(R.id.img_heart_like_post);

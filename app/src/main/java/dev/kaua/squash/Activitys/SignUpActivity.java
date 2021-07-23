@@ -39,8 +39,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import dev.kaua.squash.Data.Account.AccountServices;
+import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Fragments.SearchFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
@@ -227,6 +229,18 @@ public class SignUpActivity extends AppCompatActivity {
                                         hashMap.put("status_chat", "offline");
                                         hashMap.put("last_seen", formattedDate);
                                         hashMap.put("typingTo", "noOne");
+
+                                        DtoAccount follow = new DtoAccount();
+                                        follow.setAccount_id_cry(response.body().getAccount_id_cry());
+                                        follow.setAccount_id_following(EncryptHelper.encrypt("25"));
+                                        AccountServices services = retrofitUser.create(AccountServices.class);
+                                        Call<DtoAccount> call_follow = services.follow_a_user(follow);
+                                        call_follow.enqueue(new Callback<DtoAccount>() {
+                                            @Override
+                                            public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {}
+                                            @Override
+                                            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+                                        });
 
                                         reference.setValue(hashMap).addOnCompleteListener(task1 -> {
                                             if(task1.isSuccessful()) Log.d("User", "Register in Realtime database Successful");

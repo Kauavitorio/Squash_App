@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 import dev.kaua.squash.Adapters.Posts_Adapters;
@@ -70,40 +71,47 @@ public class RecommendedPosts {
                 @Override
                 public void onResponse(@NotNull Call<ArrayList<DtoPost>> call, @NotNull Response<ArrayList<DtoPost>> response) {
                     //swipe_main.setRefreshing(false);
-                    ArrayList<DtoPost> list = response.body();
-                    daoPosts.DropTable(0);
-                    if(list != null){
-                        if(list.get(0).getPosts() != null){
-                            for (int i = 0; i < Objects.requireNonNull(list).get(0).getPosts().size(); i++){
-                                DtoPost.Posts_Search dtoPost = list.get(0).getPosts().get(i);
-                                DtoPost post = new DtoPost();
-                                if(dtoPost.getPost_id() != null){
-                                    post.setPost_id(EncryptHelper.decrypt(dtoPost.getPost_id()));
-                                    post.setAccount_id(EncryptHelper.decrypt(dtoPost.getAccount_id()));
-                                    post.setVerification_level(EncryptHelper.decrypt(dtoPost.getVerification_level()));
-                                    post.setName_user(EncryptHelper.decrypt(dtoPost.getName_user()));
-                                    post.setUsername(EncryptHelper.decrypt(dtoPost.getUsername()));
-                                    post.setProfile_image(EncryptHelper.decrypt(dtoPost.getProfile_image()));
-                                    post.setPost_date(EncryptHelper.decrypt(dtoPost.getPost_date()));
-                                    post.setPost_time(EncryptHelper.decrypt(dtoPost.getPost_time()));
-                                    post.setPost_content(EncryptHelper.decrypt(dtoPost.getPost_content()));
-                                    if(dtoPost.getPost_images() != null && dtoPost.getPost_images().size() != 0) post.setPost_images(dtoPost.getPost_images());
-                                    else post.setPost_images(null);
-                                    post.setPost_likes(EncryptHelper.decrypt(dtoPost.getPost_likes()));
-                                    post.setPost_comments_amount(EncryptHelper.decrypt(dtoPost.getPost_comments_amount()));
-                                    post.setPost_topic(EncryptHelper.decrypt(dtoPost.getPost_topic()));
-                                    arraylist.add(post);
+                    if(response.code() == 200 || response.code() == 201){
+                        ArrayList<DtoPost> list = response.body();
+                        daoPosts.DropTable(0);
+                        if(list != null){
+                            if(list.get(0).getPosts() != null){
+                                for (int i = 0; i < Objects.requireNonNull(list).get(0).getPosts().size(); i++){
+                                    DtoPost.Posts_Search dtoPost = list.get(0).getPosts().get(i);
+                                    DtoPost post = new DtoPost();
+                                    if(dtoPost.getPost_id() != null){
+                                        if(!Objects.equals(EncryptHelper.decrypt(dtoPost.getPost_id()), "99999")){
+                                            post.setPost_id(EncryptHelper.decrypt(dtoPost.getPost_id()));
+                                            post.setAccount_id(EncryptHelper.decrypt(dtoPost.getAccount_id()));
+                                            post.setVerification_level(EncryptHelper.decrypt(dtoPost.getVerification_level()));
+                                            post.setName_user(EncryptHelper.decrypt(dtoPost.getName_user()));
+                                            post.setUsername(EncryptHelper.decrypt(dtoPost.getUsername()));
+                                            post.setProfile_image(EncryptHelper.decrypt(dtoPost.getProfile_image()));
+                                            post.setPost_date(EncryptHelper.decrypt(dtoPost.getPost_date()));
+                                            post.setPost_time(EncryptHelper.decrypt(dtoPost.getPost_time()));
+                                            post.setPost_content(EncryptHelper.decrypt(dtoPost.getPost_content()));
+                                            if(dtoPost.getPost_images() != null && dtoPost.getPost_images().size() != 0) post.setPost_images(dtoPost.getPost_images());
+                                            else post.setPost_images(null);
+                                            post.setPost_likes(EncryptHelper.decrypt(dtoPost.getPost_likes()));
+                                            post.setPost_comments_amount(EncryptHelper.decrypt(dtoPost.getPost_comments_amount()));
+                                            post.setPost_topic(EncryptHelper.decrypt(dtoPost.getPost_topic()));
+                                            arraylist.add(post);
+                                        }
+                                    }
                                 }
-                            }
-                            daoPosts.Register_Home_Posts(arraylist);
+                                arraylist.sort(null);
+                                Collections.reverse(arraylist);
 
-                            Posts_Adapters posts_adapters = new Posts_Adapters(arraylist, context);
-                            posts_adapters.notifyDataSetChanged();
-                            recyclerView.setAdapter(posts_adapters);
-                            recyclerView.getRecycledViewPool().clear();
-                            recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-                            loadingPanel.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
+                                daoPosts.Register_Home_Posts(arraylist);
+
+                                Posts_Adapters posts_adapters = new Posts_Adapters(arraylist, context);
+                                posts_adapters.notifyDataSetChanged();
+                                recyclerView.setAdapter(posts_adapters);
+                                recyclerView.getRecycledViewPool().clear();
+                                recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                                loadingPanel.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
                 }

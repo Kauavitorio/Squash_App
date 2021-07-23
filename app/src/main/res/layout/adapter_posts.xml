@@ -76,6 +76,17 @@
                     android:maxLength="20"
                     android:textSize="16sp"/>
 
+                <!-- User DateTime -->
+                <TextView
+                    android:id="@+id/txt_date_time_post"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    android:textColor="@color/hint"
+                    android:layout_marginStart="4dp"
+                    android:maxLength="20"
+                    android:textSize="13sp"/>
+
             </LinearLayout>
 
         </LinearLayout>
