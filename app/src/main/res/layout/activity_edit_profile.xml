@@ -19,18 +19,33 @@
 
     <EditText
         android:id="@+id/edit_name"
+        android:maxLength="25"
+        android:hint="@string/name"
+        android:backgroundTint="@color/hint"
+        android:textColorHint="@color/hint"
+        android:textColor="@color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <EditText
         android:id="@+id/edit_username"
+        android:hint="@string/username"
+        android:backgroundTint="@color/hint"
+        android:textColorHint="@color/hint"
+        android:textColor="@color/black"
+        android:maxLength="20"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <EditText
         android:id="@+id/edit_bio"
+        android:hint="@string/bio"
+        android:backgroundTint="@color/hint"
+        android:textColorHint="@color/hint"
+        android:textColor="@color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
     <Button
         android:id="@+id/btn_edit_profile"
         android:layout_width="wrap_content"

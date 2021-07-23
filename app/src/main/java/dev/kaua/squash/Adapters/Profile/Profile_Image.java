@@ -15,46 +15,58 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
+import dev.kaua.squash.Activitys.ComposeActivity;
 import dev.kaua.squash.Activitys.EditProfileActivity;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.R;
+import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
+import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 
 public class Profile_Image extends EditProfileActivity {
 
     public static void SendToCrop(Activity context, Intent data) {
+        LoadingDialog loadingDialog = new LoadingDialog(context);
+        loadingDialog.startLoading();
         Uri filePath = data.getData();
         try {
             //getting image from gallery
             if(filePath != null) {
-                try {
-                    Intent cropIntent = new Intent("com.android.camera.action.CROP");
-                    // indicate image type and Uri
-                    cropIntent.setDataAndType(filePath, "image/*");
-                    // set crop properties here
-                    cropIntent.putExtra("crop", true);
-                    // indicate aspect of desired crop
-                    cropIntent.putExtra("aspectX", 1);
-                    cropIntent.putExtra("aspectY", 1);
-                    // indicate output X and Y
-                    cropIntent.putExtra("outputX", 158);
-                    cropIntent.putExtra("outputY", 158);
-                    // retrieve data on return
-                    cropIntent.putExtra("return-data", true);
-                    // start the activity - we handle returning in onActivityResult
-                    context.startActivityForResult(cropIntent, PIC_CROP);
-                }
-                // respond to users whose devices do not support the crop action
-                catch (ActivityNotFoundException ex) {
-                    // display an error message
-                    String errorMessage = "Whoops - your device doesn't support the crop action!";
-                    Toast toast = Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT);
-                    toast.show();
-                }
+
+                //uploading the image
+                storageReference = ConfFirebase.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
+                        "_" + ConfFirebase.getFirebaseAuth().getUid());
+                storageReference.putFile(filePath).continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
+                    }
+                    return storageReference.getDownloadUrl();
+                }).addOnCompleteListener(task -> {
+                    loadingDialog.dismissDialog();
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        loadingDialog.dismissDialog();
+                        String imageUrl = downloadUri.toString();
+                        new_image = imageUrl;
+                        Log.d("DEBUG_CHAT",  imageUrl);
+                        Picasso.get().load(imageUrl).into(ic_edit_ProfileUser);
+                    } else {
+                        loadingDialog.dismissDialog();
+                        Warnings.showWeHaveAProblem(context);
+                        Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
+                    }
+                });
+            }
+            else{
+                ToastHelper.toast(context, context.getString(R.string.select_an_image), 0);
+                loadingDialog.dismissDialog();
             }
         } catch (Exception ex) {
+            loadingDialog.dismissDialog();
             Warnings.showWeHaveAProblem(context);
-            Log.d("DEBUG_CHAT", ex.toString());
+            Log.d("MediaUpload", ex.toString());
         }
     }
 

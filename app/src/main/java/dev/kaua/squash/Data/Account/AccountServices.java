@@ -26,4 +26,7 @@ public interface    AccountServices {
 
     @POST("user/action/un-follow")
     Call<DtoAccount> un_follow_a_user (@Body DtoAccount account);
+
+    @POST("user/action/check-username")
+    Call<DtoAccount> check_username (@Body DtoAccount account);
 }

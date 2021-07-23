@@ -6,7 +6,9 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DtoPost {
+import dev.kaua.squash.Security.EncryptHelper;
+
+public class DtoPost implements Comparable<DtoPost>{
 
     @SerializedName("Posts_Search")
     private ArrayList<Posts_Search>  posts;
@@ -155,9 +157,12 @@ public class DtoPost {
         this.post_topic = post_topic;
     }
 
+    @Override
+    public int compareTo(DtoPost o) {
+        return getPost_id().compareTo(o.getPost_id());
+    }
 
-
-    public class Posts_Search {
+    public class Posts_Search implements Comparable<DtoPost>{
 
         @SerializedName("post_id")
         @Expose
@@ -210,6 +215,11 @@ public class DtoPost {
         @SerializedName("verification_level")
         @Expose
         private String verification_level;
+        
+        @Override
+        public int compareTo(DtoPost o) {
+            return getPost_id().compareTo(o.getPost_id());
+        }
 
         public String getVerification_level() {
             return verification_level;

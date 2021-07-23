@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
@@ -55,8 +56,9 @@ public class MainFragment extends Fragment {
     private CircleImageView icon_ProfileUser_main;
     private CardView card_msg_notRead_main;
     private LinearLayout header_main;
+    private static ProgressBar loading_posts;
     private static Context instance;
-    private static RelativeLayout loadingPanel;
+    private static ConstraintLayout loadingPanel;
     private Handler timer = new Handler();
     DatabaseReference reference;
     FirebaseUser firebaseUser;
@@ -115,7 +117,7 @@ public class MainFragment extends Fragment {
     }
 
 
-    public static void RefreshRecycler(){ RecommendedPosts.getRecommendedPosts(instance, recyclerView_Posts, loadingPanel, account); }
+    public static void RefreshRecycler(){ RecommendedPosts.getRecommendedPosts(instance, recyclerView_Posts, loadingPanel, loading_posts); }
 
     private void Ids(View view) {
         instance = requireActivity();
@@ -123,6 +125,7 @@ public class MainFragment extends Fragment {
         firebaseUser = ConfFirebase.getFirebaseUser();
         account = MyPrefs.getUserInformation(requireContext());
         loadingPanel = view.findViewById(R.id.loadingPanel);
+        loading_posts = view.findViewById(R.id.loading_posts);
         icon_ProfileUser_main = view.findViewById(R.id.icon_ProfileUser_main);
         btn_create_new_story_main = view.findViewById(R.id.btn_create_new_story_main);
         card_msg_notRead_main = view.findViewById(R.id.card_msg_notRead_main);

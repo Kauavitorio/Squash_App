@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.util.Linkify;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +51,7 @@ import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
+import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -252,6 +255,7 @@ public class ProfileFragment extends Fragment {
                                 txt_user_name.setText(EncryptHelper.decrypt(response.body().getName_user()));
                                 txt_username_name.setText( " | " + EncryptHelper.decrypt(response.body().getUsername()));
                                 txt_user_bio_profile.setText(EncryptHelper.decrypt(response.body().getBio_user()));
+                                Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
                                 username = EncryptHelper.decrypt(response.body().getUsername());
                                 txt_amount_following_profile.setText(Methods.NumberTrick(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowing())))));
                                 txt_amount_followers_profile.setText(Methods.NumberTrick(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowers())))));
@@ -330,6 +334,7 @@ public class ProfileFragment extends Fragment {
         btn_follow_following_profile.setEnabled(true);
         btn_follow_following_profile.setText(activity.getString(R.string.edit_profile));
         btn_follow_following_profile.setTextColor(activity.getColor(R.color.black));
+        Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
     }
 
     private void Ids(View view) {
@@ -346,6 +351,14 @@ public class ProfileFragment extends Fragment {
         txt_user_name = view.findViewById(R.id.txt_user_name);
         txt_username_name = view.findViewById(R.id.txt_username_name);
         txt_user_bio_profile = view.findViewById(R.id.txt_user_bio_profile);
+        txt_user_bio_profile.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
+            if (Patterns.WEB_URL.matcher(url).matches()) {
+                //An web url is detected
+                Methods.browseTo(requireContext(), url);
+                return true;
+            }
+            return false;
+        }));
         btn_follow_following_profile = view.findViewById(R.id.btn_follow_following_profile);
         txt_amount_following_profile = view.findViewById(R.id.txt_amount_following_profile);
         txt_amount_followers_profile = view.findViewById(R.id.txt_amount_followers_profile);
