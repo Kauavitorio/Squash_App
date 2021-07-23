@@ -104,7 +104,7 @@ public class DaoPosts extends SQLiteOpenHelper {
     }
 
     public ArrayList<DtoPost> get_post(long account_id){
-        String command = "SELECT * FROM " + TABLE_POSTS + " WHERE account_id > ?";
+        String command = "SELECT * FROM " + TABLE_POSTS + " WHERE account_id > ? ORDER BY post_id DESC";
         String[] params = {account_id + ""};
         Cursor cursor = getWritableDatabase().rawQuery(command, params);
         ArrayList<DtoPost> dtoPosts = new ArrayList<>();

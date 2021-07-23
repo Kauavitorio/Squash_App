@@ -156,12 +156,10 @@
                     android:maxLength="1200"
                     android:background="@drawable/custom_edit_compose"
                     android:hint="@string/whats_up"
-                    android:inputType="textCapSentences|textMultiLine"
                     android:minHeight="50dp"
-                    android:singleLine="false"
+                    android:ems="10"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-                    tools:ignore="Autofill" />
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
                 <!-- Container Images -->
                 <LinearLayout

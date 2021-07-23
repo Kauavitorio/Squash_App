@@ -20,4 +20,7 @@ public interface PostServices {
 
     @POST("user/post/new/")
     Call<DtoPost> do_new_post(@Body DtoPost post );
+
+    @POST("user/post/delete/")
+    Call<DtoPost> delete_post(@Body DtoPost post );
 }

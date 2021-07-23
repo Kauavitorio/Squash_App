@@ -6,15 +6,21 @@ import android.content.SharedPreferences;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.CollationKey;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import dev.kaua.squash.Adapters.Posts_Adapters;
 import dev.kaua.squash.Data.Account.DtoAccount;
@@ -39,7 +45,7 @@ public class RecommendedPosts {
     public static final String PREFS_NAME = "myPrefs";
 
     //  Method to get RecommendedPosts
-    public static void getRecommendedPosts(Context context, RecyclerView recyclerView, RelativeLayout loadingPanel, DtoAccount account){
+    public static void getRecommendedPosts(Context context, RecyclerView recyclerView, ConstraintLayout loadingPanel, ProgressBar loading_posts){
         PostServices services = retrofit.create(PostServices.class);
         DtoAccount sameAccount = new DtoAccount();
         SharedPreferences sp = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -54,16 +60,7 @@ public class RecommendedPosts {
         recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         DaoPosts daoPosts = new DaoPosts(context);
 
-        ArrayList<DtoPost> listPostDB = daoPosts.get_post(0);
-        if(listPostDB.size() > 0){
-            Posts_Adapters posts_adapters = new Posts_Adapters(listPostDB, context);
-            posts_adapters.notifyDataSetChanged();
-            recyclerView.setAdapter(posts_adapters);
-            recyclerView.getRecycledViewPool().clear();
-            recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-            loadingPanel.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        }
+        LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
 
         //  Checking if user is connected to a network
         if(Methods.isOnline(context)){
@@ -99,31 +96,36 @@ public class RecommendedPosts {
                                         }
                                     }
                                 }
-                                arraylist.sort(null);
-                                Collections.reverse(arraylist);
+                                arraylist.sort(Collections.reverseOrder());
 
                                 daoPosts.Register_Home_Posts(arraylist);
-
-                                Posts_Adapters posts_adapters = new Posts_Adapters(arraylist, context);
-                                posts_adapters.notifyDataSetChanged();
-                                recyclerView.setAdapter(posts_adapters);
-                                recyclerView.getRecycledViewPool().clear();
-                                recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-                                loadingPanel.setVisibility(View.GONE);
-                                recyclerView.setVisibility(View.VISIBLE);
                             }
                         }
                     }
+                    LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
                 }
                 @Override
                 public void onFailure(@NotNull Call<ArrayList<DtoPost>> call, @NotNull Throwable t) {
                     Log.d("Posts", t.getMessage());
+                    LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
                 }
             });
         }else ToastHelper.toast((Activity)context , context.getString(R.string.you_are_without_internet), 0);
+    }
 
-
-        }
+    private static void LoadPostsFromLocal(Context context, RecyclerView recyclerView, ConstraintLayout loadingPanel, ProgressBar loading_posts, DaoPosts daoPosts) {
+        ArrayList<DtoPost> listPostDB = daoPosts.get_post(0);
+        if (listPostDB.size() > 0) {
+            Posts_Adapters posts_adapters = new Posts_Adapters(listPostDB, context);
+            posts_adapters.notifyDataSetChanged();
+            recyclerView.setAdapter(posts_adapters);
+            recyclerView.getRecycledViewPool().clear();
+            Objects.requireNonNull(recyclerView.getLayoutManager()).onRestoreInstanceState(recyclerViewState);
+            loadingPanel.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        } else
+            loading_posts.setVisibility(View.GONE);
+    }
 
     //  Method to get User Posts
     public static void getUsersPosts(Context context, RecyclerView recyclerView, RelativeLayout loadingPanel, RelativeLayout noPost_profile, DtoAccount account){
@@ -144,7 +146,7 @@ public class RecommendedPosts {
                 @Override
                 public void onResponse(@NotNull Call<ArrayList<DtoPost>> call, @NotNull Response<ArrayList<DtoPost>> response) {
                     //swipe_main.setRefreshing(false);
-                    if(response.code() == 200){
+                    if(response.code() == 200 || response.code() == 201){
                         ArrayList<DtoPost> list = response.body();
                         if(list != null){
                             if(list.get(0).getPosts() != null){
@@ -153,7 +155,7 @@ public class RecommendedPosts {
                                     DtoPost post = new DtoPost();
                                     if(dtoPost.getPost_id() != null){
                                         post.setPost_id(EncryptHelper.decrypt(dtoPost.getPost_id()));
-                                        post.setAccount_id(EncryptHelper.decrypt(dtoPost.getAccount_id()));
+                                        post.setAccount_id(EncryptHelper.decrypt(EncryptHelper.decrypt(dtoPost.getAccount_id())));
                                         post.setVerification_level(EncryptHelper.decrypt(dtoPost.getVerification_level()));
                                         post.setName_user(EncryptHelper.decrypt(dtoPost.getName_user()));
                                         post.setUsername(EncryptHelper.decrypt(dtoPost.getUsername()));

@@ -87,6 +87,14 @@
                     android:maxLength="20"
                     android:textSize="13sp"/>
 
+                <!-- Ic Three dots -->
+                <ImageView
+                    android:id="@+id/btn_actions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_three_dots"
+                    tools:ignore="ContentDescription" />
+
             </LinearLayout>
 
         </LinearLayout>

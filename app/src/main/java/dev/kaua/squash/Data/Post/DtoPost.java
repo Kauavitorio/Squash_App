@@ -162,7 +162,7 @@ public class DtoPost implements Comparable<DtoPost>{
         return getPost_id().compareTo(o.getPost_id());
     }
 
-    public class Posts_Search {
+    public class Posts_Search implements Comparable<DtoPost>{
 
         @SerializedName("post_id")
         @Expose
@@ -215,6 +215,11 @@ public class DtoPost implements Comparable<DtoPost>{
         @SerializedName("verification_level")
         @Expose
         private String verification_level;
+        
+        @Override
+        public int compareTo(DtoPost o) {
+            return getPost_id().compareTo(o.getPost_id());
+        }
 
         public String getVerification_level() {
             return verification_level;

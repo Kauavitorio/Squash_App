@@ -96,4 +96,8 @@
     <string name="desc_remove_image_post">Quer remover a imagem selecionada da sua postagem?</string>
     <string name="username_is_already_in_use">Nome de usuário já está em uso.</string>
     <string name="required_field">Campo obrigatório</string>
+    <string name="desc_reason_empty_timeline">Olá, sua linha do tempo está vazia porque você ainda não segue ninguém</string>
+    <string name="username">Username</string>
+    <string name="delete_post">Apagar a postagem</string>
+    <string name="delete_post_message">Deseja realmente apagar sua postagem?\nIsso resultara na perda das curtidas e comentarios.</string>
 </resources>

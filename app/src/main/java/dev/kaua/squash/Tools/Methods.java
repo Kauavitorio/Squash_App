@@ -216,18 +216,6 @@ public abstract class Methods extends MainActivity {
         strBuilder.removeSpan(span);
     }
 
-    public static void setTextViewHTML(Context context, TextView text, String html) {
-        //noinspection deprecation
-        CharSequence sequence = Html.fromHtml(html);
-        SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
-        URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
-        for(URLSpan span : urls) {
-            makeLinkClickable(context, strBuilder, span);
-        }
-        text.setText(strBuilder);
-        text.setMovementMethod(LinkMovementMethod.getInstance());
-    }
-
     public static void browseTo(Context context, String url){
         if (!url.startsWith("http://") && !url.startsWith("https://")) url = "http://" + url;
         Intent i = new Intent(context, WebActivity.class);
