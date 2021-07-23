@@ -73,9 +73,9 @@ public class RecommendedPosts {
                     //swipe_main.setRefreshing(false);
                     if(response.code() == 200 || response.code() == 201){
                         ArrayList<DtoPost> list = response.body();
-                        daoPosts.DropTable(0);
                         if(list != null){
                             if(list.get(0).getPosts() != null){
+                                daoPosts.DropTable(0);
                                 for (int i = 0; i < Objects.requireNonNull(list).get(0).getPosts().size(); i++){
                                     DtoPost.Posts_Search dtoPost = list.get(0).getPosts().get(i);
                                     DtoPost post = new DtoPost();

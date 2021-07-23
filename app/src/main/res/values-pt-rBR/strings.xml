@@ -94,4 +94,6 @@
     <string name="not_secure_website"><font color='#FD0000'>Este site não está usando uma conexão segura.</font>\nAs informações compartilhadas com este site, como senhas ou números de cartão de crédito, não são enviadas com segurança</string>
     <string name="remove_image">Remover imagem</string>
     <string name="desc_remove_image_post">Quer remover a imagem selecionada da sua postagem?</string>
+    <string name="username_is_already_in_use">Nome de usuário já está em uso.</string>
+    <string name="required_field">Campo obrigatório</string>
 </resources>
