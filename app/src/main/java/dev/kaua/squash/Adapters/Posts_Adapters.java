@@ -93,7 +93,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             int ImagesAmount = list.get(position).getPost_images().size();
             if(ImagesAmount < 2){
                 for (int i = 0; i < 1; i++){
-                    Picasso.get().load(EncryptHelper.decrypt(list.get(position).getPost_images().get(i))).into(new Target() {
+                    Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(list.get(position).getPost_images().get(i)))).into(new Target() {
                         @Override
                         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                             holder.img_firstImage_post.setImageBitmap(Methods.getRoundedCornerBitmap(bitmap, 50));
@@ -105,7 +105,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     });
                 }
             }else{
-                Picasso.get().load(EncryptHelper.decrypt(list.get(position).getPost_images().get(0))).into(new Target() {
+                Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(list.get(position).getPost_images().get(0)))).into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         holder.img_firstImage_post.setImageBitmap(Methods.getRoundedCornerBitmap(bitmap, 50));
@@ -115,14 +115,14 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     @Override
                     public void onPrepareLoad(Drawable placeHolderDrawable) {}
                 });
-                Picasso.get().load(EncryptHelper.decrypt(list.get(position).getPost_images().get(1))).into(holder.img_secondImage_post);
+                Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(list.get(position).getPost_images().get(1)))).into(holder.img_secondImage_post);
                 holder.img_secondImage_post.setVisibility(View.VISIBLE);
                 int width = holder.img_firstImage_post.getWidth();
                 holder.img_firstImage_post.getLayoutParams().width = width - 50;
                 holder.img_firstImage_post.requestLayout();
                 if (ImagesAmount > 2) {
                     holder.container_third_img.setVisibility(View.VISIBLE);
-                    Picasso.get().load(EncryptHelper.decrypt(list.get(position).getPost_images().get(2))).into(holder.img_thirdImage_post);
+                    Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(list.get(position).getPost_images().get(2)))).into(holder.img_thirdImage_post);
                     if (ImagesAmount == 3) holder.container_blur_post.setVisibility(View.GONE);
                     else {
                         holder.txt_images_amount_post.setText("+" + (ImagesAmount - 2));
