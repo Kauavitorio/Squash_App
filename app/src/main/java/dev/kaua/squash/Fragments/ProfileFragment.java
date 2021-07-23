@@ -46,6 +46,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
@@ -192,7 +193,6 @@ public class ProfileFragment extends Fragment {
                             }
                         }
                     }
-
                     @Override
                     public void onCancelled(@NonNull @NotNull DatabaseError error) {}
                 });
@@ -230,7 +230,7 @@ public class ProfileFragment extends Fragment {
             loadingPanel_profile.setVisibility(View.VISIBLE);
             recyclerView_Posts_profile.setVisibility(View.GONE);
             control = bundle.getInt("control");
-            if(bundle.getString("account_id") != null && Integer.parseInt(bundle.getString("account_id")) != account.getAccount_id()){
+            if(bundle.getString("account_id") != null && Long.parseLong(bundle.getString("account_id")) != account.getAccount_id()){
                 LoadingDialog loadingDialog = new LoadingDialog(requireActivity());
                 loadingDialog.startLoading();
                 btn_plus_story_profile.setVisibility(View.GONE);
@@ -267,6 +267,7 @@ public class ProfileFragment extends Fragment {
                                         ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
                                     ic_account_badge_profile.setVisibility(View.VISIBLE);
                                 }
+                                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, loadingPanel_profile, noPost_profile, account);
 
                                 DaoFollowing daoFollowing = new DaoFollowing(getContext());
                                 ArrayList<DtoAccount> accounts = daoFollowing.get_followers_following(account_id, Long.parseLong(bundle.getString("account_id")));
@@ -300,7 +301,7 @@ public class ProfileFragment extends Fragment {
         ic_account_badge_profile.setVisibility(View.GONE);
         btn_go_chat_profile.setVisibility(View.GONE);
         btn_plus_story_profile.setVisibility(View.VISIBLE);
-        DtoAccount user = MainActivity.getInstance().getUserInformation();
+        DtoAccount user = MyPrefs.getUserInformation(requireContext());
         account_id = user.getAccount_id();
         account.setAccount_id(account_id);
         account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
@@ -333,7 +334,7 @@ public class ProfileFragment extends Fragment {
 
     private void Ids(View view) {
         instance = this;
-        account = MainActivity.getInstance().getUserInformation();
+        account = MyPrefs.getUserInformation(requireContext());
         img_banner_profile = view.findViewById(R.id.img_banner_profile);
         loadingPanel_profile = view.findViewById(R.id.loadingPanel_profile);
         btn_go_chat_profile = view.findViewById(R.id.btn_go_chat_profile);

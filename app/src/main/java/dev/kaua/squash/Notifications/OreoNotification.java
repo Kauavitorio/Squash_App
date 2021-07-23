@@ -11,6 +11,8 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import dev.kaua.squash.R;
+
 /**
  *  Copyright (c) 2021 Kauã Vitório
  *  Official repository https://github.com/Kauavitorio/Squash_App
@@ -45,10 +47,8 @@ public class OreoNotification extends ContextWrapper {
     }
 
     public NotificationManager getManager() {
-        if (notificationManager == null) {
+        if (notificationManager == null)
             notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        }
-
         return notificationManager;
     }
 
@@ -58,7 +58,7 @@ public class OreoNotification extends ContextWrapper {
                 .setContentIntent(pendingIntent)
                 .setContentTitle(title)
                 .setContentText(body)
-                .setSmallIcon(Integer.parseInt(icon))
+                .setSmallIcon(R.drawable.pumpkin_default_image)
                 .setSound(uri)
                 .setCategory("message")
                 .setGroupSummary(true)

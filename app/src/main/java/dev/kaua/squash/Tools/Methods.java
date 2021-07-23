@@ -140,7 +140,7 @@ public abstract class Methods extends MainActivity {
         async.execute();
 
         final Retrofit retrofitUser = GetRetrofitBuilder();
-        SharedPreferences sp = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         DtoAccount account = new DtoAccount();
         account.setAccount_id_cry(sp.getString("pref_account_id", null));
         AccountServices services = retrofitUser.create(AccountServices.class);
@@ -306,7 +306,7 @@ public abstract class Methods extends MainActivity {
     }
 
     public static Set<String> GetPinnedChat(Context context){
-        mPrefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         //Retrieve the values
         return mPrefs.getStringSet("pinned_users_chat", null);
     }

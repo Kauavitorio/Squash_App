@@ -1,6 +1,7 @@
 package dev.kaua.squash.Fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +35,7 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Activitys.SettingActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
@@ -43,6 +45,8 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ToastHelper;
 
 @SuppressLint("StaticFieldLeak")
 public class ChatFragment extends Fragment {
@@ -89,43 +93,12 @@ public class ChatFragment extends Fragment {
                 if(account_info.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
                 else Picasso.get().load(EncryptHelper.decrypt(account_info.getImageURL())).into(profile_image);
             }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
-        });
-
-/*
-        reference = FirebaseDatabase.getInstance().getReference("Chats");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                int unread = 0;
-                for (DataSnapshot snapshot1 : snapshot.getChildren()){
-                    DtoMessage message = snapshot1.getValue(DtoMessage.class);
-                    if(message.getReceiver().equals(firebaseUser.getUid()) && message.getIsSeen() == 0){
-                        unread++;
-                    }
-                }
-
-                if(unread == 0){
-                    viewPaperAdapter.addFragment(new ChatsFragment(), getString(R.string.chats));
-                }else{
-                    viewPaperAdapter.addFragment(new ChatsFragment(), "(" + unread + ") " + getString(R.string.chats));
-                }
-
-                viewPaperAdapter.addFragment(new UsersFragment(), "Users");
-                view_paper_chat.setAdapter(viewPaperAdapter);
-                tab_layout_chat.setupWithViewPager(view_paper_chat);
-            }
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
-*/
+
         return view;
     }
-
 
     @Override
     public void setMenuVisibility(final boolean visible) {
@@ -198,13 +171,20 @@ public class ChatFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
         switch (item.getItemId()){
+            case R.id.account_chat:
+                MainActivity.getInstance().CallProfile();
+                return true;
+            case R.id.starred_messages_chat:
+                ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
+                return true;
+            case R.id.setting_chat:
+                Intent i = new Intent(requireActivity(), SettingActivity.class);
+                startActivity(i);
+                return true;
             case R.id.logout:
                 Methods.status_chat("offline");
                 ConfFirebase.getFirebaseAuth().signOut();
                 Login.LogOut(requireContext(), 0);
-                return true;
-            case R.id.account_chat:
-                MainActivity.getInstance().CallProfile();
                 return true;
         }
         return false;
@@ -216,7 +196,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void Ids(View view) {
-        account_info = MainActivity.getInstance().getUserInformation();
+        account_info = MyPrefs.getUserInformation(requireContext());
         instance = this;
         txt_username_chat = view.findViewById(R.id.txt_username_chat);
         profile_image = view.findViewById(R.id.profile_image_chat);

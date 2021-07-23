@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.LoadingDialog;
+import dev.kaua.squash.Tools.MyPrefs;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -27,7 +28,6 @@ public class TermsAccountActivity extends AppCompatActivity {
     private Button btn_next_terms;
     private LoadingDialog loadingDialog;
     private final Handler timer = new Handler();
-    private static final String PREFS_NAME = "Terms_Experience";
     private SharedPreferences mPrefs;
     private String terms_list = "Terms 01";
 
@@ -42,7 +42,7 @@ public class TermsAccountActivity extends AppCompatActivity {
         btn_next_terms.setOnClickListener(v -> {
             loadingDialog.startLoading();
             SignUpActivity.getInstance().EnableSignUpButton();
-            mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            mPrefs = getSharedPreferences(MyPrefs.PREFS_TERMS, MODE_PRIVATE);
             SharedPreferences.Editor editor = mPrefs.edit();
             editor.putString("terms_list", terms_list);
             editor.apply();

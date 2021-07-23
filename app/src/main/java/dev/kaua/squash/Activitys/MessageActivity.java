@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,6 +28,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -58,6 +61,7 @@ import dev.kaua.squash.Adapters.Chat.SwipeReply;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.APIService;
 import dev.kaua.squash.Notifications.Client;
@@ -70,6 +74,7 @@ import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.KeyboardUtils;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.UserPermissions;
 import dev.kaua.squash.Tools.Warnings;
@@ -84,7 +89,7 @@ import retrofit2.Response;
  *  @author Kaua Vitorio
  **/
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "StaticFieldLeak", "FieldCanBeLocal"})
 public class MessageActivity extends AppCompatActivity {
 
     private CircleImageView profile_image;
@@ -98,18 +103,19 @@ public class MessageActivity extends AppCompatActivity {
     private String message_to_reply;
     private String reply_from;
     private ConstraintLayout reply_layout;
-    ConstraintLayout container_bottom_msg;
+    private ConstraintLayout container_bottom_msg;
     private ImageView cancelButton;
     private ValueEventListener seenListener;
     public static DtoAccount user_im_chat;
+    public static DtoAccount mUser = new DtoAccount();
     private static final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
 
     public static FirebaseUser fUser;
-    DatabaseReference reference;
-    MessageAdapter messageAdapter;
-    List<DtoMessage> mMessage;
-    List<String> medias_pin = new ArrayList<>();;
-    String userId;
+    private DatabaseReference reference;
+    private MessageAdapter messageAdapter;
+    private List<DtoMessage> mMessage;
+    private List<String> medias_pin = new ArrayList<>();
+    private String userId;
     String another_user_image = "";
 
     APIService apiService;
@@ -142,10 +148,13 @@ public class MessageActivity extends AppCompatActivity {
         fUser = ConfFirebase.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
 
+        CheckShared();
+
         String img = daoChat.get_BG("bg_" + fUser.getUid() + "_"
                 + userId);
         if(img != null) BackgroundHelper.LoadBackground(img);
 
+        //  Send msg click
         btn_send.setOnClickListener(v -> {
             notify = true;
             String msg = text_send.getText().toString();
@@ -154,6 +163,7 @@ public class MessageActivity extends AppCompatActivity {
             text_send.setText("");
         });
 
+        //  Loop to get user who user having a chat information
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -217,6 +227,14 @@ public class MessageActivity extends AppCompatActivity {
         setRecyclerSwipe();
     }
 
+    private void CheckShared() {
+        Bundle bundle = getIntent().getExtras();
+        if(bundle.getInt("shared") == 1){
+            if(bundle.getInt("shared_type") == 1)
+                text_send.setText(bundle.getString("shared_content"));
+        }
+    }
+
     private void Ids() {
         instance = this;
         profile_image = findViewById(R.id.profile_image_chat);
@@ -275,7 +293,7 @@ public class MessageActivity extends AppCompatActivity {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
-        hashMap.put("id_msg", Methods.RandomCharactersWithoutSpecials(13) + formattedDate_id.replace("-","")
+        hashMap.put("id_msg", Methods.RandomCharactersWithoutSpecials(8) + formattedDate_id.replace("-","")
                 .replace(" ","").replace(":","") + fUser.getUid());
         if(message_to_reply != null && message_to_reply.length() > 0){
             hashMap.put("reply_from", reply_from);
@@ -334,7 +352,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void currentUser(String userId){
-        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = getSharedPreferences( MyPrefs.PREFS_NOTIFICATION, MODE_PRIVATE).edit();
         editor.putString("currentUser", userId);
         editor.apply();
     }
@@ -406,27 +424,27 @@ public class MessageActivity extends AppCompatActivity {
                         else joinNow = 1;
                     } else joinNow = 0;
 
-                    if(mMessageFinal.size() > 0 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())){
-                        Log.d("Chat", "OKAY NEW MSG");
-                        mMessageFinal.clear();
-                        mMessageFinal.addAll(mMessage);
-                        messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, MainActivity.getInstance().getUserInformation().getUsername(), user_im_chat.getUsername());
-                        recycler_view_msg.setAdapter(messageAdapter);
+                    if(mMessageFinal.size() > 0 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())
+                            || mMessageFinal.size() > 0 && mMessageFinal.get(mMessageFinal.size() -1).getIsSeen() != mMessage.get(mMessage.size() -1).getIsSeen()){
+                        Log.d("Chat", "OKAY NEW MSG OR IS SEEN");
+                        LoadAdapter(imageURl);
                         base_load = false;
                     }
 
-                    if(base_load){
-                        mMessageFinal.clear();
-                        mMessageFinal.addAll(mMessage);
-                        messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, MainActivity.getInstance().getUserInformation().getUsername(), user_im_chat.getUsername());
-                        recycler_view_msg.setAdapter(messageAdapter);
-                    }
+                    if(base_load) LoadAdapter(imageURl);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
+    }
+
+    private void LoadAdapter(String imageURl) {
+        mMessageFinal.clear();
+        mMessageFinal.addAll(mMessage);
+        messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, getUserInformation().getUsername(), user_im_chat.getUsername());
+        recycler_view_msg.setAdapter(messageAdapter);
     }
 
     @Override
@@ -464,10 +482,61 @@ public class MessageActivity extends AppCompatActivity {
         reply_layout.setVisibility(View.GONE);
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public DtoAccount getUserInformation(){
+        SharedPreferences sp = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+        mUser.setAccount_id(Long.parseLong(EncryptHelper.decrypt(sp.getString("pref_account_id", null))));
+        mUser.setName_user(EncryptHelper.decrypt(sp.getString("pref_name_user", null)));
+        mUser.setUsername(EncryptHelper.decrypt(sp.getString("pref_username", null)));
+        mUser.setEmail(EncryptHelper.decrypt(sp.getString("pref_email", null)));
+        mUser.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
+        mUser.setBanner_user(EncryptHelper.decrypt(sp.getString("pref_banner_user", null)));
+        mUser.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
+        mUser.setProfile_image(EncryptHelper.decrypt(sp.getString("pref_profile_image", null)));
+        mUser.setBio_user(EncryptHelper.decrypt(sp.getString("pref_bio_user", null)));
+        mUser.setUrl_user(EncryptHelper.decrypt(sp.getString("pref_url_user", null)));
+        mUser.setFollowing(EncryptHelper.decrypt(sp.getString("pref_following", null)));
+        mUser.setFollowers(EncryptHelper.decrypt(sp.getString("pref_followers", null)));
+        mUser.setBorn_date(EncryptHelper.decrypt(sp.getString("pref_born_date", null)));
+        mUser.setJoined_date(EncryptHelper.decrypt(sp.getString("pref_joined_date", null)));
+        mUser.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
+        mUser.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
+        mUser.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
+        return mUser;
+    }
+
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
         switch (item.getItemId()){
+            case R.id.see_profile:
+                finish();
+                try {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
+                    bundle.putInt("control", 0);
+                    MainActivity.getInstance().GetBundleProfile(bundle);
+                    MainActivity.getInstance().CallProfile();
+                    ProfileFragment.getInstance().LoadAnotherUser();
+                }catch (Exception ex){
+                    Intent goto_main = new Intent(this, MainActivity.class);
+                    goto_main.putExtra("shortcut", 0);
+                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
+                    ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
+                    finishAffinity();
+                    Handler timer = new Handler();
+                    timer.postDelayed(() -> {
+                        Bundle bundle_profile = new Bundle();
+                        bundle_profile.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
+                        bundle_profile.putInt("control", 0);
+                        MainActivity.getInstance().GetBundleProfile(bundle_profile);
+                        MainActivity.getInstance().CallProfile();
+                        ProfileFragment.getInstance().LoadAnotherUser();
+                    },500);
+                }
+                return true;
+            case R.id.medias_profile:
+                return true;
             case R.id.pin_message:
                 Methods.PinAUser_Chat(MessageActivity.this, userId);
                 return true;
@@ -492,9 +561,8 @@ public class MessageActivity extends AppCompatActivity {
             }
         }
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null)
             BackgroundHelper.SendToCrop(this, data);
-        }
 
         if (requestCode == PICK_IMAGE_REQUEST_MEDIA && resultCode == RESULT_OK && data != null && data.getData() != null) {
             LoadingDialog loadingDialog = new LoadingDialog(this);
@@ -506,8 +574,8 @@ public class MessageActivity extends AppCompatActivity {
 
                     //uploading the image
                     storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
-                            + getFileName(filePath) + "_" + Methods.RandomCharactersWithoutSpecials(3));
-                    storageReference .putFile(filePath).continueWithTask(task -> {
+                            + getFileName(filePath).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(3));
+                    storageReference.putFile(filePath).continueWithTask(task -> {
                         if (!task.isSuccessful()) {
                             Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
                         }
@@ -522,8 +590,8 @@ public class MessageActivity extends AppCompatActivity {
 
                         } else {
                             loadingDialog.dismissDialog();
-                            ToastHelper.toast(this, task.getException().toString(), 0);
-                            Log.d("ProfileUpload", Objects.requireNonNull(task.getException()).getMessage());
+                            Warnings.showWeHaveAProblem(MessageActivity.this);
+                            Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
                         }
                     });
                 }
@@ -534,7 +602,7 @@ public class MessageActivity extends AppCompatActivity {
             } catch (Exception ex) {
                 loadingDialog.dismissDialog();
                 Warnings.showWeHaveAProblem(this);
-                Log.d("ProfileUpload", ex.toString());
+                Log.d("MediaUpload", ex.toString());
             }
         }
     }
@@ -543,17 +611,14 @@ public class MessageActivity extends AppCompatActivity {
         String result = null;
         if (uri.getScheme().equals("content")) {
             try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
-                if (cursor != null && cursor.moveToFirst()) {
+                if (cursor != null && cursor.moveToFirst())
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
             }
         }
         if (result == null) {
             result = uri.getPath();
             int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
-            }
+            if (cut != -1) result = result.substring(cut + 1);
         }
         return result;
     }

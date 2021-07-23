@@ -36,6 +36,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.UserPermissions;
 import dev.kaua.squash.Tools.Warnings;
@@ -55,7 +56,6 @@ public class EditProfileActivity extends AppCompatActivity {
     public static final int PIC_CROP = 1;
     private static SharedPreferences mPrefs;
     public static EditProfileActivity instance;
-    private static final String PREFS_NAME = "myPrefs";
     private DatabaseReference reference;
     private LoadingDialog loadingDialog;
     private final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
@@ -87,7 +87,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     loadingDialog.dismissDialog();
 
                     //  Clear all prefs before login user
-                    mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                    mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
 
                     //  Add User prefs
                     SharedPreferences.Editor editor = mPrefs.edit();
@@ -158,7 +158,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
 
     private void loadUserInfo() {
-        user = MainActivity.getInstance().getUserInformation();
+        user = MyPrefs.getUserInformation(this);
         new_image = user.getProfile_image();
         Picasso.get().load(user.getProfile_image()).into(ic_edit_ProfileUser);
         edit_name.setText(user.getName_user());

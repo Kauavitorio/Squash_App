@@ -109,7 +109,7 @@ public class ChatsFragment extends Fragment {
                     }
                 }
 
-                userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true);
+                userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
                 recycler_myMsg.setAdapter(userChatAdapter);
             }
 

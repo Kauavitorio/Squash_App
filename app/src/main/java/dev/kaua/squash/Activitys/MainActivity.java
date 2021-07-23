@@ -27,6 +27,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -52,9 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private static MainActivity instance;
     //  Set preferences
     private SharedPreferences mPrefs;
-    public static final String PREFS_NAME = "myPrefs";
 
-    private static final DtoAccount account = new DtoAccount();
+    private static DtoAccount account = new DtoAccount();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,11 +73,22 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setCurrentItem(1, true);
 
         //  Get all SharedPreferences
-        mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        SharedPreferences sp = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         bundle = getIntent().getExtras();
         if (sp.contains("pref_account_id") && sp.contains("pref_username")) StartNavigation();
         else Login.LogOut(this, 1);
+
+        if(bundle != null){
+            if(bundle.getInt("shared") == 1){
+                Intent i = new Intent(this, ShareContentActivity.class);
+                if(bundle.getInt("shared_type") == 1){
+                    i.putExtra("shared_type", bundle.getInt("shared_type"));
+                    i.putExtra("shared_content", bundle.getString("shared_content"));
+                }
+                startActivity(i);
+            }
+        }
 
         btn_search_main.setOnClickListener(v -> LoadSearchFragment());
         btn_home_main.setOnClickListener(v -> LoadMainFragment());
@@ -131,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void StartNavigation() {
-        getUserInformation();
+        getUserInformationAndLoadProfile();
         LoadMainFragment();
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());
         //noinspection unchecked
@@ -167,28 +178,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(compose);
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public DtoAccount getUserInformation(){
-        SharedPreferences sp = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        account.setAccount_id(Long.parseLong(EncryptHelper.decrypt(sp.getString("pref_account_id", null))));
-        account.setName_user(EncryptHelper.decrypt(sp.getString("pref_name_user", null)));
-        account.setUsername(EncryptHelper.decrypt(sp.getString("pref_username", null)));
-        account.setEmail(EncryptHelper.decrypt(sp.getString("pref_email", null)));
-        account.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
-        account.setBanner_user(EncryptHelper.decrypt(sp.getString("pref_banner_user", null)));
-        account.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
-        account.setProfile_image(EncryptHelper.decrypt(sp.getString("pref_profile_image", null)));
-        account.setBio_user(EncryptHelper.decrypt(sp.getString("pref_bio_user", null)));
-        account.setUrl_user(EncryptHelper.decrypt(sp.getString("pref_url_user", null)));
-        account.setFollowing(EncryptHelper.decrypt(sp.getString("pref_following", null)));
-        account.setFollowers(EncryptHelper.decrypt(sp.getString("pref_followers", null)));
-        account.setBorn_date(EncryptHelper.decrypt(sp.getString("pref_born_date", null)));
-        account.setJoined_date(EncryptHelper.decrypt(sp.getString("pref_joined_date", null)));
-        account.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
-        account.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
-
+    public void getUserInformationAndLoadProfile(){
+        account = MyPrefs.getUserInformation(this);
         Picasso.get().load(account.getProfile_image()).into(btn_profile_main);
-        return account;
     }
 
     private void LoadMainFragment() {
@@ -231,14 +223,15 @@ public class MainActivity extends AppCompatActivity {
         bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(account.getUsername()));
         bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle_Analytics);
-        getUserInformation();
+        getUserInformationAndLoadProfile();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected void onResume() {
         super.onResume();
-        getUserInformation();
+        getUserInformationAndLoadProfile();
+        Login.ReloadUserinfo(this, MyPrefs.getUserInformation(this).getEmail(), MyPrefs.getUserInformation(this).getPassword());
         Methods.status_chat("online");
         Methods.LoadFollowersAndFollowing(this);
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());

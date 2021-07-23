@@ -14,10 +14,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.util.ArrayList;
+
 import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -42,9 +45,11 @@ public class SplashActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Uri data = intent.getData();
+        String action = intent.getAction();
+        String type = intent.getType();
         if(data != null){
             String UrlGetFrom = data.toString();
-            UrlGetFrom = UrlGetFrom.replace("https://squash-social.herokuapp.com/", "").replace("http://squash-social.herokuapp.com/", "");
+            UrlGetFrom = UrlGetFrom.replace(Methods.BASE_URL, "").replace("http://squash-social.herokuapp.com/", "");
             String[] KnowContent = UrlGetFrom.split("/");
             if (KnowContent[0].equals("verify-account")){
                 if(KnowContent[1] != null && KnowContent[1].length() > 3 ){
@@ -74,12 +79,49 @@ public class SplashActivity extends AppCompatActivity {
                     verifyIfUsersLogged();
                 }
             }else verifyIfUsersLogged();
-        }else verifyIfUsersLogged();
+        }else if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type))
+                handleSendText(intent); // Handle text being sent
+            else if (type.startsWith("image/"))
+                handleSendImage(intent); // Handle single image being sent
+        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
+            if (type.startsWith("image/"))
+                handleSendMultipleImages(intent); // Handle multiple images being sent
+        } else verifyIfUsersLogged();
 
     }
 
+    void handleSendText(Intent intent) {
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (sharedText != null) {
+            Log.d("SPLASH_HANDLER", "Text -> " + sharedText);
+            Intent goto_main = new Intent(this, MainActivity.class);
+            goto_main.putExtra("shortcut", 0);
+            goto_main.putExtra("shared", 1);
+            goto_main.putExtra("shared_type", 1);
+            goto_main.putExtra("shared_content", sharedText);
+            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
+            ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
+            finishAffinity();
+        }
+    }
+
+    void handleSendImage(Intent intent) {
+        Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+            Log.d("SPLASH_HANDLER", "image -> " + imageUri);
+        }
+    }
+
+    void handleSendMultipleImages(Intent intent) {
+        ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+        if (imageUris != null) {
+            Log.d("SPLASH_HANDLER", imageUris + "");
+        }
+    }
+
     private void DoValidation(String value) {
-        SharedPreferences sp_First = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        SharedPreferences sp_First = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         Intent i = new Intent(this, ValidateEmailActivity.class);
         i.putExtra("account_id", EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)));
         i.putExtra("password", EncryptHelper.decrypt(sp_First.getString("pref_password", null)));
@@ -92,7 +134,7 @@ public class SplashActivity extends AppCompatActivity {
 
     public void verifyIfUsersLogged() {
         //  Verification of user preference information
-        SharedPreferences sp_First = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        SharedPreferences sp_First = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         if (sp_First.contains("pref_token")) LoadBaseInfoAndMain();
         else timer.postDelayed(this::GoToIntro, 1500);
     }
@@ -105,6 +147,7 @@ public class SplashActivity extends AppCompatActivity {
     private void GoToMain(){
         Intent goto_main = new Intent(this, MainActivity.class);
         goto_main.putExtra("shortcut", 0);
+        goto_main.putExtra("shared", 0);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
         finishAffinity();

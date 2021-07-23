@@ -1,17 +1,16 @@
-package dev.kaua.squash.Fragments.Chat;
+package dev.kaua.squash.Activitys;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,20 +31,27 @@ import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
 
-public class UsersFragment extends Fragment {
+public class ShareContentActivity extends AppCompatActivity {
     private RecyclerView recycler_view_users;
     private EditText search_users;
+    private static ShareContentActivity instance;
+    private int ShareType;
+    private Object ShareContent;
 
     private UserChatAdapter userChatAdapter;
     private List<DtoAccount> mAccounts;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_users, container, false);
-        Ids(view);
-
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_share_content);
+        Ids();
         mAccounts = new ArrayList<>();
         readAccounts();
+
+        Bundle bundle = getIntent().getExtras();
+        ShareType = bundle.getInt("shared_type");
+        ShareContent = bundle.get("shared_content");
 
         search_users.addTextChangedListener(new TextWatcher() {
             @Override
@@ -58,17 +64,16 @@ public class UsersFragment extends Fragment {
             public void afterTextChanged(Editable s) {}
         });
 
-        return view;
     }
 
-    private void Ids(View view) {
-        recycler_view_users = view.findViewById(R.id.recycler_view_users);
-        search_users = view.findViewById(R.id.search_users);
-        recycler_view_users.setHasFixedSize(true);
-        recycler_view_users.setItemViewCacheSize(20);
-        recycler_view_users.setDrawingCacheEnabled(true);
-        recycler_view_users.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        recycler_view_users.setLayoutManager(new LinearLayoutManager(requireContext()));
+    public static ShareContentActivity getInstance(){ return instance; }
+
+    public int GetShareType(){
+        return ShareType;
+    }
+
+    public Object GetShareContent(){
+        return ShareContent;
     }
 
     private void searchUsers(String str) {
@@ -88,7 +93,7 @@ public class UsersFragment extends Fragment {
                         mAccounts.add(account);
                     }
                 }
-                userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
+                userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true, true);
                 recycler_view_users.setAdapter(userChatAdapter);
             }
 
@@ -114,7 +119,7 @@ public class UsersFragment extends Fragment {
                         if(account.getId() != null && !account.getId().equals(firebaseUser.getUid())) mAccounts.add(account);
                     }
 
-                    userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
+                    userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true, true);
                     recycler_view_users.setAdapter(userChatAdapter);
                 }
             }
@@ -122,5 +127,16 @@ public class UsersFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
+    }
+
+    private void Ids() {
+        instance = this;
+        recycler_view_users = findViewById(R.id.recycler_view_users_share);
+        search_users = findViewById(R.id.search_users_share);
+        recycler_view_users.setHasFixedSize(true);
+        recycler_view_users.setItemViewCacheSize(20);
+        recycler_view_users.setDrawingCacheEnabled(true);
+        recycler_view_users.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        recycler_view_users.setLayoutManager(new LinearLayoutManager(this));
     }
 }
