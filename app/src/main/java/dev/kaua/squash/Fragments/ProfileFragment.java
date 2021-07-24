@@ -47,6 +47,7 @@ import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -303,6 +304,7 @@ public class ProfileFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     public void GetUserInfo(Activity activity) {
+        Login.ReloadUserinfo(requireContext(), MyPrefs.getUserInformation(requireContext()).getEmail(), MyPrefs.getUserInformation(requireContext()).getPassword());
         ic_account_badge_profile.setVisibility(View.GONE);
         btn_go_chat_profile.setVisibility(View.GONE);
         btn_plus_story_profile.setVisibility(View.VISIBLE);
