@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,10 +19,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -48,9 +51,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+@SuppressLint("StaticFieldLeak")
 public class EditProfileActivity extends AppCompatActivity {
     public static CircleImageView ic_edit_ProfileUser;
-    EditText edit_name, edit_username, edit_bio;
+    TextInputEditText edit_name, edit_username, edit_bio;
     Button btn_edit_profile;
     public static DtoAccount user;
     public static String new_image;
@@ -78,9 +82,9 @@ public class EditProfileActivity extends AppCompatActivity {
 
         btn_edit_profile.setOnClickListener(v -> {
             if(!username_check) showError(edit_username, getString(R.string.username_is_already_in_use));
-            else if(edit_username.getText().toString().replace(" ", "").length() < 6)
+            else if(edit_username.getText() == null || edit_username.getText().toString().replace(" ", "").length() < 6)
                 showError(edit_username, getString(R.string.required_field));
-            else if(edit_name.getText().toString().length() < 2)
+            else if(edit_name.getText() == null || edit_name.getText().toString().length() < 2)
                 showError(edit_name, getString(R.string.required_field));
             else{
                 btn_edit_profile.setEnabled(false);
@@ -249,7 +253,8 @@ public class EditProfileActivity extends AppCompatActivity {
     private void loadUserInfo() {
         user = MyPrefs.getUserInformation(this);
         new_image = user.getProfile_image();
-        Picasso.get().load(user.getProfile_image()).into(ic_edit_ProfileUser);
+        Glide.with(this).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into(ic_edit_ProfileUser);
         edit_name.setText(user.getName_user());
         edit_username.setText(user.getUsername());
         base_username = user.getUsername();

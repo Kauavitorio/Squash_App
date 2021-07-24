@@ -12,8 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
@@ -152,7 +153,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void getUserInformationAndLoadProfile(){
         account = MyPrefs.getUserInformation(this);
-        Picasso.get().load(account.getProfile_image()).into(btn_profile_main);
+        Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into(btn_profile_main);
     }
 
     private void LoadMainFragment() {

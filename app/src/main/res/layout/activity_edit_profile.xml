@@ -1,61 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/base_color"
+    android:padding="10dp"
+    android:scrollbarSize="1dp"
+    android:theme="@style/EditsLoginAndSignUp"
+    android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
     tools:context=".Activitys.EditProfileActivity">
 
-    <!-- Img User Story -->
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/ic_edit_ProfileUser"
-        android:layout_width="65dp"
-        android:layout_height="65dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_profile_default"
-        app:civ_border_color="@color/base_color"
-        app:civ_border_width="1dp" />
-
-    <EditText
-        android:id="@+id/edit_name"
-        android:maxLength="25"
-        android:hint="@string/name"
-        android:backgroundTint="@color/hint"
-        android:textColorHint="@color/hint"
-        android:textColor="@color/black"
+    <!-- Inputs Container -->
+    <RelativeLayout
+        android:id="@+id/container_input_signIn"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="0dp"
+        android:background="@drawable/container_signin"
+        android:padding="20dp">
 
-    <EditText
-        android:id="@+id/edit_username"
-        android:hint="@string/username"
-        android:backgroundTint="@color/hint"
-        android:textColorHint="@color/hint"
-        android:textColor="@color/black"
-        android:maxLength="20"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <!-- Container User Profile -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container_profile_img_edit"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentTop="true"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <EditText
-        android:id="@+id/edit_bio"
-        android:hint="@string/bio"
-        android:backgroundTint="@color/hint"
-        android:textColorHint="@color/hint"
-        android:textColor="@color/black"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+            <!-- Img User Story -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/ic_edit_ProfileUser"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_profile_default"
+                app:civ_border_color="@color/base_color"
+                app:civ_border_width="1dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btn_edit_profile"
-        android:layout_width="wrap_content"
-        android:minWidth="200dp"
-        android:layout_height="35dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="10dp"
-        android:text="@string/edit_profile"
-        android:textColor="@color/black"
-        android:background="@drawable/background_button_following"/>
+            <!-- Btn Add new Story -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                app:cardBackgroundColor="@color/base_color"
+                app:cardCornerRadius="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-</LinearLayout>
+                <!-- Img Add Icon -->
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_edit"
+                    tools:ignore="ContentDescription,TooDeepLayout" />
+
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Edit Text Tittle -->
+        <TextView
+            android:id="@+id/txt_header_edit_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:layout_above="@+id/name_tl_edit_profile"
+            android:text="@string/edit_profile"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!-- Edit Text Name -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/name_tl_edit_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/container_profile_img_edit"
+            android:layout_marginTop="10dp"
+            android:maxWidth="320dp"
+            android:layout_centerHorizontal="true"
+            android:minWidth="320dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="25"
+            app:counterTextColor="@color/hint"
+            app:hintTextColor="@color/hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/hint"
+                android:hint="@string/name"
+                android:inputType="textPersonName|textCapSentences"
+                android:maxLength="25"
+                android:textColor="@color/black"
+                android:textColorHint="@color/hint" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Edit Text Username -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/username_tl_edit_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/name_tl_edit_profile"
+            android:layout_marginTop="5dp"
+            android:maxWidth="320dp"
+            android:layout_centerHorizontal="true"
+            android:minWidth="320dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="20"
+            app:counterTextColor="@color/hint"
+            app:hintTextColor="@color/hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_username"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/hint"
+                android:hint="@string/username"
+                android:inputType="textPersonName|textCapSentences"
+                android:maxLength="20"
+                android:textColor="@color/black"
+                android:textColorHint="@color/hint" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Edit Text Bio -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bio_tl_edit_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/username_tl_edit_profile"
+            android:layout_marginTop="5dp"
+            android:maxWidth="320dp"
+            android:layout_centerHorizontal="true"
+            android:minWidth="320dp"
+            app:counterTextColor="@color/hint"
+            app:hintTextColor="@color/hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_bio"
+                android:hint="@string/bio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/hint"
+                android:inputType="textPersonName|textCapSentences|textMultiLine"
+                android:textColor="@color/black"
+                android:textColorHint="@color/hint" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Button SignUp -->
+        <Button
+            android:id="@+id/btn_edit_profile"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/bio_tl_edit_profile"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="1dp"
+            android:background="@drawable/custom_button_next"
+            android:text="@string/edit_profile"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
+</ScrollView>
