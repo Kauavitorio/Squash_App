@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -21,7 +20,6 @@ import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.Fragments.FragmentPageAdapter;
-import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -69,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the adapter onto
         // the view pager
+        viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1, true);
 
@@ -111,33 +110,6 @@ public class MainActivity extends AppCompatActivity {
             public void onPageScrollStateChanged(int state) {
 
             }
-        });
-
-        viewPager.setPageTransformer(false, (page, position) -> {
-            page.setTranslationX(-position * page.getWidth());
-
-            if (Math.abs(position) <= 0.5) {
-                page.setVisibility(View.VISIBLE);
-                page.setScaleX(1 - Math.abs(position));
-                page.setScaleY(1 - Math.abs(position));
-            } else if (Math.abs(position) > 0.5)
-                page.setVisibility(View.GONE);
-
-
-            if (position < -1) // [-Infinity,-1)
-                // This page is way off-screen to the left.
-                page.setAlpha(0);
-            else if (position <= 0) {   // [-1,0]
-                page.setAlpha(1);
-                page.setRotation(360 * Math.abs(position));
-            }
-            else if (position <= 1) {   // (0,1]
-                page.setAlpha(1);
-                page.setRotation(-360 * Math.abs(position));
-            }
-            else // (1,+Infinity]
-                // This page is way off-screen to the right.
-                page.setAlpha(0);
         });
     }
 
@@ -197,14 +169,10 @@ public class MainActivity extends AppCompatActivity {
         btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search));
         btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home));
         btn_profile_main.setBorderWidth(0);
-        if(position == 1) {
-            btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
-            MainFragment.RefreshRecycler();
-        }
+        if(position == 1) btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
         else if(position == 2) btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search_select));
         else if(position == 3) btn_profile_main.setBorderWidth(3);
     }
-
 
     private void Ids() {
         instance = this;
@@ -216,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
         btn_home_main = findViewById(R.id.btn_home_main);
         container_btn_profile_main = findViewById(R.id.container_btn_profile_main);
         mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
+        btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
 
         //  Creating analytic for open app event
         Bundle bundle_Analytics = new Bundle();
@@ -224,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
         bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle_Analytics);
         getUserInformationAndLoadProfile();
+        Login.ReloadUserinfo(this, MyPrefs.getUserInformation(this).getEmail(), MyPrefs.getUserInformation(this).getPassword());
     }
 
     @SuppressWarnings("unchecked")
@@ -231,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         getUserInformationAndLoadProfile();
-        Login.ReloadUserinfo(this, MyPrefs.getUserInformation(this).getEmail(), MyPrefs.getUserInformation(this).getPassword());
         Methods.status_chat("online");
         Methods.LoadFollowersAndFollowing(this);
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());

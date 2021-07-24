@@ -1,5 +1,6 @@
 package dev.kaua.squash.LocalDataBase;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -18,6 +19,7 @@ import dev.kaua.squash.Data.Post.DtoPost;
 public class DaoPosts extends SQLiteOpenHelper {
     private final String TABLE_POSTS = "TBL_POSTS";
     private final String TABLE_LIKES = "TBL_POSTS_LIKES";
+    private final String TABLE_POST_IMAGE = "tbl_posts_image";
 
 
     public DaoPosts(@Nullable Context context) {
@@ -53,6 +55,13 @@ public class DaoPosts extends SQLiteOpenHelper {
                 "account_id bigint not null)";
 
         db.execSQL(command_likes);
+
+        String command_images = "CREATE TABLE " + TABLE_POST_IMAGE + "(" +
+                "post_id bigint not null," +
+                "account_id bigint not null," +
+                "image_link varchar(600) not null)";
+
+        db.execSQL(command_images);
     }
 
     @Override
@@ -71,8 +80,8 @@ public class DaoPosts extends SQLiteOpenHelper {
         int size = Math.min(post.size(), 50);
         for (int i = 0; i< size; i++){
             ContentValues values = new ContentValues();
-            values.put("post_id", Integer.parseInt(Objects.requireNonNull(post.get(i).getPost_id())));
-            values.put("account_id", Integer.parseInt(Objects.requireNonNull(post.get(i).getAccount_id())));
+            values.put("post_id", Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id())));
+            values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
             values.put("verification_level", post.get(i).getVerification_level());
             values.put("name_user", post.get(i).getName_user());
             values.put("username", post.get(i).getUsername());
@@ -81,7 +90,19 @@ public class DaoPosts extends SQLiteOpenHelper {
             values.put("post_time", post.get(i).getPost_time());
             values.put("post_content", post.get(i).getPost_content());
             values.put("post_likes", post.get(i).getPost_likes());
-            if(post.get(i).getPost_images() != null && post.get(i).getPost_images().size() > 0) values.put("post_images", post.get(i).getPost_images().get(0));
+            if(post.get(i).getPost_images() != null && post.get(i).getPost_images().size() > 0) {
+                long post_id = Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id()));
+                long account_id = Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id()));
+                for (int img = 0; img < post.get(i).getPost_images().size(); img++){
+                    if(post.get(i).getPost_images().get(img) != null){
+                        ContentValues values_images = new ContentValues();
+                        values_images.put("post_id", post_id);
+                        values_images.put("image_link", post.get(i).getPost_images().get(img));
+                        values_images.put("account_id", account_id);
+                        getWritableDatabase().insert(TABLE_POST_IMAGE, null, values_images);
+                    }
+                }
+            }
             else values.put("post_images", "NaN");
             values.put("post_comments_amount", post.get(i).getPost_comments_amount());
             values.put("post_topic", post.get(i).getPost_topic());
@@ -106,7 +127,7 @@ public class DaoPosts extends SQLiteOpenHelper {
     public ArrayList<DtoPost> get_post(long account_id){
         String command = "SELECT * FROM " + TABLE_POSTS + " WHERE account_id > ? ORDER BY post_id DESC";
         String[] params = {account_id + ""};
-        Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
         ArrayList<DtoPost> dtoPosts = new ArrayList<>();
 
         while (cursor.moveToNext()) {
@@ -129,10 +150,27 @@ public class DaoPosts extends SQLiteOpenHelper {
         return dtoPosts;
     }
 
+    public DtoPost get_post_img(long post_id){
+        String command = "SELECT * FROM " + TABLE_POST_IMAGE + " WHERE post_id = ?";
+        String[] params = {post_id + ""};
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        DtoPost post = new DtoPost();
+
+        ArrayList<String> img_list = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            post.setPost_id(cursor.getString(0));
+            post.setAccount_id(cursor.getString(1));
+            img_list.add(cursor.getString(2));
+        }
+        post.setPost_images(img_list);
+        return post;
+    }
+
     public boolean get_A_Like(long post_id, long account_id){
         String command = "SELECT * FROM " + TABLE_LIKES + " WHERE  post_id = ? and account_id = ?";
         String[] params = {String.valueOf(post_id), String.valueOf(account_id)};
-        Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
 
 
         return cursor.moveToFirst();
@@ -140,8 +178,10 @@ public class DaoPosts extends SQLiteOpenHelper {
 
     public void DropTable(int type){
         SQLiteDatabase db = this.getWritableDatabase();
-        if(type == 0)
+        if(type == 0){
             db.delete(TABLE_POSTS,null,null);
+            db.delete(TABLE_POST_IMAGE,null,null);
+        }
         else
             db.delete(TABLE_LIKES,null,null);
         Log.d("InsertPost", "Dropped");

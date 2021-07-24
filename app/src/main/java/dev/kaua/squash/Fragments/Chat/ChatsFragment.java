@@ -82,8 +82,6 @@ public class ChatsFragment extends Fragment {
         recycler_myMsg = view.findViewById(R.id.recycler_myMsg);
         recycler_myMsg.setHasFixedSize(true);
         recycler_myMsg.setItemViewCacheSize(20);
-        recycler_myMsg.setDrawingCacheEnabled(true);
-        recycler_myMsg.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         recycler_myMsg.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
@@ -102,9 +100,11 @@ public class ChatsFragment extends Fragment {
                 mAccounts.clear();
                 for(DataSnapshot snapshot : datasnapshot.getChildren()){
                     DtoAccount account = snapshot.getValue(DtoAccount.class);
-                    for(Chatslist chatlist : usersList){
-                        if(account.getId() != null && account.getId().equals(chatlist.getId())){
-                            mAccounts.add(account);
+                    if(account != null){
+                        for(Chatslist chatList : usersList){
+                            if(account.getId() != null && account.getId().equals(chatList.getId())){
+                                mAccounts.add(account);
+                            }
                         }
                     }
                 }

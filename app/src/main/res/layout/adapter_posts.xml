@@ -38,8 +38,8 @@
             tools:ignore="UselessParent">
 
             <!-- Header Post -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="10dp"
@@ -50,19 +50,24 @@
                     android:id="@+id/txt_name_user_post"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"
                     android:maxLength="25"
-                    android:textSize="17sp"/>
+                    android:text="@string/app_name"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <!-- Badge Account -->
                 <ImageView
                     android:id="@+id/ic_account_badge"
                     android:layout_width="20dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="2dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/ic_verified_account"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/txt_name_user_post"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="ContentDescription" />
 
                 <!-- User Username -->
@@ -70,32 +75,32 @@
                     android:id="@+id/txt_username_post"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:maxLength="20"
                     android:text="@string/app_name"
                     android:textColor="@color/hint"
-                    android:layout_marginStart="4dp"
-                    android:maxLength="20"
-                    android:textSize="16sp"/>
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ic_account_badge"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <!-- User DateTime -->
                 <TextView
                     android:id="@+id/txt_date_time_post"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:maxLength="20"
                     android:text="@string/app_name"
                     android:textColor="@color/hint"
-                    android:layout_marginStart="4dp"
-                    android:maxLength="20"
-                    android:textSize="13sp"/>
+                    android:textSize="13sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/txt_username_post"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- Ic Three dots -->
-                <ImageView
-                    android:id="@+id/btn_actions"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_three_dots"
-                    tools:ignore="ContentDescription" />
-
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
 
@@ -124,7 +129,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                tools:ignore="UselessParent">
 
                 <!-- Main Image Container -->
                 <LinearLayout
@@ -151,7 +157,7 @@
                         android:adjustViewBounds="true"
                         android:maxHeight="200dp"
                         android:layout_marginStart="5dp"
-                        android:src="@drawable/ic_search_select"
+                        android:src="@drawable/ic_search"
                         tools:ignore="ContentDescription" />
 
                 </LinearLayout>
@@ -213,6 +219,7 @@
                         android:id="@+id/btn_like_post"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:layout_marginStart="5dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -279,7 +286,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginEnd="30dp"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_actions"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:ignore="UseCompoundDrawables,UselessParent">
 
@@ -292,6 +299,18 @@
                             tools:ignore="ContentDescription" />
 
                     </LinearLayout>
+
+                    <!-- Ic Three dots -->
+                    <ImageView
+                        android:id="@+id/btn_actions"
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_three_dots"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="ContentDescription" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

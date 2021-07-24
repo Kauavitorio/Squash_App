@@ -103,29 +103,6 @@ public class ChatFragment extends Fragment {
     @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
-        if(visible){
-            loadViewAdapter();
-            firebaseUser = ConfFirebase.getFirebaseUser();
-            reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
-
-
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                    account_info = snapshot.getValue(DtoAccount.class);
-                    assert account_info != null;
-                    txt_username_chat.setText(account_info.getName_user());
-                    if(account_info.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
-                    else Picasso.get().load(EncryptHelper.decrypt(account_info.getImageURL())).into(profile_image);
-                }
-
-                @Override
-                public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-                }
-            });
-            loadViewAdapter();
-        }
     }
 
     private void loadViewAdapter() {
@@ -217,7 +194,7 @@ public class ChatFragment extends Fragment {
         }
 
         @Override
-        public Fragment getItem(int position) {
+        public @NotNull Fragment getItem(int position) {
             return fragments.get(position);
         }
 
