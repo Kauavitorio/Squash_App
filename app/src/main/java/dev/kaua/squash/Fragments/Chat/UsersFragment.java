@@ -25,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import dev.kaua.squash.Adapters.Chat.UserChatAdapter;
@@ -101,26 +102,29 @@ public class UsersFragment extends Fragment {
 
     private void readAccounts() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-        reference.addValueEventListener(new ValueEventListener() {
+        Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("status_chat");
+
+        query.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot fullSnapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
                 if(search_users.getText().toString().equals("")){
                     mAccounts.clear();
-                    for(DataSnapshot snapshot: fullSnapshot.getChildren()){
+                    for(DataSnapshot snapshot: datasnapshot.getChildren()){
                         DtoAccount account = snapshot.getValue(DtoAccount.class);
                         assert account != null;
                         assert firebaseUser != null;
                         if(account.getId() != null && !account.getId().equals(firebaseUser.getUid())) mAccounts.add(account);
                     }
-
+                    Collections.reverse(mAccounts);
                     userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
                     recycler_view_users.setAdapter(userChatAdapter);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
         });
     }
 }

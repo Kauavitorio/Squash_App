@@ -256,7 +256,7 @@ public abstract class Login {
     static Handler timer = new Handler();
     public static void LogOut(Context context, int status){
         FirebaseAuth.getInstance().signOut();
-        Methods.status_chat("offline");
+        Methods.status_chat("offline", context);
         clearApplicationData(context);
         LoadingDialog loadingDialog = new LoadingDialog((Activity)context);
         loadingDialog.startLoading();
@@ -268,7 +268,7 @@ public abstract class Login {
             Intent i;
             if(status == 0 ) i = new Intent(context, SplashActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             else i = new Intent(context, SplashActivity.class);
-            ((Activity)context).startActivity(i);
+            context.startActivity(i);
             loadingDialog.dismissDialog();
         },1000);
     }

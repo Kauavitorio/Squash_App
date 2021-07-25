@@ -159,7 +159,7 @@ public class ChatFragment extends Fragment {
                 startActivity(i);
                 return true;
             case R.id.logout:
-                Methods.status_chat("offline");
+                Methods.status_chat("offline", requireContext());
                 ConfFirebase.getFirebaseAuth().signOut();
                 Login.LogOut(requireContext(), 0);
                 return true;

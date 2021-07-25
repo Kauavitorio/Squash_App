@@ -40,28 +40,17 @@
         android:layout_height="wrap_content"
         tools:ignore="UselessParent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/container_video"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:maxHeight="260dp"
-            android:maxWidth="220dp"
+        <ImageView
+            android:id="@+id/img_seen"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/ic_seen"
             android:layout_marginTop="2dp"
-            android:layout_marginBottom="5dp">
+            android:layout_marginEnd="2dp"
+            android:layout_below="@id/container_msg"
+            android:layout_alignParentEnd="true"
+            tools:ignore="ContentDescription" />
 
-            <!-- Video for medias -->
-            <VideoView
-                android:id="@+id/media_video"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="ContentDescription" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Img for medias -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -105,7 +94,7 @@
             android:src="@mipmap/ic_launcher"/>
 
         <!-- Container Message Main -->
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/container_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -116,33 +105,33 @@
             android:background="@drawable/background_right_msg">
 
             <!-- Container Reply info -->
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_reply"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:orientation="vertical"
                 android:padding="5dp"
                 android:layout_gravity="end"
                 android:visibility="gone"
                 android:background="@drawable/background_replay_from_right"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
 
                 <!-- Text Reply From -->
                 <TextView
                     android:id="@+id/txt_reply_from"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:text="@string/starred_messages"
                     android:layout_marginEnd="5dp"
                     android:layout_marginStart="8dp"
                     android:textColor="@color/black"
                     android:textSize="10sp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     tools:ignore="SmallSp" />
 
                 <!-- Card Container Reply content -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/card_container_reply_content"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     app:cardCornerRadius="10dp"
                     android:layout_marginTop="2dp"
                     android:layout_marginEnd="5dp"
@@ -167,13 +156,13 @@
 
                 </androidx.cardview.widget.CardView>
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Text Message Content -->
             <TextView
                 android:id="@+id/msg_chat_item"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_gravity="end"
@@ -184,8 +173,8 @@
             <!-- Text Message Time -->
             <TextView
                 android:id="@+id/msgTime_chat_item"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="end"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
@@ -193,7 +182,7 @@
                 android:textSize="12sp"
                 android:textColor="@color/white"/>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Text Seen -->
         <TextView

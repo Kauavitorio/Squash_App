@@ -224,7 +224,7 @@ public abstract class Methods extends MainActivity {
     }
 
     //  Method to set new user status for chat system
-    public static void status_chat(String status){
+    public static void status_chat(String status, Context context){
         Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
         String formattedDate = df_time.format(c.getTime());
@@ -236,6 +236,7 @@ public abstract class Methods extends MainActivity {
             if(status.equals("offline"))
                 hashMap.put("last_seen", formattedDate);
             hashMap.put("status_chat", status);
+            hashMap.put("verification_level", EncryptHelper.encrypt(MyPrefs.getUserInformation(context).getVerification_level()));
 
             reference.updateChildren(hashMap);
         }

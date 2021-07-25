@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         getUserInformationAndLoadProfile();
-        Methods.status_chat("online");
+        Methods.status_chat("online", this);
         Methods.LoadFollowersAndFollowing(this);
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());
         asyncUser_follow.execute();
@@ -212,6 +212,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Methods.status_chat("offline");
+        Methods.status_chat("offline", this);
     }
 }

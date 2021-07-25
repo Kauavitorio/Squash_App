@@ -1,6 +1,6 @@
 package dev.kaua.squash.Data.Account;
 
-public class DtoAccount {
+public class DtoAccount implements Comparable<DtoAccount>{
     private long account_id, id_user, verify, status;
     private String account_id_cry, id_user_cry;
     private String name_user, username, email, phone_user, password, verify_id;
@@ -21,7 +21,7 @@ public class DtoAccount {
         this.status = status;
     }
 
-    public DtoAccount(String account_id_cry, String email, String id, String imageURL, String status_chat, String typingTo, String last_seen) {
+    public DtoAccount(String account_id_cry, String email, String id, String imageURL, String status_chat, String typingTo, String last_seen, String verification_level) {
         this.account_id_cry = account_id_cry;
         this.email = email;
         this.id = id;
@@ -29,6 +29,7 @@ public class DtoAccount {
         this.status_chat = status_chat;
         this.typingTo = typingTo;
         this.last_seen = last_seen;
+        this.verification_level = verification_level;
     }
 
     public String getLast_seen() {
@@ -309,5 +310,10 @@ public class DtoAccount {
 
     public void setJoined_date(String joined_date) {
         this.joined_date = joined_date;
+    }
+
+    @Override
+    public int compareTo(DtoAccount o) {
+        return o.getStatus_chat().compareTo(o.getStatus_chat());
     }
 }
