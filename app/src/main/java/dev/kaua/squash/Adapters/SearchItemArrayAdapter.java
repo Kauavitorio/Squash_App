@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class SearchItemArrayAdapter extends ArrayAdapter<DtoAccount> {
             TextView lblName = (TextView) view.findViewById(R.id.txt_user_name_search);
             CircleImageView circleImageView = view.findViewById(R.id.ic_user_image);
             if (lblName != null){
-                Picasso.get().load(people.getProfile_image()).into(circleImageView);
+                Glide.with(context).load(people.getProfile_image()).into(circleImageView);
                 lblName.setText(people.getName_user());
             }
         }
@@ -69,19 +70,25 @@ public class SearchItemArrayAdapter extends ArrayAdapter<DtoAccount> {
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            if (constraint != null) {
+            FilterResults filterResults = new FilterResults();
+            if (constraint != null && constraint.length() > 0) {
                 suggestions.clear();
                 for (DtoAccount people : tempItems) {
                     if (people.getName_user().toLowerCase().contains(constraint.toString().toLowerCase())) suggestions.add(people);
                     else if (people.getUsername().toLowerCase().contains(constraint.toString().toLowerCase())) suggestions.add(people);
                     else if (people.getJoined_date().toLowerCase().contains(constraint.toString().toLowerCase())) suggestions.add(people);
                 }
-                FilterResults filterResults = new FilterResults();
                 filterResults.values = suggestions;
                 filterResults.count = suggestions.size();
                 return filterResults;
-            } else
-                return new FilterResults();
+            } else {
+                suggestions.clear();
+                suggestions.addAll(tempItems);
+                filterResults.count = suggestions.size();
+                filterResults.values = suggestions;
+
+            }
+            return filterResults;
         }
 
         @Override
@@ -93,7 +100,8 @@ public class SearchItemArrayAdapter extends ArrayAdapter<DtoAccount> {
                     add(people);
                     notifyDataSetChanged();
                 }
-            }
+            }else
+                notifyDataSetChanged();
         }
     };
 }

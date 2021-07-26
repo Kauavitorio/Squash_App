@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.AutoCompleteTextView;
 
 import org.json.JSONArray;
@@ -65,7 +67,7 @@ public class AsyncUser_Search extends AsyncTask {
         return arrayListDto;
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility"})
     @Override
     protected void onPostExecute(Object arrayListDto) {
         super.onPostExecute(arrayListDto);
@@ -73,6 +75,11 @@ public class AsyncUser_Search extends AsyncTask {
 
         edit_search.setDropDownBackgroundDrawable(context.getDrawable(R.drawable.background_adapter_search));
         edit_search.setAdapter(adapter);
+        edit_search.setOnTouchListener((v, event) -> {
+            edit_search.showDropDown();
+            edit_search.requestFocus();
+            return false;
+        });
     }
 }
 
