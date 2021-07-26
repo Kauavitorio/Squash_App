@@ -22,12 +22,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,6 +47,7 @@ import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -250,10 +252,10 @@ public class ProfileFragment extends Fragment {
                         loadingDialog.dismissDialog();
                         if(response.code() == 200){
                             if(response.body() != null){
-                                //Picasso.get().load(bundle.getString("banner_user")).into(img_banner_profile);
-                                Picasso.get().load(EncryptHelper.decrypt(response.body().getProfile_image())).into(ic_ProfileUser_profile);
+                                Glide.with(requireActivity()).load(EncryptHelper.decrypt(response.body().getProfile_image())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                        .into(ic_ProfileUser_profile);
                                 txt_user_name.setText(EncryptHelper.decrypt(response.body().getName_user()));
-                                txt_username_name.setText( " | " + EncryptHelper.decrypt(response.body().getUsername()));
+                                txt_username_name.setText( " | @" + EncryptHelper.decrypt(response.body().getUsername()));
                                 txt_user_bio_profile.setText(EncryptHelper.decrypt(response.body().getBio_user()));
                                 Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
                                 username = EncryptHelper.decrypt(response.body().getUsername());
@@ -302,6 +304,7 @@ public class ProfileFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     public void GetUserInfo(Activity activity) {
+        Login.ReloadUserinfo(requireContext(), MyPrefs.getUserInformation(requireContext()).getEmail(), MyPrefs.getUserInformation(requireContext()).getPassword());
         ic_account_badge_profile.setVisibility(View.GONE);
         btn_go_chat_profile.setVisibility(View.GONE);
         btn_plus_story_profile.setVisibility(View.VISIBLE);
@@ -325,10 +328,10 @@ public class ProfileFragment extends Fragment {
             ic_account_badge_profile.setVisibility(View.VISIBLE);
         }
 
-        //Picasso.get().load(user.getBanner_user()).into(img_banner_profile);
-        Picasso.get().load(user.getProfile_image()).into(ic_ProfileUser_profile);
+        Glide.with(requireActivity()).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into(ic_ProfileUser_profile);
         txt_user_name.setText(user.getName_user());
-        txt_username_name.setText(" | " + user.getUsername());
+        txt_username_name.setText(" | @" + user.getUsername());
         txt_user_bio_profile.setText(user.getBio_user());
         btn_follow_following_profile.setBackground(activity.getDrawable(R.drawable.background_button_following));
         btn_follow_following_profile.setEnabled(true);

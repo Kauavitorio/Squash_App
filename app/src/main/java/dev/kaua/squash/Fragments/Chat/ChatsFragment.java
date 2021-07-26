@@ -9,19 +9,23 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import dev.kaua.squash.Adapters.Chat.UserChatAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
@@ -79,11 +83,11 @@ public class ChatsFragment extends Fragment {
     }
 
     private void Ids(View view) {
+
         recycler_myMsg = view.findViewById(R.id.recycler_myMsg);
         recycler_myMsg.setHasFixedSize(true);
         recycler_myMsg.setItemViewCacheSize(20);
-        recycler_myMsg.setDrawingCacheEnabled(true);
-        recycler_myMsg.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        ((SimpleItemAnimator) Objects.requireNonNull(recycler_myMsg.getItemAnimator())).setSupportsChangeAnimations(false);
         recycler_myMsg.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
@@ -102,9 +106,11 @@ public class ChatsFragment extends Fragment {
                 mAccounts.clear();
                 for(DataSnapshot snapshot : datasnapshot.getChildren()){
                     DtoAccount account = snapshot.getValue(DtoAccount.class);
-                    for(Chatslist chatlist : usersList){
-                        if(account.getId() != null && account.getId().equals(chatlist.getId())){
-                            mAccounts.add(account);
+                    if(account != null){
+                        for(Chatslist chatList : usersList){
+                            if(account.getId() != null && account.getId().equals(chatList.getId())){
+                                mAccounts.add(account);
+                            }
                         }
                     }
                 }

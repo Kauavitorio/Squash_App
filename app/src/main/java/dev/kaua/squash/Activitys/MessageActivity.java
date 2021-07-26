@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,6 +51,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
@@ -101,9 +100,9 @@ public class MessageActivity extends AppCompatActivity {
     private EditText text_send;
     private CardView btn_send;
     private String message_to_reply;
+    private ImageView verification_ic;
     private String reply_from;
     private ConstraintLayout reply_layout;
-    private ConstraintLayout container_bottom_msg;
     private ImageView cancelButton;
     private ValueEventListener seenListener;
     public static DtoAccount user_im_chat;
@@ -165,6 +164,7 @@ public class MessageActivity extends AppCompatActivity {
 
         //  Loop to get user who user having a chat information
         reference.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("UseCompatLoadingForDrawables")
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 user_im_chat = snapshot.getValue(DtoAccount.class);
@@ -190,6 +190,15 @@ public class MessageActivity extends AppCompatActivity {
                         }
                         else txt_isOnline_chat.setText(Methods.loadLastSeen(MessageActivity.this, user_im_chat.getLast_seen()));
                     }
+
+                    if(user_im_chat.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level()))) > 0){
+                        verification_ic.setVisibility(View.VISIBLE);
+                        int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level())));
+                        if (verified == 2)
+                            verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
+                        else
+                            verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
+                    }else verification_ic.setVisibility(View.GONE);
                 }
             }
 
@@ -241,19 +250,17 @@ public class MessageActivity extends AppCompatActivity {
         btn_more_medias = findViewById(R.id.btn_more_medias);
         txt_user_name = findViewById(R.id.txt_username_chat);
         recycler_view_msg = findViewById(R.id.recycler_view_msg);
+        verification_ic = findViewById(R.id.verification_ic_message);
         txt_isOnline_chat = findViewById(R.id.txt_isOnline_chat);
         reply_layout = findViewById(R.id.reply_layout);
         background_chat = findViewById(R.id.background_chat);
-        container_bottom_msg = findViewById(R.id.container_bottom_msg);
         txtQuotedMsg = findViewById(R.id.txtQuotedMsg);
         cancelButton = findViewById(R.id.cancelButton);
-        //noinspection deprecation
-        container_bottom_msg.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         text_send = findViewById(R.id.text_send);
         btn_send = findViewById(R.id.container_btn_send);
         btn_send.setElevation(0);
         recycler_view_msg.setHasFixedSize(false);
-        recycler_view_msg.setNestedScrollingEnabled(false);
+        recycler_view_msg.setNestedScrollingEnabled(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
         recycler_view_msg.setLayoutManager(linearLayoutManager);
@@ -284,8 +291,8 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void sendMessage(String sender, String receiver, String message){
-        Calendar c = Calendar.getInstance();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("HH:mm a");
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd-M-yyyy HH:mm a");
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_id = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
         String formattedDate = df_time.format(c.getTime());
         String formattedDate_id = df_time_id.format(c.getTime());
@@ -480,6 +487,7 @@ public class MessageActivity extends AppCompatActivity {
         if(reply_layout.getVisibility() == ConstraintLayout.VISIBLE)
             KeyboardUtils.hideKeyboard(this);
         reply_layout.setVisibility(View.GONE);
+        text_send.requestFocus();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -626,7 +634,7 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Methods.status_chat("online");
+        Methods.status_chat("online", this);
         currentUser(userId);
     }
 
@@ -634,7 +642,7 @@ public class MessageActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         reference.removeEventListener(seenListener);
-        Methods.status_chat("offline");
+        Methods.status_chat("offline", this);
         Methods.typingTo_chat_Status("noOne");
         currentUser("none");
     }

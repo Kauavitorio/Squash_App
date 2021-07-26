@@ -1,7 +1,6 @@
 package dev.kaua.squash.Adapters.Chat;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -12,19 +11,15 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -35,12 +30,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Message.DtoMessage;
@@ -48,7 +44,7 @@ import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 
-@SuppressWarnings("IfStatementWithIdenticalBranches")
+@SuppressWarnings({"IfStatementWithIdenticalBranches", "ConstantConditions"})
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
 
     public static final int MSG_TYPE_LEFT = 0;
@@ -59,6 +55,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private final String imageURL;
     private final String chat_Username;
     private final String myUsername;
+    FirebaseStorage firebaseStorage;
     private final int joinNow;
     private RecyclerView recycler_view_msg;
     FirebaseUser fUser = ConfFirebase.getFirebaseUser();
@@ -93,7 +90,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         }
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
     @Override
     public void onBindViewHolder(@NonNull @NotNull MessageAdapter.ViewHolder holder, int position) {
         final ViewHolder viewHolder = holder;
@@ -103,7 +100,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         if(message.getReply_from() != null && !message.getReply_from().equals("noOne") && !message.getReply_content().equals("empty")){
             viewHolder.container_reply.setVisibility(View.VISIBLE);
-            viewHolder.card_container_reply_content.setElevation(0);
             if(fUser.getUid().equals(message.getReply_from()))
                 viewHolder.txt_reply_from.setText(mContext.getString(R.string.reply_to) + " " + myUsername);
             else
@@ -113,76 +109,42 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         }
 
         if(mMessages.get(position).getMedia() != null && message.getMedia() != null && message.getMedia().size() > 0){
-            try {
-                new Thread(() -> {
-                    try {
-                        URLConnection connection = new URL(message.getMedia().get(0)).openConnection();
-                        String contentType = connection.getHeaderField("Content-Type");
-                        boolean image = contentType.startsWith("image/"); //true if image
-                        ((Activity)mContext).runOnUiThread(() -> {
-                            if(image){
-                                try {
-                                    viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
-                                    viewHolder.progress_media_img_chat.setVisibility(View.VISIBLE);
-                                    Glide.with(mContext).load(message.getMedia().get(0)).listener(new RequestListener<Drawable>() {
-                                        @Override
-                                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                                            viewHolder.progress_media_img_chat.setVisibility(View.GONE);
-                                            return false;
-                                        }
-                                        @Override
-                                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
-                                            viewHolder.progress_media_img_chat.setVisibility(View.GONE);
-                                            return false;
-                                        }
-                                        }).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(holder.media_img);
-                                }catch (Exception ex){
-                                    Log.d("MediaLoad", ex.toString());
-                                }
-                            }
-                            else{
-                                viewHolder.container_media_img_chat.setVisibility(View.GONE);
-                                viewHolder.container_video.setVisibility(View.VISIBLE);
-                                viewHolder.media_video.setVisibility(View.VISIBLE);
-                            }
+            if(EncryptHelper.decrypt(mMessages.get(position).getMessage()) == null || EncryptHelper.decrypt(mMessages.get(position).getMessage()).length() <= 0)
+                viewHolder.msg_chat_item.setVisibility(View.GONE);
 
-                            if(message.getMessage() != null && message.getMessage().replaceAll("\\s+","").length() > 0)
-                                viewHolder.msg_chat_item.setVisibility(View.VISIBLE);
-                            else viewHolder.msg_chat_item.setVisibility(View.GONE);
-                        });
-                        Thread.currentThread().start();
-                    } catch (Exception e) {
-                        Log.d("MediaLoad", e.toString());
-                    }
-                }).start();
-            }catch (Exception ex){
-                Log.d("MediaLoad", ex.toString());
-            }
+            viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
+            viewHolder.media_img.setVisibility(View.VISIBLE);
+            Glide.with(mContext).load(message.getMedia().get(0)).listener(new RequestListener<Drawable>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    viewHolder.progress_media_img_chat.setVisibility(View.GONE);
+                    return false;
+                }
+                @Override
+                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
+                    viewHolder.progress_media_img_chat.setVisibility(View.GONE);
+                    return false;
+                }
+            }).into(holder.media_img);
         }else{
             viewHolder.container_media_img_chat.setVisibility(View.GONE);
             viewHolder.progress_media_img_chat.setVisibility(View.GONE);
         }
-
-        holder.media_img.setOnClickListener(v -> {
-            viewHolder.media_video.setVideoPath(message.getMedia().get(0));
-            viewHolder.media_video.start();
-        });
 
         //Disable to future updates
         //if(imageURL == null || imageURL.equals("default")) holder.profile_image_item.setImageResource(R.drawable.pumpkin_default_image);
         //else Picasso.get().load(EncryptHelper.decrypt(imageURL)).into(holder.profile_image_item);
 
         viewHolder.container_msg.setVisibility(View.VISIBLE);
-        if(position == mMessages.size() -1){
-            if (message.getIsSeen() == 1) viewHolder.txt_seen.setText(mContext.getString(R.string.seen));
-            else viewHolder.txt_seen.setText(mContext.getString(R.string.delivered));
+        if(message.getSender().equals(fUser.getUid())){
+            if (message.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(mContext.getDrawable(R.drawable.ic_seen));
+            else viewHolder.img_seen.setImageDrawable(mContext.getDrawable(R.drawable.ic_delivered));
 
             if(joinNow != 0){
                 Animation CartAnim = AnimationUtils.loadAnimation(mContext, R.anim.slide_up);
                 viewHolder.container_msg.setAnimation(CartAnim);
-                viewHolder.txt_seen.setAnimation(CartAnim);
             }
-        }else viewHolder.txt_seen.setVisibility(View.GONE);
+        }else viewHolder.img_seen.setVisibility(View.GONE);
 
         viewHolder.container_msg.setOnLongClickListener(v -> {
             if(mMessages.get(viewHolder.getAdapterPosition()).getSender().equals(fUser.getUid()))
@@ -207,6 +169,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                             for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
                                 appleSnapshot.getRef().removeValue();
                             }
+                            firebaseStorage = FirebaseStorage.getInstance();
+                            StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(mMessages.get(position).getMedia().get(0)));
+                            photoRef.delete().addOnSuccessListener(aVoid -> {
+                                // File deleted successfully
+                                Log.d("DeleteMessage", "onSuccess: deleted file");
+                            }).addOnFailureListener(exception -> {
+                                // Uh-oh, an error occurred!
+                                Log.d("DeleteMessage", "onFailure: did not delete file");
+                            });
                             mMessages.remove(position);
                             notifyDataSetChanged();
                         }
@@ -232,14 +203,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        private final TextView msg_chat_item, txt_seen, msgTime_chat_item, txt_reply_from, reply_content;
+        private final TextView msg_chat_item, msgTime_chat_item, txt_reply_from, reply_content;
         private final CircleImageView profile_image_item;
-        private final CardView card_container_reply_content;
-        private final LinearLayout container_msg;
-        private final LinearLayout container_reply;
-        private final ConstraintLayout container_video, container_media_img_chat;
-        private final VideoView media_video;
+        private final ConstraintLayout container_msg;
+        private final ConstraintLayout container_reply;
+        private final ConstraintLayout container_media_img_chat;
         private final ImageView media_img;
+        private final ImageView img_seen;
         private final ProgressBar progress_media_img_chat;
 
         @SuppressLint("CutPasteId")
@@ -247,17 +217,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             super(itemView);
             setIsRecyclable(false);
             msg_chat_item = itemView.findViewById(R.id.msg_chat_item);
-            txt_seen = itemView.findViewById(R.id.txt_seen);
+            img_seen = itemView.findViewById(R.id.img_seen);
             media_img = itemView.findViewById(R.id.media_img);
             progress_media_img_chat = itemView.findViewById(R.id.progress_media_img_chat);
             reply_content = itemView.findViewById(R.id.reply_content);
             container_media_img_chat = itemView.findViewById(R.id.container_media_img_chat);
-            container_video = itemView.findViewById(R.id.container_video);
-            media_video = itemView.findViewById(R.id.media_video);
             profile_image_item = itemView.findViewById(R.id.profile_image_chat_item);
             txt_reply_from = itemView.findViewById(R.id.txt_reply_from);
             msgTime_chat_item = itemView.findViewById(R.id.msgTime_chat_item);
-            card_container_reply_content = itemView.findViewById(R.id.card_container_reply_content);
             container_reply = itemView.findViewById(R.id.container_reply);
             container_msg = itemView.findViewById(R.id.container_msg);
             container_msg.setVisibility(View.GONE);

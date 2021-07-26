@@ -14,13 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -59,13 +60,14 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         return new ViewHolder(view);
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public void onBindViewHolder(@NonNull @NotNull UserChatAdapter.ViewHolder holder, int position) {
         DtoAccount account = mAccounts.get(position);
         holder.user_name.setText(account.getName_user());
         if(account.getImageURL().equals("default")) holder.profile_image.setImageResource(R.drawable.pumpkin_default_image);
-        else Picasso.get().load(EncryptHelper.decrypt(account.getImageURL())).into(holder.profile_image);
-
+        else Glide.with(mContext).load(EncryptHelper.decrypt(account.getImageURL())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into(holder.profile_image);
 
         if(isChat)
             lastMessage(account.getId(), holder.last_msg, holder.card_no_read_ic);
@@ -85,6 +87,15 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
             mContext.startActivity(intent);
         });
 
+        if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
+            holder.verification_ic.setVisibility(View.VISIBLE);
+            int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level())));
+            if (verified == 2)
+                holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
+            else
+                holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
+        }else holder.verification_ic.setVisibility(View.GONE);
+
         if(isChat){
             if (account.getStatus_chat().equals("online")){
                 holder.img_on.setVisibility(View.VISIBLE);
@@ -102,19 +113,21 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     @Override
     public int getItemCount() { return mAccounts.size(); }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView user_name, last_msg;
-        private CircleImageView profile_image;
-        private CircleImageView img_on, img_off;
-        private CardView card_no_read_ic;
-        private ImageView ic_pinned_chat;
+        private final TextView user_name, last_msg;
+        private final CircleImageView profile_image;
+        private final CircleImageView img_on, img_off;
+        private final CardView card_no_read_ic;
+        private final ImageView ic_pinned_chat;
+        private final ImageView verification_ic;
 
         @SuppressLint("CutPasteId")
         public ViewHolder(View itemView){
             super(itemView);
             ic_pinned_chat = itemView.findViewById(R.id.ic_pinned_chat);
             user_name = itemView.findViewById(R.id.user_name_users);
+            verification_ic = itemView.findViewById(R.id.verification_ic_user_chat);
             profile_image = itemView.findViewById(R.id.profile_image_users);
             img_on = itemView.findViewById(R.id.img_on);
             last_msg = itemView.findViewById(R.id.last_msg);

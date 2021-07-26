@@ -4,12 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +21,13 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,12 +55,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-@SuppressLint("UseCompatLoadingForDrawables")
+@SuppressLint({"UseCompatLoadingForDrawables", "StaticFieldLeak"})
 public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolderPosts> {
     ArrayList<DtoPost> list;
     static Context mContext;
     static DaoPosts daoPosts;
     private static BottomSheetDialog bottomSheetDialog;
+    FirebaseStorage firebaseStorage;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
@@ -88,7 +91,8 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         }else holder.ic_account_badge.setVisibility(View.GONE);
         holder.img_secondImage_post.setVisibility(View.GONE);
         holder.container_third_img.setVisibility(View.GONE);
-        Picasso.get().load(list.get(position).getProfile_image()).into(holder.icon_user_profile_post);
+        Glide.with(mContext).load(list.get(position).getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into(holder.icon_user_profile_post);
         holder.txt_name_user_post.setText(list.get(position).getName_user());
         holder.txt_username_post.setText( "| @" + list.get(position).getUsername());
         holder.txt_post_content.setText(list.get(position).getPost_content());
@@ -113,40 +117,41 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         holder.txt_date_time_post.setText(" • " + list.get(position).getPost_time());
         holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(list.get(position).getPost_comments_amount())));
 
-        if(list.get(position).getPost_images() != null && list.get(position).getPost_images().size() > 0 && !list.get(position).getPost_images().get(0).equals("NaN")){
-            int ImagesAmount = list.get(position).getPost_images().size();
+        DtoPost img_list = daoPosts.get_post_img(Long.parseLong(list.get(position).getPost_id()));
+        if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0 && !img_list.getPost_images().get(0).equals("NaN")){
+            int ImagesAmount = img_list.getPost_images().size();
             if(ImagesAmount < 2){
                 for (int i = 0; i < 1; i++){
-                    Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(list.get(position).getPost_images().get(i)))).into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            holder.img_firstImage_post.setImageBitmap(Methods.getRoundedCornerBitmap(bitmap, 50));
-                        }
-                        @Override
-                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {}
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {}
-                    });
+                    RequestOptions myOptions = new RequestOptions()
+                            .fitCenter() // or centerCrop
+                            .override(500, 500);
+                    Glide.with(mContext)
+                            .asBitmap()
+                            .apply(myOptions)
+                            .load(EncryptHelper.decrypt(img_list.getPost_images().get(i)))
+                            .into(holder.img_firstImage_post);
                 }
             }else{
-                Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(list.get(position).getPost_images().get(0)))).into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        holder.img_firstImage_post.setImageBitmap(Methods.getRoundedCornerBitmap(bitmap, 50));
-                    }
-                    @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {}
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {}
-                });
-                Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(list.get(position).getPost_images().get(1)))).into(holder.img_secondImage_post);
+                RequestOptions myOptions = new RequestOptions()
+                        .fitCenter() // or centerCrop
+                        .override(100, 100);
+                Glide.with(mContext)
+                        .asBitmap()
+                        .apply(myOptions)
+                        .load(EncryptHelper.decrypt(EncryptHelper.decrypt(EncryptHelper.decrypt(img_list.getPost_images().get(0)))))
+                        .into(holder.img_firstImage_post);
+                Glide.with(mContext)
+                        .asBitmap()
+                        .apply(myOptions)
+                        .load(EncryptHelper.decrypt(EncryptHelper.decrypt(img_list.getPost_images().get(1))))
+                        .into(holder.img_secondImage_post);
                 holder.img_secondImage_post.setVisibility(View.VISIBLE);
                 int width = holder.img_firstImage_post.getWidth();
                 holder.img_firstImage_post.getLayoutParams().width = width - 50;
                 holder.img_firstImage_post.requestLayout();
                 if (ImagesAmount > 2) {
                     holder.container_third_img.setVisibility(View.VISIBLE);
-                    Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(list.get(position).getPost_images().get(2)))).into(holder.img_thirdImage_post);
+                    Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(img_list.getPost_images().get(2)))).into(holder.img_thirdImage_post);
                     if (ImagesAmount == 3) holder.container_blur_post.setVisibility(View.GONE);
                     else {
                         holder.txt_images_amount_post.setText("+" + (ImagesAmount - 2));
@@ -208,6 +213,22 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                             public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
                                 loadingDialog.dismissDialog();
                                 if(response.code() == 200){
+                                    DtoPost img_list = daoPosts.get_post_img(Long.parseLong(list.get(position).getPost_id()));
+                                    if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0){
+                                        for (int i = 0; i < img_list.getPost_images().size(); i++){
+                                            if(img_list.getPost_images().get(i) != null){
+                                                firebaseStorage = FirebaseStorage.getInstance();
+                                                StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(img_list.getPost_images().get(i))));
+                                                photoRef.delete().addOnSuccessListener(aVoid -> {
+                                                    // File deleted successfully
+                                                    Log.d("POSTS_ADAPTER", "onSuccess: deleted file");
+                                                }).addOnFailureListener(exception -> {
+                                                    // Uh-oh, an error occurred!
+                                                    Log.d("POSTS_ADAPTER", "onFailure: did not delete file");
+                                                });
+                                            }
+                                        }
+                                    }
                                     list.remove(position);
                                     notifyDataSetChanged();
                                     MainFragment.RefreshRecycler();

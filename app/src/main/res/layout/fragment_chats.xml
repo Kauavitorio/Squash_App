@@ -6,9 +6,15 @@
     android:background="@color/white"
     tools:context=".Fragments.Chat.ChatsFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/recycler_myMsg"/>
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/recycler_myMsg"/>
+
+    </androidx.core.widget.NestedScrollView>
 
 </FrameLayout>

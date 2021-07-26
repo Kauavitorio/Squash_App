@@ -1,13 +1,14 @@
 package dev.kaua.squash.Adapters.Profile;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.Toast;
 
+
+import androidx.core.graphics.BitmapCompat;
 
 import com.google.android.gms.tasks.Task;
 import com.squareup.picasso.Picasso;
@@ -15,13 +16,11 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
-import dev.kaua.squash.Activitys.ComposeActivity;
 import dev.kaua.squash.Activitys.EditProfileActivity;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
-import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.CompressImage;
 import dev.kaua.squash.Tools.LoadingDialog;
-import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 
@@ -35,27 +34,38 @@ public class Profile_Image extends EditProfileActivity {
             //getting image from gallery
             if(filePath != null) {
 
-                //uploading the image
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), filePath);
+                Log.d("UPDATE_PROFILE_IMAGE", "Default size -> " + BitmapCompat.getAllocationByteCount(bitmap));
+                ic_edit_ProfileUser.setCircleBackgroundColor(context.getColor(R.color.black));
+                ic_edit_ProfileUser.setImageBitmap(bitmap);
+                ic_edit_ProfileUser.setDrawingCacheEnabled(true);
+                ic_edit_ProfileUser.buildDrawingCache();
+                Bitmap bitmapUpload = ic_edit_ProfileUser.getDrawingCache();
+                Bitmap bitMapSendUpload = CompressImage.compressImageFromBitmap(bitmapUpload, bitmap.getWidth(), bitmap.getHeight());
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitMapSendUpload.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                Log.d("UPDATE_PROFILE_IMAGE", "Resize size -> " + BitmapCompat.getAllocationByteCount(bitMapSendUpload));
+                byte[] dataUpload = baos.toByteArray();
+                ic_edit_ProfileUser.setCircleBackgroundColor(context.getColor(R.color.base_color));
                 storageReference = ConfFirebase.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
                         "_" + ConfFirebase.getFirebaseAuth().getUid());
-                storageReference.putFile(filePath).continueWithTask(task -> {
+                storageReference.putBytes(dataUpload).addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
-                        Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
+                        loadingDialog.dismissDialog();
+                        Log.d("DEBUG_CHAT", Objects.requireNonNull(task.getException()).toString());
                     }
-                    return storageReference.getDownloadUrl();
-                }).addOnCompleteListener(task -> {
-                    loadingDialog.dismissDialog();
-                    if (task.isSuccessful()) {
-                        Uri downloadUri = task.getResult();
-                        loadingDialog.dismissDialog();
-                        String imageUrl = downloadUri.toString();
-                        new_image = imageUrl;
-                        Log.d("DEBUG_CHAT",  imageUrl);
-                        Picasso.get().load(imageUrl).into(ic_edit_ProfileUser);
-                    } else {
-                        loadingDialog.dismissDialog();
-                        Warnings.showWeHaveAProblem(context);
-                        Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
+                    if (task.getResult().getMetadata() != null) {
+                        if (task.getResult().getMetadata().getReference() != null) {
+                            Task<Uri> result = task.getResult().getStorage().getDownloadUrl();
+                            result.addOnSuccessListener(uri -> {
+                                loadingDialog.dismissDialog();
+                                String imageUrl = uri.toString();
+                                new_image = imageUrl;
+                                Log.d("DEBUG_CHAT",  imageUrl);
+                                Picasso.get().load(imageUrl).into(ic_edit_ProfileUser);
+                            });
+                        }else
+                            loadingDialog.dismissDialog();
                     }
                 });
             }

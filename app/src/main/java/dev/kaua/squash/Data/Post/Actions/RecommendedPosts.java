@@ -14,18 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.CollationKey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 import dev.kaua.squash.Adapters.Posts_Adapters;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
+import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -38,7 +36,7 @@ import retrofit2.Retrofit;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class RecommendedPosts {
+public class RecommendedPosts extends MainFragment {
 
     final static Retrofit retrofit = Methods.GetRetrofitBuilder();
     private static Parcelable recyclerViewState;
@@ -53,12 +51,12 @@ public class RecommendedPosts {
         Call<ArrayList<DtoPost>> call = services.getRecommendedPosts(sameAccount);
         recyclerViewState = Objects.requireNonNull(recyclerView.getLayoutManager()).onSaveInstanceState();
         ArrayList<DtoPost> arraylist = new ArrayList<>();
-        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setNestedScrollingEnabled(true);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(20);
-        recyclerView.setDrawingCacheEnabled(true);
-        recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         DaoPosts daoPosts = new DaoPosts(context);
+
+        swipe_posts.setRefreshing(true);
 
         LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
 
@@ -96,13 +94,13 @@ public class RecommendedPosts {
                                         }
                                     }
                                 }
-                                arraylist.sort(Collections.reverseOrder());
 
                                 daoPosts.Register_Home_Posts(arraylist);
-                            }
-                        }
-                    }
-                    LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
+
+                                LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
+                            }else LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
+                        } else LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
+                    }else LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
                 }
                 @Override
                 public void onFailure(@NotNull Call<ArrayList<DtoPost>> call, @NotNull Throwable t) {
@@ -116,6 +114,7 @@ public class RecommendedPosts {
     private static void LoadPostsFromLocal(Context context, RecyclerView recyclerView, ConstraintLayout loadingPanel, ProgressBar loading_posts, DaoPosts daoPosts) {
         ArrayList<DtoPost> listPostDB = daoPosts.get_post(0);
         if (listPostDB.size() > 0) {
+            swipe_posts.setRefreshing(false);
             Posts_Adapters posts_adapters = new Posts_Adapters(listPostDB, context);
             posts_adapters.notifyDataSetChanged();
             recyclerView.setAdapter(posts_adapters);

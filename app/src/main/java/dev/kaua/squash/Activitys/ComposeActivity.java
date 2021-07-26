@@ -8,9 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -131,7 +129,7 @@ public class ComposeActivity extends AppCompatActivity {
         });
 
         btn_add_image.setOnClickListener(v -> {
-            if(post_image.size() < 4){
+            if(post_image.size() < 2){
                 UserPermissions.validatePermissions(permissions, this, 189);
                 int GalleryPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
                 if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
@@ -201,6 +199,7 @@ public class ComposeActivity extends AppCompatActivity {
                     compose_img01.setVisibility(View.VISIBLE);
                 }else if(i == 1){
                     Picasso.get().load(EncryptHelper.decrypt(post_image.get(1))).into(compose_img02);
+                    btn_add_image.setVisibility(View.GONE);
                     compose_img02.setVisibility(View.VISIBLE);
                 }else if(i == 2){
                     Picasso.get().load(EncryptHelper.decrypt(post_image.get(2))).into(compose_img03);
@@ -289,7 +288,6 @@ public class ComposeActivity extends AppCompatActivity {
         compose_img02 = findViewById(R.id.compose_img02);
         compose_img03 = findViewById(R.id.compose_img03);
         compose_img04 = findViewById(R.id.compose_img04);
-        SetImagesGONE();
         btn_add_image = findViewById(R.id.btn_add_image_compose);
         txt_username_name_compose = findViewById(R.id.txt_username_name_compose);
         txt_user_name = findViewById(R.id.txt_user_name_compose);
@@ -298,6 +296,7 @@ public class ComposeActivity extends AppCompatActivity {
         ic_account_badge_profile.setVisibility(View.GONE);
         btn_post.setElevation(0);
         edit_compose_msg = findViewById(R.id.edit_compose_msg);
+        SetImagesGONE();
 
         LoadUserInfo();
 
@@ -317,6 +316,7 @@ public class ComposeActivity extends AppCompatActivity {
         compose_img02.setVisibility(View.GONE);
         compose_img03.setVisibility(View.GONE);
         compose_img04.setVisibility(View.GONE);
+        btn_add_image.setVisibility(View.VISIBLE);
     }
 
     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
