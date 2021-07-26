@@ -11,6 +11,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
@@ -113,6 +114,15 @@ public class PostDetailsActivity extends AppCompatActivity {
                 KeyboardUtils.showKeyboard(PostDetailsActivity.this);
                 edit_comment_msg.requestFocus();
             }else Warnings.NeedLoginWithShortCutAlert(this, 0);
+        });
+
+        btn_share_post.setOnClickListener(v -> {
+            Intent myIntent = new Intent(Intent.ACTION_SEND);
+            myIntent.setType("text/plain");
+            String body = Methods.BASE_URL + "share/" + EncryptHelper.decrypt(post_info.getUsername()) + "/post/" + EncryptHelper.decrypt(post_info.getPost_id())
+                    + "?s=" + Methods.RandomCharactersWithoutSpecials(3);
+            myIntent.putExtra(Intent.EXTRA_TEXT,body);
+            startActivity(Intent.createChooser(myIntent, "Share Using"));
         });
 
         btn_actions.setOnClickListener(v -> {
