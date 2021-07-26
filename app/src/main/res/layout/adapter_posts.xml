@@ -13,6 +13,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
+        android:id="@+id/container_post_adapter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="80dp"
@@ -219,6 +220,7 @@
                         android:id="@+id/btn_like_post"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:minWidth="80dp"
                         android:layout_marginStart="5dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -259,10 +261,10 @@
 
                         <!-- Icon Pencil -->
                         <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_pencil"
+                            android:src="@drawable/ic_comment"
                             tools:ignore="ContentDescription" />
 
                         <!-- Text Comments -->

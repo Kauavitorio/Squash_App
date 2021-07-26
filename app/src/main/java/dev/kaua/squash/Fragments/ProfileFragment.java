@@ -117,8 +117,9 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                         if(response.code() == 201){
+                            btn_go_chat_profile.setVisibility(View.VISIBLE);
                             SearchFragment.getInstance().LoadSearch();
-                            Methods.LoadFollowersAndFollowing(requireActivity());
+                            Methods.LoadFollowersAndFollowing(requireActivity(), 1);
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
                             asyncUser_follow.execute();
                         }
@@ -145,7 +146,7 @@ public class ProfileFragment extends Fragment {
                     public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                         if(response.code() == 201){
                             SearchFragment.getInstance().LoadSearch();
-                            Methods.LoadFollowersAndFollowing(requireActivity());
+                            Methods.LoadFollowersAndFollowing(requireActivity(), 1);
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
                             asyncUser_follow.execute();
                         }
@@ -226,7 +227,7 @@ public class ProfileFragment extends Fragment {
     public void LoadAnotherUser(){
         btn_go_chat_profile.setVisibility(View.GONE);
         ic_account_badge_profile.setVisibility(View.GONE);
-        Methods.LoadFollowersAndFollowing(requireContext());
+        Methods.LoadFollowersAndFollowing(requireContext(), 1);
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account.getAccount_id());
         asyncUser_follow.execute();
         control++;

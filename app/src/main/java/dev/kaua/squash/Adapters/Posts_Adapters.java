@@ -36,6 +36,7 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Activitys.PostDetailsActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;
@@ -167,6 +168,20 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             MainActivity.getInstance().GetBundleProfile(bundle);
             MainActivity.getInstance().CallProfile();
             ProfileFragment.getInstance().LoadAnotherUser();
+        });
+
+        holder.container_post_adapter.setOnClickListener(v -> {
+            Intent i = new Intent(mContext, PostDetailsActivity.class);
+            i.putExtra("post_id", Long.parseLong(list.get(position).getPost_id()));
+            i.putExtra("comment", 0);
+            mContext.startActivity(i);
+        });
+
+        holder.btn_comment_post.setOnClickListener(v -> {
+            Intent i = new Intent(mContext, PostDetailsActivity.class);
+            i.putExtra("post_id", Long.parseLong(list.get(position).getPost_id()));
+            i.putExtra("comment", 1);
+            mContext.startActivity(i);
         });
 
         holder.btn_share_post.setOnClickListener(v -> {
@@ -305,13 +320,15 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         TextView txt_name_user_post, txt_username_post, txt_post_content, txt_images_amount_post, txt_date_time_post;
         TextView txt_likes_post, txt_comments_post;
         ImageView img_firstImage_post, img_secondImage_post, img_thirdImage_post, ic_account_badge, img_heart_like, btn_actions;
-        RelativeLayout container_third_img;
+        RelativeLayout container_third_img, container_post_adapter;
         ConstraintLayout container_blur_post;
-        LinearLayout btn_like_post, btn_share_post;
+        LinearLayout btn_like_post, btn_share_post, btn_comment_post;
 
         public MyHolderPosts(@NonNull View itemView) {
             super(itemView);
             txt_date_time_post = itemView.findViewById(R.id.txt_date_time_post);
+            container_post_adapter = itemView.findViewById(R.id.container_post_adapter);
+            btn_comment_post = itemView.findViewById(R.id.btn_comment_post);
             icon_user_profile_post = itemView.findViewById(R.id.icon_user_profile_post);
             txt_name_user_post = itemView.findViewById(R.id.txt_name_user_post);
             btn_actions = itemView.findViewById(R.id.btn_actions);

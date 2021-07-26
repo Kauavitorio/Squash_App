@@ -45,6 +45,7 @@ import dev.kaua.squash.Activitys.WebActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
+import dev.kaua.squash.Data.Post.AsyncLikes_Posts_Comment;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
@@ -133,11 +134,16 @@ public abstract class Methods extends MainActivity {
         return output;
     }
 
-    public static void LoadFollowersAndFollowing(Context context){
+    public static void LoadFollowersAndFollowing(Context context, int base){
         SharedPreferences sp_First = context.getSharedPreferences("myPrefs", MODE_PRIVATE);
-        AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
-        //noinspection unchecked
-        async.execute();
+        if(base == 0){
+            AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
+            //noinspection unchecked
+            async.execute();
+            AsyncLikes_Posts_Comment posts_comment = new AsyncLikes_Posts_Comment((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
+            //noinspection unchecked
+            posts_comment.execute();
+        }
 
         final Retrofit retrofitUser = GetRetrofitBuilder();
         SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);

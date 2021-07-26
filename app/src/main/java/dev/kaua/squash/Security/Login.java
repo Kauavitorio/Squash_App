@@ -110,7 +110,7 @@ public abstract class Login {
                     editor.apply();
 
                     //  Getting Followers and Followings
-                    Methods.LoadFollowersAndFollowing(context);
+                    Methods.LoadFollowersAndFollowing(context, 0);
 
                     //  Log in User On Firebase
                     mAuth = ConfFirebase.getFirebaseAuth();
@@ -227,7 +227,7 @@ public abstract class Login {
                         editor.apply();
 
                         //  Getting Followers and Followings
-                        Methods.LoadFollowersAndFollowing(context);
+                        Methods.LoadFollowersAndFollowing(context, 1);
                     }
                 }else if(response.code() == 206){
                     Log.d("LoginActions", "Email not validated");

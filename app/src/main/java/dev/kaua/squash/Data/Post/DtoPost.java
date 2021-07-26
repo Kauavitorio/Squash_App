@@ -19,9 +19,15 @@ public class DtoPost implements Comparable<DtoPost>{
 
     private String post_id;
 
+    private String likes;
+
     private String account_id;
 
     private String account_id_cry;
+
+    private String comment;
+
+    private String reply_to;
 
     private String name_user;
 
@@ -43,6 +49,8 @@ public class DtoPost implements Comparable<DtoPost>{
 
     private String post_topic;
 
+    private String comment_id;
+
     private String verification_level;
 
     public String getVerification_level() {
@@ -51,6 +59,30 @@ public class DtoPost implements Comparable<DtoPost>{
 
     public void setVerification_level(String verification_level) {
         this.verification_level = verification_level;
+    }
+
+    public String getLikes() {
+        return likes;
+    }
+
+    public void setLikes(String likes) {
+        this.likes = likes;
+    }
+
+    public String getComment_id() {
+        return comment_id;
+    }
+
+    public void setComment_id(String comment_id) {
+        this.comment_id = comment_id;
+    }
+
+    public String getReply_to() {
+        return reply_to;
+    }
+
+    public void setReply_to(String reply_to) {
+        this.reply_to = reply_to;
     }
 
     public String getAccount_id_cry() {
@@ -79,6 +111,14 @@ public class DtoPost implements Comparable<DtoPost>{
 
     public String getAccount_id() {
         return account_id;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public void setAccount_id(String account_id) {

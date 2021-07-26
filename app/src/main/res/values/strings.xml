@@ -96,6 +96,7 @@
     <string name="refresh">Refresh</string>
     <string name="open_with">Open with …</string>
     <string name="copy_link">Copy Link</string>
+    <string name="need_login_msg">To access this function it is necessary to be logged in.\nWould you like to login?</string>
     <string name="url_copied">URL copied to your clipboard</string>
     <string name="secure_website"><font color='#98F33C'>This website is using a secure connection.</font>nInformation shared with this website, such as passwords or credit card numbers, is submitted securely</string>
     <string name="not_secure_website"><font color='#FD0000'>This site is not using a secure connection.</font>\nInformation shared with this site, such as passwords or credit card numbers, is not sent securely</string>
@@ -108,4 +109,5 @@
     <string name="bio" translatable="false">Bio</string>
     <string name="delete_post">Delete Post</string>
     <string name="delete_post_message">Do you really want to delete your post?\nThis will result in the loss of likes and comments.</string>
+    <string name="post_not_found">Post not found</string>
 </resources>
