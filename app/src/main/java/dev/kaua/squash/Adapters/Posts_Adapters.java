@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -174,7 +176,8 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             Intent i = new Intent(mContext, PostDetailsActivity.class);
             i.putExtra("post_id", Long.parseLong(list.get(position).getPost_id()));
             i.putExtra("comment", 0);
-            mContext.startActivity(i);
+            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
+            ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
         });
 
         holder.btn_comment_post.setOnClickListener(v -> {

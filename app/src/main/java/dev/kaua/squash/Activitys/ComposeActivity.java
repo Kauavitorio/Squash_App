@@ -41,6 +41,7 @@ import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.Fragments.MainFragment;
+import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
@@ -114,6 +115,7 @@ public class ComposeActivity extends AppCompatActivity {
                         loadingDialog.dismissDialog();
                         if(response.code() == 201){
                             MainFragment.RefreshRecycler();
+                            ProfileFragment.getInstance().ReloadRecycler();
                             finish();
                         }else Warnings.showWeHaveAProblem(ComposeActivity.this);
                     }

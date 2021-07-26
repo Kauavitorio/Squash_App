@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -127,16 +128,15 @@ public class RecommendedPosts extends MainFragment {
     }
 
     //  Method to get User Posts
-    public static void getUsersPosts(Context context, RecyclerView recyclerView, RelativeLayout loadingPanel, RelativeLayout noPost_profile, DtoAccount account){
+    public static void getUsersPosts(Context context, RecyclerView recyclerView, RelativeLayout noPost_profile, DtoAccount account){
         PostServices services = retrofit.create(PostServices.class);
         Call<ArrayList<DtoPost>> call = services.getUserPosts(account);
         recyclerViewState = Objects.requireNonNull(recyclerView.getLayoutManager()).onSaveInstanceState();
         ArrayList<DtoPost> arraylist = new ArrayList<>();
-        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setNestedScrollingEnabled(true);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(20);
         recyclerView.setDrawingCacheEnabled(true);
-        recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
 
         //  Checking if user is connected to a network
@@ -144,7 +144,6 @@ public class RecommendedPosts extends MainFragment {
             call.enqueue(new Callback<ArrayList<DtoPost>>() {
                 @Override
                 public void onResponse(@NotNull Call<ArrayList<DtoPost>> call, @NotNull Response<ArrayList<DtoPost>> response) {
-                    //swipe_main.setRefreshing(false);
                     if(response.code() == 200 || response.code() == 201){
                         ArrayList<DtoPost> list = response.body();
                         if(list != null){
@@ -174,14 +173,12 @@ public class RecommendedPosts extends MainFragment {
                                 if(arraylist.size() == 0){
                                     noPost_profile.setVisibility(View.VISIBLE);
                                     recyclerView.setVisibility(View.GONE);
-                                    loadingPanel.setVisibility(View.GONE);
                                 }else{
                                     Posts_Adapters posts_adapters = new Posts_Adapters(arraylist, context);
                                     posts_adapters.notifyDataSetChanged();
                                     recyclerView.setAdapter(posts_adapters);
                                     recyclerView.getRecycledViewPool().clear();
                                     recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-                                    loadingPanel.setVisibility(View.GONE);
                                     noPost_profile.setVisibility(View.GONE);
                                     recyclerView.setVisibility(View.VISIBLE);
                                 }
@@ -191,7 +188,6 @@ public class RecommendedPosts extends MainFragment {
                     else {
                         noPost_profile.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);
-                        loadingPanel.setVisibility(View.GONE);
                     }
                 }
                 @Override
