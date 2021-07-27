@@ -124,11 +124,10 @@ public class ChatFragment extends Fragment {
                                     unread++;
                     }
 
-                    if(unread == 0){
+                    if(unread == 0)
                         viewPaperAdapter.addFragment(new ChatsFragment(), getString(R.string.chats));
-                    }/*else{
+                    else
                         viewPaperAdapter.addFragment(new ChatsFragment(), "(" + unread + ") " + getString(R.string.chats));
-                    }*/
 
                     //viewPaperAdapter.addFragment(new UsersFragment(), "Users");
                     view_paper_chat.setAdapter(viewPaperAdapter);

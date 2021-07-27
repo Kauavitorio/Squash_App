@@ -98,10 +98,16 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         }else holder.verification_ic.setVisibility(View.GONE);
 
         if(isChat){
-            if (account.getStatus_chat().equals("online")){
-                holder.last_seen.setText(mContext.getString(R.string.online));
-                holder.img_on.setVisibility(View.VISIBLE);
-                holder.img_off.setVisibility(View.GONE);
+            if(Methods.isOnline(mContext)){
+                if (account.getStatus_chat().equals("online")){
+                    holder.last_seen.setText(mContext.getString(R.string.online));
+                    holder.img_on.setVisibility(View.VISIBLE);
+                    holder.img_off.setVisibility(View.GONE);
+                }else {
+                    holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
+                    holder.img_on.setVisibility(View.GONE);
+                    holder.img_off.setVisibility(View.VISIBLE);
+                }
             }else {
                 holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
                 holder.img_on.setVisibility(View.GONE);

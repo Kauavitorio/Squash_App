@@ -1,5 +1,6 @@
 package dev.kaua.squash.Notifications;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -23,10 +24,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Map;
 
 import dev.kaua.squash.Activitys.MessageActivity;
+import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.MyPrefs;
 
@@ -61,17 +66,16 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         Map<String, String> data_notify = remoteMessage.getData();
 
-//      String sented = remoteMessage.getData().get("sented");
         String user = remoteMessage.getData().get("user");
 
         SharedPreferences preferences  = getSharedPreferences(MyPrefs.PREFS_NOTIFICATION, MODE_PRIVATE);
-        String currentuser = preferences.getString("currentUser", "none");
-        Log.d("Current", currentuser);
+        String currentUser = preferences.getString("currentUser", "none");
+        Log.d("Current", currentUser);
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (firebaseUser != null && data_notify.size() > 0) {
-            if (!currentuser.equals(user)) {
+            if (!currentUser.equals(user)) {
                 Log.d("Current", user);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) sendOreoNotification(remoteMessage);
                 else sendNotification(remoteMessage);
@@ -97,6 +101,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Bundle bundle = new Bundle();
         bundle.putString("userId", user);
         intent.putExtras(bundle);
+        Update_Last_chat(user);
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -128,6 +133,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         bundle.putString("userId", user);
         intent.putExtras(bundle);
 
+        Update_Last_chat(user);
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
 
@@ -149,4 +156,13 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         notificationManager.notify(i, builder.build());
     }
 
+    private void Update_Last_chat(String user) {
+        DaoChat daoChat = new DaoChat(this);
+        DtoAccount account = new DtoAccount();
+        Calendar c = Calendar.getInstance();
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        account.setId(user);
+        account.setLast_chat(df_time_last_chat.format(c.getTime()));
+        daoChat.UPDATE_A_CHAT(account, 0);
+    }
 }
