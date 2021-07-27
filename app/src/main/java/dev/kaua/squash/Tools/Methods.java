@@ -14,15 +14,12 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.text.Html;
 import android.text.SpannableStringBuilder;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -192,10 +189,12 @@ public abstract class Methods extends MainActivity {
         if (value < 1000) return Long.toString(value); //deal with easy case
 
         Map.Entry<Long, String> e = suffixes.floorEntry(value);
+        //noinspection ConstantConditions
         Long divideBy = e.getKey();
         String suffix = e.getValue();
 
         long truncated = value / (divideBy / 10); //the number part of the output times 10
+        //noinspection IntegerDivisionInFloatingPointContext
         boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
         return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }
@@ -232,8 +231,8 @@ public abstract class Methods extends MainActivity {
     //  Method to set new user status for chat system
     public static void status_chat(String status, Context context){
         Calendar c = Calendar.getInstance();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
-        String formattedDate = df_time.format(c.getTime());
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
+        String formattedDate = df_date.format(c.getTime());
         firebaseUser = ConfFirebase.getFirebaseUser();
         //noinspection ConstantConditions
         if(firebaseUser.getUid() != null){
@@ -261,22 +260,65 @@ public abstract class Methods extends MainActivity {
     //  Method to load last seen
     public static String loadLastSeen(Context context, String get_date_time){
         Calendar c = Calendar.getInstance();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
         String formattedDate = df_time.format(c.getTime());
         try {
-            String[] splitDate = formattedDate.split(" ");
-            String[] splitDateGet = get_date_time.split(" ");
+            String[] splitDate = formattedDate.split("/");
+            String[] splitTime = formattedDate.split(" ");
+            String[] splitDateGet = get_date_time.split("/");
             int day = Integer.parseInt(splitDate[0]) - Integer.parseInt(splitDateGet[0]);
-
-            if(splitDate[0].equals(splitDateGet[0]) && splitDate[1].equals(splitDateGet[1]) && splitDate[2].equals(splitDateGet[2]))
-                return context.getString(R.string.today) + " " + splitDateGet[3];
-            else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && splitDate[2].equals(splitDateGet[2]))
-                return context.getString(R.string.yesterday) + " "  + splitDateGet[3];
+            String year = splitDate[2].substring(0, 4);
+            String yearGET = splitDateGet[2].substring(0, 4);
+            if(splitDate[0].equals(splitDateGet[0]) && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET)){
+                String time_GET = splitDateGet[2].substring(4, 10);
+                myTimeHelper now = myTimeHelper.now();
+                myTimeHelper now_GET = myTimeHelper.parse(time_GET.replace(" ", ""));
+                return context.getString(R.string.today) + " "  + showTimeAgo(now_GET, now + "", context);
+            }
+            else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET))
+                return context.getString(R.string.yesterday) + " " + splitTime[1];
             else return get_date_time;
         }catch (Exception ex){
             Log.d("LastSeen", ex.toString());
             return get_date_time;
         }
+    }
+
+    public static String loadLastSeenUser(Context context, String get_date_time){
+        Calendar c = Calendar.getInstance();
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
+        String formattedDate = df_time.format(c.getTime());
+        try {
+            String[] splitDate = formattedDate.split("/");
+            String[] splitTime = formattedDate.split(" ");
+            String[] splitDateGet = get_date_time.split("/");
+            int day = Integer.parseInt(splitDate[0]) - Integer.parseInt(splitDateGet[0]);
+            String year = splitDate[2].substring(0, 4);
+            String yearGET = splitDateGet[2].substring(0, 4);
+            if(splitDate[0].equals(splitDateGet[0]) && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET)){
+                String time_GET = splitDateGet[2].substring(4, 10);
+                myTimeHelper now = myTimeHelper.now();
+                myTimeHelper now_GET = myTimeHelper.parse(time_GET.replace(" ", ""));
+                return context.getString(R.string.today) + " "  + showTimeAgo(now_GET, now + "", context);
+            }
+            else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET))
+                return context.getString(R.string.yesterday) + " " + splitTime[1];
+            else return get_date_time;
+        }catch (Exception ex){
+            Log.d("LastSeen", ex.toString());
+            return get_date_time;
+        }
+    }
+
+    private static String showTimeAgo(myTimeHelper now, String goal, Context context) {
+        myTimeHelper desired = myTimeHelper.parse(goal);
+        myTimeHelper lack = desired.difference(now);
+        String result =  lack + "";
+        String[] result_split = result.split(":");
+        if(result_split[0].equals("00")) result = result_split[1] + " " + context.getString(R.string.minutes_ago);
+        else if(Integer.parseInt(result_split[0]) > 1) result = result_split[0] + " " + context.getString(R.string.hours_ago);
+        else result = result_split[0].replace("0", "") + " " + context.getString(R.string.hour_ago);
+        return result;
     }
 
     private static SharedPreferences mPrefs;

@@ -110,4 +110,7 @@
     <string name="delete_post">Delete Post</string>
     <string name="delete_post_message">Do you really want to delete your post?\nThis will result in the loss of likes and comments.</string>
     <string name="post_not_found">Post not found</string>
+    <string name="minutes_ago">minutes ago</string>
+    <string name="hours_ago">hours ago</string>
+    <string name="hour_ago">hour ago</string>
 </resources>

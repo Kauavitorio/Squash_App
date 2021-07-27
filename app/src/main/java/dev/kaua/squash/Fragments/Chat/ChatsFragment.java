@@ -1,9 +1,12 @@
 package dev.kaua.squash.Fragments.Chat;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -23,7 +26,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,6 +40,7 @@ public class ChatsFragment extends Fragment {
     private RecyclerView recycler_myMsg;
     private UserChatAdapter userChatAdapter;
     private List<DtoAccount> mAccounts;
+    private EditText search_users;
 
     FirebaseUser fUser;
     DatabaseReference reference;
@@ -79,12 +82,62 @@ public class ChatsFragment extends Fragment {
         });
 
 
+        search_users.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s != null && s.length() > 0)
+                searchUsers(s.toString().toLowerCase());
+                else{
+                    base_reload = true;
+                    chatList();
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+
         return view;
+    }
+
+    private void searchUsers(String str) {
+        FirebaseUser fUser = ConfFirebase.getFirebaseUser();
+        Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
+                .startAt(str)
+                .endAt(str + "\uf8ff");
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                mAccounts.clear();
+                for (DataSnapshot snapshot : datasnapshot.getChildren()){
+                    DtoAccount account = snapshot.getValue(DtoAccount.class);
+                    assert account != null;
+                    if(!account.getId().equals(fUser.getUid())){
+                        for (int i = 0; i < usersList.size(); i++){
+                            if(usersList.get(i).getId().equals(account.getId())){
+                                mAccounts.add(account);
+                            }
+                        }
+                    }
+                }
+                userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
+                recycler_myMsg.setAdapter(userChatAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void Ids(View view) {
 
         recycler_myMsg = view.findViewById(R.id.recycler_myMsg);
+        search_users = view.findViewById(R.id.search_users);
         recycler_myMsg.setHasFixedSize(true);
         recycler_myMsg.setItemViewCacheSize(20);
         ((SimpleItemAnimator) Objects.requireNonNull(recycler_myMsg.getItemAnimator())).setSupportsChangeAnimations(false);
@@ -97,6 +150,8 @@ public class ChatsFragment extends Fragment {
         reference1.child(fUser.getUid()).setValue(token1);
     }
 
+    ArrayList<DtoAccount> mAccountsBase = new ArrayList<>();
+    boolean reload = true, base_reload = true;
     private void chatList() {
         mAccounts = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference("Users");
@@ -115,8 +170,29 @@ public class ChatsFragment extends Fragment {
                     }
                 }
 
-                userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
-                recycler_myMsg.setAdapter(userChatAdapter);
+                if(mAccountsBase.size() != mAccounts.size()) mAccountsBase.addAll(mAccounts);
+                for (int i = 0; i < mAccounts.size(); i++){
+                    if(!mAccountsBase.get(i).getStatus_chat().equals(mAccounts.get(i).getStatus_chat())){
+                        reload = true;
+                    }
+                }
+                if(reload){
+                    userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
+                    ((SimpleItemAnimator) Objects.requireNonNull(recycler_myMsg.getItemAnimator())).setSupportsChangeAnimations(false);
+                    recycler_myMsg.setAdapter(userChatAdapter);
+                    mAccountsBase.clear();
+                    mAccountsBase.addAll(mAccounts);
+                    reload = false;
+                }
+
+                if(base_reload){
+                    userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
+                    ((SimpleItemAnimator) Objects.requireNonNull(recycler_myMsg.getItemAnimator())).setSupportsChangeAnimations(false);
+                    recycler_myMsg.setAdapter(userChatAdapter);
+                    mAccountsBase.clear();
+                    mAccountsBase.addAll(mAccounts);
+                    base_reload = false;
+                }
             }
 
             @Override
