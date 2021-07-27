@@ -106,7 +106,7 @@
                         android:gravity="bottom"
                         android:text="@string/online"
                         android:textColor="#e5e5e5"
-                        android:textSize="14sp" />
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 

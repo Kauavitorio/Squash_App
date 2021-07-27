@@ -3,6 +3,8 @@ package dev.kaua.squash.Fragments;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -122,13 +124,12 @@ public class ChatFragment extends Fragment {
                                     unread++;
                     }
 
-                    if(unread == 0){
+                    if(unread == 0)
                         viewPaperAdapter.addFragment(new ChatsFragment(), getString(R.string.chats));
-                    }else{
+                    else
                         viewPaperAdapter.addFragment(new ChatsFragment(), "(" + unread + ") " + getString(R.string.chats));
-                    }
 
-                    viewPaperAdapter.addFragment(new UsersFragment(), "Users");
+                    //viewPaperAdapter.addFragment(new UsersFragment(), "Users");
                     view_paper_chat.setAdapter(viewPaperAdapter);
                     tab_layout_chat.setupWithViewPager(view_paper_chat);
                 }

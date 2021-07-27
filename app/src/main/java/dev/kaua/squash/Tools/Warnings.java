@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
@@ -31,6 +32,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  *  Copyright (c) 2021 Kauã Vitório
  *  Official repository https://github.com/Kauavitorio/Squash_App
@@ -41,7 +44,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @SuppressLint("StaticFieldLeak")
 public class Warnings {
     private static BottomSheetDialog bottomSheetDialog;
-    private static Dialog WarningError;
+    private static Dialog Dialog;
     private static LoadingDialog loadingDialog;
     static final Retrofit retrofitUser = new Retrofit.Builder()
             .baseUrl("https://dev-river-api.herokuapp.com/")
@@ -138,17 +141,54 @@ public class Warnings {
     }
 
     public static void showWeHaveAProblem(Context context){
-        WarningError = new Dialog(context);
+        Dialog = new Dialog(context);
 
         CardView btnOk_WeHaveAProblem;
-        WarningError.setContentView(R.layout.adapter_wehaveaproblem);
-        WarningError.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        btnOk_WeHaveAProblem = WarningError.findViewById(R.id.btnOk_WeHaveAProblem);
+        Dialog.setContentView(R.layout.adapter_wehaveaproblem);
+        Dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        btnOk_WeHaveAProblem = Dialog.findViewById(R.id.btnOk_WeHaveAProblem);
         btnOk_WeHaveAProblem.setElevation(10);
-        WarningError.setCancelable(false);
+        Dialog.setCancelable(false);
 
-        btnOk_WeHaveAProblem.setOnClickListener(v -> WarningError.dismiss());
+        btnOk_WeHaveAProblem.setOnClickListener(v -> Dialog.dismiss());
 
-        WarningError.show();
+        Dialog.show();
+    }
+
+
+    //  Create Show Need Login Message but with shortCut
+    public static void NeedLoginWithShortCutAlert(Activity context, int shortCutId) {
+        Dialog = new Dialog(context);
+        SharedPreferences mPrefs;
+        mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+
+        TextView txtMsg_alert, txtPositiveBtn_alert, txtCancel_alert;
+        CardView PositiveBtn_alert;
+        Dialog.setContentView(R.layout.adapter_comum_alert_need_login);
+        Dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        txtMsg_alert = Dialog.findViewById(R.id.txtMsg_alert);
+        txtCancel_alert = Dialog.findViewById(R.id.txtCancel_alert);
+        PositiveBtn_alert = Dialog.findViewById(R.id.PositiveBtn_alert);
+        txtPositiveBtn_alert = Dialog.findViewById(R.id.txtPositiveBtn_alert);
+        PositiveBtn_alert.setElevation(20);
+
+        txtMsg_alert.setText(context.getString(R.string.need_login_msg));
+        txtCancel_alert.setText(context.getString(R.string.no));
+        txtPositiveBtn_alert.setText(context.getString(R.string.yes));
+
+        PositiveBtn_alert.setOnClickListener(v -> {
+            PositiveBtn_alert.setElevation(0);
+            Intent goTo_SignIn = new Intent(context, SignInActivity.class);
+            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context,R.anim.move_to_left_go, R.anim.move_to_right_go);
+            goTo_SignIn.putExtra("shortcut", shortCutId);
+            ActivityCompat.startActivity(context, goTo_SignIn, activityOptionsCompat.toBundle());
+            context.finish();
+            mPrefs.edit().clear().apply();
+            Dialog.dismiss();
+        });
+
+        txtCancel_alert.setOnClickListener(c -> Dialog.dismiss());
+
+        Dialog.show();
     }
 }

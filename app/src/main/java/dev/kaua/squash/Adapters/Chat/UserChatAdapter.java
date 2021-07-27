@@ -36,6 +36,7 @@ import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.Methods;
 
 public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHolder> {
 
@@ -70,8 +71,8 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                 .into(holder.profile_image);
 
         if(isChat)
-            lastMessage(account.getId(), holder.last_msg, holder.card_no_read_ic);
-        else holder.last_msg.setVisibility(View.GONE);
+            lastMessage(account.getId(), holder.card_no_read_ic);
+        else holder.last_seen.setVisibility(View.GONE);
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(mContext, MessageActivity.class);
@@ -97,10 +98,18 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         }else holder.verification_ic.setVisibility(View.GONE);
 
         if(isChat){
-            if (account.getStatus_chat().equals("online")){
-                holder.img_on.setVisibility(View.VISIBLE);
-                holder.img_off.setVisibility(View.GONE);
+            if(Methods.isOnline(mContext)){
+                if (account.getStatus_chat().equals("online")){
+                    holder.last_seen.setText(mContext.getString(R.string.online));
+                    holder.img_on.setVisibility(View.VISIBLE);
+                    holder.img_off.setVisibility(View.GONE);
+                }else {
+                    holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
+                    holder.img_on.setVisibility(View.GONE);
+                    holder.img_off.setVisibility(View.VISIBLE);
+                }
             }else {
+                holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
                 holder.img_on.setVisibility(View.GONE);
                 holder.img_off.setVisibility(View.VISIBLE);
             }
@@ -115,7 +124,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        private final TextView user_name, last_msg;
+        private final TextView user_name, last_seen;
         private final CircleImageView profile_image;
         private final CircleImageView img_on, img_off;
         private final CardView card_no_read_ic;
@@ -130,14 +139,14 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
             verification_ic = itemView.findViewById(R.id.verification_ic_user_chat);
             profile_image = itemView.findViewById(R.id.profile_image_users);
             img_on = itemView.findViewById(R.id.img_on);
-            last_msg = itemView.findViewById(R.id.last_msg);
+            last_seen = itemView.findViewById(R.id.last_seen);
             img_off = itemView.findViewById(R.id.img_off);
             card_no_read_ic = itemView.findViewById(R.id.card_no_read_ic);
         }
     }
 
     //  check for last message
-    private void lastMessage(String userId, TextView last_msg, CardView ic_not_seen){
+    private void lastMessage(String userId, CardView ic_not_seen){
         theLastMessage  = "default";
         FirebaseUser firebaseUser = ConfFirebase.getFirebaseUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
@@ -152,28 +161,11 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                             if(message.getReceiver().equals(firebaseUser.getUid()) && message.getSender().equals(userId) ||
                                     message.getReceiver().equals(userId) && message.getSender().equals(firebaseUser.getUid())){
                                 if(firebaseUser.getUid().equals(message.getReceiver()) && message.getSender().equals(userId) && message.getIsSeen() == 0) ic_not_seen.setVisibility(View.VISIBLE);
-                                theLastMessage = message.getMessage();
                             }
                 }
-
-                switch (theLastMessage){
-                    case "default":
-                        last_msg.setVisibility(View.GONE);
-                        break;
-                    default:
-                        if(Objects.requireNonNull(EncryptHelper.decrypt(theLastMessage)).length() > 35)
-                        last_msg.setText(Objects.requireNonNull(EncryptHelper.decrypt(theLastMessage)).substring(0, 35) + "…");
-                        else
-                            last_msg.setText(EncryptHelper.decrypt(theLastMessage));
-                        break;
-                }
-                theLastMessage = "default";
             }
-
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
 
     }

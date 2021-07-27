@@ -19,11 +19,12 @@ import dev.kaua.squash.Data.Post.DtoPost;
 public class DaoPosts extends SQLiteOpenHelper {
     private final String TABLE_POSTS = "TBL_POSTS";
     private final String TABLE_LIKES = "TBL_POSTS_LIKES";
+    private final String TABLE_LIKES_COMMENTS = "TBL_POSTS_LIKES_COMMENTS";
     private final String TABLE_POST_IMAGE = "tbl_posts_image";
 
 
     public DaoPosts(@Nullable Context context) {
-        super(context, "DB_POSTS", null, 1);
+        super(context, "DB_POSTS", null, 2);
     }
 
     @Override
@@ -62,6 +63,12 @@ public class DaoPosts extends SQLiteOpenHelper {
                 "image_link varchar(600) not null)";
 
         db.execSQL(command_images);
+
+        String command_likes_comments = "CREATE TABLE " + TABLE_LIKES_COMMENTS + "(" +
+                "comment_id bigint not null," +
+                "account_id bigint not null)";
+
+        db.execSQL(command_likes_comments);
     }
 
     @Override
@@ -69,6 +76,9 @@ public class DaoPosts extends SQLiteOpenHelper {
         if(oldVersion < newVersion){
             // Drop older table if existed
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_POSTS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_LIKES);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_POST_IMAGE);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_LIKES_COMMENTS);
 
             // Create tables again
             onCreate(db);
@@ -171,8 +181,23 @@ public class DaoPosts extends SQLiteOpenHelper {
         String command = "SELECT * FROM " + TABLE_LIKES + " WHERE  post_id = ? and account_id = ?";
         String[] params = {String.valueOf(post_id), String.valueOf(account_id)};
         @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        return cursor.moveToFirst();
+    }
+    public void Register_Likes_Comments(ArrayList<DtoPost> post){
+        DropTable(2);
+        if(post != null && post.size() > 0)
+            for (int i = 0; i< post.size(); i++){
+                ContentValues values = new ContentValues();
+                values.put("comment_id", Long.parseLong(Objects.requireNonNull(post.get(i).getComment_id())));
+                values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
+                getWritableDatabase().insert(TABLE_LIKES_COMMENTS, null, values);
+            }
+    }
 
-
+    public boolean get_A_Like_comment(long comment_id, long account_id){
+        String command = "SELECT * FROM " + TABLE_LIKES_COMMENTS + " WHERE  comment_id = ? and account_id = ?";
+        String[] params = {String.valueOf(comment_id), String.valueOf(account_id)};
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
         return cursor.moveToFirst();
     }
 
@@ -182,8 +207,10 @@ public class DaoPosts extends SQLiteOpenHelper {
             db.delete(TABLE_POSTS,null,null);
             db.delete(TABLE_POST_IMAGE,null,null);
         }
-        else
+        else if(type == 1)
             db.delete(TABLE_LIKES,null,null);
+        else
+            db.delete(TABLE_LIKES_COMMENTS,null,null);
         Log.d("InsertPost", "Dropped");
         //createTable(db);
     }

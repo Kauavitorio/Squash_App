@@ -72,6 +72,7 @@ public class SplashActivity extends AppCompatActivity {
                     finish();
                     Intent i = new Intent(this, PostDetailsActivity.class);
                     i.putExtra("post_id", Long.parseLong(post_id));
+                    i.putExtra("comment", 0);
                     startActivity(i);
                 }catch (Exception ex){
                     Log.d("ShareLink", ex.toString());
@@ -140,7 +141,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void LoadBaseInfoAndMain() {
-        Methods.LoadFollowersAndFollowing(this);
+        Methods.LoadFollowersAndFollowing(this, 0);
         timer.postDelayed(this::GoToMain, 300);
     }
 

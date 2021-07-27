@@ -89,6 +89,7 @@
     <string name="refresh">Atualizar</string>
     <string name="open_with">Abrir com …</string>
     <string name="copy_link">Link de cópia</string>
+    <string name="need_login_msg">Para que você possa ter acesso a essa aba é necessário estar logado.\nGostaria de realizar seu login?</string>
     <string name="url_copied">URL copiado para sua área de transferência</string>
     <string name="secure_website"><font color='#98F33C'>Este site está usando uma conexão segura.</font>\nAs informações compartilhadas com este site, como senhas ou números de cartão de crédito, são enviadas com segurança</string>
     <string name="not_secure_website"><font color='#FD0000'>Este site não está usando uma conexão segura.</font>\nAs informações compartilhadas com este site, como senhas ou números de cartão de crédito, não são enviadas com segurança</string>
@@ -100,4 +101,8 @@
     <string name="username">Username</string>
     <string name="delete_post">Apagar a postagem</string>
     <string name="delete_post_message">Deseja realmente apagar sua postagem?\nIsso resultara na perda das curtidas e comentarios.</string>
+    <string name="post_not_found">Post não encontrado</string>
+    <string name="minutes_ago">minutos atrás</string>
+    <string name="hours_ago">horas atrás</string>
+    <string name="hour_ago">hora atrás</string>
 </resources>

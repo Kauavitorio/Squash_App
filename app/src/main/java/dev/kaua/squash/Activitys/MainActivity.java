@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         getUserInformationAndLoadProfile();
         Methods.status_chat("online", this);
-        Methods.LoadFollowersAndFollowing(this);
+        Methods.LoadFollowersAndFollowing(this, 1);
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());
         asyncUser_follow.execute();
     }

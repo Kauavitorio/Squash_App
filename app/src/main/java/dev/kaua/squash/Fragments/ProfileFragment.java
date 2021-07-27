@@ -21,6 +21,7 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -74,7 +75,7 @@ public class ProfileFragment extends Fragment {
     private static CircleImageView ic_ProfileUser_profile;
     private static TextView txt_user_name, txt_username_name, txt_user_bio_profile, txt_amount_following_profile, txt_amount_followers_profile;
     private static Button btn_follow_following_profile;
-    private RelativeLayout loadingPanel_profile, noPost_profile;
+    private RelativeLayout noPost_profile;
     private CardView btn_plus_story_profile;
     private String username;
     private RecyclerView recyclerView_Posts_profile;
@@ -117,8 +118,9 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                         if(response.code() == 201){
+                            btn_go_chat_profile.setVisibility(View.VISIBLE);
                             SearchFragment.getInstance().LoadSearch();
-                            Methods.LoadFollowersAndFollowing(requireActivity());
+                            Methods.LoadFollowersAndFollowing(requireActivity(), 1);
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
                             asyncUser_follow.execute();
                         }
@@ -145,7 +147,7 @@ public class ProfileFragment extends Fragment {
                     public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                         if(response.code() == 201){
                             SearchFragment.getInstance().LoadSearch();
-                            Methods.LoadFollowersAndFollowing(requireActivity());
+                            Methods.LoadFollowersAndFollowing(requireActivity(), 1);
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
                             asyncUser_follow.execute();
                         }
@@ -223,16 +225,17 @@ public class ProfileFragment extends Fragment {
 
     public static ProfileFragment getInstance(){ return instance;}
 
+    public void ReloadRecycler(){ RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);}
+
     public void LoadAnotherUser(){
         btn_go_chat_profile.setVisibility(View.GONE);
         ic_account_badge_profile.setVisibility(View.GONE);
-        Methods.LoadFollowersAndFollowing(requireContext());
+        Methods.LoadFollowersAndFollowing(requireContext(), 1);
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account.getAccount_id());
         asyncUser_follow.execute();
         control++;
         Bundle bundle = MainActivity.getInstance().SetBundleProfile();
         if(bundle != null){
-            loadingPanel_profile.setVisibility(View.VISIBLE);
             recyclerView_Posts_profile.setVisibility(View.GONE);
             control = bundle.getInt("control");
             if(bundle.getString("account_id") != null && Long.parseLong(bundle.getString("account_id")) != account.getAccount_id()){
@@ -242,7 +245,7 @@ public class ProfileFragment extends Fragment {
                 DtoAccount account = new DtoAccount();
                 account_another_user = Long.parseLong(bundle.getString("account_id"));
                 account.setAccount_id_cry(EncryptHelper.encrypt(bundle.getString("account_id")));
-                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, loadingPanel_profile, noPost_profile, account);
+                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);
                 AccountServices services = retrofitUser.create(AccountServices.class);
                 Call<DtoAccount> call = services.getUserInfo(account);
                 call.enqueue(new Callback<DtoAccount>() {
@@ -255,7 +258,7 @@ public class ProfileFragment extends Fragment {
                                 Glide.with(requireActivity()).load(EncryptHelper.decrypt(response.body().getProfile_image())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                         .into(ic_ProfileUser_profile);
                                 txt_user_name.setText(EncryptHelper.decrypt(response.body().getName_user()));
-                                txt_username_name.setText( " | @" + EncryptHelper.decrypt(response.body().getUsername()));
+                                txt_username_name.setText( "@" + EncryptHelper.decrypt(response.body().getUsername()));
                                 txt_user_bio_profile.setText(EncryptHelper.decrypt(response.body().getBio_user()));
                                 Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
                                 username = EncryptHelper.decrypt(response.body().getUsername());
@@ -273,7 +276,7 @@ public class ProfileFragment extends Fragment {
                                         ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
                                     ic_account_badge_profile.setVisibility(View.VISIBLE);
                                 }
-                                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, loadingPanel_profile, noPost_profile, account);
+                                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);
 
                                 DaoFollowing daoFollowing = new DaoFollowing(getContext());
                                 ArrayList<DtoAccount> accounts = daoFollowing.get_followers_following(account_id, Long.parseLong(bundle.getString("account_id")));
@@ -312,7 +315,7 @@ public class ProfileFragment extends Fragment {
         account_id = user.getAccount_id();
         account.setAccount_id(account_id);
         account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
-        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, loadingPanel_profile, noPost_profile, account);
+        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);
 
         DaoAccount db = new DaoAccount(activity);
         DtoAccount account_follow = db.get_followers_following(account_id);
@@ -331,7 +334,7 @@ public class ProfileFragment extends Fragment {
         Glide.with(requireActivity()).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(ic_ProfileUser_profile);
         txt_user_name.setText(user.getName_user());
-        txt_username_name.setText(" | @" + user.getUsername());
+        txt_username_name.setText("@" + user.getUsername());
         txt_user_bio_profile.setText(user.getBio_user());
         btn_follow_following_profile.setBackground(activity.getDrawable(R.drawable.background_button_following));
         btn_follow_following_profile.setEnabled(true);
@@ -344,7 +347,6 @@ public class ProfileFragment extends Fragment {
         instance = this;
         account = MyPrefs.getUserInformation(requireContext());
         img_banner_profile = view.findViewById(R.id.img_banner_profile);
-        loadingPanel_profile = view.findViewById(R.id.loadingPanel_profile);
         btn_go_chat_profile = view.findViewById(R.id.btn_go_chat_profile);
         btn_plus_story_profile = view.findViewById(R.id.btn_plus_story_profile);
         recyclerView_Posts_profile = view.findViewById(R.id.recyclerView_Posts_profile);

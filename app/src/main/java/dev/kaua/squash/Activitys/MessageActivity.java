@@ -51,7 +51,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
@@ -60,6 +59,7 @@ import dev.kaua.squash.Adapters.Chat.SwipeReply;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.APIService;
@@ -110,6 +110,8 @@ public class MessageActivity extends AppCompatActivity {
     private static final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
 
     public static FirebaseUser fUser;
+
+    private DaoChat chatDB;
     private DatabaseReference reference;
     private MessageAdapter messageAdapter;
     private List<DtoMessage> mMessage;
@@ -133,6 +135,7 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message);
         Ids();
         DaoChat daoChat = new DaoChat(MessageActivity.this);
+        chatDB = new DaoChat(MessageActivity.this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -291,9 +294,9 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void sendMessage(String sender, String receiver, String message){
-        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd-M-yyyy HH:mm a");
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_id = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+        Calendar c = Calendar.getInstance();
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd-MM-yyyy HH:mm a");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_id = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         String formattedDate = df_time.format(c.getTime());
         String formattedDate_id = df_time_id.format(c.getTime());
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
@@ -319,23 +322,36 @@ public class MessageActivity extends AppCompatActivity {
         medias_pin.clear();
         text_send.setText("");
 
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
+        chatDB.UPDATE_A_CHAT(user_im_chat, 1);
+
         //  add User to chat fragment
         final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatslist")
                 .child(fUser.getUid())
                 .child(userId);
 
+        final DatabaseReference chatRefANOTHER_USER = FirebaseDatabase.getInstance().getReference("Chatslist")
+                .child(userId)
+                .child(fUser.getUid());
+
         chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if(!snapshot.exists()){
+                if(!snapshot.exists())
                     chatRef.child("id").setValue(userId);
-                }
             }
-
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+        });
+        chatRefANOTHER_USER.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                if(!snapshot.exists())
+                    chatRefANOTHER_USER.child("id").setValue(fUser.getUid());
             }
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
 
         final String msg = message;
@@ -350,10 +366,14 @@ public class MessageActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
+
+        try {
+            ChatsFragment.getInstance().chatList();
+        }catch (Exception exception){
+            Log.d("Message", "Cant load list");
+        }
 
         hideReplayLayout();
     }
@@ -406,6 +426,7 @@ public class MessageActivity extends AppCompatActivity {
     boolean base_load = true;
     List<DtoMessage> mMessageFinal = new ArrayList<>();
     private void readMessage(String myID, String userId, String imageURl){
+        Calendar c = Calendar.getInstance();
         mMessage = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference().child("Chats");
         reference.addValueEventListener(new ValueEventListener() {
@@ -436,6 +457,10 @@ public class MessageActivity extends AppCompatActivity {
                         Log.d("Chat", "OKAY NEW MSG OR IS SEEN");
                         LoadAdapter(imageURl);
                         base_load = false;
+
+                        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                        user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
+                        chatDB.UPDATE_A_CHAT(user_im_chat, 1);
                     }
 
                     if(base_load) LoadAdapter(imageURl);
