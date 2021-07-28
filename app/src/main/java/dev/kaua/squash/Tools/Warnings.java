@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -50,6 +52,36 @@ public class Warnings {
             .baseUrl("https://dev-river-api.herokuapp.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
+
+    public static void showNeedUpdate(Context context, String versionName, long versionCode, int needUpdate){
+        if(bottomSheetDialog != null) bottomSheetDialog.dismiss();
+
+        bottomSheetDialog = new BottomSheetDialog(context, R.style.BottomSheetTheme);
+        //  Creating View for SheetMenu
+
+        bottomSheetDialog.setCancelable(false);
+        View sheetView = LayoutInflater.from(context).inflate(R.layout.adapter_appneedupdate,
+                ((Activity)context).findViewById(R.id.sheet_app_update_menu));
+        TextView txt_version_app = sheetView.findViewById(R.id.txt_version_app);
+        txt_version_app.setText(context.getString(R.string.have_new_version, versionName));
+
+        sheetView.findViewById(R.id.btn_update_now).setOnClickListener(v -> {
+            String url = "https://play.google.com/store/apps/details?id=dev.kaua.squash";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            context.startActivity(i);
+            bottomSheetDialog.dismiss();
+        });
+        if(needUpdate != 0) sheetView.findViewById(R.id.btn_update_later).setVisibility(View.GONE);
+        sheetView.findViewById(R.id.btn_update_later).setOnClickListener(v -> {
+            MyPrefs.setUpdateRequest_Show(context , 1);
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetDialog.setContentView(sheetView);
+        bottomSheetDialog.show();
+        Log.d("MobileVersion", "Need update: " + versionCode);
+    }
 
     //  Create Show To Base Message
     public static void Base_Sheet_Alert(Activity context, String msg, boolean cancelable) {
@@ -154,7 +186,6 @@ public class Warnings {
 
         Dialog.show();
     }
-
 
     //  Create Show Need Login Message but with shortCut
     public static void NeedLoginWithShortCutAlert(Activity context, int shortCutId) {

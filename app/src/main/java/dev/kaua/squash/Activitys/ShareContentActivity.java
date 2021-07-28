@@ -28,7 +28,9 @@ import java.util.List;
 
 import dev.kaua.squash.Adapters.Chat.UserChatAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 
 public class ShareContentActivity extends AppCompatActivity {
@@ -37,9 +39,15 @@ public class ShareContentActivity extends AppCompatActivity {
     private static ShareContentActivity instance;
     private int ShareType;
     private Object ShareContent;
+    private DaoChat chatDB;
+
+    FirebaseUser fUser;
+    DatabaseReference reference;
 
     private UserChatAdapter userChatAdapter;
     private List<DtoAccount> mAccounts;
+
+    private List<Chatslist> usersList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +55,24 @@ public class ShareContentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_share_content);
         Ids();
         mAccounts = new ArrayList<>();
-        readAccounts();
+        usersList = new ArrayList<>();
+        fUser = ConfFirebase.getFirebaseUser();
+
+        reference = FirebaseDatabase.getInstance().getReference("Chatslist").child(fUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                usersList.clear();
+                for(DataSnapshot snapshot : datasnapshot.getChildren()){
+                    Chatslist chatList = snapshot.getValue(Chatslist.class);
+                    usersList.add(chatList);
+                }
+                readAccounts();
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+        });
 
         Bundle bundle = getIntent().getExtras();
         ShareType = bundle.getInt("shared_type");
@@ -90,33 +115,42 @@ public class ShareContentActivity extends AppCompatActivity {
                     DtoAccount account = snapshot.getValue(DtoAccount.class);
                     assert account != null;
                     if(!account.getId().equals(fUser.getUid())){
-                        mAccounts.add(account);
+                        for (int i = 0; i < usersList.size(); i++){
+                            if(usersList.get(i).getId().equals(account.getId())){
+                                account.setChat_id(usersList.get(i).getChat_id());
+                                mAccounts.add(account);
+                            }
+                        }
                     }
                 }
-                userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true, true);
+                userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true, false);
                 recycler_view_users.setAdapter(userChatAdapter);
             }
-
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
     }
 
     private void readAccounts() {
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        mAccounts = chatDB.get_CHAT_LIST();
+        userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true, true);
+        recycler_view_users.setAdapter(userChatAdapter);
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot fullSnapshot) {
                 if(search_users.getText().toString().equals("")){
                     mAccounts.clear();
-                    for(DataSnapshot snapshot: fullSnapshot.getChildren()){
+                    for(DataSnapshot snapshot : fullSnapshot.getChildren()){
                         DtoAccount account = snapshot.getValue(DtoAccount.class);
-                        assert account != null;
-                        assert firebaseUser != null;
-                        if(account.getId() != null && !account.getId().equals(firebaseUser.getUid())) mAccounts.add(account);
+                        if(account != null){
+                            for(Chatslist chatList : usersList){
+                                if(account.getId() != null && account.getId().equals(chatList.getId())){
+                                    account.setChat_id(chatList.getChat_id());
+                                    mAccounts.add(account);
+                                }
+                            }
+                        }
                     }
 
                     userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true, true);
@@ -131,6 +165,7 @@ public class ShareContentActivity extends AppCompatActivity {
 
     private void Ids() {
         instance = this;
+        chatDB = new DaoChat(this);
         recycler_view_users = findViewById(R.id.recycler_view_users_share);
         search_users = findViewById(R.id.search_users_share);
         recycler_view_users.setHasFixedSize(true);

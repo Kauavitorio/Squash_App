@@ -88,6 +88,8 @@
     <string name="report_website"><font color='#FD0000'>Reportar Site</font></string>
     <string name="refresh">Atualizar</string>
     <string name="open_with">Abrir com …</string>
+    <string name="update_later">Atualizar Depois</string>
+    <string name="have_new_version">Tem uma nova atualização disponível (%1$s), para garantir melhor experiência em nosso aplicativo recomendamos que atualize.</string>
     <string name="copy_link">Link de cópia</string>
     <string name="need_login_msg">Para que você possa ter acesso a essa aba é necessário estar logado.\nGostaria de realizar seu login?</string>
     <string name="url_copied">URL copiado para sua área de transferência</string>
@@ -105,4 +107,5 @@
     <string name="minutes_ago">minutos atrás</string>
     <string name="hours_ago">horas atrás</string>
     <string name="hour_ago">hora atrás</string>
+    <string name="updatenow">Atualizar agora</string>
 </resources>

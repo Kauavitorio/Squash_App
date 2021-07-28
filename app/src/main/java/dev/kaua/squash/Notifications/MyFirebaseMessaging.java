@@ -90,6 +90,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         String icon = remoteMessage.getData().get("icon");
         //String icon = remoteMessage.getData().get("icon");
         String title = remoteMessage.getData().get("title");
+        String chat_id = remoteMessage.getData().get("chat_id");
         String body = remoteMessage.getData().get("body");
 
         RemoteMessage.Notification notification  = remoteMessage.getNotification();
@@ -100,6 +101,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Intent intent = new Intent(this, MessageActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("userId", user);
+        bundle.putString("chat_id", chat_id);
         intent.putExtras(bundle);
         Update_Last_chat(user);
 
@@ -121,6 +123,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         String user = remoteMessage.getData().get("user");
         String icon = remoteMessage.getData().get("icon");
         String title = remoteMessage.getData().get("title");
+        String chat_id = remoteMessage.getData().get("chat_id");
         String body = remoteMessage.getData().get("body");
 
         RemoteMessage.Notification notification  = remoteMessage.getNotification();
@@ -131,6 +134,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Intent intent = new Intent(this, MessageActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("userId", user);
+        bundle.putString("chat_id", chat_id);
         intent.putExtras(bundle);
 
         Update_Last_chat(user);

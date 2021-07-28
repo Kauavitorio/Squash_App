@@ -57,6 +57,7 @@ import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
 import dev.kaua.squash.Adapters.Chat.MessageAdapter;
 import dev.kaua.squash.Adapters.Chat.SwipeReply;
 import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
@@ -111,12 +112,13 @@ public class MessageActivity extends AppCompatActivity {
 
     public static FirebaseUser fUser;
 
-    private DaoChat chatDB;
-    private DatabaseReference reference;
-    private MessageAdapter messageAdapter;
-    private List<DtoMessage> mMessage;
+    private static DaoChat chatDB;
+    private static DatabaseReference reference;
+    private static MessageAdapter messageAdapter;
+    private static List<DtoMessage> mMessage;
     private List<String> medias_pin = new ArrayList<>();
-    private String userId;
+    private static String userId;
+    private static String chat_id;
     String another_user_image = "";
 
     APIService apiService;
@@ -147,10 +149,12 @@ public class MessageActivity extends AppCompatActivity {
 
         intent = getIntent();
         userId = intent.getStringExtra("userId");
+        chat_id = intent.getStringExtra("chat_id");
         fUser = ConfFirebase.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
 
         CheckShared();
+        GenerateChatID();
 
         String img = daoChat.get_BG("bg_" + fUser.getUid() + "_"
                 + userId);
@@ -179,7 +183,8 @@ public class MessageActivity extends AppCompatActivity {
                         if(user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
                         else Picasso.get().load(EncryptHelper.decrypt(another_user_image)).into(profile_image);
                     }
-                    readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
+                    //readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
+                    checkChatList(userId);
 
                     //  check typing status
                     if(user_im_chat.getTypingTo().equals(fUser.getUid())){
@@ -237,6 +242,34 @@ public class MessageActivity extends AppCompatActivity {
 
         seenMessage(userId);
         setRecyclerSwipe();
+    }
+
+    private void checkChatList(String userId) {
+        reference = FirebaseDatabase.getInstance().getReference("Chatslist").child(fUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                for(DataSnapshot snapshot : datasnapshot.getChildren()){
+                    Chatslist chatList = snapshot.getValue(Chatslist.class);
+                    if(chatList != null)
+                    if(chatList.getId().equals(userId)){
+                        if(chatList.getChat_id() != null)
+                            UpdateChat_Id(chatList.getChat_id());
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+        });
+    }
+
+    private void GenerateChatID() {
+        if(chat_id == null){
+            String first_sequence = Methods.RandomCharactersWithoutSpecials(30);
+            String second_sequence = Methods.RandomCharactersWithoutSpecials(10);
+            chat_id = "CHATID" + fUser.getUid() + first_sequence + userId + second_sequence + "SQUASH";
+            chat_id = EncryptHelper.encrypt(Methods.shuffle(chat_id));
+        }
     }
 
     private void CheckShared() {
@@ -318,7 +351,7 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("time", EncryptHelper.encrypt(formattedDate));
         hashMap.put("media", medias_pin);
 
-        reference.child("Chats").push().setValue(hashMap);
+        reference.child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id))).push().setValue(hashMap);
         medias_pin.clear();
         text_send.setText("");
 
@@ -338,8 +371,10 @@ public class MessageActivity extends AppCompatActivity {
         chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if(!snapshot.exists())
+                if(!snapshot.exists()){
                     chatRef.child("id").setValue(userId);
+                    chatRef.child("chat_id").setValue(chat_id);
+                }
             }
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
@@ -347,8 +382,10 @@ public class MessageActivity extends AppCompatActivity {
         chatRefANOTHER_USER.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if(!snapshot.exists())
+                if(!snapshot.exists()){
                     chatRefANOTHER_USER.child("id").setValue(fUser.getUid());
+                    chatRefANOTHER_USER.child("chat_id").setValue(chat_id);
+                }
             }
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
@@ -361,7 +398,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 DtoAccount account = snapshot.getValue(DtoAccount.class);
                 if(account != null)
-                if(notify) sendNotification(receiver, account.getUsername(), msg);
+                if(notify) sendNotification(receiver, account.getUsername(), msg, EncryptHelper.decrypt(chat_id));
                 notify = false;
             }
 
@@ -384,7 +421,7 @@ public class MessageActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    private void sendNotification(String receiver, String username, String message){
+    private void sendNotification(String receiver, String username, String message, String chat_id){
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
         Query query = tokens.orderByKey().equalTo(receiver);
         query.addValueEventListener(new ValueEventListener() {
@@ -392,7 +429,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
                 for (DataSnapshot snapshot : datasnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fUser.getUid(), R.drawable.pumpkin_default_image, username+": "+ message, getString(R.string.new_message), userId);
+                    Data data = new Data(fUser.getUid(), R.drawable.pumpkin_default_image, username+": "+ message, getString(R.string.new_message), userId, EncryptHelper.encrypt(chat_id));
 
                     assert token != null;
                     Sender sender = new Sender(data, token.getToken());
@@ -422,13 +459,19 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    int joinNow = 0;
-    boolean base_load = true;
-    List<DtoMessage> mMessageFinal = new ArrayList<>();
-    private void readMessage(String myID, String userId, String imageURl){
+    public static void UpdateChat_Id(String id){
+        chat_id = id;
+        base_load = true;
+        readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
+    }
+
+    static int joinNow = 0;
+    static boolean base_load = true;
+    static List<DtoMessage> mMessageFinal = new ArrayList<>();
+    private static void readMessage(String myID, String userId, String imageURl){
         Calendar c = Calendar.getInstance();
         mMessage = new ArrayList<>();
-        reference = FirebaseDatabase.getInstance().getReference().child("Chats");
+        reference = FirebaseDatabase.getInstance().getReference().child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
@@ -472,10 +515,10 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void LoadAdapter(String imageURl) {
+    private static void LoadAdapter(String imageURl) {
         mMessageFinal.clear();
         mMessageFinal.addAll(mMessage);
-        messageAdapter = new MessageAdapter(MessageActivity.this, mMessage, imageURl, joinNow, recycler_view_msg, getUserInformation().getUsername(), user_im_chat.getUsername());
+        messageAdapter = new MessageAdapter(instance, mMessage, imageURl, joinNow, recycler_view_msg, MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername());
         recycler_view_msg.setAdapter(messageAdapter);
     }
 

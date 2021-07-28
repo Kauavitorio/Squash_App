@@ -11,6 +11,7 @@ import static android.content.Context.MODE_PRIVATE;
 public abstract class MyPrefs {
     public static final String PREFS_USER = "myPrefs";
     public static final String PREFS_CONFIG = "myPrefsConfiguration";
+    public static final String PREFS_UPDATES = "myPrefsUpdates";
     public static final String PREFS_NOTIFICATION = "myPrefsNOTFY";
     public static final String PREFS_TERMS = "myPrefsTerms_Experience";
     private static final DtoAccount account = new DtoAccount();
@@ -40,5 +41,20 @@ public abstract class MyPrefs {
         account.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
 
         return account;
+    }
+
+    public static void setUpdateRequest_Show(Context context, int request){
+        sp = context.getSharedPreferences(PREFS_UPDATES, MODE_PRIVATE);
+        sp.edit().clear().apply();
+
+        //  Add Request prefs
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt("pref_request", request);
+        editor.apply();
+    }
+
+    public static int getUpdateRequest_Show(Context context){
+        sp = context.getSharedPreferences(PREFS_UPDATES, MODE_PRIVATE);
+        return sp.getInt("pref_request", 0);
     }
 }

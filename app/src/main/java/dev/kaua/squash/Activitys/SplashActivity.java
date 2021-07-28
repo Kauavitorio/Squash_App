@@ -134,6 +134,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void verifyIfUsersLogged() {
+        MyPrefs.setUpdateRequest_Show(this, 0);
         //  Verification of user preference information
         SharedPreferences sp_First = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         if (sp_First.contains("pref_token")) LoadBaseInfoAndMain();

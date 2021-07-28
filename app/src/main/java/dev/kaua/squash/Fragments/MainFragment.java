@@ -34,14 +34,18 @@ import org.jetbrains.annotations.NotNull;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
+import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
+import dev.kaua.squash.Tools.Warnings;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -86,15 +90,16 @@ public class MainFragment extends Fragment {
         swipe_posts.setOnRefreshListener(MainFragment::RefreshRecycler);
 
         loadMsgNotRead();
+        loadCheckSystemInfo();
 
         return view;
     }
 
     long following = 0;
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
+    public void setMenuVisibility(final boolean visible) {
+        super.setMenuVisibility(visible);
+        if (visible) {
             if(getContext() != null){
                 DaoAccount db = new DaoAccount(getContext());
                 DtoAccount account_follow = db.get_followers_following(account.getAccount_id());
@@ -122,11 +127,37 @@ public class MainFragment extends Fragment {
 
                 if(unread == 0) card_msg_notRead_main.setVisibility(View.GONE);
                 else card_msg_notRead_main.setVisibility(View.VISIBLE);
-
             }
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
+    }
+
+    private void loadCheckSystemInfo() {
+        if(getContext() != null)
+        if(Methods.isOnline(getContext())){
+            int currentVersionCode = BuildConfig.VERSION_CODE;
+
+            reference = FirebaseDatabase.getInstance().getReference("System");
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    if(getContext() != null)
+                    if(Methods.isOnline(getContext())){
+                        DtoSystem system = snapshot.getValue(DtoSystem.class);
+                        if(system != null){
+                            if(currentVersionCode < system.getVersionCode()){
+                                if(getContext() != null)
+                                    if(MyPrefs.getUpdateRequest_Show(getContext()) == 0 || system.getNeedUpdate() == 1)
+                                        Warnings.showNeedUpdate(requireContext(), system.getVersionName(), system.getVersionCode(), (int) system.getNeedUpdate());
+                            }
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            });
+        }
     }
 
     private void StoryClick() {
