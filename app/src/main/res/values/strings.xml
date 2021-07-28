@@ -96,6 +96,8 @@
     <string name="refresh">Refresh</string>
     <string name="open_with">Open with …</string>
     <string name="copy_link">Copy Link</string>
+    <string name="update_later">Update Later</string>
+    <string name="have_new_version">We have a new application update available (%1$s), to ensure better experience in our application we recommend that you update.</string>
     <string name="need_login_msg">To access this function it is necessary to be logged in.\nWould you like to login?</string>
     <string name="url_copied">URL copied to your clipboard</string>
     <string name="secure_website"><font color='#98F33C'>This website is using a secure connection.</font>nInformation shared with this website, such as passwords or credit card numbers, is submitted securely</string>
@@ -113,4 +115,5 @@
     <string name="minutes_ago">minutes ago</string>
     <string name="hours_ago">hours ago</string>
     <string name="hour_ago">hour ago</string>
+    <string name="updatenow">Update now</string>
 </resources>

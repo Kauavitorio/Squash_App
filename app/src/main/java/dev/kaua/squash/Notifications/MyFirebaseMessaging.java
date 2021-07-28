@@ -31,6 +31,7 @@ import java.util.Map;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.MyPrefs;

@@ -37,7 +37,6 @@ import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.Methods;
-import dev.kaua.squash.Tools.MyPrefs;
 
 public class ChatsFragment extends Fragment {
     private RecyclerView recycler_myMsg;
@@ -66,17 +65,14 @@ public class ChatsFragment extends Fragment {
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
                 usersList.clear();
                 for(DataSnapshot snapshot : datasnapshot.getChildren()){
-                    Chatslist chatlist = snapshot.getValue(Chatslist.class);
-                    usersList.add(chatlist);
+                    Chatslist chatList = snapshot.getValue(Chatslist.class);
+                    usersList.add(chatList);
                 }
-
                 chatList();
             }
 
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
 
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
@@ -85,7 +81,6 @@ public class ChatsFragment extends Fragment {
                 updateToken(token);
             }
         });
-
 
         search_users.addTextChangedListener(new TextWatcher() {
             @Override
@@ -102,7 +97,6 @@ public class ChatsFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
 
         return view;
     }
@@ -122,20 +116,16 @@ public class ChatsFragment extends Fragment {
                     assert account != null;
                     if(!account.getId().equals(fUser.getUid())){
                         for (int i = 0; i < usersList.size(); i++){
-                            if(usersList.get(i).getId().equals(account.getId())){
+                            if(usersList.get(i).getId().equals(account.getId()))
                                 mAccounts.add(account);
-                            }
                         }
                     }
                 }
                 userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
                 recycler_myMsg.setAdapter(userChatAdapter);
             }
-
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
     }
 
@@ -171,7 +161,8 @@ public class ChatsFragment extends Fragment {
         mAccounts = chatDB.get_CHAT_LIST();
         LoadChatRecycler();
 
-        if(Methods.isOnline(requireContext())){
+        if(getContext() != null)
+        if(Methods.isOnline(getContext())){
             mAccounts = new ArrayList<>();
             reference = FirebaseDatabase.getInstance().getReference("Users");
             reference.addValueEventListener(new ValueEventListener() {
@@ -220,7 +211,7 @@ public class ChatsFragment extends Fragment {
         }
     }
 
-    private void LoadChatRecycler() {
+    public void LoadChatRecycler() {
         if(chatDB != null && mAccounts != null && recycler_myMsg != null){
             mAccounts = chatDB.get_CHAT_LIST();
             userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
