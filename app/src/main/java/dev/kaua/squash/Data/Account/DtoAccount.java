@@ -8,7 +8,7 @@ public class DtoAccount implements Comparable<DtoAccount>{
     private String message, verification_level;
     private String login_method, token, login_info, trust, date_time_login, UID;
     private String id_following, imageURL, id, typingTo, last_seen;
-    private String account_id_following, status_chat, search, last_chat;
+    private String account_id_following, status_chat, search, last_chat, chat_id;
 
     public DtoAccount (){}
 
@@ -30,6 +30,14 @@ public class DtoAccount implements Comparable<DtoAccount>{
         this.typingTo = typingTo;
         this.last_seen = last_seen;
         this.verification_level = verification_level;
+    }
+
+    public String getChat_id() {
+        return chat_id;
+    }
+
+    public void setChat_id(String chat_id) {
+        this.chat_id = chat_id;
     }
 
     public String getLast_chat() {

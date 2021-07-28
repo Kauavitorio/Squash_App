@@ -22,7 +22,7 @@ public class DaoChat extends SQLiteOpenHelper {
 
 
     public DaoChat(@Nullable Context context) {
-        super(context, "DB_CHAT", null, 8);
+        super(context, "DB_CHAT", null, 15);
     }
 
     @Override
@@ -49,7 +49,8 @@ public class DaoChat extends SQLiteOpenHelper {
                 "typingTo varchar(800)," +
                 "last_chat varchar(800)," +
                 "verification_level varchar(800)," +
-                "username varchar(800))";
+                "username varchar(800)," +
+                "chat_id varchar(1000))";
 
         db.execSQL(command_chat_list);
     }
@@ -107,6 +108,7 @@ public class DaoChat extends SQLiteOpenHelper {
                     values.put("typingTo", accounts.get(i).getTypingTo());
                     values.put("verification_level", accounts.get(i).getVerification_level());
                     values.put("username", accounts.get(i).getUsername());
+                    values.put("chat_id", accounts.get(i).getChat_id());
 
                     String where = "id=?";
 
@@ -123,6 +125,7 @@ public class DaoChat extends SQLiteOpenHelper {
                     values.put("typingTo", accounts.get(i).getTypingTo());
                     values.put("verification_level", accounts.get(i).getVerification_level());
                     values.put("username", accounts.get(i).getUsername());
+                    values.put("chat_id", accounts.get(i).getChat_id());
 
                     getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
                 }
@@ -176,12 +179,14 @@ public class DaoChat extends SQLiteOpenHelper {
                 values.put("typingTo", account.getTypingTo());
                 values.put("verification_level", account.getVerification_level());
                 values.put("username", account.getUsername());
+                values.put("chat_id", account.getChat_id());
 
                 getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
             }else{
                 ContentValues values = new ContentValues();
                 values.put("last_chat", account.getLast_chat());
                 values.put("id", account.getId());
+                values.put("chat_id", account.getChat_id());
 
                 getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
             }
@@ -206,6 +211,7 @@ public class DaoChat extends SQLiteOpenHelper {
             account.setLast_chat(cursor.getString(8));
             account.setVerification_level(cursor.getString(9));
             account.setUsername(cursor.getString(10));
+            account.setChat_id(cursor.getString(11));
             accounts.add(account);
         }
         return accounts;

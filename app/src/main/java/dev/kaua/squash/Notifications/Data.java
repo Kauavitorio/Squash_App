@@ -13,16 +13,26 @@ public class Data {
     private String body;
     private String title;
     private String sented;
+    private String chat_id;
 
-    public Data(String user, int icon, String body, String title, String sented) {
+    public Data(String user, int icon, String body, String title, String sented, String chat_id) {
         this.user = user;
         this.icon = icon;
         this.body = body;
         this.title = title;
         this.sented = sented;
+        this.chat_id = chat_id;
     }
 
     public Data() {}
+
+    public String getChat_id() {
+        return chat_id;
+    }
+
+    public void setChat_id(String chat_id) {
+        this.chat_id = chat_id;
+    }
 
     public String getUser() {
         return user;

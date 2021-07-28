@@ -116,8 +116,10 @@ public class ChatsFragment extends Fragment {
                     assert account != null;
                     if(!account.getId().equals(fUser.getUid())){
                         for (int i = 0; i < usersList.size(); i++){
-                            if(usersList.get(i).getId().equals(account.getId()))
+                            if(usersList.get(i).getId().equals(account.getId())){
+                                account.setChat_id(usersList.get(i).getChat_id());
                                 mAccounts.add(account);
+                            }
                         }
                     }
                 }
@@ -174,6 +176,7 @@ public class ChatsFragment extends Fragment {
                         if(account != null){
                             for(Chatslist chatList : usersList){
                                 if(account.getId() != null && account.getId().equals(chatList.getId())){
+                                    account.setChat_id(chatList.getChat_id());
                                     mAccounts.add(account);
                                 }
                             }

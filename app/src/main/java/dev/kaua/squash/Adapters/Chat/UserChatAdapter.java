@@ -77,6 +77,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(mContext, MessageActivity.class);
             intent.putExtra("userId", account.getId());
+            intent.putExtra("chat_id", account.getChat_id());
             if(share){
                 int shareType = ShareContentActivity.getInstance().GetShareType();
                 intent.putExtra("shared", 1);

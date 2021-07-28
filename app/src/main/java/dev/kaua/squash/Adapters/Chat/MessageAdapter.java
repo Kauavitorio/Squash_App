@@ -43,6 +43,7 @@ import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.Methods;
 
 @SuppressWarnings({"IfStatementWithIdenticalBranches", "ConstantConditions"})
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
@@ -96,7 +97,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         final ViewHolder viewHolder = holder;
         DtoMessage message = mMessages.get(position);
         viewHolder.msg_chat_item.setText(EncryptHelper.decrypt(message.getMessage()));
-        viewHolder.msgTime_chat_item.setText(EncryptHelper.decrypt(message.getTime()));
+        if(message.getTime() != null){
+            String[] time = EncryptHelper.decrypt(message.getTime()).replace("-", "/").split("/");
+            viewHolder.msgTime_chat_item.setText(time[2].substring(4));
+        }
+
 
         if(message.getReply_from() != null && !message.getReply_from().equals("noOne") && !message.getReply_content().equals("empty")){
             viewHolder.container_reply.setVisibility(View.VISIBLE);
@@ -191,6 +196,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 });
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, mContext.getString(R.string.cancel), (dialog, which) -> alertDialog.dismiss());
         alertDialog.show();
+    }
+
+    public static int getSize(){
+        return mMessages.size();
     }
 
     @Override

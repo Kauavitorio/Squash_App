@@ -28,8 +28,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
@@ -308,6 +311,16 @@ public abstract class Methods extends MainActivity {
             Log.d("LastSeen", ex.toString());
             return get_date_time;
         }
+    }
+
+    public static String shuffle(String s) {
+        List<String> letters = Arrays.asList(s.split(""));
+        Collections.shuffle(letters);
+        StringBuilder t = new StringBuilder(s.length());
+        for (String k : letters) {
+            t.append(k);
+        }
+        return t.toString();
     }
 
     private static String showTimeAgo(myTimeHelper now, String goal, Context context) {
