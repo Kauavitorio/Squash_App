@@ -116,4 +116,6 @@
     <string name="hours_ago">hours ago</string>
     <string name="hour_ago">hour ago</string>
     <string name="updatenow">Update now</string>
+    <string name="image">Image</string>
+    <string name="video">Video</string>
 </resources>

@@ -1,5 +1,6 @@
 package dev.kaua.squash.Notifications;
 
+import dev.kaua.squash.EncryptDep.StorageKeys;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Headers;
@@ -9,7 +10,7 @@ public interface APIService {
     @Headers({
 
             "Content-Type:application/json",
-            "Authorization:key=AAAAbBwXSb8:APA91bGSCRlr7TOIJldceWpJ15RUS0fA_XURr16KFzlIxEKf31dYELWqwDHABMeYZRBlGjlHlVQXFHztA2zFmpe6IQiwQLkCzTiyxoafe6FGZYkn5Kdy_i8YUrCcDEqyqHLIsAFOW8Mx"
+            "Authorization:key=" + StorageKeys.NOTIFICATION_KEY
     })
 
     @POST("fcm/send")

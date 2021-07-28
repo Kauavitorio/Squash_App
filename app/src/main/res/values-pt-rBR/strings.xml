@@ -108,4 +108,6 @@
     <string name="hours_ago">horas atrás</string>
     <string name="hour_ago">hora atrás</string>
     <string name="updatenow">Atualizar agora</string>
+    <string name="image">Imagem</string>
+    <string name="video">Vídeo</string>
 </resources>

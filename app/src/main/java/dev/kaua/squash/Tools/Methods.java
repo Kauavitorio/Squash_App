@@ -67,6 +67,7 @@ public abstract class Methods extends MainActivity {
 
     //  Base API URL
     public static final String BASE_URL = "https://squash-social.herokuapp.com/";
+    public static final String FCM_URL = "https://fcm.googleapis.com/";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
 

@@ -36,14 +36,12 @@ import com.google.firebase.storage.StorageReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
-import dev.kaua.squash.Tools.Methods;
 
 @SuppressWarnings({"IfStatementWithIdenticalBranches", "ConstantConditions"})
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
@@ -56,13 +54,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private final String imageURL;
     private final String chat_Username;
     private final String myUsername;
+    private final String chat_id;
     FirebaseStorage firebaseStorage;
     private final int joinNow;
     private RecyclerView recycler_view_msg;
     FirebaseUser fUser = ConfFirebase.getFirebaseUser();
 
     public MessageAdapter(Context mContext, List<DtoMessage> mMessages, String imageURL, int joinNow, RecyclerView recycler_view_msg
-    , String myUsername, String chat_Username){
+    , String myUsername, String chat_Username, String chat_id){
         this.mContext = mContext;
         MessageAdapter.mMessages = mMessages;
         this.imageURL = imageURL;
@@ -70,6 +69,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         this.myUsername = myUsername;
         this.joinNow = joinNow;
         this.recycler_view_msg = recycler_view_msg;
+        this.chat_id = chat_id;
     }
 
     @NonNull
@@ -166,7 +166,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.yes),
                 (dialog, which) -> {
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                    Query applesQuery = ref.child("Chats").orderByChild("id_msg").equalTo(id_msg);
+                    Query applesQuery = ref.child("Chats").child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(id_msg);
 
                     applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -175,14 +175,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 appleSnapshot.getRef().removeValue();
                             }
                             firebaseStorage = FirebaseStorage.getInstance();
-                            StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(mMessages.get(position).getMedia().get(0)));
-                            photoRef.delete().addOnSuccessListener(aVoid -> {
-                                // File deleted successfully
-                                Log.d("DeleteMessage", "onSuccess: deleted file");
-                            }).addOnFailureListener(exception -> {
-                                // Uh-oh, an error occurred!
-                                Log.d("DeleteMessage", "onFailure: did not delete file");
-                            });
+                            if(mMessages != null && mMessages.get(position).getMedia() != null && mMessages.get(position).getMedia().get(0) != null){
+                                StorageReference photoRef = firebaseStorage.getReferenceFromUrl(mMessages.get(position).getMedia().get(0));
+                                photoRef.delete().addOnSuccessListener(aVoid -> {
+                                    // File deleted successfully
+                                    Log.d("DeleteMessage", "onSuccess: deleted file");
+                                }).addOnFailureListener(exception -> {
+                                    // Uh-oh, an error occurred!
+                                    Log.d("DeleteMessage", "onFailure: did not delete file");
+                                });
+                            }
                             mMessages.remove(position);
                             notifyDataSetChanged();
                         }
