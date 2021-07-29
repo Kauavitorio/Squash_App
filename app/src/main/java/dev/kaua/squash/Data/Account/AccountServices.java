@@ -1,5 +1,6 @@
 package dev.kaua.squash.Data.Account;
 
+import dev.kaua.squash.Data.Post.DtoPost;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -11,6 +12,9 @@ public interface    AccountServices {
 
     @POST("user/edit")
     Call<DtoAccount> edit (@Body DtoAccount account);
+
+    @POST("user/search/from/username")
+    Call<DtoPost> search_with_username (@Body DtoAccount account);
 
     @POST("user/login")
     Call<DtoAccount> login (@Body DtoAccount account);

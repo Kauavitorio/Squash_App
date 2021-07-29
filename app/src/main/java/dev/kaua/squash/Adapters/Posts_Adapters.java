@@ -35,10 +35,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.PostDetailsActivity;
+import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;
@@ -51,6 +53,8 @@ import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.PatternEditableBuilder;
+import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 import retrofit2.Call;
@@ -81,6 +85,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         return new MyHolderPosts(listItem);
     }
 
+    @SuppressWarnings("RegExpRedundantEscape")
     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
     @Override
     public void onBindViewHolder(@NonNull MyHolderPosts holder, int position) {
@@ -99,6 +104,37 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         holder.txt_name_user_post.setText(list.get(position).getName_user());
         holder.txt_username_post.setText( "| @" + list.get(position).getUsername());
         holder.txt_post_content.setText(list.get(position).getPost_content());
+        new PatternEditableBuilder().
+                addPattern(Pattern.compile("\\@(\\w+)"), mContext.getColor(R.color.base_color),
+                        text -> {
+                            DtoAccount account = new DtoAccount();
+                            account.setUsername(text.replace("@", ""));
+                            AccountServices services = retrofit.create(AccountServices.class);
+                            Call<DtoPost> call = services.search_with_username(account);
+                            LoadingDialog loadingDialog = new LoadingDialog(((Activity)mContext));
+                            loadingDialog.startLoading();
+                            call.enqueue(new Callback<DtoPost>() {
+                                @Override
+                                public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                                    loadingDialog.dismissDialog();
+                                    if(response.code() == 200){
+                                        if(response.body() != null){
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("account_id", response.body().getAccount_id());
+                                            bundle.putInt("control", 0);
+                                            MainActivity.getInstance().GetBundleProfile(bundle);
+                                            MainActivity.getInstance().CallProfile();
+                                            ProfileFragment.getInstance().LoadAnotherUser();
+                                        }
+                                    }else ToastHelper.toast(((Activity)mContext), mContext.getString(R.string.user_not_found), 0);
+                                }
+                                @Override
+                                public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                                    loadingDialog.dismissDialog();
+                                    Warnings.showWeHaveAProblem(mContext);
+                                }
+                            });
+                        }).into(holder.txt_post_content);
 
         //  Apply all url on Texts Views
         Linkify.addLinks(holder.txt_post_content, Linkify.ALL);
@@ -199,6 +235,12 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         EnableActions(holder, position);
 
         holder.btn_like_post.setOnClickListener(v -> Like_Un_Like_A_Post(holder, position, list.get(position).getPost_id()));
+
+        if(list.get(position).isSuggestion()) {
+            holder.suggestion_container.setVisibility(View.VISIBLE);
+            if(list.get(position).getAccount_id().equals("5")) holder.txt_suggestion.setText(mContext.getString(R.string.developer_post));
+        }
+        else holder.suggestion_container.setVisibility(View.GONE);
     }
 
     private void EnableActions(MyHolderPosts holder, int position) {
@@ -321,15 +363,17 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     static class MyHolderPosts extends RecyclerView.ViewHolder{
         CircleImageView icon_user_profile_post;
         TextView txt_name_user_post, txt_username_post, txt_post_content, txt_images_amount_post, txt_date_time_post;
-        TextView txt_likes_post, txt_comments_post;
+        TextView txt_likes_post, txt_comments_post, txt_suggestion;
         ImageView img_firstImage_post, img_secondImage_post, img_thirdImage_post, ic_account_badge, img_heart_like, btn_actions;
         RelativeLayout container_third_img, container_post_adapter;
         ConstraintLayout container_blur_post;
-        LinearLayout btn_like_post, btn_share_post, btn_comment_post;
+        LinearLayout btn_like_post, btn_share_post, btn_comment_post, suggestion_container;
 
         public MyHolderPosts(@NonNull View itemView) {
             super(itemView);
             txt_date_time_post = itemView.findViewById(R.id.txt_date_time_post);
+            suggestion_container = itemView.findViewById(R.id.suggestion_container);
+            txt_suggestion = itemView.findViewById(R.id.txt_suggestion);
             container_post_adapter = itemView.findViewById(R.id.container_post_adapter);
             btn_comment_post = itemView.findViewById(R.id.btn_comment_post);
             icon_user_profile_post = itemView.findViewById(R.id.icon_user_profile_post);

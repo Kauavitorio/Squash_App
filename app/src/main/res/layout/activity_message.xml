@@ -9,6 +9,7 @@
     android:id="@+id/message_activity"
     tools:context=".Activitys.MessageActivity">
 
+    <!-- Background System -->
     <ImageView
         android:id="@+id/background_chat"
         android:layout_width="match_parent"
@@ -29,8 +30,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout><!-- End Background System -->
 
+    <!-- Header -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/bar_layout"
         android:layout_width="match_parent"
@@ -38,22 +40,24 @@
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- Toolbar for actions and User info -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             app:theme="@style/ToolbarColored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/black_intro"
-            android:padding="10dp"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:popupTheme="@style/MenuStyle">
 
+            <!-- Container -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/toolbar"
                 android:padding="5dp">
 
+                <!-- Profile Image -->
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_image_chat"
                     android:layout_width="40dp"
@@ -125,42 +129,42 @@
         app:layout_constraintBottom_toTopOf="@+id/container_edits_chat"
         app:layout_constraintTop_toBottomOf="@+id/bar_layout"/>
 
-    <!-- Btn More Medias -->
-    <ImageView
-        android:id="@+id/btn_more_medias"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginBottom="15dp"
-        android:layout_marginStart="5dp"
-        android:src="@drawable/ic_plus"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="ContentDescription" />
-
     <!-- Container Edit and Send Button -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container_edits_chat"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
         android:layout_marginStart="3dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/custom_edit_chat"
         android:minHeight="40dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btn_more_medias">
+        app:layout_constraintStart_toStartOf="parent">
 
+        <!-- Btn More Medias -->
+        <ImageView
+            android:id="@+id/btn_more_medias"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="5dp"
+            android:src="@drawable/ic_plus"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <!-- Main Container -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
             android:orientation="vertical"
             android:padding="5dp"
+            android:layout_marginStart="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/container_btn_send"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toEndOf="@+id/btn_more_medias">
 
             <!-- Container Reply -->
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -212,14 +216,15 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- Msg edittext -->
             <EditText
                 android:id="@+id/text_send"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:hint="@string/type_a_message"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:hint="@string/type_a_message"
                 android:inputType="text|textCapSentences|textMultiLine"
                 android:maxHeight="140dp"
                 android:padding="8dp"
@@ -258,6 +263,49 @@
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Container No Message Yet -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container_no_message_yet"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:padding="10dp"
+        android:maxWidth="300dp"
+        android:visibility="visible"
+        android:background="@drawable/no_message_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Text not message -->
+        <TextView
+            android:id="@+id/txt_no_message_yet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center"
+            android:text="@string/there_are_no_message"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_no_message_yet"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/halloween_pumpkin_black_cat" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -7,14 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Data.Account.AsyncUser_Search;
 import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Data.Post.AsyncRecommended_Posts_feed;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.MyPrefs;
 
@@ -24,6 +29,9 @@ public class SearchFragment extends Fragment {
     private static final int PROFILE_TARGET = 0;
 
     private AutoCompleteTextView edit_search;
+    private SwipeRefreshLayout swipe_post_feed;
+    private RecyclerView recycler_post_feed;
+    private TextView txt_empty_feed;
     private View view;
     private static SearchFragment instance;
     private DtoAccount account;
@@ -33,8 +41,6 @@ public class SearchFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_activity_search, container, false);
         Ids(view);
-
-        LoadSearch();
 
         //  Click search item
         edit_search.setOnItemClickListener((parent, view, position, id) -> {
@@ -51,6 +57,8 @@ public class SearchFragment extends Fragment {
             edit_search.setText(null);
         });
 
+        swipe_post_feed.setOnRefreshListener(this::loadFeed);
+
         return view;
     }
 
@@ -62,21 +70,26 @@ public class SearchFragment extends Fragment {
         asyncProductsSearchMain.execute();
     }
 
+    private void loadFeed() {
+        AsyncRecommended_Posts_feed async = new AsyncRecommended_Posts_feed(requireContext(), recycler_post_feed, swipe_post_feed, txt_empty_feed);
+        async.execute();
+    }
+
     @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
         if (visible) LoadSearch();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        LoadSearch();
-    }
-
-    private void Ids(View view) {
+    private void Ids(@NonNull View view) {
         instance = this;
         account = MyPrefs.getUserInformation(requireContext());
         edit_search = view.findViewById(R.id.edit_Search_Main);
+        swipe_post_feed = view.findViewById(R.id.swipe_post_feed);
+        txt_empty_feed = view.findViewById(R.id.txt_empty_feed);
+        recycler_post_feed = view.findViewById(R.id.recycler_post_feed);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext());
+        recycler_post_feed.setLayoutManager(linearLayoutManager);
+        loadFeed();
     }
 }

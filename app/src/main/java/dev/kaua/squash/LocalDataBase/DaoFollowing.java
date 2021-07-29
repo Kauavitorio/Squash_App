@@ -1,5 +1,6 @@
 package dev.kaua.squash.LocalDataBase;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -61,7 +62,7 @@ public class DaoFollowing extends SQLiteOpenHelper {
     public ArrayList<DtoAccount> get_followers_following(long account_id, long account_id_following){
         String command = "SELECT * FROM " + TABLE + " WHERE account_id = ? and account_id_following = ?";
         String[] params = {account_id + "", account_id_following + ""};
-        Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
         ArrayList<DtoAccount> list = new ArrayList<>();
 
         while (cursor.moveToNext()) {
@@ -72,6 +73,13 @@ public class DaoFollowing extends SQLiteOpenHelper {
             list.add(account);
         }
         return list;
+    }
+
+    public boolean check_if_follow(long account_id, long account_id_following){
+        String command = "SELECT * FROM " + TABLE + " WHERE account_id = ? and account_id_following = ?";
+        String[] params = {account_id + "", account_id_following + ""};
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        return cursor.moveToNext();
     }
 
     public void DropTable(){

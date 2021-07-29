@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.util.Linkify;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,14 +38,15 @@ import com.google.firebase.storage.StorageReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.Methods;
+import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 
 @SuppressWarnings({"IfStatementWithIdenticalBranches", "ConstantConditions"})
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
@@ -56,13 +59,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private final String imageURL;
     private final String chat_Username;
     private final String myUsername;
+    private final String chat_id;
     FirebaseStorage firebaseStorage;
     private final int joinNow;
     private RecyclerView recycler_view_msg;
     FirebaseUser fUser = ConfFirebase.getFirebaseUser();
 
     public MessageAdapter(Context mContext, List<DtoMessage> mMessages, String imageURL, int joinNow, RecyclerView recycler_view_msg
-    , String myUsername, String chat_Username){
+    , String myUsername, String chat_Username, String chat_id){
         this.mContext = mContext;
         MessageAdapter.mMessages = mMessages;
         this.imageURL = imageURL;
@@ -70,6 +74,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         this.myUsername = myUsername;
         this.joinNow = joinNow;
         this.recycler_view_msg = recycler_view_msg;
+        this.chat_id = chat_id;
+        checkMessagesSize();
+    }
+
+    private void checkMessagesSize() {
+        MessageActivity.ShowOrNot_noMessage(mMessages.size() <= 0);
     }
 
     @NonNull
@@ -97,6 +107,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         final ViewHolder viewHolder = holder;
         DtoMessage message = mMessages.get(position);
         viewHolder.msg_chat_item.setText(EncryptHelper.decrypt(message.getMessage()));
+        //  Apply all url on Texts Views
+        Linkify.addLinks(viewHolder.msg_chat_item, Linkify.WEB_URLS);
+
+        //  URL CLICK'S listener
+        viewHolder.msg_chat_item.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
+            if (Patterns.WEB_URL.matcher(url).matches()) {
+                //An web url is detected
+                Methods.browseTo(mContext, url);
+                return true;
+            }
+            return false;
+        }));
         if(message.getTime() != null){
             String[] time = EncryptHelper.decrypt(message.getTime()).replace("-", "/").split("/");
             viewHolder.msgTime_chat_item.setText(time[2].substring(4));
@@ -166,7 +188,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.yes),
                 (dialog, which) -> {
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                    Query applesQuery = ref.child("Chats").orderByChild("id_msg").equalTo(id_msg);
+                    Query applesQuery = ref.child("Chats").child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(id_msg);
 
                     applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -175,14 +197,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 appleSnapshot.getRef().removeValue();
                             }
                             firebaseStorage = FirebaseStorage.getInstance();
-                            StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(mMessages.get(position).getMedia().get(0)));
-                            photoRef.delete().addOnSuccessListener(aVoid -> {
-                                // File deleted successfully
-                                Log.d("DeleteMessage", "onSuccess: deleted file");
-                            }).addOnFailureListener(exception -> {
-                                // Uh-oh, an error occurred!
-                                Log.d("DeleteMessage", "onFailure: did not delete file");
-                            });
+                            if(mMessages != null && mMessages.get(position).getMedia() != null && mMessages.get(position).getMedia().get(0) != null){
+                                StorageReference photoRef = firebaseStorage.getReferenceFromUrl(mMessages.get(position).getMedia().get(0));
+                                photoRef.delete().addOnSuccessListener(aVoid -> {
+                                    // File deleted successfully
+                                    Log.d("DeleteMessage", "onSuccess: deleted file");
+                                }).addOnFailureListener(exception -> {
+                                    // Uh-oh, an error occurred!
+                                    Log.d("DeleteMessage", "onFailure: did not delete file");
+                                });
+                            }
                             mMessages.remove(position);
                             notifyDataSetChanged();
                         }

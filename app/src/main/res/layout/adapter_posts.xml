@@ -12,6 +12,34 @@
     android:background="@drawable/background_post"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Suggestion Container -->
+    <LinearLayout
+        android:id="@+id/suggestion_container"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        tools:ignore="UseCompoundDrawables">
+
+        <!-- Pumpkin img -->
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/cute_pumpkin"
+            tools:ignore="ContentDescription" />
+
+        <!-- Suggestion Text -->
+        <TextView
+            android:id="@+id/txt_suggestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/hint"
+            android:textSize="16sp"
+            android:text="@string/maybe_you_like_it"/>
+
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/container_post_adapter"
         android:layout_width="match_parent"

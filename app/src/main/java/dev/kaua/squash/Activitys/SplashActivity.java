@@ -104,21 +104,21 @@ public class SplashActivity extends AppCompatActivity {
             ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
             ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
             finishAffinity();
-        }
+        }else verifyIfUsersLogged();
     }
 
     void handleSendImage(Intent intent) {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
             Log.d("SPLASH_HANDLER", "image -> " + imageUri);
-        }
+        }else verifyIfUsersLogged();
     }
 
     void handleSendMultipleImages(Intent intent) {
         ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
         if (imageUris != null) {
             Log.d("SPLASH_HANDLER", imageUris + "");
-        }
+        }else verifyIfUsersLogged();
     }
 
     private void DoValidation(String value) {

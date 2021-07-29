@@ -44,8 +44,8 @@
             android:layout_height="wrap_content"
             android:background="@color/black_intro"
             app:tabIconTintMode="src_atop"
-            app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="@color/third_or_plus_img"
+            app:tabSelectedTextColor="@color/base_color"
+            app:tabTextColor="@color/hint_default_button"
             app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>

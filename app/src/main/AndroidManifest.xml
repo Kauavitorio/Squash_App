@@ -33,7 +33,8 @@
         <activity android:name=".Activitys.MainActivity" />
         <activity android:name=".Activitys.ValidateEmailActivity" />
         <activity android:name=".Activitys.TermsAccountActivity" />
-        <activity android:name=".Activitys.SplashActivity">
+        <activity android:name=".Activitys.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

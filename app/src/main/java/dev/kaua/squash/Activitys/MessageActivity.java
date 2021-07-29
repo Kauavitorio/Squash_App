@@ -14,6 +14,7 @@ import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -93,6 +95,7 @@ import retrofit2.Response;
 public class MessageActivity extends AppCompatActivity {
 
     private CircleImageView profile_image;
+    public static ConstraintLayout container_no_message_yet;
     public static ImageView background_chat;
     public static ImageView btn_more_medias;
     public static MessageActivity instance;
@@ -107,7 +110,6 @@ public class MessageActivity extends AppCompatActivity {
     private ImageView cancelButton;
     private ValueEventListener seenListener;
     public static DtoAccount user_im_chat;
-    public static DtoAccount mUser = new DtoAccount();
     private static final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
 
     public static FirebaseUser fUser;
@@ -124,9 +126,10 @@ public class MessageActivity extends AppCompatActivity {
     APIService apiService;
 
     boolean notify = false;
-    public static final int PIC_CROP = 1;
-    public static final int PICK_IMAGE_REQUEST = 111;
-    public static final int PICK_IMAGE_REQUEST_MEDIA = 222;
+    public static final int PIC_CROP = 111;
+    public static final int PICK_IMAGE_REQUEST = 222;
+    public static final int PICK_IMAGE_REQUEST_MEDIA = 333;
+    public static final int OPEN_CAMERA = 444;
     public static StorageReference storageReference;
 
     Intent intent;
@@ -136,8 +139,6 @@ public class MessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         Ids();
-        DaoChat daoChat = new DaoChat(MessageActivity.this);
-        chatDB = new DaoChat(MessageActivity.this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -145,18 +146,18 @@ public class MessageActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+        apiService = Client.getClient(Methods.FCM_URL).create(APIService.class);
 
         intent = getIntent();
         userId = intent.getStringExtra("userId");
         chat_id = intent.getStringExtra("chat_id");
         fUser = ConfFirebase.getFirebaseUser();
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
+        reference = ConfFirebase.getFirebaseDatabase().getReference("Users").child(userId);
 
         CheckShared();
         GenerateChatID();
 
-        String img = daoChat.get_BG("bg_" + fUser.getUid() + "_"
+        String img = chatDB.get_BG("bg_" + fUser.getUid() + "_"
                 + userId);
         if(img != null) BackgroundHelper.LoadBackground(img);
 
@@ -164,7 +165,8 @@ public class MessageActivity extends AppCompatActivity {
         btn_send.setOnClickListener(v -> {
             notify = true;
             String msg = text_send.getText().toString();
-            if(!msg.equals("")) sendMessage(fUser.getUid(), userId, msg);
+            if(!msg.equals("") && msg.trim().replaceAll(" +", "").length() > 0)
+                sendMessage(fUser.getUid(), userId, msg);
             else ToastHelper.toast(this, getString(R.string.the_message_cannot_be_empty), 0);
             text_send.setText("");
         });
@@ -209,7 +211,6 @@ public class MessageActivity extends AppCompatActivity {
                     }else verification_ic.setVisibility(View.GONE);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
@@ -227,18 +228,32 @@ public class MessageActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
+        //  Reply close button click
         cancelButton.setOnClickListener(v -> hideReplayLayout());
 
+        //  Btn medias click
         btn_more_medias.setOnClickListener(v -> {
-            UserPermissions.validatePermissions(permissions, instance, 189);
-            int GalleryPermission = ContextCompat.checkSelfPermission(instance, Manifest.permission.READ_EXTERNAL_STORAGE);
-            if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
-                Intent openGallery = new Intent();
-                openGallery.setType("image/*");
-                openGallery.setAction(Intent.ACTION_PICK);
-                startActivityForResult(Intent.createChooser(openGallery, "Select Image"), PICK_IMAGE_REQUEST_MEDIA);
-            }
+            BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.BottomSheetTheme);
+            View sheetView = LayoutInflater.from(this).inflate(R.layout.adapter_sheet_media_action,
+                    findViewById(R.id.adapter_sheet_media));
+
+            sheetView.findViewById(R.id.close_media_action).setOnClickListener(view -> dialog.dismiss());
+
+            sheetView.findViewById(R.id.container_btn_image).setOnClickListener(view -> {
+                OpenGallery_ACTION();
+                dialog.dismiss();
+            });
+
+            sheetView.findViewById(R.id.container_btn_video).setOnClickListener(view -> {
+                dialog.dismiss();
+                ToastHelper.toast(this, getString(R.string.under_development), 0);
+            });
+            dialog.setContentView(sheetView);
+            dialog.show();
         });
+
+        //  Profile Image click
+        profile_image.setOnClickListener(v -> OpenUserProfile());
 
         seenMessage(userId);
         setRecyclerSwipe();
@@ -272,6 +287,11 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
+    public static void ShowOrNot_noMessage(boolean status){
+        if(status) container_no_message_yet.setVisibility(View.VISIBLE);
+        else container_no_message_yet.setVisibility(View.GONE);
+    }
+
     private void CheckShared() {
         Bundle bundle = getIntent().getExtras();
         if(bundle.getInt("shared") == 1){
@@ -282,8 +302,10 @@ public class MessageActivity extends AppCompatActivity {
 
     private void Ids() {
         instance = this;
+        chatDB = new DaoChat(MessageActivity.this);
         profile_image = findViewById(R.id.profile_image_chat);
         btn_more_medias = findViewById(R.id.btn_more_medias);
+        container_no_message_yet = findViewById(R.id.container_no_message_yet);
         txt_user_name = findViewById(R.id.txt_username_chat);
         recycler_view_msg = findViewById(R.id.recycler_view_msg);
         verification_ic = findViewById(R.id.verification_ic_message);
@@ -518,7 +540,8 @@ public class MessageActivity extends AppCompatActivity {
     private static void LoadAdapter(String imageURl) {
         mMessageFinal.clear();
         mMessageFinal.addAll(mMessage);
-        messageAdapter = new MessageAdapter(instance, mMessage, imageURl, joinNow, recycler_view_msg, MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername());
+        messageAdapter = new MessageAdapter(instance, mMessage, imageURl, joinNow, recycler_view_msg,
+                MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername(), chat_id);
         recycler_view_msg.setAdapter(messageAdapter);
     }
 
@@ -558,58 +581,12 @@ public class MessageActivity extends AppCompatActivity {
         text_send.requestFocus();
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public DtoAccount getUserInformation(){
-        SharedPreferences sp = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        mUser.setAccount_id(Long.parseLong(EncryptHelper.decrypt(sp.getString("pref_account_id", null))));
-        mUser.setName_user(EncryptHelper.decrypt(sp.getString("pref_name_user", null)));
-        mUser.setUsername(EncryptHelper.decrypt(sp.getString("pref_username", null)));
-        mUser.setEmail(EncryptHelper.decrypt(sp.getString("pref_email", null)));
-        mUser.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
-        mUser.setBanner_user(EncryptHelper.decrypt(sp.getString("pref_banner_user", null)));
-        mUser.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
-        mUser.setProfile_image(EncryptHelper.decrypt(sp.getString("pref_profile_image", null)));
-        mUser.setBio_user(EncryptHelper.decrypt(sp.getString("pref_bio_user", null)));
-        mUser.setUrl_user(EncryptHelper.decrypt(sp.getString("pref_url_user", null)));
-        mUser.setFollowing(EncryptHelper.decrypt(sp.getString("pref_following", null)));
-        mUser.setFollowers(EncryptHelper.decrypt(sp.getString("pref_followers", null)));
-        mUser.setBorn_date(EncryptHelper.decrypt(sp.getString("pref_born_date", null)));
-        mUser.setJoined_date(EncryptHelper.decrypt(sp.getString("pref_joined_date", null)));
-        mUser.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
-        mUser.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
-        mUser.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
-        return mUser;
-    }
-
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.see_profile:
-                finish();
-                try {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
-                    bundle.putInt("control", 0);
-                    MainActivity.getInstance().GetBundleProfile(bundle);
-                    MainActivity.getInstance().CallProfile();
-                    ProfileFragment.getInstance().LoadAnotherUser();
-                }catch (Exception ex){
-                    Intent goto_main = new Intent(this, MainActivity.class);
-                    goto_main.putExtra("shortcut", 0);
-                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
-                    ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
-                    finishAffinity();
-                    Handler timer = new Handler();
-                    timer.postDelayed(() -> {
-                        Bundle bundle_profile = new Bundle();
-                        bundle_profile.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
-                        bundle_profile.putInt("control", 0);
-                        MainActivity.getInstance().GetBundleProfile(bundle_profile);
-                        MainActivity.getInstance().CallProfile();
-                        ProfileFragment.getInstance().LoadAnotherUser();
-                    },500);
-                }
+                OpenUserProfile();
                 return true;
             case R.id.medias_profile:
                 return true;
@@ -623,19 +600,46 @@ public class MessageActivity extends AppCompatActivity {
         return false;
     }
 
+    private void OpenUserProfile(){
+        finish();
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
+            bundle.putInt("control", 0);
+            MainActivity.getInstance().GetBundleProfile(bundle);
+            MainActivity.getInstance().CallProfile();
+            ProfileFragment.getInstance().LoadAnotherUser();
+        }catch (Exception ex){
+            Intent goto_main = new Intent(this, MainActivity.class);
+            goto_main.putExtra("shortcut", 0);
+            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
+            ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
+            finishAffinity();
+            Handler timer = new Handler();
+            timer.postDelayed(() -> {
+                Bundle bundle_profile = new Bundle();
+                bundle_profile.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
+                bundle_profile.putInt("control", 0);
+                MainActivity.getInstance().GetBundleProfile(bundle_profile);
+                MainActivity.getInstance().CallProfile();
+                ProfileFragment.getInstance().LoadAnotherUser();
+            },500);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PIC_CROP) {
-            if (data != null) {
-                // get the returned data
-                Bundle extras = data.getExtras();
-                // get the cropped bitmap
-                Bitmap selectedBitmap = extras.getParcelable("data");
-                BackgroundHelper.uploadFile(selectedBitmap);
-            }
+        if (requestCode == PIC_CROP && data != null) {
+            // get the returned data
+            Bundle extras = data.getExtras();
+            // get the cropped bitmap
+            Bitmap selectedBitmap = extras.getParcelable("data");
+            BackgroundHelper.uploadFile(selectedBitmap);
         }
+
+        if(requestCode == OPEN_CAMERA) OpenGallery_ACTION();
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null)
             BackgroundHelper.SendToCrop(this, data);
@@ -697,6 +701,17 @@ public class MessageActivity extends AppCompatActivity {
             if (cut != -1) result = result.substring(cut + 1);
         }
         return result;
+    }
+
+    private void OpenGallery_ACTION() {
+        UserPermissions.validatePermissions(permissions, instance, OPEN_CAMERA);
+        int GalleryPermission = ContextCompat.checkSelfPermission(instance, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
+            Intent openGallery = new Intent();
+            openGallery.setType("image/*");
+            openGallery.setAction(Intent.ACTION_PICK);
+            startActivityForResult(Intent.createChooser(openGallery, "Select Image"), PICK_IMAGE_REQUEST_MEDIA);
+        }
     }
 
     @Override

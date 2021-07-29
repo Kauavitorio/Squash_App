@@ -8,6 +8,11 @@
         android:bottomLeftRadius="20dp"
         android:topLeftRadius="20dp"/>
 
-    <solid android:color="@color/background_my_message"/>
+    <gradient
+        android:angle="315"
+        android:startColor="@color/background_my_message_top"
+        android:endColor="@color/background_my_message_middle"
+        android:centerColor="@color/background_my_message_bottom"
+        android:type="linear"/>
 
 </shape>
