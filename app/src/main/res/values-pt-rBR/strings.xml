@@ -110,4 +110,7 @@
     <string name="updatenow">Atualizar agora</string>
     <string name="image">Imagem</string>
     <string name="video">Vídeo</string>
+    <string name="maybe_you_like_it">Talvez você goste</string>
+    <string name="empty_recommendation_feed">Seu feed de recomendação está vazio no momento, volte mais tarde para ver as novidades</string>
+    <string name="developer_post">Post do desenvolvedor</string>
 </resources>

@@ -118,4 +118,7 @@
     <string name="updatenow">Update now</string>
     <string name="image">Image</string>
     <string name="video">Video</string>
+    <string name="maybe_you_like_it">Maybe you like it</string>
+    <string name="empty_recommendation_feed">Your recommendation feed is currently empty, come back later to see what\'s new</string>
+    <string name="developer_post">Developer post</string>
 </resources>

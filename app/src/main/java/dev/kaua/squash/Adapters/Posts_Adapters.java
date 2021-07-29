@@ -235,6 +235,12 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         EnableActions(holder, position);
 
         holder.btn_like_post.setOnClickListener(v -> Like_Un_Like_A_Post(holder, position, list.get(position).getPost_id()));
+
+        if(list.get(position).isSuggestion()) {
+            holder.suggestion_container.setVisibility(View.VISIBLE);
+            if(list.get(position).getAccount_id().equals("5")) holder.txt_suggestion.setText(mContext.getString(R.string.developer_post));
+        }
+        else holder.suggestion_container.setVisibility(View.GONE);
     }
 
     private void EnableActions(MyHolderPosts holder, int position) {
@@ -357,15 +363,17 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     static class MyHolderPosts extends RecyclerView.ViewHolder{
         CircleImageView icon_user_profile_post;
         TextView txt_name_user_post, txt_username_post, txt_post_content, txt_images_amount_post, txt_date_time_post;
-        TextView txt_likes_post, txt_comments_post;
+        TextView txt_likes_post, txt_comments_post, txt_suggestion;
         ImageView img_firstImage_post, img_secondImage_post, img_thirdImage_post, ic_account_badge, img_heart_like, btn_actions;
         RelativeLayout container_third_img, container_post_adapter;
         ConstraintLayout container_blur_post;
-        LinearLayout btn_like_post, btn_share_post, btn_comment_post;
+        LinearLayout btn_like_post, btn_share_post, btn_comment_post, suggestion_container;
 
         public MyHolderPosts(@NonNull View itemView) {
             super(itemView);
             txt_date_time_post = itemView.findViewById(R.id.txt_date_time_post);
+            suggestion_container = itemView.findViewById(R.id.suggestion_container);
+            txt_suggestion = itemView.findViewById(R.id.txt_suggestion);
             container_post_adapter = itemView.findViewById(R.id.container_post_adapter);
             btn_comment_post = itemView.findViewById(R.id.btn_comment_post);
             icon_user_profile_post = itemView.findViewById(R.id.icon_user_profile_post);

@@ -8,9 +8,13 @@
     <!-- Edit Search -->
     <AutoCompleteTextView
         android:id="@+id/edit_Search_Main"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="51dp"
-        android:background="@drawable/bg_edittext_search_main"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@drawable/custom_edit_register_new"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
         android:hint="@string/search_with_dots"
         android:imeOptions="actionSearch"
         android:inputType="text"
@@ -20,5 +24,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="Autofill" />
+
+    <!-- Post Container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:padding="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_Search_Main">
+
+        <!-- Text empty feed -->
+        <TextView
+            android:id="@+id/txt_empty_feed"
+            android:layout_width="230dp"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:textAlignment="center"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_recommendation_feed"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Swipe container recycler -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_post_feed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <!-- Post RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_post_feed"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

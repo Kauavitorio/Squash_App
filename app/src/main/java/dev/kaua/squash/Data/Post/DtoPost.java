@@ -19,6 +19,8 @@ public class DtoPost implements Comparable<DtoPost>{
 
     private String post_id;
 
+    private boolean suggestion;
+
     private String likes;
 
     private String account_id;
@@ -52,6 +54,14 @@ public class DtoPost implements Comparable<DtoPost>{
     private String comment_id;
 
     private String verification_level;
+
+    public boolean isSuggestion() {
+        return suggestion;
+    }
+
+    public void setSuggestion(boolean suggestion) {
+        this.suggestion = suggestion;
+    }
 
     public String getVerification_level() {
         return verification_level;
