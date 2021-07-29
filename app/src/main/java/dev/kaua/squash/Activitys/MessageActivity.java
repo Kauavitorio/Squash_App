@@ -95,6 +95,7 @@ import retrofit2.Response;
 public class MessageActivity extends AppCompatActivity {
 
     private CircleImageView profile_image;
+    public static ConstraintLayout container_no_message_yet;
     public static ImageView background_chat;
     public static ImageView btn_more_medias;
     public static MessageActivity instance;
@@ -251,6 +252,9 @@ public class MessageActivity extends AppCompatActivity {
             dialog.show();
         });
 
+        //  Profile Image click
+        profile_image.setOnClickListener(v -> OpenUserProfile());
+
         seenMessage(userId);
         setRecyclerSwipe();
     }
@@ -283,6 +287,11 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
+    public static void ShowOrNot_noMessage(boolean status){
+        if(status) container_no_message_yet.setVisibility(View.VISIBLE);
+        else container_no_message_yet.setVisibility(View.GONE);
+    }
+
     private void CheckShared() {
         Bundle bundle = getIntent().getExtras();
         if(bundle.getInt("shared") == 1){
@@ -296,6 +305,7 @@ public class MessageActivity extends AppCompatActivity {
         chatDB = new DaoChat(MessageActivity.this);
         profile_image = findViewById(R.id.profile_image_chat);
         btn_more_medias = findViewById(R.id.btn_more_medias);
+        container_no_message_yet = findViewById(R.id.container_no_message_yet);
         txt_user_name = findViewById(R.id.txt_username_chat);
         recycler_view_msg = findViewById(R.id.recycler_view_msg);
         verification_ic = findViewById(R.id.verification_ic_message);
@@ -576,30 +586,7 @@ public class MessageActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.see_profile:
-                finish();
-                try {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
-                    bundle.putInt("control", 0);
-                    MainActivity.getInstance().GetBundleProfile(bundle);
-                    MainActivity.getInstance().CallProfile();
-                    ProfileFragment.getInstance().LoadAnotherUser();
-                }catch (Exception ex){
-                    Intent goto_main = new Intent(this, MainActivity.class);
-                    goto_main.putExtra("shortcut", 0);
-                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
-                    ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
-                    finishAffinity();
-                    Handler timer = new Handler();
-                    timer.postDelayed(() -> {
-                        Bundle bundle_profile = new Bundle();
-                        bundle_profile.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
-                        bundle_profile.putInt("control", 0);
-                        MainActivity.getInstance().GetBundleProfile(bundle_profile);
-                        MainActivity.getInstance().CallProfile();
-                        ProfileFragment.getInstance().LoadAnotherUser();
-                    },500);
-                }
+                OpenUserProfile();
                 return true;
             case R.id.medias_profile:
                 return true;
@@ -611,6 +598,33 @@ public class MessageActivity extends AppCompatActivity {
                 return true;
         }
         return false;
+    }
+
+    private void OpenUserProfile(){
+        finish();
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
+            bundle.putInt("control", 0);
+            MainActivity.getInstance().GetBundleProfile(bundle);
+            MainActivity.getInstance().CallProfile();
+            ProfileFragment.getInstance().LoadAnotherUser();
+        }catch (Exception ex){
+            Intent goto_main = new Intent(this, MainActivity.class);
+            goto_main.putExtra("shortcut", 0);
+            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
+            ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
+            finishAffinity();
+            Handler timer = new Handler();
+            timer.postDelayed(() -> {
+                Bundle bundle_profile = new Bundle();
+                bundle_profile.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
+                bundle_profile.putInt("control", 0);
+                MainActivity.getInstance().GetBundleProfile(bundle_profile);
+                MainActivity.getInstance().CallProfile();
+                ProfileFragment.getInstance().LoadAnotherUser();
+            },500);
+        }
     }
 
     @Override

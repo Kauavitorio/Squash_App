@@ -40,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
@@ -74,6 +75,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         this.joinNow = joinNow;
         this.recycler_view_msg = recycler_view_msg;
         this.chat_id = chat_id;
+        checkMessagesSize();
+    }
+
+    private void checkMessagesSize() {
+        MessageActivity.ShowOrNot_noMessage(mMessages.size() <= 0);
     }
 
     @NonNull

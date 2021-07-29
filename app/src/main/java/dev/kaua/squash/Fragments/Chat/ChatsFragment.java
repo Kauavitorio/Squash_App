@@ -191,7 +191,7 @@ public class ChatsFragment extends Fragment {
                                 !mAccountsBase.get(i).getName_user().equals(mAccounts.get(i).getName_user()) ||
                                 !mAccountsBase.get(i).getSearch().equals(mAccounts.get(i).getSearch()) ||
                                 !mAccountsBase.get(i).getImageURL().equals(mAccounts.get(i).getImageURL()) ||
-                                !mAccountsBase.get(i).getVerification_level().equals(mAccounts.get(i).getVerification_level())){
+                                mAccountsBase.get(i).getVerification_level() != null && !mAccountsBase.get(i).getVerification_level().equals(mAccounts.get(i).getVerification_level())){
                             reload = true;
                         }
                     }
