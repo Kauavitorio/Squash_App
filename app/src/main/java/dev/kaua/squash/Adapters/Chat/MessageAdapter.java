@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.util.Linkify;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +44,8 @@ import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.Methods;
+import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 
 @SuppressWarnings({"IfStatementWithIdenticalBranches", "ConstantConditions"})
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
@@ -97,6 +101,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         final ViewHolder viewHolder = holder;
         DtoMessage message = mMessages.get(position);
         viewHolder.msg_chat_item.setText(EncryptHelper.decrypt(message.getMessage()));
+        //  Apply all url on Texts Views
+        Linkify.addLinks(viewHolder.msg_chat_item, Linkify.WEB_URLS);
+
+        //  URL CLICK'S listener
+        viewHolder.msg_chat_item.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
+            if (Patterns.WEB_URL.matcher(url).matches()) {
+                //An web url is detected
+                Methods.browseTo(mContext, url);
+                return true;
+            }
+            return false;
+        }));
         if(message.getTime() != null){
             String[] time = EncryptHelper.decrypt(message.getTime()).replace("-", "/").split("/");
             viewHolder.msgTime_chat_item.setText(time[2].substring(4));

@@ -18,7 +18,7 @@
     <string name="it_is_necessary_last_name">É necessário inserir pelo menos seu sobrenome.</string>
     <string name="customize_your_experience">Personalize sua experiência</string>
     <string name="get_more_out_to_squash">Aproveite mais o Squash</string>
-    <string name="receive_email_terms">Receba e-mail sobre sua atividade no rio e recomendações.</string>
+    <string name="receive_email_terms">Receba e-mail sobre sua atividade do Squash e recomendações.</string>
     <string name="personalize_based_on_your_inferred">Personalize com base em sua identidade deduzida</string>
     <string name="desc_personalize_based_inferred">Squash sempre personalizará seu experiência baseada em informações que você fornecera, bem como os dispositivos que você usado para fazer login. Quando esta configuração é habilitado, Squash também pode personalizar com base em outras inferências sobre o seu identidade, como dispositivos e navegadores que você não costumava fazer login no Squash ou enviar e-mail endereços e números de telefone semelhantes para aqueles vinculados à sua conta Squash.</string>
     <string name="yes">Sim</string>
