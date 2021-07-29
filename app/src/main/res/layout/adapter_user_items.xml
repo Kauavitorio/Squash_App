@@ -3,16 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="9dp"
-    android:maxHeight="90dp"
-    android:minHeight="90dp"
+    android:padding="6dp"
+    android:maxHeight="80dp"
+    android:minHeight="80dp"
     android:layout_height="wrap_content">
 
     <!-- Container Main -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:padding="8dp"
         android:paddingStart="15dp"
         android:paddingEnd="10dp"
         android:background="@drawable/background_users_chat_list"
@@ -31,12 +31,12 @@
             android:id="@+id/user_name_users"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:layout_toEndOf="@id/profile_image_users"
+            android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
-            android:layout_centerVertical="true"/>
+            android:layout_toEndOf="@id/profile_image_users"
+            android:text="@string/app_name"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
 
         <!-- Image Verification Level -->
         <ImageView

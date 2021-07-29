@@ -3,8 +3,6 @@ package dev.kaua.squash.Fragments;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -129,7 +127,7 @@ public class ChatFragment extends Fragment {
                     else
                         viewPaperAdapter.addFragment(new ChatsFragment(), "(" + unread + ") " + getString(R.string.chats));
 
-                    //viewPaperAdapter.addFragment(new UsersFragment(), "Users");
+                    viewPaperAdapter.addFragment(new UsersFragment(), getString(R.string.following));
                     view_paper_chat.setAdapter(viewPaperAdapter);
                     tab_layout_chat.setupWithViewPager(view_paper_chat);
                 }
@@ -156,6 +154,7 @@ public class ChatFragment extends Fragment {
                 ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
                 return true;
             case R.id.setting_chat:
+                ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
                 Intent i = new Intent(requireActivity(), SettingActivity.class);
                 startActivity(i);
                 return true;
