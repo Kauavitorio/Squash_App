@@ -114,4 +114,14 @@
     <string name="empty_recommendation_feed">Seu feed de recomendação está vazio no momento, volte mais tarde para ver as novidades</string>
     <string name="developer_post">Post do desenvolvedor</string>
     <string name="there_are_no_message">Ainda não há mensagens aqui…</string>
+    <string name="notification_and_sounds">Notificações e sons</string>
+    <string name="privacy_and_security">Privacidade e segurança</string>
+    <string name="data_and_storage">Dados e armazenamento</string>
+    <string name="chats_settings">Configurações de Chats</string>
+    <string name="languages">Idiomas</string>
+    <string name="help">Ajuda</string>
+    <string name="ask_a_question">Fazer uma pergunta</string>
+    <string name="common_questions">Perguntas Frequentes</string>
+    <string name="policy_and_privacy">Política e Privacidade</string>
+    <string name="squash_for_mobile">Squash para Android v%1$S (%2$d)</string>
 </resources>

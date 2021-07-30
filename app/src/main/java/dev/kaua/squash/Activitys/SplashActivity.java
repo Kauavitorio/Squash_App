@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -16,7 +15,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 
-import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.Methods;
@@ -40,8 +38,6 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         getWindow().setStatusBarColor(getColor(R.color.base_color));
         getWindow().setNavigationBarColor(getColor(R.color.base_color));
-        TextView app_version_splash = findViewById(R.id.app_version_splash);
-        app_version_splash.setText( getString(R.string.app_name) + " - " + BuildConfig.VERSION_NAME);
 
         Intent intent = getIntent();
         Uri data = intent.getData();
@@ -95,7 +91,6 @@ public class SplashActivity extends AppCompatActivity {
     void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
-            Log.d("SPLASH_HANDLER", "Text -> " + sharedText);
             Intent goto_main = new Intent(this, MainActivity.class);
             goto_main.putExtra("shortcut", 0);
             goto_main.putExtra("shared", 1);
@@ -110,6 +105,7 @@ public class SplashActivity extends AppCompatActivity {
     void handleSendImage(Intent intent) {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
+            verifyIfUsersLogged();
             Log.d("SPLASH_HANDLER", "image -> " + imageUri);
         }else verifyIfUsersLogged();
     }
@@ -117,6 +113,7 @@ public class SplashActivity extends AppCompatActivity {
     void handleSendMultipleImages(Intent intent) {
         ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
         if (imageUris != null) {
+            verifyIfUsersLogged();
             Log.d("SPLASH_HANDLER", imageUris + "");
         }else verifyIfUsersLogged();
     }
