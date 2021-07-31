@@ -21,10 +21,13 @@ import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
@@ -68,6 +71,7 @@ public abstract class Methods extends MainActivity {
     //  Base API URL
     public static final String BASE_URL = "https://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
+    public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.;])[A-Za-z\\d@$!%*#?&.;]{8,}$";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
 
@@ -88,6 +92,7 @@ public abstract class Methods extends MainActivity {
     private static final Random rand = new Random();
     private static final char[] letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$!@#$!@#$".toCharArray();
     private static final char[] lettersWithoutSpecials = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+    @NonNull
     public static String RandomCharacters (int CharactersAmount) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < CharactersAmount; i++) {
@@ -97,6 +102,7 @@ public abstract class Methods extends MainActivity {
         return sb.toString();
     }
 
+    @NonNull
     public static String RandomCharactersWithoutSpecials (int CharactersAmount) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < CharactersAmount; i++) {
@@ -107,6 +113,8 @@ public abstract class Methods extends MainActivity {
     }
 
     //  Method to return Default Retrofit Builder
+    @NonNull
+    @Contract(" -> new")
     public static Retrofit GetRetrofitBuilder(){
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)

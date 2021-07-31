@@ -20,9 +20,11 @@ import dev.kaua.squash.R;
 
 @SuppressWarnings({"deprecation", "UseCompatLoadingForDrawables"})
 public abstract class ToastHelper {
+    public static final int LONG_DURATION = 1;
+    public static final int SHORT_DURATION = 0;
 
     private static Toast toast_item;
-    public static void toast(@NonNull Activity activity, String msg, int time){
+    public static void toast(@NonNull Activity activity, String msg, int LENGTH){
         LayoutInflater inflater = activity.getLayoutInflater();
         View layout = inflater.inflate(R.layout.adapter_custom_toast, activity.findViewById(R.id.custom_toast_layout));
         layout.setBackgroundDrawable(activity.getDrawable(R.drawable.background_custom_toast));
@@ -31,8 +33,7 @@ public abstract class ToastHelper {
         if(toast_item != null) toast_item.cancel();
         toast_item = new Toast(activity.getApplicationContext());
         toast_item.setGravity(Gravity.CENTER, 0, 0);
-        if(time == 0) toast_item.setDuration(Toast.LENGTH_SHORT);
-        else toast_item.setDuration(Toast.LENGTH_LONG);
+        toast_item.setDuration(LENGTH);
         toast_item.setView(layout);
         toast_item.show();
     }

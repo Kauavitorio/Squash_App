@@ -4,8 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Patterns;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -30,7 +34,9 @@ public class SignInActivity extends AppCompatActivity {
     private static SignInActivity instance;
     private Button btn_next;
     private ImageView btn_back;
+    private TextView txt_forget_password;
     private TextInputEditText edit_login_method, edit_password;
+    private Animation myAnim;
 
     private String login_method, password;
 
@@ -42,12 +48,22 @@ public class SignInActivity extends AppCompatActivity {
         SetTextWatcher();
 
         btn_next.setOnClickListener(v -> {
+            btn_next.startAnimation(myAnim);
             login_method = Objects.requireNonNull(edit_login_method.getText()).toString();
             password = Objects.requireNonNull(edit_password.getText()).toString();
             Login.DoLogin(this, login_method, password);
         });
 
         btn_back.setOnClickListener(v -> goTo_intro());
+
+        txt_forget_password.setOnClickListener(v -> {
+            Intent i = new Intent(this, ForgotPasswordActivity.class);
+            if(edit_login_method.getText() != null &&
+                    Patterns.EMAIL_ADDRESS.matcher(edit_login_method.getText().toString().replace(" ", "")).matches())
+            i.putExtra("email", edit_login_method.getText().toString());
+            else i.putExtra("email", "");
+            startActivity(i);
+        });
     }
 
     private void SetTextWatcher(){
@@ -83,9 +99,11 @@ public class SignInActivity extends AppCompatActivity {
 
     private void Ids() {
         instance = this;
+        myAnim = AnimationUtils.loadAnimation(this,R.anim.click_anim);
         edit_login_method = findViewById(R.id.edit_login_method_signIn);
         edit_password = findViewById(R.id.edit_password_signIn);
         btn_next = findViewById(R.id.btn_next_signIn);
+        txt_forget_password = findViewById(R.id.txt_forget_password);
         btn_back = findViewById(R.id.btn_back_signIn);
         getWindow().setStatusBarColor(getColor(R.color.base_color));
         getWindow().setNavigationBarColor(getColor(R.color.base_color));
@@ -104,6 +122,7 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void goTo_intro() {
+        btn_back.startAnimation(myAnim);
         Intent goTo_intro = new Intent(this, IntroActivity.class);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_right_back, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goTo_intro, activityOptionsCompat.toBundle());

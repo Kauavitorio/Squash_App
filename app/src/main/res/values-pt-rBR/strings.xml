@@ -38,7 +38,7 @@
     <string name="resend_code">Reenviar código</string>
     <string name="resend_code_desc">Caso não tenha obtido o código de validacão em seu email basta clicar no botão <font color='#10ace0'>reenviar código</font> para recerber o código.</string>
     <string name="the_validation_code_is_invalid">O código de validação é inválido.</string>
-    <string name="unable_to_login">Não foi possível entrar na sua conta, devido à pendência na pendência do seu email.</string>
+    <string name="unable_to_login">Não foi possível entrar na sua conta, devido à pendência de validação do seu email.</string>
     <string name="account_will_not_be_validated_leave">Se você sair desta página, sua conta não será validada e você não poderá fazer o login.\nQuer mesmo sair?</string>
     <string name="phone_email_or_username">Telefone, e-mail ou nome de usuário.</string>
     <string name="login_to_squash">Entrar no Squash.</string>
@@ -124,4 +124,8 @@
     <string name="common_questions">Perguntas Frequentes</string>
     <string name="policy_and_privacy">Política e Privacidade</string>
     <string name="squash_for_mobile">Squash para Android v%1$S (%2$d)</string>
+    <string name="confirm_your_password">Confirme sua senha</string>
+    <string name="passwords_do_not_match">As senhas não coincidem</string>
+    <string name="password_has_successfully_been_changed">A senha foi alterada com sucesso</string>
+    <string name="we_send_validation_code">Enviamos para <b>%1$s</b> um código de validação, insira o seguinte </string>
 </resources>

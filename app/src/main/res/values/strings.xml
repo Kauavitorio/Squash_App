@@ -132,4 +132,8 @@
     <string name="common_questions">Common questions</string>
     <string name="policy_and_privacy">Policy and Privacy</string>
     <string name="squash_for_mobile">Squash for Android v%1$S (%2$d)</string>
+    <string name="confirm_your_password">Confirm your password</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="password_has_successfully_been_changed">Password has successfully been changed</string>
+    <string name="we_send_validation_code">We send to <b>%1$s</b> a validation code, insert the below</string>
 </resources>

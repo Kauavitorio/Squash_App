@@ -26,6 +26,7 @@ public class EncryptHelper {
 
     public static String encrypt(String str) {
         try {
+            if(str == null) return null;
             // str(utf8) -> bytes -> encrypt -> bytes -> base64(ascii)
             return new String(Base64.getEncoder().encode(encrypt(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.ISO_8859_1);
         } catch (Exception e) {
@@ -37,7 +38,7 @@ public class EncryptHelper {
         }
     }
 
-    public static byte[] encrypt(byte[] data) {
+    private static byte[] encrypt(byte[] data) {
         try {
             Cipher cipher = Cipher.getInstance(StorageKeys.ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, getEncryptionKey());
@@ -66,7 +67,7 @@ public class EncryptHelper {
         }
     }
 
-    public static byte[] decrypt(byte[] data) {
+    private static byte[] decrypt(byte[] data) {
         try {
             Cipher cipher = Cipher.getInstance(StorageKeys.ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, getEncryptionKey());

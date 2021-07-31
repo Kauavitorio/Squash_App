@@ -33,4 +33,13 @@ public interface    AccountServices {
 
     @POST("user/action/check-username")
     Call<DtoAccount> check_username (@Body DtoAccount account);
+
+    @POST("user/action/request/forgot-password")
+    Call<DtoAccount> forgot_password (@Body DtoAccount account);
+
+    @POST("user/action/change-password")
+    Call<DtoAccount> change_password (@Body DtoAccount account);
+
+    @POST("user/action/check/validation-code")
+    Call<DtoAccount> check_validation_code (@Body DtoAccount account);
 }

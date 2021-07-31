@@ -20,7 +20,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activitys.ShareContentActivity"></activity>
+        <activity
+            android:name=".Activitys.ForgotPasswordActivity"
+            android:exported="true" />
+        <activity android:name=".Activitys.ShareContentActivity" />
         <activity android:name=".Activitys.SettingActivity" />
         <activity android:name=".Activitys.WebActivity" />
         <activity android:name=".Activitys.PostDetailsActivity" />
@@ -33,7 +36,8 @@
         <activity android:name=".Activitys.MainActivity" />
         <activity android:name=".Activitys.ValidateEmailActivity" />
         <activity android:name=".Activitys.TermsAccountActivity" />
-        <activity android:name=".Activitys.SplashActivity"
+        <activity
+            android:name=".Activitys.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
