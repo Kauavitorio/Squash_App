@@ -89,7 +89,7 @@ public class MainFragment extends Fragment {
 
         swipe_posts.setOnRefreshListener(MainFragment::RefreshRecycler);
 
-        loadMsgNotRead();
+        //loadMsgNotRead();
         loadCheckSystemInfo();
 
         return view;
@@ -170,6 +170,7 @@ public class MainFragment extends Fragment {
     private void Ids(View view) {
         instance = requireActivity();
         requireActivity().getWindow().setStatusBarColor(requireActivity().getColor(R.color.background_menu_sheet));
+        requireActivity().getWindow().setNavigationBarColor(requireActivity().getColor(R.color.base_color));
         firebaseUser = ConfFirebase.getFirebaseUser();
         account = MyPrefs.getUserInformation(requireContext());
         loadingPanel = view.findViewById(R.id.loadingPanel);

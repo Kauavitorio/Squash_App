@@ -18,10 +18,7 @@
         android:id="@+id/container_bottom_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:paddingEnd="30dp"
-        android:paddingStart="30dp"
+        android:minHeight="45dp"
         android:background="@drawable/background_bottom_main"
         android:layout_alignParentBottom="true"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -29,42 +26,64 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <!-- Btn Home -->
-        <ImageView
-            android:id="@+id/btn_home_main"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_home"
+        <RelativeLayout
+            android:id="@+id/click_home"
+            android:layout_width="60dp"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/relativeLayout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Image Home -->
+            <ImageView
+                android:id="@+id/btn_home_main"
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/ic_home"
+                tools:ignore="ContentDescription" />
+
+        </RelativeLayout>
 
         <!-- Btn Search -->
-        <ImageView
-            android:id="@+id/btn_search_main"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_search_select"
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="60dp"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/container_btn_profile_main"
-            app:layout_constraintStart_toEndOf="@+id/btn_home_main"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription" />
-
-        <LinearLayout
-            android:id="@+id/container_btn_profile_main"
-            android:layout_width="35dp"
-            android:orientation="vertical"
-            android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Image Search -->
+            <ImageView
+                android:id="@+id/btn_search_main"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/ic_search_select"
+                tools:ignore="ContentDescription" />
+
+        </RelativeLayout>
+
+        <!-- Btn Profile -->
+        <RelativeLayout
+            android:id="@+id/container_btn_profile_main"
+            android:layout_width="60dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/relativeLayout"
             app:layout_constraintTop_toTopOf="parent">
 
             <!-- Img User With Profile btn -->
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/btn_profile_main"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_gravity="center"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
                 android:src="@drawable/ic_profile_default"
                 app:civ_border_color="@color/base_color"
                 app:civ_border_width="0dp" />
@@ -72,14 +91,14 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="5dp"
                 android:layout_height="5dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:visibility="gone"
                 app:cardBackgroundColor="@color/base_color"
-                app:cardCornerRadius="10dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp" />
+                app:cardCornerRadius="10dp" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
