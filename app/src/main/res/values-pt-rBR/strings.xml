@@ -128,4 +128,5 @@
     <string name="passwords_do_not_match">As senhas não coincidem</string>
     <string name="password_has_successfully_been_changed">A senha foi alterada com sucesso</string>
     <string name="we_send_validation_code">Enviamos para <b>%1$s</b> um código de validação, insira o seguinte </string>
+    <string name="slide_to_cancel">Deslize para cancelar</string>
 </resources>

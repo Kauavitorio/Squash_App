@@ -40,6 +40,96 @@
         android:layout_height="wrap_content"
         tools:ignore="UselessParent">
 
+
+        <LinearLayout
+            android:id="@+id/voicePlayerView"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Btn play and pause -->
+            <LinearLayout
+                android:layout_width="32dp"
+                android:layout_height="match_parent">
+
+                <!-- Btn play -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/play_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/base_color"
+                    app:cardCornerRadius="20dp">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_play"
+                        tools:ignore="ContentDescription" />
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Btn pause -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/pause_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    app:cardBackgroundColor="@color/base_color"
+                    app:cardCornerRadius="20dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_pause"
+                        tools:ignore="ContentDescription" />
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <!-- Audio Body -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_marginStart="5dp"
+                android:layout_height="match_parent">
+
+                <!-- SeekBar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent">
+
+                    <SeekBar
+                        android:id="@+id/audio_seek_bar"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <!-- Timer -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_weight="0"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/audio_timer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_name"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
         <ImageView
             android:id="@+id/img_seen"
             android:layout_width="15dp"

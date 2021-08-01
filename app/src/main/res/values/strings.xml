@@ -136,4 +136,5 @@
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="password_has_successfully_been_changed">Password has successfully been changed</string>
     <string name="we_send_validation_code">We send to <b>%1$s</b> a validation code, insert the below</string>
+    <string name="slide_to_cancel">Slide to Cancel</string>
 </resources>

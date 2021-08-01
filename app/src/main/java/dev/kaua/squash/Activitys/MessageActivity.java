@@ -2,6 +2,7 @@ package dev.kaua.squash.Activitys;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,6 +11,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
+import android.os.Vibrator;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,9 +20,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -34,6 +40,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -47,17 +54,24 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Adapters.AudioRecorder;
 import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
 import dev.kaua.squash.Adapters.Chat.MessageAdapter;
 import dev.kaua.squash.Adapters.Chat.SwipeReply;
+import dev.kaua.squash.Adapters.ViewProxy;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Data.Message.DtoMessage;
@@ -91,6 +105,7 @@ import retrofit2.Response;
  *  @author Kaua Vitorio
  **/
 
+@SuppressLint("SetTextI18n")
 @SuppressWarnings({"deprecation", "StaticFieldLeak", "FieldCanBeLocal"})
 public class MessageActivity extends AppCompatActivity {
 
@@ -98,11 +113,12 @@ public class MessageActivity extends AppCompatActivity {
     public static ConstraintLayout container_no_message_yet;
     public static ImageView background_chat;
     public static ImageView btn_more_medias;
+    public static LinearLayout container_edit_text;
     public static MessageActivity instance;
     private TextView txt_user_name, txt_isOnline_chat, txtQuotedMsg;
     private static RecyclerView recycler_view_msg;
     private EditText text_send;
-    private CardView btn_send;
+    private CardView btn_send, btn_rec_audio;
     private String message_to_reply;
     private ImageView verification_ic;
     private String reply_from;
@@ -111,6 +127,8 @@ public class MessageActivity extends AppCompatActivity {
     private ValueEventListener seenListener;
     public static DtoAccount user_im_chat;
     private static final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
+    private static final String[] permissions_audio = { Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE };
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
     public static FirebaseUser fUser;
 
@@ -134,6 +152,23 @@ public class MessageActivity extends AppCompatActivity {
 
     Intent intent;
 
+
+    private TextView recordTimeText;
+    private View recordPanel;
+    private View slideText;
+    private boolean recording;
+    private float startedDraggingX = -1;
+    private float distCanMove = dp(80);
+    private long startTime = 0L;
+    long timeInMilliseconds = 0L;
+    long timeSwapBuff = 0L;
+    long updatedTime = 0L;
+    private Timer timer;
+    private float x1,x2;
+    static final int MIN_DISTANCE = dp(400);
+    AudioRecorder audioRecorder;
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -221,8 +256,19 @@ public class MessageActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.toString().trim().length() == 0) Methods.typingTo_chat_Status("noOne");
-                else Methods.typingTo_chat_Status(userId);
+                if(s.toString().trim().length() == 0) {
+                    Methods.typingTo_chat_Status("noOne");
+                    btn_rec_audio.setVisibility(View.VISIBLE);
+                    btn_send.setVisibility(View.GONE);
+                }
+                else {
+                    recordPanel.setVisibility(View.GONE);
+                    btn_rec_audio.setVisibility(View.GONE);
+                    btn_send.setVisibility(View.VISIBLE);
+                    container_edit_text.setVisibility(View.VISIBLE);
+                    btn_more_medias.setVisibility(View.VISIBLE);
+                    Methods.typingTo_chat_Status(userId);
+                }
             }
             @Override
             public void afterTextChanged(Editable s) {}
@@ -255,8 +301,224 @@ public class MessageActivity extends AppCompatActivity {
         //  Profile Image click
         profile_image.setOnClickListener(v -> OpenUserProfile());
 
+        btn_rec_audio.setOnTouchListener((view, motionEvent) -> {
+            UserPermissions.validatePermissions(permissions_audio, instance, REQUEST_RECORD_AUDIO_PERMISSION);
+            int RECORD_PERMISSION = ContextCompat.checkSelfPermission(instance, Manifest.permission.RECORD_AUDIO);
+            if (RECORD_PERMISSION == PackageManager.PERMISSION_GRANTED){
+
+                x2 = motionEvent.getX();
+                float deltaX = x2 - x1;
+                Log.d("RECORD_AUDIO", "MIN -> " + MIN_DISTANCE);
+                Log.d("RECORD_AUDIO", "CURRENT -> " + deltaX);
+
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    if(!recording){
+                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) slideText
+                                .getLayoutParams();
+                        params.leftMargin = dp(30);
+                        slideText.setLayoutParams(params);
+                        ViewProxy.setAlpha(slideText, 1);
+                        startedDraggingX = -1;
+                        // startRecording();
+                        StartRecord();
+                        btn_rec_audio.getParent()
+                                .requestDisallowInterceptTouchEvent(true);
+                    }
+                } else if (Math.abs(deltaX) >= MIN_DISTANCE && motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if(recording){
+                        startedDraggingX = -1;
+                        Log.d("RECORD_AUDIO", "CANCEL ACTION");
+                        StopRecord(true);
+                        // stopRecording(true);
+                    }
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                    float x = motionEvent.getX();
+                    /*if (x < -distCanMove) {
+                        StopRecord(false);
+                        // stopRecording(false);
+                    }*/
+                    x = x + ViewProxy.getX(btn_rec_audio);
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) slideText
+                            .getLayoutParams();
+                    if (startedDraggingX != -1) {
+                        float dist = (x - startedDraggingX);
+                        params.leftMargin = dp(30) + (int) dist;
+                        slideText.setLayoutParams(params);
+                        float alpha = 1.0f + dist / distCanMove;
+                        if (alpha > 1) alpha = 1;
+                        else if (alpha < 0)
+                            alpha = 0;
+                        ViewProxy.setAlpha(slideText, alpha);
+                    }
+                    if (x <= ViewProxy.getX(slideText) + slideText.getWidth()
+                            + dp(30)) {
+                        if (startedDraggingX == -1) {
+                            startedDraggingX = x;
+                            distCanMove = (recordPanel.getMeasuredWidth()
+                                    - slideText.getMeasuredWidth() - dp(48)) / 2.0f;
+                            if (distCanMove <= 0)
+                                distCanMove = dp(80);
+                            else if (distCanMove > dp(80))
+                                distCanMove = dp(80);
+                        }
+                    }
+                    if (params.leftMargin > dp(30)) {
+                        params.leftMargin = dp(30);
+                        slideText.setLayoutParams(params);
+                        ViewProxy.setAlpha(slideText, 1);
+                        startedDraggingX = -1;
+                    }
+                }else if (motionEvent.getAction() == MotionEvent.ACTION_UP){
+                    if(recording){
+                        startedDraggingX = -1;
+                        Log.d("RECORD_AUDIO", "SENT ACTION");
+                        StopRecord(false);
+                    }
+                }
+                view.onTouchEvent(motionEvent);
+                return true;
+            }
+            return true;
+        });
+
         seenMessage(userId);
         setRecyclerSwipe();
+    }
+
+    private static String fileName = null;
+    private void StartRecord() {
+        UserPermissions.validatePermissions(permissions_audio, instance, REQUEST_RECORD_AUDIO_PERMISSION);
+        int RECORD_PERMISSION = ContextCompat.checkSelfPermission(instance, Manifest.permission.RECORD_AUDIO);
+        if (RECORD_PERMISSION == PackageManager.PERMISSION_GRANTED){
+            try {
+                recording = true;
+                // Record to the external cache directory for visibility
+                fileName = getExternalCacheDir().getAbsolutePath();
+                @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                fileName += "/squash_" + timeStamp + ".3gp";
+                audioRecorder = new AudioRecorder(fileName);
+                audioRecorder.start();
+                recordPanel.setVisibility(View.VISIBLE);
+                container_edit_text.setVisibility(View.GONE);
+                btn_more_medias.setVisibility(View.GONE);
+                startTime = SystemClock.uptimeMillis();
+                timer = new Timer();
+                MyTimerTask myTimerTask = new MyTimerTask();
+                timer.schedule(myTimerTask, 1000, 1000);
+                vibrate();
+            }catch (Exception ex){
+                recording = false;
+                Log.d("RECORD_AUDIO", ex.getMessage());
+                StopRecord(true);
+                Warnings.showWeHaveAProblem(this);
+            }
+        }
+    }
+
+    private void StopRecord(boolean cancel) {
+        recording = false;
+        try {
+            if (!cancel) {
+                recordPanel.setVisibility(View.GONE);
+                container_edit_text.setVisibility(View.VISIBLE);
+                btn_more_medias.setVisibility(View.VISIBLE);
+                String audio_path = audioRecorder.stop();
+                String record_time = recordTimeText.getText().toString();
+                String[] record_time_split = record_time.split(":");
+                if (timer != null && !record_time.equals("00:00") && Integer.parseInt(record_time_split[1]) > 0) {
+                    @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    Uri uriAudio = Uri.fromFile(new File(audio_path).getAbsoluteFile());
+                    LoadingDialog loadingDialog = new LoadingDialog(this);
+                    loadingDialog.startLoading();
+                    storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid())
+                            .child("audios").child("squash_audio_" + timeStamp + ".3gp");
+                    storageReference.putFile(uriAudio).addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            loadingDialog.dismissDialog();
+                            Log.d("RECORD_AUDIO", Objects.requireNonNull(task.getException()).toString());
+                        }
+                        if (task.getResult().getMetadata() != null) {
+                            if (task.getResult().getMetadata().getReference() != null) {
+                                Task<Uri> result = task.getResult().getStorage().getDownloadUrl();
+                                result.addOnSuccessListener(uri -> {
+                                    loadingDialog.dismissDialog();
+                                    String audio_download = uri.toString();
+                                    medias_pin = new ArrayList<>();
+                                    medias_pin.add(audio_download);
+                                    sendMessage(fUser.getUid(), userId, text_send.getText().toString());
+                                    Log.d("RECORD_AUDIO", "OK UPLOAD");
+                                });
+                            } else
+                                loadingDialog.dismissDialog();
+                        }
+                    });
+                }
+
+                if(timer != null)
+                    timer.cancel();
+
+                recordTimeText.setText("00:00");
+                vibrate();
+            } else {
+                recordPanel.setVisibility(View.GONE);
+                container_edit_text.setVisibility(View.VISIBLE);
+                btn_more_medias.setVisibility(View.VISIBLE);
+                String audio_path = audioRecorder.stop();
+                Log.d("RECORD_AUDIO", "CANCEL -> " + audio_path);
+
+                if(timer != null)
+                    timer.cancel();
+
+                recordTimeText.setText("00:00");
+                vibrate();
+            }
+        }catch (Exception ex){
+            Log.d("RECORD_AUDIO", ex.toString());
+            Warnings.showWeHaveAProblem(this);
+        }
+    }
+
+    private void vibrate() {
+        try {
+            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int dp(float value) {
+        return (int) Math.ceil(1 * value);
+    }
+
+    class MyTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
+            updatedTime = timeSwapBuff + timeInMilliseconds;
+            @SuppressLint("DefaultLocale") final String hms = String.format(
+                    "%02d:%02d",
+                    TimeUnit.MILLISECONDS.toMinutes(updatedTime)
+                            - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
+                            .toHours(updatedTime)),
+                    TimeUnit.MILLISECONDS.toSeconds(updatedTime)
+                            - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+                            .toMinutes(updatedTime)));
+            long lastSec = TimeUnit.MILLISECONDS.toSeconds(updatedTime)
+                    - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+                    .toMinutes(updatedTime));
+            System.out.println(lastSec + " hms " + hms);
+            runOnUiThread(() -> {
+                try {
+                    if (recordTimeText != null)
+                        recordTimeText.setText(hms);
+                } catch (Exception e) {
+                    // TODO: handle exception
+                }
+
+            });
+        }
     }
 
     private void checkChatList(String userId) {
@@ -301,17 +563,24 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void Ids() {
-        instance = this;
+        instance = MessageActivity.this;
         chatDB = new DaoChat(MessageActivity.this);
         profile_image = findViewById(R.id.profile_image_chat);
+        recordPanel = findViewById(R.id.record_panel);
+        recordTimeText = findViewById(R.id.recording_time_text);
         btn_more_medias = findViewById(R.id.btn_more_medias);
+        TextView textView = findViewById(R.id.slideToCancelTextView);
+        textView.setText(getString(R.string.slide_to_cancel));
         container_no_message_yet = findViewById(R.id.container_no_message_yet);
         txt_user_name = findViewById(R.id.txt_username_chat);
+        slideText = findViewById(R.id.slideText);
         recycler_view_msg = findViewById(R.id.recycler_view_msg);
         verification_ic = findViewById(R.id.verification_ic_message);
         txt_isOnline_chat = findViewById(R.id.txt_isOnline_chat);
+        btn_rec_audio = findViewById(R.id.container_btn_rec_audio);
         reply_layout = findViewById(R.id.reply_layout);
         background_chat = findViewById(R.id.background_chat);
+        container_edit_text = findViewById(R.id.container_edit_text_chat);
         txtQuotedMsg = findViewById(R.id.txtQuotedMsg);
         cancelButton = findViewById(R.id.cancelButton);
         text_send = findViewById(R.id.text_send);
@@ -323,6 +592,8 @@ public class MessageActivity extends AppCompatActivity {
         linearLayoutManager.setStackFromEnd(true);
         recycler_view_msg.setLayoutManager(linearLayoutManager);
         getWindow().setStatusBarColor(getColor(R.color.black_intro));
+        recordPanel.setVisibility(View.GONE);
+        container_edit_text.setVisibility(View.VISIBLE);
     }
 
     private void seenMessage(String userUid){
