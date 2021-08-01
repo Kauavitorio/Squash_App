@@ -137,4 +137,9 @@
     <string name="password_has_successfully_been_changed">Password has successfully been changed</string>
     <string name="we_send_validation_code">We send to <b>%1$s</b> a validation code, insert the below</string>
     <string name="slide_to_cancel">Slide to Cancel</string>
+    <string name="enter_email_to_start_password_reset">Enter your account email and we\'ll send you a validation code to start the password reset process</string>
+    <string name="all_right_enter_your_new_password">All right, enter your new password below to reset your password.</string>
+    <string name="increase_media_volume">Increase media volume to listen to audio</string>
+    <string name="audio">Audio</string>
+    <string name="media">Media</string>
 </resources>

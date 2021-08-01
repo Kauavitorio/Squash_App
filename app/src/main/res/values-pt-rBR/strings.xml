@@ -129,4 +129,9 @@
     <string name="password_has_successfully_been_changed">A senha foi alterada com sucesso</string>
     <string name="we_send_validation_code">Enviamos para <b>%1$s</b> um código de validação, insira o seguinte </string>
     <string name="slide_to_cancel">Deslize para cancelar</string>
+    <string name="enter_email_to_start_password_reset">Insira o e-mail da sua conta e enviaremos um código de validação para iniciar o processo de redefinição de senha</string>
+    <string name="all_right_enter_your_new_password">Tudo certo, digite sua nova senha abaixo para a redefinição.</string>
+    <string name="increase_media_volume">Aumente o volume de mídia para ouvir o audio</string>
+    <string name="audio">Áudio</string>
+    <string name="media">Mídia</string>
 </resources>

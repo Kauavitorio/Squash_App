@@ -132,7 +132,8 @@
         android:id="@+id/container_edits_chat"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/custom_edit_chat"
         android:minHeight="40dp"
@@ -233,6 +234,7 @@
 
         </LinearLayout>
 
+        <!-- Container Buttons -->
         <LinearLayout
             android:id="@+id/container_btns_chat"
             android:layout_width="wrap_content"
@@ -277,6 +279,8 @@
                 android:layout_marginEnd="10dp"
                 app:cardBackgroundColor="@color/base_color"
                 app:cardCornerRadius="20dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -298,13 +302,14 @@
 
         </LinearLayout>
 
+        <!-- Voice Recording Container -->
         <FrameLayout
             android:id="@+id/record_panel"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_gravity="bottom"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="2dp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -317,49 +322,59 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginLeft="30dp"
-                android:orientation="horizontal">
+                android:layout_marginStart="30dp"
+                android:orientation="horizontal"
+                tools:ignore="UseCompoundDrawables">
 
+                <!-- Arrow Image -->
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginTop="1dp"
-                    android:src="@drawable/slidearrow" />
+                    android:src="@drawable/slidearrow"
+                    tools:ignore="ContentDescription" />
 
+                <!-- Swipe to cancel Text -->
                 <TextView
                     android:id="@+id/slideToCancelTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="6dp"
-                    android:textColor="#999999"
-                    android:textSize="12dp" />
+                    android:layout_marginStart="6dp"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
             </LinearLayout>
 
+            <!-- Recording Info -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingLeft="13dp">
+                android:paddingStart="13dp"
+                tools:ignore="RtlSymmetry">
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <!-- Rec Animation -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginTop="1dp"
-                    android:src="@drawable/rec" />
+                    app:lottie_rawRes="@raw/recording_blink"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"/>
 
+                <!-- Recording time -->
                 <TextView
                     android:id="@+id/recording_time_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="6dp"
+                    android:layout_marginStart="6dp"
                     android:text="00:00"
                     android:textColor="@color/base_color"
-                    android:textSize="16dp" />
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
         </FrameLayout>
 

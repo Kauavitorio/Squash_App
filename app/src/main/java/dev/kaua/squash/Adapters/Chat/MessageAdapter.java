@@ -1,8 +1,12 @@
 package dev.kaua.squash.Adapters.Chat;
 
+import static android.content.Context.AUDIO_SERVICE;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
@@ -52,6 +56,7 @@ import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.ToastHelper;
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 
 @SuppressWarnings({"IfStatementWithIdenticalBranches", "ConstantConditions"})
@@ -72,6 +77,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private MediaPlayer mediaPlayer;
     private Handler handler = new Handler();
     private Runnable runnable;
+    private Animation myAnim;
     FirebaseUser fUser = ConfFirebase.getFirebaseUser();
 
     public MessageAdapter(MessageActivity mContext, List<DtoMessage> mMessages, String imageURL, int joinNow, RecyclerView recycler_view_msg
@@ -84,6 +90,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         this.joinNow = joinNow;
         this.recycler_view_msg = recycler_view_msg;
         this.chat_id = chat_id;
+        myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
         checkMessagesSize();
     }
 
@@ -95,17 +102,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @NotNull
     @Override
     public MessageAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
         View view;
         if(viewType == MSG_TYPE_RIGHT){
-            view = LayoutInflater.from(mContext).inflate(R.layout.adapter_chat_item_right, parent, false);
+            view = LayoutInflater.from(context).inflate(R.layout.adapter_chat_item_right, parent, false);
             return new ViewHolder(view);
         }
         else if(viewType == MSG_TYPE_START){
-            view = LayoutInflater.from(mContext).inflate(R.layout.adapter_start_chat, parent, false);
+            view = LayoutInflater.from(context).inflate(R.layout.adapter_start_chat, parent, false);
             return new ViewHolder(view);
         }
         else{
-            view = LayoutInflater.from(mContext).inflate(R.layout.adapter_chat_item_left, parent, false);
+            view = LayoutInflater.from(context).inflate(R.layout.adapter_chat_item_left, parent, false);
             return new ViewHolder(view);
         }
     }
@@ -113,6 +121,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
     @Override
     public void onBindViewHolder(@NonNull @NotNull MessageAdapter.ViewHolder holder, int position) {
+        Context context = holder.itemView.getContext();
         final ViewHolder viewHolder = holder;
         DtoMessage message = mMessages.get(position);
         viewHolder.msg_chat_item.setText(EncryptHelper.decrypt(message.getMessage()));
@@ -123,7 +132,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         viewHolder.msg_chat_item.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
             if (Patterns.WEB_URL.matcher(url).matches()) {
                 //An web url is detected
-                Methods.browseTo(mContext, url);
+                Methods.browseTo(context, url);
                 return true;
             }
             return false;
@@ -159,8 +168,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.audio_timer.setText(convertFormat(MediaPlayer.create(mContext, Uri.parse(mMessages.get(position).getMedia().get(0))).getDuration()));
 
                 holder.play_button.setOnClickListener(v -> {
+                    AudioManager am = (AudioManager) context.getSystemService(AUDIO_SERVICE);
+                    if(am.getStreamVolume(AudioManager.STREAM_MUSIC) == 0)
+                        ToastHelper.toast(mContext, mContext.getString(R.string.increase_media_volume), 0);
+
                     ResetHandlers();
-                    mediaPlayer = MediaPlayer.create(mContext, Uri.parse(mMessages.get(position).getMedia().get(0)));
+                    mediaPlayer = MediaPlayer.create(context, Uri.parse(mMessages.get(position).getMedia().get(0)));
                     runnable = new Runnable() {
                         @Override
                         public void run() {
@@ -201,6 +214,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         if(fromUser){
+                            if(mediaPlayer != null)
                             mediaPlayer.seekTo(progress);
                         }
 
@@ -232,7 +246,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.voicePlayerView.setVisibility(View.GONE);
                 viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
                 viewHolder.media_img.setVisibility(View.VISIBLE);
-                Glide.with(mContext).load(message.getMedia().get(0)).listener(new RequestListener<Drawable>() {
+                Glide.with(context).load(message.getMedia().get(0)).listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         viewHolder.progress_media_img_chat.setVisibility(View.GONE);
@@ -264,7 +278,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             }
         }else viewHolder.img_seen.setVisibility(View.GONE);
 
-        viewHolder.container_msg.setOnLongClickListener(v -> {
+        viewHolder.message_container.setOnLongClickListener(v -> {
+            viewHolder.container_msg.startAnimation(myAnim);
+            viewHolder.voicePlayerView.startAnimation(myAnim);
+            if(mMessages.get(viewHolder.getAdapterPosition()).getSender().equals(fUser.getUid()))
+                delete(viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
+            return false;
+        });
+
+        viewHolder.msg_chat_item.setOnLongClickListener(v -> {
+            viewHolder.container_msg.startAnimation(myAnim);
+            viewHolder.voicePlayerView.startAnimation(myAnim);
             if(mMessages.get(viewHolder.getAdapterPosition()).getSender().equals(fUser.getUid()))
                 delete(viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
             return false;
@@ -343,7 +367,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         private final TextView msg_chat_item, msgTime_chat_item, txt_reply_from, reply_content;
         private final CircleImageView profile_image_item;
-        private final ConstraintLayout container_msg;
+        private final ConstraintLayout container_msg, message_container;
         private final ConstraintLayout container_reply;
         private final ConstraintLayout container_media_img_chat;
         private final ImageView media_img;
@@ -364,6 +388,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             pause_button = itemView.findViewById(R.id.pause_button);
             audio_timer = itemView.findViewById(R.id.audio_timer);
             audio_seek_bar = itemView.findViewById(R.id.audio_seek_bar);
+            message_container = itemView.findViewById(R.id.message_container);
             media_img = itemView.findViewById(R.id.media_img);
             voicePlayerView = itemView.findViewById(R.id.voicePlayerView);
             progress_media_img_chat = itemView.findViewById(R.id.progress_media_img_chat);

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:id="@+id/message_container"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp"
@@ -11,7 +12,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@drawable/background_desc_encrypted_chat">
+        android:background="@drawable/background_desc_encrypted_chat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,12 +25,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxWidth="300dp"
                 android:layout_gravity="center"
+                android:maxWidth="300dp"
+                android:text="@string/desc_encrypted_message_chat"
                 android:textAlignment="center"
-                android:textSize="14sp"
                 android:textColor="@color/white"
-                android:text="@string/desc_encrypted_message_chat"/>
+                android:textSize="14sp" />
 
         </LinearLayout>
 
@@ -35,9 +39,11 @@
     <!-- Container Message Body -->
     <RelativeLayout
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:maxWidth="300dp"
         android:visibility="gone"
-        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="UselessParent">
 
 
@@ -94,35 +100,35 @@
             <!-- Audio Body -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:orientation="vertical"
+                android:layout_height="match_parent"
                 android:layout_marginStart="5dp"
-                android:layout_height="match_parent">
+                android:orientation="vertical">
 
                 <!-- SeekBar -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
 
                     <SeekBar
                         android:id="@+id/audio_seek_bar"
                         android:layout_width="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
 
                 </LinearLayout>
 
                 <!-- Timer -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_weight="0"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0">
 
                     <TextView
                         android:id="@+id/audio_timer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/app_name"/>
+                        android:text="@string/app_name" />
 
                 </LinearLayout>
 
@@ -134,11 +140,11 @@
             android:id="@+id/img_seen"
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@drawable/ic_seen"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="2dp"
             android:layout_below="@id/container_msg"
             android:layout_alignParentEnd="true"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
+            android:src="@drawable/ic_seen"
             tools:ignore="ContentDescription" />
 
 
@@ -147,8 +153,8 @@
             android:id="@+id/container_media_img_chat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxHeight="260dp"
             android:maxWidth="220dp"
+            android:maxHeight="260dp"
             android:visibility="visible">
 
             <ProgressBar
@@ -164,13 +170,13 @@
                 android:id="@+id/media_img"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:maxHeight="260dp"
-                android:maxWidth="220dp"
-                android:minHeight="260dp"
-                android:minWidth="220dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginBottom="5dp"
                 android:adjustViewBounds="true"
+                android:maxWidth="220dp"
+                android:maxHeight="260dp"
+                android:minWidth="220dp"
+                android:minHeight="260dp"
                 tools:ignore="ContentDescription" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -180,41 +186,41 @@
             android:id="@+id/profile_image_chat_item"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:visibility="gone"
-            android:src="@mipmap/ic_launcher"/>
+            android:src="@mipmap/ic_launcher"
+            android:visibility="gone" />
 
         <!-- Container Message Main -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/container_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/profile_image_chat_item"
-            android:padding="8dp"
-            android:orientation="vertical"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/background_right_msg">
+            android:layout_toEndOf="@id/profile_image_chat_item"
+            android:background="@drawable/background_right_msg"
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <!-- Container Reply info -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_reply"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:background="@drawable/background_replay_from_right"
                 android:orientation="vertical"
                 android:padding="5dp"
-                android:layout_gravity="end"
-                android:visibility="gone"
-                android:background="@drawable/background_replay_from_right"
-                android:layout_height="match_parent">
+                android:visibility="gone">
 
                 <!-- Text Reply From -->
                 <TextView
                     android:id="@+id/txt_reply_from"
                     android:layout_width="match_parent"
-                    android:text="@string/starred_messages"
-                    android:layout_marginEnd="5dp"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="8dp"
+                    android:layout_marginEnd="5dp"
+                    android:text="@string/starred_messages"
                     android:textColor="@color/black"
                     android:textSize="10sp"
-                    android:layout_height="match_parent"
                     tools:ignore="SmallSp" />
 
                 <!-- Card Container Reply content -->
@@ -222,12 +228,12 @@
                     android:id="@+id/card_container_reply_content"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:cardCornerRadius="10dp"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="2dp"
                     android:layout_marginEnd="5dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="3dp"
                     app:cardBackgroundColor="@color/transparent"
-                    android:layout_marginBottom="3dp">
+                    app:cardCornerRadius="10dp">
 
                     <!-- Content Reply Content -->
                     <LinearLayout
@@ -239,8 +245,8 @@
                             android:id="@+id/reply_content"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/hint"
-                            android:text="@string/app_name"/>
+                            android:text="@string/app_name"
+                            android:textColor="@color/hint" />
 
                     </LinearLayout>
 
@@ -253,12 +259,12 @@
                 android:id="@+id/msg_chat_item"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_gravity="end"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_gravity="end"
                 android:text="@string/app_name"
-                android:textSize="16sp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textSize="16sp" />
 
             <!-- Text Message Time -->
             <TextView
@@ -266,22 +272,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
-                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:text="@string/app_name"
-                android:textSize="12sp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textSize="12sp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Text Seen -->
         <TextView
+            android:id="@+id/txt_seen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/txt_seen"
             android:layout_below="@id/container_msg"
             android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
