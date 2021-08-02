@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_setting"
+    android:fillViewport="true"
+    android:scrollbarSize="1dp"
+    android:theme="@style/EditsLoginAndSignUp"
+    android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
+    android:layout_height="match_parent">
+
+    <!-- Main Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+        <!-- Setting Menu -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:padding="13dp"
+            android:orientation="vertical"
+            android:background="@color/background_menu_sheet"
+            android:layout_height="wrap_content">
+
+            <!-- Setting Text Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Setting Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting"
+                    android:textSize="16sp"
+                    android:letterSpacing="0.1"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <!-- Notification and Sounds -->
+            <LinearLayout
+                android:id="@+id/btn_notifications"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:minHeight="42dp"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Setting Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_gravity="center"
+                    android:layout_height="25dp"
+                    android:src="@drawable/ic_not_secure_lock"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Setting Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/notification_and_sounds"/>
+
+            </LinearLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="30dp"
+                android:background="@color/dividing_line_settings"/>
+
+            <!-- Privacy and Security -->
+            <LinearLayout
+                android:id="@+id/btn_privacy"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:minHeight="42dp"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Setting Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_not_secure_lock"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Setting Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/privacy_and_security"/>
+
+            </LinearLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_marginStart="30dp"
+                android:layout_height="1dp"
+                android:background="@color/dividing_line_settings"/>
+
+            <!-- Data and Storage -->
+            <LinearLayout
+                android:id="@+id/btn_data"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:minHeight="42dp"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Setting Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_not_secure_lock"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Setting Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/data_and_storage"/>
+
+            </LinearLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="30dp"
+                android:background="@color/dividing_line_settings"/>
+
+            <!-- Chats Setup -->
+            <LinearLayout
+                android:id="@+id/btn_chats_setting"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:minHeight="42dp"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Setting Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_not_secure_lock"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Setting Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/chats_settings"/>
+
+            </LinearLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="30dp"
+                android:background="@color/dividing_line_settings"/>
+
+            <!-- Languages -->
+            <LinearLayout
+                android:id="@+id/btn_languages"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:minHeight="42dp"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Setting Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_not_secure_lock"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Setting Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/languages"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Help Menu -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:padding="13dp"
+            android:orientation="vertical"
+            android:layout_marginTop="15dp"
+            android:background="@color/background_menu_sheet"
+            android:layout_height="wrap_content">
+
+            <!-- Help Text Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Setting Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/help"
+                    android:textSize="16sp"
+                    android:letterSpacing="0.1"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <!-- Ask a question -->
+            <LinearLayout
+                android:id="@+id/btn_ask_a_question"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:minHeight="42dp"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Setting Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_gravity="center"
+                    android:layout_height="25dp"
+                    android:src="@drawable/ic_not_secure_lock"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Help Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/ask_a_question"/>
+
+            </LinearLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="30dp"
+                android:background="@color/dividing_line_settings"/>
+
+            <!-- Common questions -->
+            <LinearLayout
+                android:id="@+id/btn_common_questions"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:minHeight="42dp"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Help Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_not_secure_lock"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Help Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/common_questions"/>
+
+            </LinearLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_marginStart="30dp"
+                android:layout_height="1dp"
+                android:background="@color/dividing_line_settings"/>
+
+            <!-- Policy and Privacy -->
+            <LinearLayout
+                android:id="@+id/btn_policy_and_Privacy"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:minHeight="42dp"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Help Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_not_secure_lock"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Help Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/policy_and_privacy"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- App Version -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:padding="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_height="wrap_content">
+
+            <!-- Version Text -->
+            <TextView
+                android:id="@+id/txt_app_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textAlignment="center"
+                android:textColor="@color/text_version"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+</ScrollView>

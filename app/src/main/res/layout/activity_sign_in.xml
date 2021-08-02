@@ -123,12 +123,12 @@
                 android:id="@+id/txt_forget_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="50dp"
+                android:layout_below="@id/edit_ls_password_signIn"
                 android:layout_marginTop="8dp"
+                android:minHeight="50dp"
                 android:text="@string/forgot_your_password"
                 android:textColor="@color/black"
-                android:textSize="18sp"
-                android:layout_below="@id/edit_ls_password_signIn" />
+                android:textSize="18sp" />
 
             <!-- Button Next -->
             <Button

@@ -42,7 +42,6 @@ import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.Fragments.Chat.UsersFragment;
 import dev.kaua.squash.R;
-import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -83,26 +82,17 @@ public class ChatFragment extends Fragment {
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
 
-
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                account_info = snapshot.getValue(DtoAccount.class);
-                assert account_info != null;
-                txt_username_chat.setText(account_info.getName_user());
-                if(account_info.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
-                else Picasso.get().load(EncryptHelper.decrypt(account_info.getImageURL())).into(profile_image);
-            }
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
-
         return view;
     }
 
     @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
+        if (visible)
+            if(getContext() != null){
+                txt_username_chat.setText(MyPrefs.getUserInformation(getContext()).getName_user());
+                Picasso.get().load(MyPrefs.getUserInformation(getContext()).getProfile_image()).into(profile_image);
+            }
     }
 
     private void loadViewAdapter() {
@@ -172,7 +162,7 @@ public class ChatFragment extends Fragment {
         super.onResume();
     }
 
-    private void Ids(View view) {
+    private void Ids(@NonNull View view) {
         account_info = MyPrefs.getUserInformation(requireContext());
         instance = this;
         txt_username_chat = view.findViewById(R.id.txt_username_chat);
@@ -180,6 +170,11 @@ public class ChatFragment extends Fragment {
         tab_layout_chat = view.findViewById(R.id.tab_layout_chat);
         view_paper_chat = view.findViewById(R.id.view_paper_chat);
         loadViewAdapter();
+
+        if(getContext() != null){
+            txt_username_chat.setText(MyPrefs.getUserInformation(getContext()).getName_user());
+            Picasso.get().load(MyPrefs.getUserInformation(getContext()).getProfile_image()).into(profile_image);
+        }
     }
 
     static class ViewPaperAdapter extends FragmentPageAdapter{

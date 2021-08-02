@@ -2,6 +2,7 @@ package dev.kaua.squash.Activitys;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,6 +11,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
+import android.os.Vibrator;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,9 +20,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -34,6 +42,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -47,17 +56,24 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Adapters.AudioRecorder;
 import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
 import dev.kaua.squash.Adapters.Chat.MessageAdapter;
 import dev.kaua.squash.Adapters.Chat.SwipeReply;
+import dev.kaua.squash.Adapters.Chat.ViewProxy;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Data.Message.DtoMessage;
@@ -91,6 +107,7 @@ import retrofit2.Response;
  *  @author Kaua Vitorio
  **/
 
+@SuppressLint("SetTextI18n")
 @SuppressWarnings({"deprecation", "StaticFieldLeak", "FieldCanBeLocal"})
 public class MessageActivity extends AppCompatActivity {
 
@@ -98,11 +115,12 @@ public class MessageActivity extends AppCompatActivity {
     public static ConstraintLayout container_no_message_yet;
     public static ImageView background_chat;
     public static ImageView btn_more_medias;
+    public static LinearLayout container_edit_text;
     public static MessageActivity instance;
     private TextView txt_user_name, txt_isOnline_chat, txtQuotedMsg;
     private static RecyclerView recycler_view_msg;
     private EditText text_send;
-    private CardView btn_send;
+    private CardView btn_send, btn_rec_audio;
     private String message_to_reply;
     private ImageView verification_ic;
     private String reply_from;
@@ -111,6 +129,8 @@ public class MessageActivity extends AppCompatActivity {
     private ValueEventListener seenListener;
     public static DtoAccount user_im_chat;
     private static final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
+    private static final String[] permissions_audio = { Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE };
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
     public static FirebaseUser fUser;
 
@@ -122,6 +142,7 @@ public class MessageActivity extends AppCompatActivity {
     private static String userId;
     private static String chat_id;
     String another_user_image = "";
+    private Animation myAnim;
 
     APIService apiService;
 
@@ -130,10 +151,27 @@ public class MessageActivity extends AppCompatActivity {
     public static final int PICK_IMAGE_REQUEST = 222;
     public static final int PICK_IMAGE_REQUEST_MEDIA = 333;
     public static final int OPEN_CAMERA = 444;
+    public static final String TAG = "MESSAGE_ACTIVITY";
     public static StorageReference storageReference;
 
     Intent intent;
 
+    private TextView recordTimeText;
+    private View recordPanel;
+    private View slideText;
+    private boolean recording;
+    private float startedDraggingX = -1;
+    private float distCanMove = dp(80);
+    private long startTime = 0L;
+    long timeInMilliseconds = 0L;
+    long timeSwapBuff = 0L;
+    long updatedTime = 0L;
+    private Timer timer;
+    private float x1,x2;
+    static final int MIN_DISTANCE = dp(400);
+    AudioRecorder audioRecorder;
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,6 +201,7 @@ public class MessageActivity extends AppCompatActivity {
 
         //  Send msg click
         btn_send.setOnClickListener(v -> {
+            btn_send.startAnimation(myAnim);
             notify = true;
             String msg = text_send.getText().toString();
             if(!msg.equals("") && msg.trim().replaceAll(" +", "").length() > 0)
@@ -221,8 +260,33 @@ public class MessageActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.toString().trim().length() == 0) Methods.typingTo_chat_Status("noOne");
-                else Methods.typingTo_chat_Status(userId);
+                if(s.toString().trim().length() == 0) {
+                    Methods.typingTo_chat_Status("noOne");
+
+                    if(reply_layout.getVisibility() == ConstraintLayout.VISIBLE){
+                        btn_send.setVisibility(View.VISIBLE);
+                        btn_rec_audio.setVisibility(View.GONE);
+                    }else{
+                        if(btn_send.getVisibility() != CardView.GONE)
+                            btn_send.startAnimation(AnimationUtils.loadAnimation(MessageActivity.this ,R.anim.slide_donw));
+                        btn_send.setVisibility(View.GONE);
+                        if(btn_rec_audio.getVisibility() != CardView.VISIBLE)
+                            btn_rec_audio.startAnimation(AnimationUtils.loadAnimation(MessageActivity.this ,R.anim.slide_up));
+                        btn_rec_audio.setVisibility(View.VISIBLE);
+                    }
+                }
+                else {
+                    recordPanel.setVisibility(View.GONE);
+                    if(btn_send.getVisibility() != CardView.VISIBLE)
+                        btn_send.startAnimation(AnimationUtils.loadAnimation(MessageActivity.this ,R.anim.slide_up));
+                    btn_send.setVisibility(View.VISIBLE);
+                    if(btn_rec_audio.getVisibility() != CardView.GONE)
+                        btn_rec_audio.startAnimation(AnimationUtils.loadAnimation(MessageActivity.this ,R.anim.slide_donw));
+                    btn_rec_audio.setVisibility(View.GONE);
+                    container_edit_text.setVisibility(View.VISIBLE);
+                    btn_more_medias.setVisibility(View.VISIBLE);
+                    Methods.typingTo_chat_Status(userId);
+                }
             }
             @Override
             public void afterTextChanged(Editable s) {}
@@ -233,6 +297,7 @@ public class MessageActivity extends AppCompatActivity {
 
         //  Btn medias click
         btn_more_medias.setOnClickListener(v -> {
+            btn_more_medias.startAnimation(myAnim);
             BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.BottomSheetTheme);
             View sheetView = LayoutInflater.from(this).inflate(R.layout.adapter_sheet_media_action,
                     findViewById(R.id.adapter_sheet_media));
@@ -255,8 +320,230 @@ public class MessageActivity extends AppCompatActivity {
         //  Profile Image click
         profile_image.setOnClickListener(v -> OpenUserProfile());
 
+        //  Rec audio click
+        btn_rec_audio.setOnTouchListener((view, motionEvent) -> {
+            if(!recording) btn_rec_audio.startAnimation(myAnim);
+            UserPermissions.validatePermissions(permissions_audio, instance, REQUEST_RECORD_AUDIO_PERMISSION);
+            int RECORD_PERMISSION = ContextCompat.checkSelfPermission(instance, Manifest.permission.RECORD_AUDIO);
+            if (RECORD_PERMISSION == PackageManager.PERMISSION_GRANTED){
+
+                x2 = motionEvent.getX();
+                float deltaX = x2 - x1;
+                Log.d(TAG, "MIN -> " + MIN_DISTANCE);
+                Log.d(TAG, "CURRENT -> " + deltaX);
+
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    if(!recording){
+                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) slideText
+                                .getLayoutParams();
+                        params.leftMargin = dp(30);
+                        slideText.setLayoutParams(params);
+                        ViewProxy.setAlpha(slideText, 1);
+                        startedDraggingX = -1;
+                        // startRecording();
+                        StartRecord();
+                        btn_rec_audio.getParent()
+                                .requestDisallowInterceptTouchEvent(true);
+                    }
+                } else if (Math.abs(deltaX) >= MIN_DISTANCE && motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if(recording){
+                        startedDraggingX = -1;
+                        Log.d(TAG, "CANCEL ACTION");
+                        StopRecord(true);
+                        // stopRecording(true);
+                    }
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                    float x = motionEvent.getX();
+                    /*if (x < -distCanMove) {
+                        StopRecord(false);
+                        // stopRecording(false);
+                    }*/
+                    x = x + ViewProxy.getX(btn_rec_audio);
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) slideText
+                            .getLayoutParams();
+                    if (startedDraggingX != -1) {
+                        float dist = (x - startedDraggingX);
+                        params.leftMargin = dp(120) + (int) dist;
+                        slideText.setLayoutParams(params);
+                        float alpha = 1.0f + dist / distCanMove;
+                        if (alpha > 1) alpha = 1;
+                        else if (alpha < 0)
+                            alpha = 0;
+                        ViewProxy.setAlpha(slideText, alpha);
+                    }
+                    if (x <= ViewProxy.getX(slideText) + slideText.getWidth()
+                            + dp(30)) {
+                        if (startedDraggingX == -1) {
+                            startedDraggingX = x;
+                            distCanMove = (recordPanel.getMeasuredWidth()
+                                    - slideText.getMeasuredWidth() - dp(48)) / 2.0f;
+                            if (distCanMove <= 0)
+                                distCanMove = dp(80);
+                            else if (distCanMove > dp(80))
+                                distCanMove = dp(80);
+                        }
+                    }
+                    if (params.leftMargin > dp(30)) {
+                        params.leftMargin = dp(30);
+                        slideText.setLayoutParams(params);
+                        ViewProxy.setAlpha(slideText, 1);
+                        startedDraggingX = -1;
+                    }
+                }else if (motionEvent.getAction() == MotionEvent.ACTION_UP){
+                    if(recording){
+                        startedDraggingX = -1;
+                        Log.d(TAG, "SENT ACTION");
+                        StopRecord(false);
+                    }
+                }
+                view.onTouchEvent(motionEvent);
+                return true;
+            }
+            return true;
+        });
+
         seenMessage(userId);
         setRecyclerSwipe();
+    }
+
+    private static String fileName = null;
+    private MyTimerTask myTimerTask;
+    private void StartRecord() {
+        UserPermissions.validatePermissions(permissions_audio, instance, REQUEST_RECORD_AUDIO_PERMISSION);
+        int RECORD_PERMISSION = ContextCompat.checkSelfPermission(instance, Manifest.permission.RECORD_AUDIO);
+        if (RECORD_PERMISSION == PackageManager.PERMISSION_GRANTED){
+            try {
+                recording = true;
+                // Record to the external cache directory for visibility
+                fileName = getExternalCacheDir().getAbsolutePath();
+                @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                fileName += "/squash_" + timeStamp + ".3gp";
+                audioRecorder = null;
+                audioRecorder = new AudioRecorder(fileName);
+                audioRecorder.start();
+                recordPanel.setVisibility(View.VISIBLE);
+                container_edit_text.setVisibility(View.GONE);
+                btn_more_medias.setVisibility(View.GONE);
+                startTime = SystemClock.uptimeMillis();
+                timer = null;
+                timer = new Timer();
+                if(myTimerTask != null) myTimerTask = null;
+                myTimerTask = new MyTimerTask();
+                timer.schedule(myTimerTask, 1000, 1000);
+                vibrate();
+            }catch (Exception ex){
+                recording = false;
+                Log.d(TAG, ex.getMessage());
+                StopRecord(true);
+                Warnings.showWeHaveAProblem(this);
+            }
+        }
+    }
+
+    private void StopRecord(boolean cancel) {
+        recording = false;
+        try {
+            if (!cancel) {
+                recordPanel.setVisibility(View.GONE);
+                container_edit_text.setVisibility(View.VISIBLE);
+                btn_more_medias.setVisibility(View.VISIBLE);
+                String audio_path = audioRecorder.stop();
+                String record_time = recordTimeText.getText().toString();
+                String[] record_time_split = record_time.split(":");
+                if (timer != null && !record_time.equals("00:00") && Integer.parseInt(record_time_split[1]) > 0) {
+                    @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    Uri uriAudio = Uri.fromFile(new File(audio_path).getAbsoluteFile());
+                    LoadingDialog loadingDialog = new LoadingDialog(this);
+                    loadingDialog.startLoading();
+                    storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid())
+                            .child("audios").child("squash_audio_" + timeStamp + ".3gp");
+                    storageReference.putFile(uriAudio).addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            loadingDialog.dismissDialog();
+                            Log.d(TAG, Objects.requireNonNull(task.getException()).toString());
+                        }
+                        if (task.getResult().getMetadata() != null) {
+                            if (task.getResult().getMetadata().getReference() != null) {
+                                Task<Uri> result = task.getResult().getStorage().getDownloadUrl();
+                                result.addOnSuccessListener(uri -> {
+                                    loadingDialog.dismissDialog();
+                                    String audio_download = uri.toString();
+                                    medias_pin = new ArrayList<>();
+                                    medias_pin.add(audio_download);
+                                    sendMessage(fUser.getUid(), userId, text_send.getText().toString());
+                                    Log.d(TAG, "OK UPLOAD");
+                                });
+                            } else
+                                loadingDialog.dismissDialog();
+                        }
+                    });
+                }
+
+                if(timer != null)
+                    timer.cancel();
+
+                recordTimeText.setText("00:00");
+                vibrate();
+            } else {
+                recordPanel.setVisibility(View.GONE);
+                container_edit_text.setVisibility(View.VISIBLE);
+                btn_more_medias.setVisibility(View.VISIBLE);
+                String audio_path = audioRecorder.stop();
+                Log.d(TAG, "CANCEL -> " + audio_path);
+
+                if(timer != null)
+                    timer.cancel();
+
+                recordTimeText.setText("00:00");
+                vibrate();
+            }
+        }catch (Exception ex){
+            Log.d(TAG, ex.toString());
+            Warnings.showWeHaveAProblem(this);
+        }
+    }
+
+    private void vibrate() {
+        try {
+            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int dp(float value) {
+        return (int) Math.ceil(1 * value);
+    }
+
+    class MyTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
+            updatedTime = timeSwapBuff + timeInMilliseconds;
+            @SuppressLint("DefaultLocale") final String hms = String.format(
+                    "%02d:%02d",
+                    TimeUnit.MILLISECONDS.toMinutes(updatedTime)
+                            - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
+                            .toHours(updatedTime)),
+                    TimeUnit.MILLISECONDS.toSeconds(updatedTime)
+                            - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+                            .toMinutes(updatedTime)));
+            long lastSec = TimeUnit.MILLISECONDS.toSeconds(updatedTime)
+                    - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+                    .toMinutes(updatedTime));
+            System.out.println(lastSec + " hms " + hms);
+            runOnUiThread(() -> {
+                try {
+                    if (recordTimeText != null)
+                        recordTimeText.setText(hms);
+                } catch (Exception e) {
+                    Log.d(TAG, "TimerTask -> " + e.toString());
+                }
+
+            });
+        }
     }
 
     private void checkChatList(String userId) {
@@ -280,8 +567,8 @@ public class MessageActivity extends AppCompatActivity {
 
     private void GenerateChatID() {
         if(chat_id == null){
-            String first_sequence = Methods.RandomCharactersWithoutSpecials(30);
-            String second_sequence = Methods.RandomCharactersWithoutSpecials(10);
+            String first_sequence = Methods.RandomCharactersWithoutSpecials(20);
+            String second_sequence = Methods.RandomCharactersWithoutSpecials(5);
             chat_id = "CHATID" + fUser.getUid() + first_sequence + userId + second_sequence + "SQUASH";
             chat_id = EncryptHelper.encrypt(Methods.shuffle(chat_id));
         }
@@ -301,17 +588,25 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void Ids() {
-        instance = this;
+        myAnim = AnimationUtils.loadAnimation(this,R.anim.click_anim);
+        instance = MessageActivity.this;
         chatDB = new DaoChat(MessageActivity.this);
         profile_image = findViewById(R.id.profile_image_chat);
+        recordPanel = findViewById(R.id.record_panel);
+        recordTimeText = findViewById(R.id.recording_time_text);
         btn_more_medias = findViewById(R.id.btn_more_medias);
+        TextView textView = findViewById(R.id.slideToCancelTextView);
+        textView.setText(getString(R.string.slide_to_cancel));
         container_no_message_yet = findViewById(R.id.container_no_message_yet);
         txt_user_name = findViewById(R.id.txt_username_chat);
+        slideText = findViewById(R.id.slideText);
         recycler_view_msg = findViewById(R.id.recycler_view_msg);
         verification_ic = findViewById(R.id.verification_ic_message);
         txt_isOnline_chat = findViewById(R.id.txt_isOnline_chat);
+        btn_rec_audio = findViewById(R.id.container_btn_rec_audio);
         reply_layout = findViewById(R.id.reply_layout);
         background_chat = findViewById(R.id.background_chat);
+        container_edit_text = findViewById(R.id.container_edit_text_chat);
         txtQuotedMsg = findViewById(R.id.txtQuotedMsg);
         cancelButton = findViewById(R.id.cancelButton);
         text_send = findViewById(R.id.text_send);
@@ -323,6 +618,8 @@ public class MessageActivity extends AppCompatActivity {
         linearLayoutManager.setStackFromEnd(true);
         recycler_view_msg.setLayoutManager(linearLayoutManager);
         getWindow().setStatusBarColor(getColor(R.color.black_intro));
+        recordPanel.setVisibility(View.GONE);
+        container_edit_text.setVisibility(View.VISIBLE);
     }
 
     private void seenMessage(String userUid){
@@ -374,8 +671,6 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("media", medias_pin);
 
         reference.child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id))).push().setValue(hashMap);
-        medias_pin.clear();
-        text_send.setText("");
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
@@ -413,25 +708,34 @@ public class MessageActivity extends AppCompatActivity {
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
 
-        final String msg = message;
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
+        if(medias_pin != null && medias_pin.size() > 0){
+            String extension = medias_pin.get(0).substring(medias_pin.get(0).lastIndexOf("."));
+            if(extension.startsWith(".3gp")) message = getString(R.string.audio);
+            medias_pin.clear();
+        }
+
+        if(notify) sendNotification(receiver, MyPrefs.getUserInformation(this).getUsername(), message, EncryptHelper.decrypt(chat_id));
+        notify = false;
+
+        text_send.setText("");
+        /*reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 DtoAccount account = snapshot.getValue(DtoAccount.class);
-                if(account != null)
-                if(notify) sendNotification(receiver, account.getUsername(), msg, EncryptHelper.decrypt(chat_id));
+                //if(account != null)
+                //if(notify) sendNotification(receiver, account.getUsername(), msg, EncryptHelper.decrypt(chat_id));
                 notify = false;
             }
 
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
+        });*/
 
         try {
             ChatsFragment.getInstance().chatList();
         }catch (Exception exception){
-            Log.d("Message", "Cant load list");
+            Log.d(TAG, "Cant load list");
         }
 
         hideReplayLayout();
@@ -462,7 +766,7 @@ public class MessageActivity extends AppCompatActivity {
                             if(response.code() == 200){
                                 assert response.body() != null;
                                 if(response.body().success != 1)
-                                    Log.w("Send Message Notification", "Failed");
+                                    Log.w(TAG, "Send Message Notification -> Failed");
                             }
                         }
 
@@ -473,11 +777,8 @@ public class MessageActivity extends AppCompatActivity {
                     });
                 }
             }
-
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
     }
 
@@ -512,14 +813,14 @@ public class MessageActivity extends AppCompatActivity {
                 }
                 if(mMessage.size() > 1){
                     if(mMessageFinal.size() != mMessage.size()) {
-                        Log.d("Chat", "OKAY not need to reset");
+                        Log.d(TAG, "OKAY not need to reset");
                         if(joinNow <= 100) joinNow++;
                         else joinNow = 1;
                     } else joinNow = 0;
 
                     if(mMessageFinal.size() > 0 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())
                             || mMessageFinal.size() > 0 && mMessageFinal.get(mMessageFinal.size() -1).getIsSeen() != mMessage.get(mMessage.size() -1).getIsSeen()){
-                        Log.d("Chat", "OKAY NEW MSG OR IS SEEN");
+                        Log.d(TAG, "OKAY NEW MSG OR IS SEEN");
                         LoadAdapter(imageURl);
                         base_load = false;
 
@@ -529,6 +830,8 @@ public class MessageActivity extends AppCompatActivity {
                     }
 
                     if(base_load) LoadAdapter(imageURl);
+
+                    if(!base_load && mMessageFinal.size() != mMessage.size()) LoadAdapter(imageURl);
                 }
             }
 
@@ -570,6 +873,8 @@ public class MessageActivity extends AppCompatActivity {
         KeyboardUtils.showKeyboard(this);
         txtQuotedMsg.setText(msg);
         reply_layout.setVisibility(View.VISIBLE);
+        btn_rec_audio.setVisibility(View.GONE);
+        btn_send.setVisibility(View.VISIBLE);
     }
 
     private void hideReplayLayout() {
@@ -579,6 +884,18 @@ public class MessageActivity extends AppCompatActivity {
             KeyboardUtils.hideKeyboard(this);
         reply_layout.setVisibility(View.GONE);
         text_send.requestFocus();
+
+        if(text_send.getText() != null && text_send.getText().toString().length() > 0 ){
+            btn_rec_audio.setVisibility(View.GONE);
+            btn_send.setVisibility(View.VISIBLE);
+        }else{
+            if(btn_send.getVisibility() != CardView.GONE)
+                btn_send.startAnimation(AnimationUtils.loadAnimation(MessageActivity.this ,R.anim.slide_donw));
+            btn_send.setVisibility(View.GONE);
+            if(btn_rec_audio.getVisibility() != CardView.VISIBLE)
+                btn_rec_audio.startAnimation(AnimationUtils.loadAnimation(MessageActivity.this ,R.anim.slide_up));
+            btn_rec_audio.setVisibility(View.VISIBLE);
+        }
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -589,12 +906,14 @@ public class MessageActivity extends AppCompatActivity {
                 OpenUserProfile();
                 return true;
             case R.id.medias_profile:
+                ToastHelper.toast(this, getString(R.string.under_development), 0);
                 return true;
             case R.id.pin_message:
                 Methods.PinAUser_Chat(MessageActivity.this, userId);
                 return true;
             case R.id.wallpaper_profile:
-                BackgroundHelper.OpenGallery();
+                ToastHelper.toast(this, getString(R.string.under_development), 1);
+                //BackgroundHelper.OpenGallery();
                 return true;
         }
         return false;
@@ -657,7 +976,7 @@ public class MessageActivity extends AppCompatActivity {
                             + getFileName(filePath).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(3));
                     storageReference.putFile(filePath).continueWithTask(task -> {
                         if (!task.isSuccessful()) {
-                            Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
+                            Log.d(TAG, Objects.requireNonNull(task.getException()).toString());
                         }
                         return storageReference.getDownloadUrl();
                     }).addOnCompleteListener(task -> {
@@ -671,7 +990,7 @@ public class MessageActivity extends AppCompatActivity {
                         } else {
                             loadingDialog.dismissDialog();
                             Warnings.showWeHaveAProblem(MessageActivity.this);
-                            Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
+                            Log.d(TAG, Objects.requireNonNull(task.getException()).toString());
                         }
                     });
                 }
@@ -682,12 +1001,12 @@ public class MessageActivity extends AppCompatActivity {
             } catch (Exception ex) {
                 loadingDialog.dismissDialog();
                 Warnings.showWeHaveAProblem(this);
-                Log.d("MediaUpload", ex.toString());
+                Log.d(TAG, ex.toString());
             }
         }
     }
 
-    public String getFileName(Uri uri) {
+    public String getFileName(@NonNull Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
             try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {

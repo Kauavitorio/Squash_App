@@ -2,9 +2,7 @@ package dev.kaua.squash.Notifications;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
@@ -15,7 +13,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,11 +25,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Map;
 
+import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.LocalDataBase.DaoChat;
-import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.MyPrefs;
 
 /**
@@ -77,14 +74,13 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         if (firebaseUser != null && data_notify.size() > 0) {
             if (!currentUser.equals(user)) {
                 Log.d("Current", user);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) sendOreoNotification(remoteMessage);
-                else sendNotification(remoteMessage);
+                sendOreoNotification(remoteMessage);
             }
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void sendOreoNotification(RemoteMessage remoteMessage) {
+    private void sendOreoNotification(@NonNull RemoteMessage remoteMessage) {
 
         String user = remoteMessage.getData().get("user");
         String icon = remoteMessage.getData().get("icon");
@@ -98,12 +94,22 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         assert user != null;
         int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
 
-        Intent intent = new Intent(this, MessageActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("userId", user);
-        bundle.putString("chat_id", chat_id);
-        intent.putExtras(bundle);
-        Update_Last_chat(user);
+        final Intent intent;
+        if(chat_id != null && chat_id.equals("comment_id")){
+            intent = new Intent(this, MainActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putInt("shortcut", 0);
+            bundle.putInt("shared", 0);
+            intent.putExtras(bundle);
+        }else{
+            intent = new Intent(this, MessageActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("userId", user);
+            bundle.putString("chat_id", chat_id);
+            intent.putExtras(bundle);
+
+            Update_Last_chat(user);
+        }
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -117,47 +123,6 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         if (j > 0) i=j;
 
         oreoNotification.getManager().notify(i, builder.build());
-    }
-
-    private void sendNotification(RemoteMessage remoteMessage) {
-        String user = remoteMessage.getData().get("user");
-        String icon = remoteMessage.getData().get("icon");
-        String title = remoteMessage.getData().get("title");
-        String chat_id = remoteMessage.getData().get("chat_id");
-        String body = remoteMessage.getData().get("body");
-
-        RemoteMessage.Notification notification  = remoteMessage.getNotification();
-
-        assert user != null;
-        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
-
-        Intent intent = new Intent(this, MessageActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("userId", user);
-        bundle.putString("chat_id", chat_id);
-        intent.putExtras(bundle);
-
-        Update_Last_chat(user);
-
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        assert icon != null;
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.pumpkin_default_image)
-                .setContentTitle(title)
-                .setContentText(body)
-                .setAutoCancel(true)
-                .setSound(defaultSound)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-
-        int i=0;
-        if (j>0) i = j;
-
-        notificationManager.notify(i, builder.build());
     }
 
     private void Update_Last_chat(String user) {

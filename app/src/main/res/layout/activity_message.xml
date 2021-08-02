@@ -28,9 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
-
-    </androidx.constraintlayout.widget.ConstraintLayout><!-- End Background System -->
+        app:layout_constraintVertical_bias="0.0"/><!-- End Background System -->
 
     <!-- Header -->
     <com.google.android.material.appbar.AppBarLayout
@@ -55,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/toolbar"
-                android:padding="5dp">
+                android:padding="3dp">
 
                 <!-- Profile Image -->
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -134,7 +132,8 @@
         android:id="@+id/container_edits_chat"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/custom_edit_chat"
         android:minHeight="40dp"
@@ -157,13 +156,14 @@
 
         <!-- Main Container -->
         <LinearLayout
+            android:id="@+id/container_edit_text_chat"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
             android:orientation="vertical"
             android:padding="5dp"
-            android:layout_marginStart="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/container_btn_send"
+            app:layout_constraintEnd_toStartOf="@+id/container_btns_chat"
             app:layout_constraintStart_toEndOf="@+id/btn_more_medias">
 
             <!-- Container Reply -->
@@ -234,35 +234,149 @@
 
         </LinearLayout>
 
-        <!-- Card Btn Send -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/container_btn_send"
+        <!-- Container Buttons -->
+        <LinearLayout
+            android:id="@+id/container_btns_chat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="10dp"
-            app:cardBackgroundColor="@color/base_color"
-            app:cardCornerRadius="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="9dp">
+            <!-- Card Btn Send -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/container_btn_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/base_color"
+                app:cardCornerRadius="20dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="9dp">
+
+                    <ImageView
+                        android:id="@+id/btn_send"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_send"
+                        tools:ignore="ContentDescription" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card Btn Send Audio -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/container_btn_rec_audio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                app:cardBackgroundColor="@color/base_color"
+                app:cardCornerRadius="20dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="9dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_microphone"
+                        tools:ignore="ContentDescription" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+        <!-- Voice Recording Container -->
+        <FrameLayout
+            android:id="@+id/record_panel"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="2dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:id="@+id/slideText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="30dp"
+                android:orientation="horizontal"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Arrow Image -->
                 <ImageView
-                    android:id="@+id/btn_send"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_send"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginTop="1dp"
+                    android:src="@drawable/slidearrow"
                     tools:ignore="ContentDescription" />
 
+                <!-- Swipe to cancel Text -->
+                <TextView
+                    android:id="@+id/slideToCancelTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="6dp"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+            <!-- Recording Info -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="13dp"
+                tools:ignore="RtlSymmetry">
+
+                <!-- Rec Animation -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center_vertical"
+                    app:lottie_rawRes="@raw/recording_blink"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"/>
+
+                <!-- Recording time -->
+                <TextView
+                    android:id="@+id/recording_time_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="6dp"
+                    android:text="00:00"
+                    android:textColor="@color/base_color"
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

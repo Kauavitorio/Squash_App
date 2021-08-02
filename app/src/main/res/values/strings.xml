@@ -122,4 +122,25 @@
     <string name="empty_recommendation_feed">Your recommendation feed is currently empty, come back later to see what\'s new</string>
     <string name="developer_post">Developer post</string>
     <string name="there_are_no_message">There are no messages here yet…</string>
+    <string name="notification_and_sounds">Notifications and sounds</string>
+    <string name="privacy_and_security">Privacy and Security</string>
+    <string name="data_and_storage">Data and Storage</string>
+    <string name="chats_settings">Chats Setup</string>
+    <string name="languages">Languages</string>
+    <string name="help">Help</string>
+    <string name="ask_a_question">Ask a question</string>
+    <string name="common_questions">Common questions</string>
+    <string name="policy_and_privacy">Policy and Privacy</string>
+    <string name="squash_for_mobile">Squash for Android v%1$S (%2$d)</string>
+    <string name="confirm_your_password">Confirm your password</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="password_has_successfully_been_changed">Password has successfully been changed</string>
+    <string name="we_send_validation_code">We send to <b>%1$s</b> a validation code, insert the below</string>
+    <string name="slide_to_cancel">Slide to Cancel</string>
+    <string name="enter_email_to_start_password_reset">Enter your account email and we\'ll send you a validation code to start the password reset process</string>
+    <string name="all_right_enter_your_new_password">All right, enter your new password below to reset your password.</string>
+    <string name="increase_media_volume">Increase media volume to listen to audio</string>
+    <string name="audio">Audio</string>
+    <string name="media">Media</string>
+    <string name="new_comment">New Comment</string>
 </resources>

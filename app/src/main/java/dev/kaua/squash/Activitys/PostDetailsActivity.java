@@ -30,6 +30,13 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -44,8 +51,15 @@ import dev.kaua.squash.Data.Post.AsyncComments_Posts;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
+import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
+import dev.kaua.squash.Notifications.APIService;
+import dev.kaua.squash.Notifications.Client;
+import dev.kaua.squash.Notifications.Data;
+import dev.kaua.squash.Notifications.MyResponse;
+import dev.kaua.squash.Notifications.Sender;
+import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.KeyboardUtils;
@@ -76,6 +90,11 @@ public class PostDetailsActivity extends AppCompatActivity {
     static DaoPosts daoPosts;
     InputMethodManager imm;
     FirebaseStorage firebaseStorage;
+    FirebaseUser fUser;
+    private final String TAG = "PostDetails";
+    String base_comment = "";
+
+    APIService apiService;
 
     DtoAccount account = new DtoAccount();
     DtoPost post_info = new DtoPost();
@@ -198,10 +217,12 @@ public class PostDetailsActivity extends AppCompatActivity {
                 LoadingDialog loadingDialog = new LoadingDialog(this);
                 loadingDialog.startLoading();
 
+                String comment = edit_comment_msg.getText().toString();
+
                 DtoPost dtoPost = new DtoPost();
                 dtoPost.setPost_id(EncryptHelper.encrypt(post_id + ""));
                 dtoPost.setAccount_id(EncryptHelper.encrypt(account.getAccount_id_cry()));
-                dtoPost.setComment(EncryptHelper.encrypt(edit_comment_msg.getText().toString()));
+                dtoPost.setComment(EncryptHelper.encrypt(comment));
                 PostServices services = retrofit.create(PostServices.class);
                 Call<DtoPost> call = services.create_a_comment(dtoPost);
                 call.enqueue(new Callback<DtoPost>() {
@@ -209,6 +230,8 @@ public class PostDetailsActivity extends AppCompatActivity {
                     public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
                         loadingDialog.dismissDialog();
                         if(response.code() == 201){
+                            StartSendNotify(comment);
+
                             swipeRefreshLayout_comments.setVisibility(View.VISIBLE);
                             current_comments++;
                             txt_comments_post.setText(Methods.NumberTrick(current_comments));
@@ -295,6 +318,81 @@ public class PostDetailsActivity extends AppCompatActivity {
         });
     }
 
+    private void StartSendNotify(String comment) {
+        if(post_info.getUsername() != null && Objects.requireNonNull(EncryptHelper.decrypt(post_info.getUsername())).length() > 2){
+            DtoAccount account_chat = new DtoAccount();
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot fullSnapshot) {
+                    for(DataSnapshot snapshot: fullSnapshot.getChildren()){
+                        DtoAccount account = snapshot.getValue(DtoAccount.class);
+                        if(account != null){
+                            if(account.getUsername().equals(EncryptHelper.decrypt(post_info.getUsername()))){
+                                if(account_chat.getAccount_id_cry() == null){
+                                    account_chat.setId(account.getId());
+                                    account_chat.setUsername(account.getUsername());
+                                    account_chat.setAccount_id_cry(account.getId());
+                                    account_chat.setChat_id("go");
+                                }
+                            }
+                        }
+                    }
+
+                    if(account_chat.getAccount_id_cry() != null){
+                        if(account_chat.getUsername().equals(EncryptHelper.decrypt(post_info.getUsername())) && account_chat.getChat_id().equals("go")
+                        && !base_comment.equals(comment)){
+                            sendNotification(account_chat.getId(),MyPrefs.getUserInformation(PostDetailsActivity.this).getUsername(),
+                                    comment);
+                            account_chat.setChat_id(account_chat.getId());
+                            base_comment = comment;
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            });
+
+        }
+    }
+
+
+    private void sendNotification(String receiver, String username, String comment){
+
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                for (DataSnapshot snapshot : datasnapshot.getChildren()){
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(fUser.getUid(), R.drawable.pumpkin_default_image, username+": "+ comment, getString(R.string.new_comment), receiver, "comment_id");
+
+                    assert token != null;
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender).enqueue(new Callback<MyResponse>() {
+                        @Override
+                        public void onResponse(@NotNull Call<MyResponse> call, @NotNull Response<MyResponse> response) {
+                            if(response.code() == 200){
+                                assert response.body() != null;
+                                if(response.body().success != 1)
+                                    Log.w(TAG, "Send Message Notification -> Failed");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NotNull Call<MyResponse> call, @NotNull Throwable t) {
+                            Warnings.showWeHaveAProblem(PostDetailsActivity.this);
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+        });
+    }
+
     public static void hideSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager =
                 (InputMethodManager) activity.getSystemService(
@@ -315,6 +413,8 @@ public class PostDetailsActivity extends AppCompatActivity {
     }
 
     private void Ids() {
+        fUser = ConfFirebase.getFirebaseUser();
+        apiService = Client.getClient(Methods.FCM_URL).create(APIService.class);
         daoPosts = new DaoPosts(this);
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         SharedPreferences sp_First = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);

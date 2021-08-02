@@ -7,6 +7,8 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="dividing_line">#525252</color>
+    <color name="dividing_line_settings">#1AFFFFFF</color>
+    <color name="background_setting">#0B1929</color>
     <color name="black">#FF000000</color>
     <color name="transparent_black">#66100804</color>
     <color name="black_intro">#333333</color>
@@ -27,6 +29,7 @@
     <color name="custom_toast">#DF202020</color>
     <color name="hint_default_button">#B5B5B5</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="text_version">#72FFFFFF</color>
     <color name="BarColor">#DDDADA</color>
     <color name="base_color">#FF6C26</color>
     <color name="stroke_chat_left">#0562D0</color>

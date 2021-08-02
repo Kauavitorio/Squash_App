@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <corners
+        android:topRightRadius="15dp"
+        android:bottomRightRadius="15dp"
+        android:bottomLeftRadius="15dp"
+        android:topLeftRadius="15dp"/>
+
+    <gradient
+        android:angle="315"
+        android:startColor="@color/header_intro_color"
+        android:endColor="@color/background_my_message_top"
+        android:centerColor="@color/background_my_message_middle"
+        android:type="linear"/>
+
+</shape>

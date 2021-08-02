@@ -24,7 +24,7 @@
     <string name="yes">Sim</string>
     <string name="no">Não</string>
     <string name="ok">Ok</string>
-    <string name="account_was_created" >Sua conta Squash foi criada com sucesso. Para prosseguir com o aplicativo, é necessário confirmar o seu e-mail. Enviamos um email com uma explicação da explicação de email via código de verificação.</string>
+    <string name="account_was_created" >Sua conta Squash foi criada com sucesso. Para prosseguir com o aplicativo, é necessário confirmar o seu e-mail. Enviamos um email com uma explicação de como ativar sua conta.</string>
     <string name="email_is_already_used">Esse email já foi usado em outra conta, por favor alterar o email informado.</string>
     <string name="phone_is_already_used">Esse número de celular já está em uso, por favor alterar o número informado.</string>
     <string name="bad_username">O nome de usuário especificado, não é adequado, por favor alterar o nome de usuário.  </string>
@@ -38,7 +38,7 @@
     <string name="resend_code">Reenviar código</string>
     <string name="resend_code_desc">Caso não tenha obtido o código de validacão em seu email basta clicar no botão <font color='#10ace0'>reenviar código</font> para recerber o código.</string>
     <string name="the_validation_code_is_invalid">O código de validação é inválido.</string>
-    <string name="unable_to_login">Não foi possível entrar na sua conta, devido à pendência na pendência do seu email.</string>
+    <string name="unable_to_login">Não foi possível entrar na sua conta, devido à pendência de validação do seu email.</string>
     <string name="account_will_not_be_validated_leave">Se você sair desta página, sua conta não será validada e você não poderá fazer o login.\nQuer mesmo sair?</string>
     <string name="phone_email_or_username">Telefone, e-mail ou nome de usuário.</string>
     <string name="login_to_squash">Entrar no Squash.</string>
@@ -114,4 +114,25 @@
     <string name="empty_recommendation_feed">Seu feed de recomendação está vazio no momento, volte mais tarde para ver as novidades</string>
     <string name="developer_post">Post do desenvolvedor</string>
     <string name="there_are_no_message">Ainda não há mensagens aqui…</string>
+    <string name="notification_and_sounds">Notificações e sons</string>
+    <string name="privacy_and_security">Privacidade e segurança</string>
+    <string name="data_and_storage">Dados e armazenamento</string>
+    <string name="chats_settings">Configurações de Chats</string>
+    <string name="languages">Idiomas</string>
+    <string name="help">Ajuda</string>
+    <string name="ask_a_question">Fazer uma pergunta</string>
+    <string name="common_questions">Perguntas Frequentes</string>
+    <string name="policy_and_privacy">Política e Privacidade</string>
+    <string name="squash_for_mobile">Squash para Android v%1$S (%2$d)</string>
+    <string name="confirm_your_password">Confirme sua senha</string>
+    <string name="passwords_do_not_match">As senhas não coincidem</string>
+    <string name="password_has_successfully_been_changed">A senha foi alterada com sucesso</string>
+    <string name="we_send_validation_code">Enviamos para <b>%1$s</b> um código de validação, insira o seguinte </string>
+    <string name="slide_to_cancel">Deslize para cancelar</string>
+    <string name="enter_email_to_start_password_reset">Insira o e-mail da sua conta e enviaremos um código de validação para iniciar o processo de redefinição de senha</string>
+    <string name="all_right_enter_your_new_password">Tudo certo, digite sua nova senha abaixo para a redefinição.</string>
+    <string name="increase_media_volume">Aumente o volume de mídia para ouvir o audio</string>
+    <string name="audio">Áudio</string>
+    <string name="media">Mídia</string>
+    <string name="new_comment">Novo comentário</string>
 </resources>

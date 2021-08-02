@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -75,6 +77,8 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         else holder.last_seen.setVisibility(View.GONE);
 
         holder.itemView.setOnClickListener(v -> {
+            final Animation myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
+            holder.itemView.startAnimation(myAnim);
             Intent intent = new Intent(mContext, MessageActivity.class);
             intent.putExtra("userId", account.getId());
             intent.putExtra("chat_id", account.getChat_id());

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -39,8 +40,9 @@ import dev.kaua.squash.Tools.MyPrefs;
 @SuppressLint({"StaticFieldLeak", "UseCompatLoadingForDrawables"})
 public class MainActivity extends AppCompatActivity {
     private static ImageView btn_search_main, btn_home_main;
+    private RelativeLayout click_home;
     private CircleImageView btn_profile_main;
-    private LinearLayout container_btn_profile_main;
+    private RelativeLayout container_btn_profile_main;
     private static ViewPager viewPager;
     private FragmentPageAdapter adapter;
     private static FirebaseAnalytics mFirebaseAnalytics;
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         btn_search_main.setOnClickListener(v -> LoadSearchFragment());
-        btn_home_main.setOnClickListener(v -> LoadMainFragment());
+        click_home.setOnClickListener(v -> LoadMainFragment());
 
         container_btn_profile_main.setOnClickListener(v -> CallProfile());
 
@@ -182,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setNavigationBarColor(getColor(R.color.BarColor));
         viewPager = findViewById(R.id.viewpager_main);
         btn_profile_main = findViewById(R.id.btn_profile_main);
+        click_home = findViewById(R.id.click_home);
         btn_search_main = findViewById(R.id.btn_search_main);
         btn_home_main = findViewById(R.id.btn_home_main);
         container_btn_profile_main = findViewById(R.id.container_btn_profile_main);

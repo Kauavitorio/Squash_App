@@ -133,7 +133,7 @@ public class SignUpActivity extends AppCompatActivity {
                     bornDate_tl_signUp.setError(getString(R.string.age_warning));
                 else if(age_user < 13)
                     bornDate_tl_signUp.setError(getString(R.string.age_warning));
-                else if(!Objects.requireNonNull(edit_password.getText()).toString().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$"))
+                else if(!Objects.requireNonNull(edit_password.getText()).toString().matches(Methods.PASSWORD_REGEX))
                     password_tl_signUp.setError(getString(R.string.password_needs));
                 else{
                     loadingDialog.startLoading();
@@ -459,7 +459,7 @@ public class SignUpActivity extends AppCompatActivity {
                         password_tl_signUp.setError(getString(R.string.password_cannot_contain_spaces));
                         password_tl_signUp.setErrorEnabled(true);
                     }else{
-                        if (!edit_password.getText().toString().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")){
+                        if (!edit_password.getText().toString().matches(Methods.PASSWORD_REGEX)){
                             password_tl_signUp.setError(getString(R.string.password_needs));
                             password_tl_signUp.setErrorEnabled(true);
                         }else
@@ -475,7 +475,7 @@ public class SignUpActivity extends AppCompatActivity {
     private void all_filled(){
         if(edit_name.getText().toString().length() > 0 && Patterns.EMAIL_ADDRESS.matcher(edit_email.getText().toString()).matches()
         && Methods.isValidPhoneNumber(edit_phone.getText().toString()) && edit_bornDate.getText().toString().length() > 0 && edit_password.getText().toString().length() >= 8
-        && edit_password.getText().toString().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")){
+        && edit_password.getText().toString().matches(Methods.PASSWORD_REGEX)){
             btn_next.setEnabled(true);
             btn_next.setBackgroundResource(R.drawable.custom_button_next);
         }else{

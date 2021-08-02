@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"  android:maxSdkVersion="26"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -19,8 +22,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".Activitys.ShareContentActivity"></activity>
+        android:usesCleartextTraffic="true"
+        android:resizeableActivity="false"
+        android:requestLegacyExternalStorage="true">
+        <activity
+            android:name=".Activitys.ForgotPasswordActivity"
+            android:exported="true" />
+        <activity android:name=".Activitys.ShareContentActivity" />
         <activity android:name=".Activitys.SettingActivity" />
         <activity android:name=".Activitys.WebActivity" />
         <activity android:name=".Activitys.PostDetailsActivity" />
@@ -33,7 +41,8 @@
         <activity android:name=".Activitys.MainActivity" />
         <activity android:name=".Activitys.ValidateEmailActivity" />
         <activity android:name=".Activitys.TermsAccountActivity" />
-        <activity android:name=".Activitys.SplashActivity"
+        <activity
+            android:name=".Activitys.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -104,5 +113,4 @@
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
     </application>
-
 </manifest>
