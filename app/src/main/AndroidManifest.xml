@@ -23,6 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true"
+        android:resizeableActivity="false"
         android:requestLegacyExternalStorage="true">
         <activity
             android:name=".Activitys.ForgotPasswordActivity"
@@ -112,5 +113,4 @@
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
     </application>
-
 </manifest>

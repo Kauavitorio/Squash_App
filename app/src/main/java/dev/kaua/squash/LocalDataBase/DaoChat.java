@@ -20,9 +20,8 @@ public class DaoChat extends SQLiteOpenHelper {
     private final String TABLE_BG = "TBL_BACKGROUND";
     private final String TABLE_CHAT_LIST = "TBL_CHAT_LIST";
 
-
     public DaoChat(@Nullable Context context) {
-        super(context, "DB_CHAT", null, 15);
+        super(context, "DB_CHAT", null, 16);
     }
 
     @Override

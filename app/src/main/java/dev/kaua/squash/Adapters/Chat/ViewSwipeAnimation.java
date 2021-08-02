@@ -1,8 +1,7 @@
-package dev.kaua.squash.Adapters;
+package dev.kaua.squash.Adapters.Chat;
 import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.graphics.RectF;
-import android.os.Build;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
@@ -24,17 +23,17 @@ import java.util.WeakHashMap;
     limitations under the License.
  **/
 
-public class View10 extends Animation {
+public class ViewSwipeAnimation extends Animation {
 
-    public static boolean NEED_PROXY = Build.VERSION.SDK_INT < 11;
+    public static boolean NEED_PROXY = false;
 
-    private static final WeakHashMap<View, View10> PROXIES = new WeakHashMap<View, View10>();
+    private static final WeakHashMap<View, ViewSwipeAnimation> PROXIES = new WeakHashMap<View, ViewSwipeAnimation>();
 
-    public static View10 wrap(View view) {
-        View10 proxy = PROXIES.get(view);
+    public static ViewSwipeAnimation wrap(View view) {
+        ViewSwipeAnimation proxy = PROXIES.get(view);
         Animation animation = view.getAnimation();
         if (proxy == null || proxy != animation && animation != null) {
-            proxy = new View10(view);
+            proxy = new ViewSwipeAnimation(view);
             PROXIES.put(view, proxy);
         } else if (animation == null) {
             view.setAnimation(proxy);
@@ -61,7 +60,7 @@ public class View10 extends Animation {
     private final RectF mAfter = new RectF();
     private final Matrix mTempMatrix = new Matrix();
 
-    private View10(View view) {
+    private ViewSwipeAnimation(View view) {
         setDuration(0);
         setFillAfter(true);
         view.setAnimation(this);

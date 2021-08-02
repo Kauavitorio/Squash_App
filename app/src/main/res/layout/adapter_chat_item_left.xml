@@ -41,7 +41,6 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:visibility="gone"
                 app:cardBackgroundColor="@color/base_color"
                 app:cardCornerRadius="20dp">
 
@@ -60,6 +59,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
+                android:visibility="gone"
                 app:cardBackgroundColor="@color/base_color"
                 app:cardCornerRadius="20dp">
 

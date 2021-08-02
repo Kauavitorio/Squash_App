@@ -73,7 +73,7 @@ import dev.kaua.squash.Adapters.AudioRecorder;
 import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
 import dev.kaua.squash.Adapters.Chat.MessageAdapter;
 import dev.kaua.squash.Adapters.Chat.SwipeReply;
-import dev.kaua.squash.Adapters.ViewProxy;
+import dev.kaua.squash.Adapters.Chat.ViewProxy;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Data.Message.DtoMessage;
@@ -407,7 +407,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private static String fileName = null;
-    MyTimerTask myTimerTask;
+    private MyTimerTask myTimerTask;
     private void StartRecord() {
         UserPermissions.validatePermissions(permissions_audio, instance, REQUEST_RECORD_AUDIO_PERMISSION);
         int RECORD_PERMISSION = ContextCompat.checkSelfPermission(instance, Manifest.permission.RECORD_AUDIO);
@@ -766,7 +766,7 @@ public class MessageActivity extends AppCompatActivity {
                             if(response.code() == 200){
                                 assert response.body() != null;
                                 if(response.body().success != 1)
-                                    Log.w("Send Message Notification", "Failed");
+                                    Log.w(TAG, "Send Message Notification -> Failed");
                             }
                         }
 
@@ -777,11 +777,8 @@ public class MessageActivity extends AppCompatActivity {
                     });
                 }
             }
-
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
     }
 
