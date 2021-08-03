@@ -11,6 +11,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,13 +24,19 @@ import android.widget.EditText;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
+import com.yalantis.ucrop.UCrop;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Timer;
@@ -53,6 +62,7 @@ import retrofit2.Retrofit;
 
 @SuppressLint("StaticFieldLeak")
 public class EditProfileActivity extends AppCompatActivity {
+    private static final String TAG = "EditProfile";
     public static CircleImageView ic_edit_ProfileUser;
     TextInputEditText edit_name, edit_username, edit_bio;
     Button btn_edit_profile;
@@ -94,7 +104,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 newInfo.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
                 newInfo.setName_user(EncryptHelper.encrypt(edit_name.getText().toString()));
                 newInfo.setUsername(EncryptHelper.encrypt(edit_username.getText().toString()));
-                newInfo.setBio_user(EncryptHelper.encrypt(edit_bio.getText().toString()));
+                if(edit_bio.getText() == null) newInfo.setBio_user(EncryptHelper.encrypt(""));
+                else newInfo.setBio_user(EncryptHelper.encrypt(edit_bio.getText().toString()));
                 newInfo.setProfile_image(EncryptHelper.encrypt(new_image));
 
                 loadingDialog = new LoadingDialog(this);
@@ -128,7 +139,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             hashMap.put("imageURL", new_image);
 
                             reference.updateChildren(hashMap).addOnCompleteListener(task1 -> {
-                                if(task1.isSuccessful()) Log.d("User", "Register in Realtime database Successful");
+                                if(task1.isSuccessful()) Log.d(TAG, "Register in Realtime database Successful");
                             });
 
                             ProfileFragment.getInstance().GetUserInfo(EditProfileActivity.this);
@@ -215,10 +226,11 @@ public class EditProfileActivity extends AppCompatActivity {
             openGallery.setType("image/*");
             openGallery.setAction(Intent.ACTION_PICK);
             //noinspection deprecation
-            startActivityForResult(Intent.createChooser(openGallery, "Select Image"), PICK_IMAGE_REQUEST);
+            startActivityForResult(Intent.createChooser(openGallery, getString(R.string.select_an_image)), PICK_IMAGE_REQUEST);
         }
     }
 
+    File file_upload_to_crop;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -231,22 +243,59 @@ public class EditProfileActivity extends AppCompatActivity {
                 openGallery.setType("image/*");
                 openGallery.setAction(Intent.ACTION_PICK);
                 //noinspection deprecation
-                startActivityForResult(Intent.createChooser(openGallery, "Select Image"), PICK_IMAGE_REQUEST);
+                startActivityForResult(Intent.createChooser(openGallery, getString(R.string.select_an_image)), PICK_IMAGE_REQUEST);
             }
         }
 
-        /*if (requestCode == PIC_CROP) {
-            if (data != null) {
-                // get the returned data
-                Bundle extras = data.getExtras();
-                // get the cropped bitmap
-                Bitmap selectedBitmap = extras.getParcelable("data");
-                Profile_Image.uploadFile(selectedBitmap);
-            }
-        }*/
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null){
+            Uri filePath = data.getData();
+            LoadingDialog dialog = new LoadingDialog(this);
+            dialog.startLoading();
+            try {
+                Glide.with(this)
+                        .asBitmap()
+                        .load(filePath)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                try {
+                                    @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date());
+                                    file_upload_to_crop = Methods.SaveImage(EditProfileActivity.this, resource, "user_profile_image", timeStamp);
+                                    dialog.dismissDialog();
+                                    UCrop.of(filePath, Uri.fromFile(file_upload_to_crop))
+                                            .start(EditProfileActivity.this);
+                                }
+                                catch (Exception ex){
+                                    dialog.dismissDialog();
+                                    Warnings.showWeHaveAProblem(EditProfileActivity.this);
+                                    Log.d(TAG, ex.toString());
+                                }
+                            }
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) { }
+                        });
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null)
-            Profile_Image.SendToCrop(this, data);
+            }catch (Exception ex){
+                dialog.dismissDialog();
+                Warnings.showWeHaveAProblem(EditProfileActivity.this);
+                Log.d(TAG, ex.toString());
+            }
+        }
+
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            if(data != null){
+                final Uri resultUri = UCrop.getOutput(data);
+                Profile_Image.SendToCrop(this, resultUri);
+            }else Warnings.showWeHaveAProblem(this);
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            if(data != null){
+                final Throwable cropError = UCrop.getError(data);
+                if(cropError != null)
+                    Log.d(TAG, cropError.toString());
+            }
+            Warnings.showWeHaveAProblem(this);
+        }
     }
 
 
