@@ -91,8 +91,9 @@
                 <!-- Badge Account -->
                 <ImageView
                     android:id="@+id/ic_account_badge"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="2dp"
                     android:src="@drawable/ic_verified_account"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/txt_name_user_post"

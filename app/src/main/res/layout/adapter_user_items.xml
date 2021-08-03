@@ -41,10 +41,10 @@
         <!-- Image Verification Level -->
         <ImageView
             android:id="@+id/verification_ic_user_chat"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:layout_centerVertical="true"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="3dp"
             android:layout_toEndOf="@+id/user_name_users"
             android:src="@drawable/ic_verified_account"
             tools:ignore="ContentDescription" />
