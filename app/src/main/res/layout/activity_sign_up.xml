@@ -192,6 +192,32 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <LinearLayout
+                android:id="@+id/container_Privacy_Policy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:layout_below="@+id/password_tl_signUp">
+
+                <CheckBox
+                    android:id="@+id/policy_and_privacy_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/txt_policy_and_privacy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="5dp"
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:textColor="@color/base_color"
+                    android:text="@string/i_agree_with_the_policy_and_privacy"/>
+
+            </LinearLayout>
+
             <!-- Button SignUp -->
             <Button
                 android:id="@+id/btn_signUp_signUp"
@@ -200,7 +226,7 @@
                 android:minWidth="200dp"
                 android:minHeight="50dp"
                 android:padding="2dp"
-                android:layout_below="@+id/password_tl_signUp"
+                android:layout_below="@+id/container_Privacy_Policy"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="1dp"

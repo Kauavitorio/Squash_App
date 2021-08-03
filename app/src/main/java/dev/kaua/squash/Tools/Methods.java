@@ -22,6 +22,8 @@ import android.util.Patterns;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -43,6 +45,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
+import dev.kaua.squash.Activitys.IntroActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.WebActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
@@ -233,11 +236,12 @@ public abstract class Methods extends MainActivity {
         strBuilder.removeSpan(span);
     }
 
-    public static void browseTo(Context context, String url){
+    public static void browseTo(Context context, @NonNull String url){
         if (!url.startsWith("http://") && !url.startsWith("https://")) url = "http://" + url;
         Intent i = new Intent(context, WebActivity.class);
         i.setData(Uri.parse(url));
-        context.startActivity(i);
+        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_right_back, R.anim.move_to_right_go);
+        ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
     }
 
     //  Method to set new user status for chat system

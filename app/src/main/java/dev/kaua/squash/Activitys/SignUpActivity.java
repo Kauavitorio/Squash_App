@@ -14,7 +14,9 @@ import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -48,6 +50,7 @@ import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -76,8 +79,12 @@ public class SignUpActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     private static SignUpActivity instance;
     private static SharedPreferences mPrefs;
+    private TextView txt_policy_and_privacy;
+    private CheckBox policy_and_privacy_check;
+    private final String POLICY_PRIVACY_LINK = "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf";
 
     int age_user = 0;
+    boolean policy_and_privacy = false;
     String name_user, email, phone;
     private FirebaseAuth mAuth;
     private DatabaseReference reference;
@@ -111,6 +118,12 @@ public class SignUpActivity extends AppCompatActivity {
             updateLabel();
         };
 
+        //  Privacy Policy click
+        txt_policy_and_privacy.setOnClickListener(v -> Methods.browseTo(this, POLICY_PRIVACY_LINK));
+
+        //  Privacy Policy check status
+        policy_and_privacy_check.setOnClickListener(v -> policy_and_privacy = policy_and_privacy_check.isChecked());
+
         //  Select Birth date Click
         edit_bornDate.setOnClickListener(v -> ShowCalendar());
 
@@ -135,6 +148,7 @@ public class SignUpActivity extends AppCompatActivity {
                     bornDate_tl_signUp.setError(getString(R.string.age_warning));
                 else if(!Objects.requireNonNull(edit_password.getText()).toString().matches(Methods.PASSWORD_REGEX))
                     password_tl_signUp.setError(getString(R.string.password_needs));
+                else if(!policy_and_privacy) ToastHelper.toast(this, getString(R.string.required_to_accept_the_privacy_policy_term), 0);
                 else{
                     loadingDialog.startLoading();
                     timerHandler.postDelayed(() -> {
@@ -150,144 +164,148 @@ public class SignUpActivity extends AppCompatActivity {
 
         //  Sign Up button click
         btn_signUp.setOnClickListener(v -> {
-            loadingDialog = new LoadingDialog(this);
-            loadingDialog.startLoading();
+            if(!policy_and_privacy) ToastHelper.toast(this, getString(R.string.required_to_accept_the_privacy_policy_term), 0);
+            else{
 
-            //  Getting joined date before send user information to API
-            Calendar cal = Calendar.getInstance();
-            int day = cal.get(Calendar.DATE);
-            int month = cal.get(Calendar.MONTH) + 1;
-            int year = cal.get(Calendar.YEAR);
-            String joined_date;
-            if(month < 10 && day < 10) joined_date = "0" + day + "/" + "0" + month + "/" + year;
-            else if (day < 10) joined_date = "0" + day + "/" + month + "/" + year;
-            else if (month < 10) joined_date = day + "/" + "0" + month + "/" + year;
-            else joined_date = day + "/" + month + "/" + year;
+                loadingDialog = new LoadingDialog(this);
+                loadingDialog.startLoading();
 
-            // User information storage on your Dto
-            DtoAccount account = new DtoAccount();
-            account.setName_user(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_name.getText()).toString())));
-            account.setEmail(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_email.getText()).toString().replace(" ", ""))));
-            account.setPhone_user(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_phone.getText()).toString())));
-            account.setPassword(EncryptHelper.encrypt(edit_password.getText().toString()));
-            account.setBorn_date(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_bornDate.getText()).toString())));
-            account.setJoined_date(EncryptHelper.encrypt(joined_date));
-            String device_login = Build.BRAND + ", " + Build.MODEL;
-            account.setLogin_info(EncryptHelper.encrypt(device_login));
-            account.setBio_user(EncryptHelper.encrypt(getString(R.string.default_bio)));
+                //  Getting joined date before send user information to API
+                Calendar cal = Calendar.getInstance();
+                int day = cal.get(Calendar.DATE);
+                int month = cal.get(Calendar.MONTH) + 1;
+                int year = cal.get(Calendar.YEAR);
+                String joined_date;
+                if(month < 10 && day < 10) joined_date = "0" + day + "/" + "0" + month + "/" + year;
+                else if (day < 10) joined_date = "0" + day + "/" + month + "/" + year;
+                else if (month < 10) joined_date = day + "/" + "0" + month + "/" + year;
+                else joined_date = day + "/" + month + "/" + year;
 
-            // Generate token to user can be logged in firebase services
-            String token = Methods.RandomCharacters(45);
-            account.setToken(EncryptHelper.encrypt(token));
+                // User information storage on your Dto
+                DtoAccount account = new DtoAccount();
+                account.setName_user(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_name.getText()).toString())));
+                account.setEmail(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_email.getText()).toString().replace(" ", ""))));
+                account.setPhone_user(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_phone.getText()).toString())));
+                account.setPassword(EncryptHelper.encrypt(edit_password.getText().toString()));
+                account.setBorn_date(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_bornDate.getText()).toString())));
+                account.setJoined_date(EncryptHelper.encrypt(joined_date));
+                String device_login = Build.BRAND + ", " + Build.MODEL;
+                account.setLogin_info(EncryptHelper.encrypt(device_login));
+                account.setBio_user(EncryptHelper.encrypt(getString(R.string.default_bio)));
 
-            //  Register User in Firebase
-            mAuth = ConfFirebase.getFirebaseAuth();
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-            if(currentUser != null) mAuth.signOut();
+                // Generate token to user can be logged in firebase services
+                String token = Methods.RandomCharacters(45);
+                account.setToken(EncryptHelper.encrypt(token));
 
-            mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
+                //  Register User in Firebase
+                mAuth = ConfFirebase.getFirebaseAuth();
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                if(currentUser != null) mAuth.signOut();
+
+                mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
 
 
-            AccountServices services = retrofitUser.create(AccountServices.class);
-            Call<DtoAccount> call = services.registerUser(account);
-            call.enqueue(new Callback<DtoAccount>() {
-                @Override
-                public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                    if(response.code() == 201){
-                        mAuth.createUserWithEmailAndPassword(EncryptHelper.decrypt(account.getEmail()), token)
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        loadingDialog.dismissDialog();
+                AccountServices services = retrofitUser.create(AccountServices.class);
+                Call<DtoAccount> call = services.registerUser(account);
+                call.enqueue(new Callback<DtoAccount>() {
+                    @Override
+                    public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                        if(response.code() == 201){
+                            mAuth.createUserWithEmailAndPassword(EncryptHelper.decrypt(account.getEmail()), token)
+                                    .addOnCompleteListener(task -> {
+                                        if (task.isSuccessful()) {
+                                            loadingDialog.dismissDialog();
 
-                                        // Sign in success, now go to register user into API
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        Log.w("Auth", "OK" + user);
+                                            // Sign in success, now go to register user into API
+                                            FirebaseUser user = mAuth.getCurrentUser();
+                                            Log.w("Auth", "OK" + user);
 
-                                        String userId = user.getUid();
+                                            String userId = user.getUid();
 
-                                        //  Creating analytic for sign up event
-                                        Bundle bundle_Analytics = new Bundle();
-                                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, userId);
-                                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
-                                        bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
-                                        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle_Analytics);
+                                            //  Creating analytic for sign up event
+                                            Bundle bundle_Analytics = new Bundle();
+                                            bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, userId);
+                                            bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
+                                            bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+                                            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle_Analytics);
 
-                                        Calendar c = Calendar.getInstance();
-                                        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
-                                        String formattedDate = df_time.format(c.getTime());
+                                            Calendar c = Calendar.getInstance();
+                                            @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
+                                            String formattedDate = df_time.format(c.getTime());
 
-                                        //  Register new user on Firebase Database
-                                        reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
-                                        HashMap<String, String> hashMap = new HashMap<>();
-                                        hashMap.put("id", userId);
-                                        assert response.body() != null;
-                                        hashMap.put("username", EncryptHelper.decrypt(response.body().getUsername()));
-                                        hashMap.put("name_user", edit_name.getText().toString());
-                                        hashMap.put("search", EncryptHelper.decrypt(response.body().getUsername()));
-                                        hashMap.put("account_id_cry", response.body().getAccount_id_cry());
-                                        hashMap.put("imageURL", "default");
-                                        hashMap.put("status_chat", "offline");
-                                        hashMap.put("last_seen", formattedDate);
-                                        hashMap.put("typingTo", "noOne");
+                                            //  Register new user on Firebase Database
+                                            reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
+                                            HashMap<String, String> hashMap = new HashMap<>();
+                                            hashMap.put("id", userId);
+                                            assert response.body() != null;
+                                            hashMap.put("username", EncryptHelper.decrypt(response.body().getUsername()));
+                                            hashMap.put("name_user", edit_name.getText().toString());
+                                            hashMap.put("search", EncryptHelper.decrypt(response.body().getUsername()));
+                                            hashMap.put("account_id_cry", response.body().getAccount_id_cry());
+                                            hashMap.put("imageURL", "default");
+                                            hashMap.put("status_chat", "offline");
+                                            hashMap.put("last_seen", formattedDate);
+                                            hashMap.put("typingTo", "noOne");
 
-                                        DtoAccount follow = new DtoAccount();
-                                        follow.setAccount_id_cry(response.body().getAccount_id_cry());
-                                        follow.setAccount_id_following(EncryptHelper.encrypt("25"));
-                                        AccountServices services = retrofitUser.create(AccountServices.class);
-                                        Call<DtoAccount> call_follow = services.follow_a_user(follow);
-                                        call_follow.enqueue(new Callback<DtoAccount>() {
-                                            @Override
-                                            public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {}
-                                            @Override
-                                            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
-                                        });
+                                            DtoAccount follow = new DtoAccount();
+                                            follow.setAccount_id_cry(response.body().getAccount_id_cry());
+                                            follow.setAccount_id_following(EncryptHelper.encrypt("25"));
+                                            AccountServices services = retrofitUser.create(AccountServices.class);
+                                            Call<DtoAccount> call_follow = services.follow_a_user(follow);
+                                            call_follow.enqueue(new Callback<DtoAccount>() {
+                                                @Override
+                                                public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {}
+                                                @Override
+                                                public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+                                            });
 
-                                        reference.setValue(hashMap).addOnCompleteListener(task1 -> {
-                                            if(task1.isSuccessful()) Log.d("User", "Register in Realtime database Successful");
-                                        });
+                                            reference.setValue(hashMap).addOnCompleteListener(task1 -> {
+                                                if(task1.isSuccessful()) Log.d("User", "Register in Realtime database Successful");
+                                            });
 
-                                        //  User has been created so now go to the Email Validation
-                                        Intent i = new Intent(SignUpActivity.this, ValidateEmailActivity.class);
-                                        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
-                                        mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-                                        SharedPreferences.Editor editor = mPrefs.edit();
-                                        editor.putString("pref_account_id", response.body().getAccount_id_cry());
-                                        editor.putString("pref_email", EncryptHelper.encrypt(edit_email.getText().toString()));
-                                        editor.putString("pref_password", EncryptHelper.encrypt(edit_password.getText().toString()));
-                                        editor.apply();
-                                        i.putExtra("account_id", EncryptHelper.decrypt(response.body().getAccount_id_cry()));
-                                        i.putExtra("email_user", edit_email.getText().toString());
-                                        i.putExtra("password", edit_password.getText().toString());
-                                        i.putExtra("type_validate", 0);
-                                        ActivityCompat.startActivity(SignUpActivity.this, i, activityOptionsCompat.toBundle());
-                                        finish();
+                                            //  User has been created so now go to the Email Validation
+                                            Intent i = new Intent(SignUpActivity.this, ValidateEmailActivity.class);
+                                            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
+                                            mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = mPrefs.edit();
+                                            editor.putString("pref_account_id", response.body().getAccount_id_cry());
+                                            editor.putString("pref_email", EncryptHelper.encrypt(edit_email.getText().toString()));
+                                            editor.putString("pref_password", EncryptHelper.encrypt(edit_password.getText().toString()));
+                                            editor.apply();
+                                            i.putExtra("account_id", EncryptHelper.decrypt(response.body().getAccount_id_cry()));
+                                            i.putExtra("email_user", edit_email.getText().toString());
+                                            i.putExtra("password", edit_password.getText().toString());
+                                            i.putExtra("type_validate", 0);
+                                            ActivityCompat.startActivity(SignUpActivity.this, i, activityOptionsCompat.toBundle());
+                                            finish();
 
-                                    } else {
-                                        loadingDialog.dismissDialog();
-                                        //  Email is already used
-                                        ReloadPage(401);
-                                        Log.d("Auth", "Error " + task.getException());
-                                    }
-                                });
-                    }else if(response.code() == 401)
-                        //  Email is already used
-                        ReloadPage(401);
-                    else if(response.code() == 423)
-                        //  Phone is already used
-                        ReloadPage(423);
-                    else if(response.code() == 406)
-                        //  BadWord in user name
-                        ReloadPage(406);
-                    else
+                                        } else {
+                                            loadingDialog.dismissDialog();
+                                            //  Email is already used
+                                            ReloadPage(401);
+                                            Log.d("Auth", "Error " + task.getException());
+                                        }
+                                    });
+                        }else if(response.code() == 401)
+                            //  Email is already used
+                            ReloadPage(401);
+                        else if(response.code() == 423)
+                            //  Phone is already used
+                            ReloadPage(423);
+                        else if(response.code() == 406)
+                            //  BadWord in user name
+                            ReloadPage(406);
+                        else
+                            Warnings.showWeHaveAProblem(SignUpActivity.this);
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
+                        loadingDialog.dismissDialog();
                         Warnings.showWeHaveAProblem(SignUpActivity.this);
-                }
-
-                @Override
-                public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
-                    loadingDialog.dismissDialog();
-                    Warnings.showWeHaveAProblem(SignUpActivity.this);
-                }
-            });
+                    }
+                });
+            }
         });
 
     }
@@ -401,8 +419,10 @@ public class SignUpActivity extends AppCompatActivity {
         btn_back_signUp = findViewById(R.id.btn_back_signUp);
         edit_name = findViewById(R.id.edit_name_signUp);
         edit_email = findViewById(R.id.edit_email_signUp);
+        txt_policy_and_privacy = findViewById(R.id.txt_policy_and_privacy);
         edit_phone = findViewById(R.id.edit_phone_signUp);
         email_tl_signUp = findViewById(R.id.email_tl_signUp);
+        policy_and_privacy_check = findViewById(R.id.policy_and_privacy_check);
         phone_tl_signUp = findViewById(R.id.phone_tl_signUp);
         edit_bornDate = findViewById(R.id.edit_bornDate_signUp);
         bornDate_tl_signUp = findViewById(R.id.bornDate_tl_signUp);
