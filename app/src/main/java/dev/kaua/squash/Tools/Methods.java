@@ -6,14 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.Environment;
 import android.text.SpannableStringBuilder;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
@@ -32,6 +35,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -326,7 +331,7 @@ public abstract class Methods extends MainActivity {
         }
     }
 
-    public static String shuffle(String s) {
+    public static String shuffle(@NonNull String s) {
         List<String> letters = Arrays.asList(s.split(""));
         Collections.shuffle(letters);
         StringBuilder t = new StringBuilder(s.length());
@@ -372,6 +377,96 @@ public abstract class Methods extends MainActivity {
         mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         //Retrieve the values
         return mPrefs.getStringSet("pinned_users_chat", null);
+    }
+
+
+    public static File SaveImage(Context mContext, Bitmap finalBitmap, @NonNull String chat_id, String timeReceive) {
+        String root = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES).toString();
+        File myDir = new File(root + "/Squash Images");
+        //noinspection ResultOfMethodCallIgnored
+        myDir.mkdirs();
+
+        String fName = "IMG-"+ timeReceive + chat_id.substring(0, 11) + ".jpg";
+        File file = new File (myDir, fName.toUpperCase());
+        if (file.exists()) {
+            Log.d("ExternalStorage", "Image already exists");
+        }else{
+            fName = "IMG-"+ timeReceive + "_" + chat_id.substring(0, 11) + ".jpg";
+            file = new File (myDir, fName.toUpperCase());
+            try {
+                FileOutputStream out = new FileOutputStream(file);
+                finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                out.flush();
+                out.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.d("ExternalStorage", e.toString());
+            }
+            // Tell the media scanner about the new file so that it is
+            // immediately available to the user.
+            MediaScannerConnection.scanFile(mContext, new String[]{file.toString()}, null,
+                    (path, uri) -> {
+                        Log.d("ExternalStorage", "Time -> " + timeReceive);
+                        Log.d("ExternalStorage", "Scanned " + path + ":");
+                        Log.d("ExternalStorage", "uri -> " + uri);
+                    });
+        }
+        return file;
+    }
+
+    public static Uri bitmapToUriConverter(Context mContext, Bitmap mBitmap) {
+        Uri uri = null;
+        try {
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            // Calculate inSampleSize
+            options.inSampleSize = calculateInSampleSize(options, 100, 100);
+
+            // Decode bitmap with inSampleSize set
+            options.inJustDecodeBounds = false;
+            Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, 200, 200,
+                    true);
+            File file = new File(mContext.getFilesDir(), "Image"
+                    + new Random().nextInt() + ".jpeg");
+            FileOutputStream out = mContext.openFileOutput(file.getName(),
+                    Context.MODE_WORLD_READABLE);
+            newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+            //get absolute path
+            String realPath = file.getAbsolutePath();
+            File f = new File(realPath);
+            uri = Uri.fromFile(f);
+
+        } catch (Exception e) {
+            Log.e("Your Error Message", e.getMessage());
+        }
+        return uri;
+    }
+
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
     // This method can be used in the future
