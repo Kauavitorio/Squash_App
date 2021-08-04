@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+import dev.kaua.squash.Adapters.ProgressBarAnimation;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
@@ -41,6 +43,8 @@ public class WebActivity extends AppCompatActivity {
     private TextView status_web, url_web;
     static Uri url_start;
     private String url_active;
+    private ProgressBarAnimation anim;
+    private static final String DOCS_URL = "https://docs.google.com/gview?embedded=true&url=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,8 @@ public class WebActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> finish());
 
         url_start = getIntent().getData();
-        webView.loadUrl(url_start.toString());
+        if(url_start.toString().endsWith(".pdf")) webView.loadUrl(DOCS_URL + url_start.toString());
+        else webView.loadUrl(url_start.toString());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient());
         url_web.setText(url_start.toString().replace("https://", "").replace("http://", ""));
@@ -74,12 +79,20 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                view.getSettings().setLoadsImagesAutomatically(true);
                 url_active = url;
                 progressBar.setVisibility(View.GONE);
 
                 SetUrlLink(url);
 
-                status_web.setText(view.getTitle());
+                if(view.getTitle().replace("_", " ").replace(".pdf", "").equals(getString(R.string.squash_privacy_policy)))
+                    status_web.setText(getString(R.string.squash_privacy_policy));
+                else{
+                    String web_title = view.getTitle();
+                    if(web_title.length() > 40)
+                        web_title = web_title.substring(0, 38) + "…";
+                    status_web.setText(web_title);
+                }
             }
         });
 
@@ -87,11 +100,22 @@ public class WebActivity extends AppCompatActivity {
             public void onProgressChanged(WebView view, int progress)
             {
                 progressBar.setVisibility(View.VISIBLE);
+
+                anim = null;
+                anim = new ProgressBarAnimation(progressBar, progressBar.getProgress(), progress);
+                anim.setDuration(500);
+                progressBar.startAnimation(anim);
+
                 // update the progressBar
-                progressBar.setProgress(progress);
                 Log.d("WebProgress", "Current progress -> " + progress);
 
-                if(progress  == 100) progressBar.setVisibility(View.GONE);
+                if(progress  == 100) {
+                    anim = null;
+                    anim = new ProgressBarAnimation(progressBar, progressBar.getProgress(), progress);
+                    anim.setDuration(500);
+                    progressBar.startAnimation(anim);
+                    new Handler().postDelayed(() -> progressBar.setVisibility(View.GONE),500);
+                }
             }
         });
 
@@ -106,7 +130,7 @@ public class WebActivity extends AppCompatActivity {
         String url_replace = url.substring(0, index).replace("https://", "").replace("http://", "");
 
         if(url_replace.length() > 43)
-            url_replace = url_replace.substring(0, 43) + "...";
+            url_replace = url_replace.substring(0, 38) + "…";
 
         url_web.setText(url_replace);
 

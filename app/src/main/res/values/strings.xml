@@ -143,4 +143,7 @@
     <string name="audio">Audio</string>
     <string name="media">Media</string>
     <string name="new_comment">New Comment</string>
+    <string name="i_agree_with_the_policy_and_privacy"><u>I agree with the privacy policy term.</u></string>
+    <string name="required_to_accept_the_privacy_policy_term">Required to accept the privacy policy term</string>
+    <string name="squash_privacy_policy">Squash Privacy Policy</string>
 </resources>

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,6 +32,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
@@ -42,6 +45,10 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseUser;
@@ -53,6 +60,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+import com.yalantis.ucrop.UCrop;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -946,6 +954,7 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
+    File file_upload_to_crop;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -964,45 +973,93 @@ public class MessageActivity extends AppCompatActivity {
             BackgroundHelper.SendToCrop(this, data);
 
         if (requestCode == PICK_IMAGE_REQUEST_MEDIA && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            LoadingDialog loadingDialog = new LoadingDialog(this);
-            loadingDialog.startLoading();
             Uri filePath = data.getData();
+            LoadingDialog dialog = new LoadingDialog(this);
+            dialog.startLoading();
             try {
-                //getting image from gallery
-                if(filePath != null) {
+                Glide.with(this)
+                        .asBitmap()
+                        .load(filePath)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                try {
+                                    @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date());
+                                    file_upload_to_crop = Methods.SaveImage(MessageActivity.this, resource, chat_id, timeStamp);
+                                    dialog.dismissDialog();
+                                    UCrop.of(filePath, Uri.fromFile(file_upload_to_crop))
+                                            .start(MessageActivity.this);
+                                }
+                                catch (Exception ex){
+                                    dialog.dismissDialog();
+                                    Warnings.showWeHaveAProblem(MessageActivity.this);
+                                    Log.d(TAG, ex.toString());
+                                }
+                            }
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) { }
+                        });
 
-                    //uploading the image
-                    storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
-                            + getFileName(filePath).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(3));
-                    storageReference.putFile(filePath).continueWithTask(task -> {
-                        if (!task.isSuccessful()) {
-                            Log.d(TAG, Objects.requireNonNull(task.getException()).toString());
-                        }
-                        return storageReference.getDownloadUrl();
-                    }).addOnCompleteListener(task -> {
-                        loadingDialog.dismissDialog();
-                        if (task.isSuccessful()) {
-                            Uri downloadUri = task.getResult();
-                            medias_pin = new ArrayList<>();
-                            medias_pin.add(downloadUri.toString());
-                            sendMessage(fUser.getUid(), userId, text_send.getText().toString());
-
-                        } else {
-                            loadingDialog.dismissDialog();
-                            Warnings.showWeHaveAProblem(MessageActivity.this);
-                            Log.d(TAG, Objects.requireNonNull(task.getException()).toString());
-                        }
-                    });
-                }
-                else{
-                    ToastHelper.toast(this, getString(R.string.select_an_image), 0);
-                    loadingDialog.dismissDialog();
-                }
-            } catch (Exception ex) {
-                loadingDialog.dismissDialog();
-                Warnings.showWeHaveAProblem(this);
+            }catch (Exception ex){
+                dialog.dismissDialog();
+                Warnings.showWeHaveAProblem(MessageActivity.this);
                 Log.d(TAG, ex.toString());
             }
+        }
+
+        LoadingDialog loadingDialog = new LoadingDialog(this);
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            loadingDialog.startLoading();
+            final Uri resultUri = UCrop.getOutput(data);
+            Upload_Image(loadingDialog, resultUri);
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            loadingDialog.dismissDialog();
+            if(data != null){
+                final Throwable cropError = UCrop.getError(data);
+                if(cropError != null)
+                Log.d(TAG, cropError.toString());
+            }
+            Warnings.showWeHaveAProblem(this);
+        }
+    }
+
+    private void Upload_Image(LoadingDialog loadingDialog, Uri resultUri) {
+        try {
+            //getting image from gallery
+            if(resultUri != null) {
+
+                //uploading the image
+                storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
+                        + getFileName(resultUri).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(3));
+                storageReference.putFile(resultUri).continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.d(TAG, Objects.requireNonNull(task.getException()).toString());
+                    }
+                    return storageReference.getDownloadUrl();
+                }).addOnCompleteListener(task -> {
+                    loadingDialog.dismissDialog();
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        medias_pin = new ArrayList<>();
+                        medias_pin.add(downloadUri.toString());
+                        sendMessage(fUser.getUid(), userId, text_send.getText().toString());
+
+                    } else {
+                        loadingDialog.dismissDialog();
+                        Warnings.showWeHaveAProblem(MessageActivity.this);
+                        Log.d(TAG, Objects.requireNonNull(task.getException()).toString());
+                    }
+                });
+            }
+            else{
+                ToastHelper.toast(this, getString(R.string.select_an_image), 0);
+                loadingDialog.dismissDialog();
+            }
+        } catch (Exception ex) {
+            loadingDialog.dismissDialog();
+            Warnings.showWeHaveAProblem(this);
+            Log.d(TAG, ex.toString());
         }
     }
 

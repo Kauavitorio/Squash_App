@@ -5,10 +5,14 @@ import static android.content.Context.AUDIO_SERVICE;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -31,9 +35,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,11 +54,17 @@ import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MessageActivity;
+import dev.kaua.squash.Adapters.DownloadIdGenerator;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
@@ -258,6 +272,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                         return false;
                     }
                 }).into(holder.media_img);
+
+                viewHolder.container_media_img_chat.setOnClickListener(v -> {
+                    Glide.with(context)
+                            .asBitmap()
+                            .load(message.getMedia().get(0))
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                    String[] receive_time = EncryptHelper.decrypt(message.getTime()).replace("-", "/").split("/");
+                                    if(resource != null) Methods.SaveImage(mContext, resource, chat_id, receive_time[0] + receive_time[1] +
+                                            receive_time[2].replace(" ", "").replace(":", "").substring(0, 8));
+                                }
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) { }
+                            });
+                });
             }
         }else{
             viewHolder.container_media_img_chat.setVisibility(View.GONE);
@@ -296,6 +327,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         //recycler_view_msg.smoothScrollToPosition(mMessages.size() - 1);
     }
+
 
     private void ResetHandlers() {
         handler.removeCallbacks(runnable);

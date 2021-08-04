@@ -26,10 +26,9 @@ import dev.kaua.squash.Tools.Warnings;
 
 public class Profile_Image extends EditProfileActivity {
 
-    public static void SendToCrop(Activity context, Intent data) {
+    public static void SendToCrop(Activity context, Uri filePath) {
         LoadingDialog loadingDialog = new LoadingDialog(context);
         loadingDialog.startLoading();
-        Uri filePath = data.getData();
         try {
             //getting image from gallery
             if(filePath != null) {

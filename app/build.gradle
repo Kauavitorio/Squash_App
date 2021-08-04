@@ -10,8 +10,8 @@ android {
         applicationId "dev.kaua.squash"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 8
-        versionName "1.7.6"
+        versionCode 10
+        versionName "1.7.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -75,6 +75,9 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
     /*--------------- End Retrofit Dependencies  ---------------*/
+
+    //  UCrop for edit images
+    implementation 'com.github.yalantis:ucrop:2.2.6-native'
 
     //  Encrypt Dependencies
     implementation 'org.slf4j:slf4j-api:1.7.25'
