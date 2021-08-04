@@ -146,4 +146,7 @@
     <string name="i_agree_with_the_policy_and_privacy"><u>I agree with the privacy policy term.</u></string>
     <string name="required_to_accept_the_privacy_policy_term">Required to accept the privacy policy term</string>
     <string name="squash_privacy_policy">Squash Privacy Policy</string>
+    <string name="sent_on">Sent on</string>
+    <string name="unable_to_download_the_image">Unable to download the image</string>
+    <string name="image_downloaded_successfully">Image downloaded successfully</string>
 </resources>

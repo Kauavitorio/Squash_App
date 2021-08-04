@@ -79,6 +79,9 @@ dependencies {
     //  UCrop for edit images
     implementation 'com.github.yalantis:ucrop:2.2.6-native'
 
+    //  Zoom Image
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
+
     //  Encrypt Dependencies
     implementation 'org.slf4j:slf4j-api:1.7.25'
     implementation 'com.github.tony19:logback-android:1.1.1-12'

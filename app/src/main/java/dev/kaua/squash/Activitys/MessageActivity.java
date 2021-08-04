@@ -33,7 +33,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
@@ -144,7 +143,7 @@ public class MessageActivity extends AppCompatActivity {
 
     private static DaoChat chatDB;
     private static DatabaseReference reference;
-    private static MessageAdapter messageAdapter;
+    static MessageAdapter messageAdapter;
     private static List<DtoMessage> mMessage;
     private List<String> medias_pin = new ArrayList<>();
     private static String userId;
@@ -152,14 +151,14 @@ public class MessageActivity extends AppCompatActivity {
     String another_user_image = "";
     private Animation myAnim;
 
-    APIService apiService;
+    private APIService apiService;
 
     boolean notify = false;
     public static final int PIC_CROP = 111;
     public static final int PICK_IMAGE_REQUEST = 222;
     public static final int PICK_IMAGE_REQUEST_MEDIA = 333;
     public static final int OPEN_CAMERA = 444;
-    public static final String TAG = "MESSAGE_ACTIVITY";
+    private static final String TAG = "MESSAGE_ACTIVITY";
     public static StorageReference storageReference;
 
     Intent intent;
@@ -177,7 +176,7 @@ public class MessageActivity extends AppCompatActivity {
     private Timer timer;
     private float x1,x2;
     static final int MIN_DISTANCE = dp(400);
-    AudioRecorder audioRecorder;
+    private static AudioRecorder audioRecorder;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override

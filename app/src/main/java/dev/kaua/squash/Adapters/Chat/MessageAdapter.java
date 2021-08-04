@@ -5,6 +5,7 @@ import static android.content.Context.AUDIO_SERVICE;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -32,6 +33,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -64,6 +67,7 @@ import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MessageActivity;
+import dev.kaua.squash.Activitys.ViewMediaActivity;
 import dev.kaua.squash.Adapters.DownloadIdGenerator;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
@@ -274,20 +278,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 }).into(holder.media_img);
 
                 viewHolder.container_media_img_chat.setOnClickListener(v -> {
-                    Glide.with(context)
-                            .asBitmap()
-                            .load(message.getMedia().get(0))
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(new CustomTarget<Bitmap>() {
-                                @Override
-                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                    String[] receive_time = EncryptHelper.decrypt(message.getTime()).replace("-", "/").split("/");
-                                    if(resource != null) Methods.SaveImage(mContext, resource, chat_id, receive_time[0] + receive_time[1] +
-                                            receive_time[2].replace(" ", "").replace(":", "").substring(0, 8));
-                                }
-                                @Override
-                                public void onLoadCleared(@Nullable Drawable placeholder) { }
-                            });
+                    viewHolder.container_media_img_chat.startAnimation(myAnim);
+                    Intent i = new Intent(mContext, ViewMediaActivity.class);
+                    i.putExtra("image_url", message.getMedia().get(0));
+                    i.putExtra("receive_time", EncryptHelper.decrypt(message.getTime()).replace("-", "/"));
+                    i.putExtra("chat_id", chat_id);
+                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
+                    ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
                 });
             }
         }else{

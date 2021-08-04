@@ -138,4 +138,7 @@
     <string name="i_agree_with_the_policy_and_privacy"><u>Eu concordo com o termo de política de privacidade.</u></string>
     <string name="required_to_accept_the_privacy_policy_term">Necessário para aceitar o termo da política de privacidade</string>
     <string name="squash_privacy_policy">Política de privacidade Squash</string>
+    <string name="sent_on">Enviado em</string>
+    <string name="unable_to_download_the_image">Não foi possível baixar a imagem, tente mais tarde.</string>
+    <string name="image_downloaded_successfully">Imagem baixada com sucesso</string>
 </resources>
