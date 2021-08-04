@@ -437,7 +437,7 @@ public class MessageActivity extends AppCompatActivity {
                 if(myTimerTask != null) myTimerTask = null;
                 myTimerTask = new MyTimerTask();
                 timer.schedule(myTimerTask, 1000, 1000);
-                vibrate();
+                Methods.vibrate(this, Methods.VIBRATE_SHORT);
             }catch (Exception ex){
                 recording = false;
                 Log.d(TAG, ex.getMessage());
@@ -490,7 +490,7 @@ public class MessageActivity extends AppCompatActivity {
                     timer.cancel();
 
                 recordTimeText.setText("00:00");
-                vibrate();
+                Methods.vibrate(this, Methods.VIBRATE_SHORT);
             } else {
                 recordPanel.setVisibility(View.GONE);
                 container_edit_text.setVisibility(View.VISIBLE);
@@ -502,20 +502,11 @@ public class MessageActivity extends AppCompatActivity {
                     timer.cancel();
 
                 recordTimeText.setText("00:00");
-                vibrate();
+                Methods.vibrate(this, Methods.VIBRATE_SHORT);
             }
         }catch (Exception ex){
             Log.d(TAG, ex.toString());
             Warnings.showWeHaveAProblem(this);
-        }
-    }
-
-    private void vibrate() {
-        try {
-            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            v.vibrate(200);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

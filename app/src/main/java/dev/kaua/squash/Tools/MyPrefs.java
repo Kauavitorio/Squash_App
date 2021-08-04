@@ -8,6 +8,8 @@ import dev.kaua.squash.Security.EncryptHelper;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import androidx.annotation.NonNull;
+
 public abstract class MyPrefs {
     public static final String PREFS_USER = "myPrefs";
     public static final String PREFS_CONFIG = "myPrefsConfiguration";
@@ -18,7 +20,7 @@ public abstract class MyPrefs {
     public static SharedPreferences sp;
 
     @SuppressWarnings("ConstantConditions")
-    public static DtoAccount getUserInformation(Context context){
+    public static DtoAccount getUserInformation(@NonNull Context context){
         sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
 
         //  Passing all preferences to DTO
@@ -43,7 +45,7 @@ public abstract class MyPrefs {
         return account;
     }
 
-    public static void setUpdateRequest_Show(Context context, int request){
+    public static void setUpdateRequest_Show(@NonNull Context context, int request){
         sp = context.getSharedPreferences(PREFS_UPDATES, MODE_PRIVATE);
         sp.edit().clear().apply();
 
@@ -53,8 +55,23 @@ public abstract class MyPrefs {
         editor.apply();
     }
 
-    public static int getUpdateRequest_Show(Context context){
+    public static int getUpdateRequest_Show(@NonNull Context context){
         sp = context.getSharedPreferences(PREFS_UPDATES, MODE_PRIVATE);
         return sp.getInt("pref_request", 0);
+    }
+
+    public static void logOut(@NonNull Context context){
+        //  Clear User Prefs
+        sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
+        sp.edit().clear().apply();
+        //  Clear User Config Prefs
+        sp = context.getSharedPreferences(PREFS_CONFIG, MODE_PRIVATE);
+        sp.edit().clear().apply();
+        //  Clear User Notification Config Prefs
+        sp = context.getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
+        sp.edit().clear().apply();
+        //  Clear User Terms Prefs
+        sp = context.getSharedPreferences(PREFS_TERMS, MODE_PRIVATE);
+        sp.edit().clear().apply();
     }
 }

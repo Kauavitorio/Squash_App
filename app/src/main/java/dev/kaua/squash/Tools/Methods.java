@@ -17,6 +17,7 @@ import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.text.SpannableStringBuilder;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
@@ -47,10 +48,8 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeMap;
 
-import dev.kaua.squash.Activitys.IntroActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.WebActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
@@ -257,6 +256,7 @@ public abstract class Methods extends MainActivity {
         firebaseUser = ConfFirebase.getFirebaseUser();
         //noinspection ConstantConditions
         if(firebaseUser.getUid() != null){
+            reference = null;
             reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
             HashMap<String, Object> hashMap = new HashMap<>();
             if(status.equals("offline"))
@@ -270,6 +270,8 @@ public abstract class Methods extends MainActivity {
 
     //  Method to update typing status for chat system
     public static void typingTo_chat_Status(String typing){
+        firebaseUser = null;
+        reference = null;
         firebaseUser = ConfFirebase.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
@@ -352,33 +354,17 @@ public abstract class Methods extends MainActivity {
         return result;
     }
 
-    private static SharedPreferences mPrefs;
-    @SuppressLint("MutatingSharedPrefs")
-    public static void PinAUser_Chat(Context context, String userId){
-        ToastHelper.toast((Activity)context, context.getString(R.string.under_development), 0);
-        /*mPrefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        //Retrieve the values
-        Set<String> set = mPrefs.getStringSet("pinned_users_chat", null);
-        SharedPreferences.Editor editor = mPrefs.edit();
-
-        if (set == null)
-            set = new HashSet<>();
-
-        if(!set.contains(userId))
-            set.add(userId);
-
-        //Set the values
-        Set<String> set_list = new HashSet<>(set);
-        editor.putStringSet("pinned_users_chat", set_list);
-        editor.apply();*/
+    public static final int VIBRATE_SHORT = 200;
+    public static final int VIBRATE_LONG = 500;
+    private static Vibrator vibrator;
+    public static void vibrate(Context context, int VIBRATE_TIME) {
+        try {
+            if(vibrator == null) vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(VIBRATE_TIME);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
-    public static Set<String> GetPinnedChat(Context context){
-        mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        //Retrieve the values
-        return mPrefs.getStringSet("pinned_users_chat", null);
-    }
-
 
     public static File SaveImage(Context mContext, Bitmap finalBitmap, @NonNull String chat_id, String timeReceive) {
         String root = Environment.getExternalStoragePublicDirectory(
@@ -444,7 +430,6 @@ public abstract class Methods extends MainActivity {
         }
         return uri;
     }
-
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {

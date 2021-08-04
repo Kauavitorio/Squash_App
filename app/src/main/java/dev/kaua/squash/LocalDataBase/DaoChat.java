@@ -19,6 +19,8 @@ import dev.kaua.squash.Data.Post.DtoPost;
 public class DaoChat extends SQLiteOpenHelper {
     private final String TABLE_BG = "TBL_BACKGROUND";
     private final String TABLE_CHAT_LIST = "TBL_CHAT_LIST";
+    public static final int DROP_BG = 0;
+    public static final int DROP_ALL = 999;
 
     public DaoChat(@Nullable Context context) {
         super(context, "DB_CHAT", null, 16);
@@ -229,14 +231,19 @@ public class DaoChat extends SQLiteOpenHelper {
 
     public void DropTable(int type){
         SQLiteDatabase db = this.getWritableDatabase();
-        if(type == 0){
+        if(type == DROP_BG){
             db.delete(TABLE_BG,null,null);
             Log.d("DB_CHAT", "Dropped BG");
-        }else{
+        }else if(type == DROP_ALL){
+            db.delete(TABLE_BG,null,null);
+            Log.d("DB_CHAT", "Dropped BG");
             db.delete(TABLE_CHAT_LIST,null,null);
             Log.d("DB_CHAT", "Dropped CHAT LIST");
         }
-        //createTable(db);
+        else{
+            db.delete(TABLE_CHAT_LIST,null,null);
+            Log.d("DB_CHAT", "Dropped CHAT LIST");
+        }
     }
 
 }
