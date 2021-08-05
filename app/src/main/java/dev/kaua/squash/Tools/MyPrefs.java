@@ -2,6 +2,7 @@ package dev.kaua.squash.Tools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -14,8 +15,10 @@ public abstract class MyPrefs {
     public static final String PREFS_USER = "myPrefs";
     public static final String PREFS_CONFIG = "myPrefsConfiguration";
     public static final String PREFS_UPDATES = "myPrefsUpdates";
-    public static final String PREFS_NOTIFICATION = "myPrefsNOTFY";
+    public static final String PREFS_PRIVACY_POLICY = "myPrefsPrivacyPolicy";
+    public static final String PREFS_NOTIFICATION = "myPrefsNotify";
     public static final String PREFS_TERMS = "myPrefsTerms_Experience";
+    public static final String TAG = "MyPrefs";
     private static final DtoAccount account = new DtoAccount();
     public static SharedPreferences sp;
 
@@ -60,6 +63,20 @@ public abstract class MyPrefs {
         return sp.getInt("pref_request", 0);
     }
 
+    public static long Privacy_Policy_Version(@NonNull Context context){
+        sp = context.getSharedPreferences(PREFS_PRIVACY_POLICY, MODE_PRIVATE);
+        Log.d(TAG, "Current version -> " + sp.getLong("pref_version", 0));
+        return sp.getLong("pref_version", 0);
+    }
+
+    public static void setPrivacy_Policy(@NonNull Context context, long version){
+        sp = context.getSharedPreferences(PREFS_PRIVACY_POLICY, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putLong("pref_version", version);
+        editor.apply();
+        Log.d(TAG, version + " <- New Version");
+    }
+
     public static void logOut(@NonNull Context context){
         //  Clear User Prefs
         sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
@@ -72,6 +89,9 @@ public abstract class MyPrefs {
         sp.edit().clear().apply();
         //  Clear User Terms Prefs
         sp = context.getSharedPreferences(PREFS_TERMS, MODE_PRIVATE);
+        sp.edit().clear().apply();
+        //  Clear Privacy Policy Prefs
+        sp = context.getSharedPreferences(PREFS_PRIVACY_POLICY, MODE_PRIVATE);
         sp.edit().clear().apply();
     }
 }

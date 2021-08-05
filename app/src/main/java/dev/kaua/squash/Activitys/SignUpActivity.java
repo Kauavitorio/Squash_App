@@ -18,6 +18,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
@@ -27,8 +28,11 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,6 +47,7 @@ import java.util.TimerTask;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.Fragments.SearchFragment;
 import dev.kaua.squash.R;
@@ -216,6 +221,8 @@ public class SignUpActivity extends AppCompatActivity {
                                         if (task.isSuccessful()) {
                                             loadingDialog.dismissDialog();
 
+                                            Privacy_PolicyCheck();
+
                                             // Sign in success, now go to register user into API
                                             FirebaseUser user = mAuth.getCurrentUser();
                                             Log.w("Auth", "OK" + user);
@@ -308,6 +315,24 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    //  Method to get last version of Privacy Policy
+    private void Privacy_PolicyCheck(){
+        if(Methods.isOnline(SignUpActivity.this)){
+            reference = FirebaseDatabase.getInstance().getReference("System");
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(Methods.isOnline(SignUpActivity.this)){
+                        DtoSystem system = snapshot.getValue(DtoSystem.class);
+                        if(system != null) MyPrefs.setPrivacy_Policy(SignUpActivity.this, system.getPrivacy_policy());
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {}
+            });
+        }
     }
 
     //  Method to check what is the error the register got

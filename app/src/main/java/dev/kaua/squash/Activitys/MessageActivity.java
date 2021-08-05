@@ -907,7 +907,7 @@ public class MessageActivity extends AppCompatActivity {
                 ToastHelper.toast(this, getString(R.string.under_development), 0);
                 return true;
             case R.id.pin_message:
-                Methods.PinAUser_Chat(MessageActivity.this, userId);
+                ToastHelper.toast(this, getString(R.string.under_development), 0);
                 return true;
             case R.id.wallpaper_profile:
                 ToastHelper.toast(this, getString(R.string.under_development), 1);

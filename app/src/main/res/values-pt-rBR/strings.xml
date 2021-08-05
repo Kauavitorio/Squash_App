@@ -141,4 +141,9 @@
     <string name="sent_on">Enviado em</string>
     <string name="unable_to_download_the_image">Não foi possível baixar a imagem, tente mais tarde.</string>
     <string name="image_downloaded_successfully">Imagem baixada com sucesso</string>
+    <string name="updating_its_terms_and_privacy_policy">Squash está atualizando seus termos e política de privacidade.</string>
+    <string name="key_updates_include_more_information_about">Com esta <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">atualização</a></font>, estamos fornecendo mais informações em nossos termos e política de privacidade, incluindo como você pode conversar com empresas, se desejar. Isso inclui: </string>
+    <string name="services_and_how_we_process_your_data">1- Mais informações sobre como funciona o Squash; incluindo como processamos dados e mantemos sua conta segura.</string>
+    <string name="please_accept_these_terms">Aceite estes termos para continuar usando o Squash após esta data. Saiba mais sobre como processamos seus dados em nossa política de privacidade atualizada.</string>
+    <string name="accept">Aceitar</string>
 </resources>

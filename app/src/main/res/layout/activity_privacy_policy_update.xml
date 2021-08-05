@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="35dp"
+    tools:context=".Activitys.PrivacyPolicyUpdateActivity">
+
+    <!-- Docs Icon -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_ic_docs"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:cardBackgroundColor="@color/hint"
+        app:cardCornerRadius="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Docs Icon -->
+        <ImageView
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_docs"
+            tools:ignore="ContentDescription" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Header text -->
+    <TextView
+        android:id="@+id/txt_header_privacy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/updating_its_terms_and_privacy_policy"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView_ic_docs" />
+
+    <!-- text include information -->
+    <TextView
+        android:id="@+id/txt_include_information"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp"
+        android:clickable="true"
+        android:textColor="@color/black"
+        android:text="@string/key_updates_include_more_information_about"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_header_privacy" />
+
+    <!-- text container info -->
+    <LinearLayout
+        android:id="@+id/container_info_update_policy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/txt_include_information">
+
+        <!-- text Squash's services and how we process your data -->
+        <TextView
+            android:id="@+id/txt_services_and_how_we_process"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:text="@string/services_and_how_we_process_your_data"
+            android:textColor="@color/background_menu_sheet"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_header_privacy" />
+
+    </LinearLayout>
+
+    <!-- Text Please accept -->
+    <TextView
+        android:id="@+id/txt_please_accept"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp"
+        android:clickable="true"
+        android:textColor="@color/hint"
+        android:text="@string/please_accept_these_terms"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/container_info_update_policy" />
+
+    <!-- Btn Accept -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btn_accept"
+        android:layout_width="130dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="20dp"
+        app:cardBackgroundColor="@color/base_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_please_accept" >
+
+        <!-- Accept Text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="@string/accept"
+            android:textAllCaps="true"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:textStyle="bold"/>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -151,6 +151,9 @@ public class MainFragment extends Fragment {
                                     if(MyPrefs.getUpdateRequest_Show(getContext()) == 0 || system.getNeedUpdate() == 1)
                                         Warnings.showNeedUpdate(requireContext(), system.getVersionName(), system.getVersionCode(), (int) system.getNeedUpdate());
                             }
+
+                            if(MyPrefs.Privacy_Policy_Version(getContext()) < system.getPrivacy_policy())
+                                Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
                         }
                     }
                 }

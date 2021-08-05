@@ -27,13 +27,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
-
         <!-- Image Crop Activity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-
+        <activity
+            android:name=".Activitys.PrivacyPolicyUpdateActivity"
+            android:exported="true" />
         <activity
             android:name=".Activitys.ViewMediaActivity"
             android:exported="true" />

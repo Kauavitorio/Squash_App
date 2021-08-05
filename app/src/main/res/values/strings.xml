@@ -149,4 +149,9 @@
     <string name="sent_on">Sent on</string>
     <string name="unable_to_download_the_image">Unable to download the image</string>
     <string name="image_downloaded_successfully">Image downloaded successfully</string>
+    <string name="updating_its_terms_and_privacy_policy">Squash is updating its terms and privacy policy.</string>
+    <string name="key_updates_include_more_information_about">With this <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">update</a></font>, we\'re providing more information in our terms and privacy policy, including how you can chat with businesses if you choose. This include:</string>
+    <string name="services_and_how_we_process_your_data">1- More information about how Squash works; including how we process data and keep your account safe.</string>
+    <string name="please_accept_these_terms">Please accept these <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">terms</a></font> to continue using Squash after this date. Learn about how we process your data in our updated <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">privacy policy.</a></font></string>
+    <string name="accept">Accept</string>
 </resources>
