@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -15,7 +14,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import dev.kaua.squash.Adapters.Comments_Adapters;
-import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.JsonHandler;
 import dev.kaua.squash.Tools.Methods;
@@ -44,7 +42,7 @@ public class AsyncComments_Posts extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        String json =  JsonHandler.getJson( Methods.BASE_URL + "post/action/get-comments?post_id=" + post_id);
+        String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "post/action/get-comments?post_id=" + post_id);
         Comments_Adapters comments_adapters = null;
         try {
             JSONObject jsonObject = new JSONObject(json);

@@ -7,14 +7,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.util.Patterns;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import java.util.ArrayList;
 
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -31,6 +30,7 @@ import dev.kaua.squash.Tools.MyPrefs;
 public class SplashActivity extends AppCompatActivity {
     //  Create timer
     private final Handler timer = new Handler();
+    public static final String TAG = "SplashActivity";
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -46,7 +46,7 @@ public class SplashActivity extends AppCompatActivity {
         String type = intent.getType();
         if(data != null){
             String UrlGetFrom = data.toString();
-            UrlGetFrom = UrlGetFrom.replace(Methods.BASE_URL, "").replace("http://squash-social.herokuapp.com/", "");
+            UrlGetFrom = UrlGetFrom.replace(Methods.BASE_URL_HTTPS, "").replace(Methods.BASE_URL_HTTP, "");
             String[] KnowContent = UrlGetFrom.split("/");
             if (KnowContent[0].equals("verify-account")){
                 if(KnowContent[1] != null && KnowContent[1].length() > 3 ){
@@ -62,17 +62,17 @@ public class SplashActivity extends AppCompatActivity {
                 }
             } else if(KnowContent[0].equals("share")){
                 try {
-                    Log.d("ShareLink", KnowContent[3]);
+                    Log.d(TAG, KnowContent[3]);
                     int indexBase = KnowContent[3].indexOf("?");
                     String post_id = KnowContent[3].substring(0, indexBase);
-                    Log.d("ShareLink", post_id);
+                    Log.d(TAG, post_id);
                     finish();
                     Intent i = new Intent(this, PostDetailsActivity.class);
                     i.putExtra("post_id", Long.parseLong(post_id));
                     i.putExtra("comment", 0);
                     startActivity(i);
                 }catch (Exception ex){
-                    Log.d("ShareLink", ex.toString());
+                    Log.d(TAG, ex.toString());
                     finishAffinity();
                     verifyIfUsersLogged();
                 }
@@ -82,9 +82,6 @@ public class SplashActivity extends AppCompatActivity {
                 handleSendText(intent); // Handle text being sent
             else if (type.startsWith("image/"))
                 handleSendImage(intent); // Handle single image being sent
-        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
-            if (type.startsWith("image/"))
-                handleSendMultipleImages(intent); // Handle multiple images being sent
         } else verifyIfUsersLogged();
 
     }
@@ -93,29 +90,28 @@ public class SplashActivity extends AppCompatActivity {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
             Intent goto_main = new Intent(this, MainActivity.class);
-            goto_main.putExtra("shortcut", 0);
-            goto_main.putExtra("shared", 1);
-            goto_main.putExtra("shared_type", 1);
-            goto_main.putExtra("shared_content", sharedText);
+            goto_main.putExtra(MainActivity.SHORTCUT_TAG, 0);
+            goto_main.putExtra(MainActivity.SHARED_TAG, MainActivity.SHARED_ID);
+            goto_main.putExtra(MainActivity.SHARED_TYPE_TAG, MainActivity.SHARED_PLAIN_TEXT);
+            goto_main.putExtra(MainActivity.SHARED_CONTENT_TAG, sharedText);
             ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
             ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
             finishAffinity();
         }else verifyIfUsersLogged();
     }
 
-    void handleSendImage(Intent intent) {
+    void handleSendImage(@NonNull Intent intent) {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
-            verifyIfUsersLogged();
-            Log.d("SPLASH_HANDLER", "image -> " + imageUri);
-        }else verifyIfUsersLogged();
-    }
-
-    void handleSendMultipleImages(Intent intent) {
-        ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-        if (imageUris != null) {
-            verifyIfUsersLogged();
-            Log.d("SPLASH_HANDLER", imageUris + "");
+            Intent goto_main = new Intent(this, MainActivity.class);
+            goto_main.putExtra(MainActivity.SHORTCUT_TAG, 0);
+            goto_main.putExtra(MainActivity.SHARED_TAG, MainActivity.SHARED_ID);
+            goto_main.putExtra(MainActivity.SHARED_TYPE_TAG, MainActivity.SHARED_IMAGE);
+            goto_main.putExtra(MainActivity.SHARED_CONTENT_TAG, imageUri);
+            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
+            ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
+            finishAffinity();
+            Log.d(TAG, "image -> " + imageUri);
         }else verifyIfUsersLogged();
     }
 
@@ -146,8 +142,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private void GoToMain(){
         Intent goto_main = new Intent(this, MainActivity.class);
-        goto_main.putExtra("shortcut", 0);
-        goto_main.putExtra("shared", 0);
+        goto_main.putExtra(MainActivity.SHORTCUT_TAG, 0);
+        goto_main.putExtra(MainActivity.SHARED_TAG, 0);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
         finishAffinity();
@@ -155,7 +151,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void GoToIntro(){
         Intent goto_intro = new Intent(this, IntroActivity.class);
-        goto_intro.putExtra("shortcut", 0);
+        goto_intro.putExtra(MainActivity.SHORTCUT_TAG, 0);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goto_intro, activityOptionsCompat.toBundle());
         finishAffinity();

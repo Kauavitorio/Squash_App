@@ -2,7 +2,6 @@ package dev.kaua.squash.Activitys;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,7 +12,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.os.Vibrator;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -579,9 +577,13 @@ public class MessageActivity extends AppCompatActivity {
 
     private void CheckShared() {
         Bundle bundle = getIntent().getExtras();
-        if(bundle.getInt("shared") == 1){
-            if(bundle.getInt("shared_type") == 1)
+        if(bundle.getInt("shared") == MainActivity.SHARED_ID){
+            int shared_type = bundle.getInt("shared_type");
+            if(shared_type == MainActivity.SHARED_PLAIN_TEXT)
                 text_send.setText(bundle.getString("shared_content"));
+            else if(shared_type == MainActivity.SHARED_IMAGE){
+                ToastHelper.toast(this, getString(R.string.under_development), 0);
+            }
         }
     }
 
@@ -1080,6 +1082,8 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
+    public static MessageActivity getInstance(){ return instance; }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -1091,7 +1095,12 @@ public class MessageActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         reference.removeEventListener(seenListener);
-        Methods.status_chat("offline", this);
+        try {
+            MainActivity instance = MainActivity.getInstance();
+            if(instance == null) Methods.status_chat("offline", this);
+        }catch (Exception ex){
+            Methods.status_chat("offline", this);
+        }
         Methods.typingTo_chat_Status("noOne");
         currentUser("none");
     }

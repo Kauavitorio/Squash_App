@@ -76,7 +76,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public abstract class Methods extends MainActivity {
 
     //  Base API URL
-    public static final String BASE_URL = "https://squash-social.herokuapp.com/";
+    public static final String BASE_URL_HTTPS = "https://squash-social.herokuapp.com/";
+    public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
     public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.;])[A-Za-z\\d@$!%*#?&.;]{8,}$";
     private static FirebaseUser firebaseUser;
@@ -110,7 +111,7 @@ public abstract class Methods extends MainActivity {
     }
 
     @NonNull
-    public static String RandomCharactersWithoutSpecials (int CharactersAmount) {
+    public static String RandomCharactersWithoutSpecials (final int CharactersAmount) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < CharactersAmount; i++) {
             int ch = rand.nextInt (lettersWithoutSpecials.length);
@@ -124,7 +125,7 @@ public abstract class Methods extends MainActivity {
     @Contract(" -> new")
     public static Retrofit GetRetrofitBuilder(){
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(BASE_URL_HTTPS)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
@@ -150,7 +151,7 @@ public abstract class Methods extends MainActivity {
         return output;
     }
 
-    public static void LoadFollowersAndFollowing(Context context, int base){
+    public static void LoadFollowersAndFollowing(@NonNull Context context, final int base){
         SharedPreferences sp_First = context.getSharedPreferences("myPrefs", MODE_PRIVATE);
         if(base == 0){
             AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
@@ -201,7 +202,7 @@ public abstract class Methods extends MainActivity {
         suffixes.put(1_000_000_000_000_000_000L, "E");
     }
 
-    public static String NumberTrick(long value) {
+    public static String NumberTrick(final long value) {
         //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
         if (value == Long.MIN_VALUE) return NumberTrick(Long.MIN_VALUE + 1);
         if (value < 0) return "-" + NumberTrick(-value);

@@ -35,7 +35,7 @@ public class AsyncUser_Follow extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        String json =  JsonHandler.getJson( Methods.BASE_URL + "user/action/get-users-followes/LqiO3ga5iNuP3eBahfP3TQ" + account_id + "9gfl2dPu91ES2cvCmFyU4g-river-08*A");
+        String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "user/action/get-users-followes/LqiO3ga5iNuP3eBahfP3TQ" + account_id + "9gfl2dPu91ES2cvCmFyU4g-river-08*A");
         try {
             JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("Search");

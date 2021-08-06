@@ -138,7 +138,7 @@ public class PostDetailsActivity extends AppCompatActivity {
         btn_share_post.setOnClickListener(v -> {
             Intent myIntent = new Intent(Intent.ACTION_SEND);
             myIntent.setType("text/plain");
-            String body = Methods.BASE_URL + "share/" + EncryptHelper.decrypt(post_info.getUsername()) + "/post/" + EncryptHelper.decrypt(post_info.getPost_id())
+            String body = Methods.BASE_URL_HTTPS + "share/" + EncryptHelper.decrypt(post_info.getUsername()) + "/post/" + EncryptHelper.decrypt(post_info.getPost_id())
                     + "?s=" + Methods.RandomCharactersWithoutSpecials(3);
             myIntent.putExtra(Intent.EXTRA_TEXT,body);
             startActivity(Intent.createChooser(myIntent, "Share Using"));

@@ -240,7 +240,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         holder.btn_share_post.setOnClickListener(v -> {
             Intent myIntent = new Intent(Intent.ACTION_SEND);
             myIntent.setType("text/plain");
-            String body = Methods.BASE_URL + "share/" + list.get(position).getUsername() + "/post/" +  list.get(position).getPost_id()
+            String body = Methods.BASE_URL_HTTPS + "share/" + list.get(position).getUsername() + "/post/" +  list.get(position).getPost_id()
                     + "?s=" + Methods.RandomCharactersWithoutSpecials(3);
             myIntent.putExtra(Intent.EXTRA_TEXT,body);
             mContext.startActivity(Intent.createChooser(myIntent, "Share Using"));

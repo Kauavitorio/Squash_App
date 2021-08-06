@@ -115,7 +115,7 @@ public abstract class Login {
                     editor.apply();
 
                     //  Getting Followers and Followings
-                    Methods.LoadFollowersAndFollowing(context, 0);
+                    Methods.LoadFollowersAndFollowing(context, 1);
 
                     //  Log in User On Firebase
                     mAuth = ConfFirebase.getFirebaseAuth();

@@ -34,7 +34,7 @@ public class AsyncLikes_Posts_Comment extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        String json =  JsonHandler.getJson( Methods.BASE_URL + "post/list/likes/comment?account_id=" + EncryptHelper.encrypt(account_id + "")
+        String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "post/list/likes/comment?account_id=" + EncryptHelper.encrypt(account_id + "")
                 .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9") + "&key="
                 + Methods.RandomCharactersWithoutSpecials(9));
         try {

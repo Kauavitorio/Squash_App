@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.AutoCompleteTextView;
 
 import org.json.JSONArray;
@@ -38,7 +36,7 @@ public class AsyncUser_Search extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        String json =  JsonHandler.getJson( Methods.BASE_URL + "user/action/search");
+        String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "user/action/search");
         try {
             JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("Search");

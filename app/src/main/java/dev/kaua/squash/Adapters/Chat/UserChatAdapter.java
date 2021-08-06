@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Activitys.ShareContentActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
@@ -84,10 +86,12 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
             intent.putExtra("chat_id", account.getChat_id());
             if(share){
                 int shareType = ShareContentActivity.getInstance().GetShareType();
-                intent.putExtra("shared", 1);
+                intent.putExtra("shared", MainActivity.SHARED_ID);
                 intent.putExtra("shared_type", shareType);
-                if(shareType == 1)
-                intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
+                if(shareType == MainActivity.SHARED_PLAIN_TEXT)
+                    intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
+                else if(shareType == MainActivity.SHARED_IMAGE)
+                    intent.putExtra("shared_content", (Uri) ShareContentActivity.getInstance().GetShareContent());
                 ((Activity)mContext).finish();
             }else intent.putExtra("shared", 0);
             mContext.startActivity(intent);
