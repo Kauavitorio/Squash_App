@@ -4,7 +4,7 @@
     android:id="@+id/message_container"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="8dp"
+    android:padding="2dp"
     android:orientation="vertical"
     android:layout_height="wrap_content">
 

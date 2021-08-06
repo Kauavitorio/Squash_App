@@ -6,14 +6,10 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -41,10 +37,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.request.transition.Transition;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -57,20 +50,15 @@ import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Activitys.ViewMediaActivity;
-import dev.kaua.squash.Adapters.DownloadIdGenerator;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.Methods;
@@ -95,7 +83,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private MediaPlayer mediaPlayer;
     private Handler handler = new Handler();
     private Runnable runnable;
-    private Animation myAnim;
+    private final Animation myAnim;
+    private final DaoChat daoChat;
     FirebaseUser fUser = ConfFirebase.getFirebaseUser();
 
     public MessageAdapter(MessageActivity mContext, List<DtoMessage> mMessages, String imageURL, int joinNow, RecyclerView recycler_view_msg
@@ -108,6 +97,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         this.joinNow = joinNow;
         this.recycler_view_msg = recycler_view_msg;
         this.chat_id = chat_id;
+        this.daoChat = new DaoChat(mContext);
         myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
         checkMessagesSize();
     }
@@ -117,9 +107,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     }
 
     @NonNull
-    @NotNull
     @Override
-    public MessageAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+    public MessageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         View view;
         if(viewType == MSG_TYPE_RIGHT){
@@ -173,17 +162,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         viewHolder.container_msg.setVisibility(View.VISIBLE);
         holder.voicePlayerView.setVisibility(View.GONE);
-        if(mMessages.get(position).getMedia() != null && message.getMedia() != null && message.getMedia().size() > 0){
-            if(EncryptHelper.decrypt(mMessages.get(position).getMessage()) == null || EncryptHelper.decrypt(mMessages.get(position).getMessage()).length() <= 0)
+        if(mMessages.get(position).getMedia() != null && message.getMedia() != null && message.getMedia().size() > 0
+        && !mMessages.get(position).getMedia().get(0).equals("")){
+            if(EncryptHelper.decrypt(mMessages.get(position).getMessage()) == null || EncryptHelper.decrypt(message.getMessage()).length() <= 0)
                 viewHolder.msg_chat_item.setVisibility(View.GONE);
 
             holder.voicePlayerView.setVisibility(View.VISIBLE);
             viewHolder.container_msg.setVisibility(View.GONE);
-            String extension = mMessages.get(position).getMedia().get(0).substring(mMessages.get(position).getMedia().get(0).lastIndexOf("."));
+            String extension = mMessages.get(position).getMedia().get(0).substring(message.getMedia().get(0).lastIndexOf("."));
             Log.d("Audio_Loader", extension.substring(0, 4));
             if(extension.startsWith(".3gp")){
 
-                holder.audio_timer.setText(convertFormat(MediaPlayer.create(mContext, Uri.parse(mMessages.get(position).getMedia().get(0))).getDuration()));
+                holder.audio_timer.setText(convertFormat(MediaPlayer.create(mContext, Uri.parse(message.getMedia().get(0))).getDuration()));
 
                 holder.play_button.setOnClickListener(v -> {
                     AudioManager am = (AudioManager) context.getSystemService(AUDIO_SERVICE);
@@ -191,7 +181,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                         ToastHelper.toast(mContext, mContext.getString(R.string.increase_media_volume), 0);
 
                     ResetHandlers();
-                    mediaPlayer = MediaPlayer.create(context, Uri.parse(mMessages.get(position).getMedia().get(0)));
+                    mediaPlayer = MediaPlayer.create(context, Uri.parse(message.getMedia().get(0)));
                     runnable = new Runnable() {
                         @Override
                         public void run() {
@@ -233,7 +223,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         if(fromUser){
                             if(mediaPlayer != null)
-                            mediaPlayer.seekTo(progress);
+                                mediaPlayer.seekTo(progress);
                         }
 
                         //  Get audio duration
@@ -264,7 +254,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.voicePlayerView.setVisibility(View.GONE);
                 viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
                 viewHolder.media_img.setVisibility(View.VISIBLE);
-                Glide.with(context).load(message.getMedia().get(0)).listener(new RequestListener<Drawable>() {
+                Glide.with(context).load(message.getMedia().get(0)).dontAnimate().diskCacheStrategy(DiskCacheStrategy.ALL).thumbnail(0.5f).listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         viewHolder.progress_media_img_chat.setVisibility(View.GONE);
@@ -297,8 +287,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         //else Picasso.get().load(EncryptHelper.decrypt(imageURL)).into(holder.profile_image_item);
 
         if(message.getSender().equals(fUser.getUid())){
-            if (message.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(mContext.getDrawable(R.drawable.ic_seen));
-            else viewHolder.img_seen.setImageDrawable(mContext.getDrawable(R.drawable.ic_delivered));
+            viewHolder.message_container.setPadding(2, 2, 20, 2);
+            if(position == mMessages.size() - 1){
+                if (message.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(mContext.getDrawable(R.drawable.ic_seen));
+                else viewHolder.img_seen.setImageDrawable(mContext.getDrawable(R.drawable.ic_delivered));
+            }else viewHolder.img_seen.setVisibility(View.GONE);
 
             if(joinNow != 0){
                 Animation CartAnim = AnimationUtils.loadAnimation(mContext, R.anim.slide_up);
@@ -321,8 +314,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 delete(viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
             return false;
         });
-
-        //recycler_view_msg.smoothScrollToPosition(mMessages.size() - 1);
     }
 
 
@@ -345,36 +336,39 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         alertDialog.setTitle(mContext.getString(R.string.delete_message_for_everyone));
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.yes),
                 (dialog, which) -> {
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                    Query applesQuery = ref.child("Chats").child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(id_msg);
+                    if(Methods.isOnline(mContext)){
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        Query applesQuery = ref.child("Chats").child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(id_msg);
 
-                    applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                                appleSnapshot.getRef().removeValue();
+                        applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                    appleSnapshot.getRef().removeValue();
+                                }
+                                firebaseStorage = FirebaseStorage.getInstance();
+                                if(mMessages != null && mMessages.get(position).getMedia() != null && mMessages.get(position).getMedia().get(0) != null && !mMessages.get(position).getMedia().get(0).equals("")){
+                                    StorageReference photoRef = firebaseStorage.getReferenceFromUrl(mMessages.get(position).getMedia().get(0));
+                                    photoRef.delete().addOnSuccessListener(aVoid -> {
+                                        // File deleted successfully
+                                        Log.d("DeleteMessage", "onSuccess: deleted file");
+                                    }).addOnFailureListener(exception -> {
+                                        // Uh-oh, an error occurred!
+                                        Log.d("DeleteMessage", "onFailure: did not delete file");
+                                    });
+                                }
+                                daoChat.delete_message(id_msg);
+                                mMessages.remove(position);
+                                notifyItemRemoved(position);
                             }
-                            firebaseStorage = FirebaseStorage.getInstance();
-                            if(mMessages != null && mMessages.get(position).getMedia() != null && mMessages.get(position).getMedia().get(0) != null){
-                                StorageReference photoRef = firebaseStorage.getReferenceFromUrl(mMessages.get(position).getMedia().get(0));
-                                photoRef.delete().addOnSuccessListener(aVoid -> {
-                                    // File deleted successfully
-                                    Log.d("DeleteMessage", "onSuccess: deleted file");
-                                }).addOnFailureListener(exception -> {
-                                    // Uh-oh, an error occurred!
-                                    Log.d("DeleteMessage", "onFailure: did not delete file");
-                                });
-                            }
-                            mMessages.remove(position);
-                            notifyDataSetChanged();
-                        }
 
-                        @Override
-                        public void onCancelled(@NotNull DatabaseError databaseError) {
-                            Log.e("DeleteMessage", "onCancelled", databaseError.toException());
-                        }
-                    });
-                    dialog.dismiss();
+                            @Override
+                            public void onCancelled(@NotNull DatabaseError databaseError) {
+                                Log.e("DeleteMessage", "onCancelled", databaseError.toException());
+                            }
+                        });
+                        dialog.dismiss();
+                    }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
                 });
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, mContext.getString(R.string.cancel), (dialog, which) -> alertDialog.dismiss());
         alertDialog.show();

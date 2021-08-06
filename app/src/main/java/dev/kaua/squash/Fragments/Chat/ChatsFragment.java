@@ -59,6 +59,7 @@ public class ChatsFragment extends Fragment {
         fUser = ConfFirebase.getFirebaseUser();
         usersList = new ArrayList<>();
 
+        chatList();
         reference = FirebaseDatabase.getInstance().getReference("Chatslist").child(fUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             @Override

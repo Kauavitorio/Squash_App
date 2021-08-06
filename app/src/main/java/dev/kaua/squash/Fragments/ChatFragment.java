@@ -97,34 +97,45 @@ public class ChatFragment extends Fragment {
 
     private void loadViewAdapter() {
 
-        reference = FirebaseDatabase.getInstance().getReference("Chats");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if(getActivity() != null){
-                    viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
-                    int unread = 0;
-                    for (DataSnapshot snapshot1 : snapshot.getChildren()){
-                        DtoMessage message = snapshot1.getValue(DtoMessage.class);
-                        if(message != null)
-                            if(message.getReceiver() != null)
-                                if(message.getReceiver().equals(firebaseUser.getUid()) && message.getIsSeen() == 0)
-                                    unread++;
+        if(getContext() != null){
+            if(Methods.isOnline(getContext())){
+                reference = FirebaseDatabase.getInstance().getReference("Chats");
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if(getActivity() != null){
+                            viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
+                            int unread = 0;
+                            for (DataSnapshot snapshot1 : snapshot.getChildren()){
+                                DtoMessage message = snapshot1.getValue(DtoMessage.class);
+                                if(message != null)
+                                    if(message.getReceiver() != null)
+                                        if(message.getReceiver().equals(firebaseUser.getUid()) && message.getIsSeen() == 0)
+                                            unread++;
+                            }
+
+                            if(unread == 0)
+                                viewPaperAdapter.addFragment(new ChatsFragment(), getString(R.string.chats));
+                            else
+                                viewPaperAdapter.addFragment(new ChatsFragment(), "(" + unread + ") " + getString(R.string.chats));
+
+                            viewPaperAdapter.addFragment(new UsersFragment(), getString(R.string.following));
+                            view_paper_chat.setAdapter(viewPaperAdapter);
+                            tab_layout_chat.setupWithViewPager(view_paper_chat);
+                        }
                     }
-
-                    if(unread == 0)
-                        viewPaperAdapter.addFragment(new ChatsFragment(), getString(R.string.chats));
-                    else
-                        viewPaperAdapter.addFragment(new ChatsFragment(), "(" + unread + ") " + getString(R.string.chats));
-
-                    viewPaperAdapter.addFragment(new UsersFragment(), getString(R.string.following));
-                    view_paper_chat.setAdapter(viewPaperAdapter);
-                    tab_layout_chat.setupWithViewPager(view_paper_chat);
-                }
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+                });
+            }else{
+                viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
+                viewPaperAdapter.addFragment(new ChatsFragment(), getString(R.string.chats));
+                viewPaperAdapter.addFragment(new UsersFragment(), getString(R.string.following));
+                view_paper_chat.setAdapter(viewPaperAdapter);
+                tab_layout_chat.setupWithViewPager(view_paper_chat);
             }
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
+        }
+
     }
 
     @Override
@@ -149,8 +160,6 @@ public class ChatFragment extends Fragment {
                 startActivity(i);
                 return true;
             case R.id.logout:
-                Methods.status_chat("offline", requireContext());
-                ConfFirebase.getFirebaseAuth().signOut();
                 Login.LogOut(requireContext(), 0);
                 return true;
         }

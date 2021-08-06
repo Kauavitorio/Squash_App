@@ -112,7 +112,7 @@ import retrofit2.Response;
  *  @author Kaua Vitorio
  **/
 
-@SuppressLint("SetTextI18n")
+@SuppressLint({"SetTextI18n", "ClickableViewAccessibility", "UseCompatLoadingForDrawables"})
 @SuppressWarnings({"deprecation", "StaticFieldLeak", "FieldCanBeLocal"})
 public class MessageActivity extends AppCompatActivity {
 
@@ -176,7 +176,6 @@ public class MessageActivity extends AppCompatActivity {
     static final int MIN_DISTANCE = dp(400);
     private static AudioRecorder audioRecorder;
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -216,48 +215,21 @@ public class MessageActivity extends AppCompatActivity {
         });
 
         //  Loop to get user who user having a chat information
-        reference.addValueEventListener(new ValueEventListener() {
+        user_im_chat = chatDB.get_Single_User(userId);
+        LoadAnotherUserInfo();
+
+        if(Methods.isOnline(this)){
+            reference.addValueEventListener(new ValueEventListener() {
             @SuppressLint("UseCompatLoadingForDrawables")
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 user_im_chat = snapshot.getValue(DtoAccount.class);
-                if(user_im_chat != null){
-
-                    txt_user_name.setText(user_im_chat.getName_user());
-                    if(!another_user_image.equals(user_im_chat.getImageURL())){
-                        another_user_image = user_im_chat.getImageURL();
-                        if(user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
-                        else Picasso.get().load(EncryptHelper.decrypt(another_user_image)).into(profile_image);
-                    }
-                    //readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
-                    checkChatList(userId);
-
-                    //  check typing status
-                    if(user_im_chat.getTypingTo().equals(fUser.getUid())){
-                        txt_isOnline_chat.setVisibility(View.VISIBLE);
-                        txt_isOnline_chat.setText(getString(R.string.typing));
-                    }
-                    else{
-                        if(user_im_chat.getStatus_chat().equals("online")){
-                            txt_isOnline_chat.setVisibility(View.VISIBLE);
-                            txt_isOnline_chat.setText(getString(R.string.online));
-                        }
-                        else txt_isOnline_chat.setText(Methods.loadLastSeen(MessageActivity.this, user_im_chat.getLast_seen()));
-                    }
-
-                    if(user_im_chat.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level()))) > 0){
-                        verification_ic.setVisibility(View.VISIBLE);
-                        int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level())));
-                        if (verified == 2)
-                            verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
-                        else
-                            verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
-                    }else verification_ic.setVisibility(View.GONE);
-                }
+                LoadAnotherUserInfo();
             }
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
         });
+        }
 
         //  check edittext is typing
         text_send.addTextChangedListener(new TextWatcher() {
@@ -409,6 +381,46 @@ public class MessageActivity extends AppCompatActivity {
 
         seenMessage(userId);
         setRecyclerSwipe();
+    }
+
+    private void LoadAnotherUserInfo() {
+        if(user_im_chat != null && user_im_chat.getId() != null){
+            LoadAdapter(""); // First Load on adapter
+
+            txt_user_name.setText(user_im_chat.getName_user());
+            if(!another_user_image.equals(user_im_chat.getImageURL())){
+                another_user_image = user_im_chat.getImageURL();
+                if(user_im_chat.getImageURL() == null || user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
+                else Picasso.get().load(EncryptHelper.decrypt(another_user_image)).into(profile_image);
+            }
+            //readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
+            checkChatList(userId);
+
+            //  check typing status
+            if(user_im_chat.getTypingTo() != null && user_im_chat.getTypingTo().equals(fUser.getUid())){
+                txt_isOnline_chat.setVisibility(View.VISIBLE);
+                txt_isOnline_chat.setText(getString(R.string.typing));
+            }
+            else{
+                if(user_im_chat.getStatus_chat() != null){
+                    txt_isOnline_chat.setVisibility(View.VISIBLE);
+                    if(user_im_chat.getStatus_chat().equals("online")){
+                        txt_isOnline_chat.setVisibility(View.VISIBLE);
+                        txt_isOnline_chat.setText(getString(R.string.online));
+                    }
+                    else txt_isOnline_chat.setText(Methods.loadLastSeen(MessageActivity.this, user_im_chat.getLast_seen()));
+                }else txt_isOnline_chat.setVisibility(View.GONE);
+            }
+
+            if(user_im_chat.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level()))) > 0){
+                verification_ic.setVisibility(View.VISIBLE);
+                int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level())));
+                if (verified == 2)
+                    verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
+                else
+                    verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
+            }else verification_ic.setVisibility(View.GONE);
+        }
     }
 
     private static String fileName = null;
@@ -612,8 +624,10 @@ public class MessageActivity extends AppCompatActivity {
         text_send = findViewById(R.id.text_send);
         btn_send = findViewById(R.id.container_btn_send);
         btn_send.setElevation(0);
-        recycler_view_msg.setHasFixedSize(false);
-        recycler_view_msg.setNestedScrollingEnabled(true);
+        recycler_view_msg.setHasFixedSize(true);
+        recycler_view_msg.setItemViewCacheSize(20);
+        recycler_view_msg.setDrawingCacheEnabled(true);
+        recycler_view_msg.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
         recycler_view_msg.setLayoutManager(linearLayoutManager);
@@ -794,57 +808,73 @@ public class MessageActivity extends AppCompatActivity {
     private static void readMessage(String myID, String userId, String imageURl){
         Calendar c = Calendar.getInstance();
         mMessage = new ArrayList<>();
-        reference = FirebaseDatabase.getInstance().getReference().child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                mMessage.clear();
-                DtoMessage messageBase = new DtoMessage();
-                messageBase.setSender("base_start");
-                mMessage.add(messageBase);
-                for (DataSnapshot snapshot : datasnapshot.getChildren()){
-                    DtoMessage message = snapshot.getValue(DtoMessage.class);
-                    if(message != null)
-                        if(message.getReceiver() != null)
-                            if (message.getReceiver().equals(myID) && message.getSender().equals(userId)
-                                    || message.getReceiver().equals(userId) && message.getSender().equals(myID)){
-                                mMessage.add(message);
+
+        if(Methods.isOnline(instance)){
+            reference = FirebaseDatabase.getInstance().getReference().child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                    mMessage.clear();
+                    DtoMessage messageBase = new DtoMessage();
+                    messageBase.setSender("base_start");
+                    mMessage.add(messageBase);
+                    for (DataSnapshot snapshot : datasnapshot.getChildren()){
+                        DtoMessage message = snapshot.getValue(DtoMessage.class);
+                        if(message != null)
+                            if(message.getReceiver() != null)
+                                if (message.getReceiver().equals(myID) && message.getSender().equals(userId)
+                                        || message.getReceiver().equals(userId) && message.getSender().equals(myID)){
+                                    mMessage.add(message);
+                                }
+                    }
+                    if(mMessage.size() > 1){
+                        if(mMessageFinal.size() != mMessage.size()) {
+                            Log.d(TAG, "OKAY not need to reset");
+                            if(joinNow <= 100) joinNow++;
+                            else joinNow = 1;
+                        } else joinNow = 0;
+
+                        if(mMessageFinal.size() > 1 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())
+                                || mMessageFinal.size() > 0 && mMessageFinal.get(mMessageFinal.size() -1).getIsSeen() != mMessage.get(mMessage.size() -1).getIsSeen()){
+                            Log.d(TAG, "OKAY NEW MSG OR IS SEEN");
+                            chatDB.REGISTER_CHAT(mMessage, EncryptHelper.decrypt(chat_id));
+                            LoadAdapter(imageURl);
+                            base_load = false;
+
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                            user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
+                            chatDB.UPDATE_A_CHAT(user_im_chat, 1);
+                        }
+
+                        if(base_load) {
+                            chatDB.REGISTER_CHAT(mMessage, EncryptHelper.decrypt(chat_id));
+                            LoadAdapter(imageURl);
+                        }
+
+                        if(!base_load && mMessageFinal.size() != mMessage.size()) LoadAdapter(imageURl);
                     }
                 }
-                if(mMessage.size() > 1){
-                    if(mMessageFinal.size() != mMessage.size()) {
-                        Log.d(TAG, "OKAY not need to reset");
-                        if(joinNow <= 100) joinNow++;
-                        else joinNow = 1;
-                    } else joinNow = 0;
 
-                    if(mMessageFinal.size() > 0 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())
-                            || mMessageFinal.size() > 0 && mMessageFinal.get(mMessageFinal.size() -1).getIsSeen() != mMessage.get(mMessage.size() -1).getIsSeen()){
-                        Log.d(TAG, "OKAY NEW MSG OR IS SEEN");
-                        LoadAdapter(imageURl);
-                        base_load = false;
-
-                        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                        user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
-                        chatDB.UPDATE_A_CHAT(user_im_chat, 1);
-                    }
-
-                    if(base_load) LoadAdapter(imageURl);
-
-                    if(!base_load && mMessageFinal.size() != mMessage.size()) LoadAdapter(imageURl);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            });
+        }else LoadAdapter(imageURl);
     }
 
     private static void LoadAdapter(String imageURl) {
-        mMessageFinal.clear();
-        mMessageFinal.addAll(mMessage);
-        messageAdapter = new MessageAdapter(instance, mMessage, imageURl, joinNow, recycler_view_msg,
+        if(mMessageFinal != null && mMessage != null){
+            mMessageFinal.clear();
+            mMessageFinal.addAll(mMessage);
+        }
+        final List<DtoMessage> LocalMessages = new ArrayList<>();
+        DtoMessage messageBase = new DtoMessage();
+        messageBase.setSender("base_start");
+        LocalMessages.add(messageBase);
+        LocalMessages.addAll(chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)));
+
+        messageAdapter = new MessageAdapter(instance, LocalMessages, imageURl, joinNow, recycler_view_msg,
                 MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername(), chat_id);
+        messageAdapter.setHasStableIds(true);
         recycler_view_msg.setAdapter(messageAdapter);
     }
 
