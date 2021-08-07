@@ -43,7 +43,7 @@ import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.Fragments.Chat.UsersFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.Login;
-import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 
@@ -98,7 +98,7 @@ public class ChatFragment extends Fragment {
     private void loadViewAdapter() {
 
         if(getContext() != null){
-            if(Methods.isOnline(getContext())){
+            if(ConnectionHelper.isOnline(getContext())){
                 reference = FirebaseDatabase.getInstance().getReference("Chats");
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override

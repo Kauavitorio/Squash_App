@@ -36,7 +36,7 @@ import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
-import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.ConnectionHelper;
 
 public class ChatsFragment extends Fragment {
     private RecyclerView recycler_myMsg;
@@ -165,7 +165,7 @@ public class ChatsFragment extends Fragment {
         LoadChatRecycler();
 
         if(getContext() != null)
-        if(Methods.isOnline(getContext())){
+        if(ConnectionHelper.isOnline(getContext())){
             mAccounts = new ArrayList<>();
             reference = FirebaseDatabase.getInstance().getReference("Users");
             reference.addValueEventListener(new ValueEventListener() {

@@ -219,13 +219,6 @@ public abstract class Methods extends MainActivity {
         return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }
 
-    //  Method to know if user is has internet connection
-    public static boolean isOnline(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return manager.getActiveNetworkInfo() != null &&
-                manager.getActiveNetworkInfo().isConnectedOrConnecting();
-    }
-
     protected static void makeLinkClickable(Context context, SpannableStringBuilder strBuilder, final URLSpan span)
     {
         int start = strBuilder.getSpanStart(span);

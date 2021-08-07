@@ -129,7 +129,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_not_secure_lock"
+                    android:src="@drawable/ic_usage"
                     tools:ignore="ContentDescription" />
 
                 <!-- Setting Text -->

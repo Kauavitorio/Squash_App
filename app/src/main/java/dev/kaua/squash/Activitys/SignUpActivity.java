@@ -52,6 +52,7 @@ import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.Fragments.SearchFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -319,12 +320,12 @@ public class SignUpActivity extends AppCompatActivity {
 
     //  Method to get last version of Privacy Policy
     private void Privacy_PolicyCheck(){
-        if(Methods.isOnline(SignUpActivity.this)){
+        if(ConnectionHelper.isOnline(SignUpActivity.this)){
             reference = FirebaseDatabase.getInstance().getReference("System");
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(Methods.isOnline(SignUpActivity.this)){
+                    if(ConnectionHelper.isOnline(SignUpActivity.this)){
                         DtoSystem system = snapshot.getValue(DtoSystem.class);
                         if(system != null) MyPrefs.setPrivacy_Policy(SignUpActivity.this, system.getPrivacy_policy());
                     }

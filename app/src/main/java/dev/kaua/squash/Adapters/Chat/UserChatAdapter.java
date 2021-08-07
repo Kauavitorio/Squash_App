@@ -40,6 +40,7 @@ import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.Methods;
 
 public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHolder> {
@@ -107,7 +108,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         }else holder.verification_ic.setVisibility(View.GONE);
 
         if(isChat){
-            if(Methods.isOnline(mContext)){
+            if(ConnectionHelper.isOnline(mContext)){
                 if (account.getStatus_chat().equals("online")){
                     holder.last_seen.setText(mContext.getString(R.string.online));
                     holder.img_on.setVisibility(View.VISIBLE);

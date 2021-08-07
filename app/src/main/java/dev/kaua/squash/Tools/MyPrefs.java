@@ -1,5 +1,6 @@
 package dev.kaua.squash.Tools;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -11,8 +12,14 @@ import static android.content.Context.MODE_PRIVATE;
 
 import androidx.annotation.NonNull;
 
+import org.jetbrains.annotations.Contract;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public abstract class MyPrefs {
     public static final String PREFS_USER = "myPrefs";
+    public static final String PREFS_NETWORK_USAGE = "myPrefsNetWorkUsage";
     public static final String PREFS_CONFIG = "myPrefsConfiguration";
     public static final String PREFS_UPDATES = "myPrefsUpdates";
     public static final String PREFS_PRIVACY_POLICY = "myPrefsPrivacyPolicy";
@@ -22,12 +29,12 @@ public abstract class MyPrefs {
     private static final DtoAccount account = new DtoAccount();
     public static SharedPreferences sp;
 
-    @SuppressWarnings("ConstantConditions")
     public static DtoAccount getUserInformation(@NonNull Context context){
         sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
 
         //  Passing all preferences to DTO
-        account.setAccount_id(Long.parseLong(EncryptHelper.decrypt(sp.getString("pref_account_id", null))));
+        String account_id = EncryptHelper.decrypt(sp.getString("pref_account_id", null));
+        if(account_id != null) account.setAccount_id(Long.parseLong(account_id));
         account.setName_user(EncryptHelper.decrypt(sp.getString("pref_name_user", null)));
         account.setUsername(EncryptHelper.decrypt(sp.getString("pref_username", null)));
         account.setEmail(EncryptHelper.decrypt(sp.getString("pref_email", null)));
@@ -75,6 +82,45 @@ public abstract class MyPrefs {
         editor.putLong("pref_version", version);
         editor.apply();
         Log.d(TAG, version + " <- New Version");
+    }
+
+    public static void InsertNetworkCount(@NonNull Context context){
+        sp = context.getSharedPreferences(PREFS_NETWORK_USAGE, MODE_PRIVATE);
+
+        @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm a").format(new Date());
+        //  Add Request prefs
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("pref_start_time", timeStamp);
+        editor.apply();
+    }
+
+    public static void InsertNetworkStatisticsReset(@NonNull Context context, long rx, long tx){
+        sp = context.getSharedPreferences(PREFS_NETWORK_USAGE, MODE_PRIVATE);
+
+        @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm a").format(new Date());
+        //  Add Request prefs
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("pref_last_reset", timeStamp);
+        editor.putLong("pref_rx", rx);
+        editor.putLong("pref_tx", tx);
+        editor.apply();
+    }
+
+    public static String get_NetWorkLastReset(@NonNull Context context){
+        sp = context.getSharedPreferences(PREFS_NETWORK_USAGE, MODE_PRIVATE);
+        return sp.getString("pref_last_reset", null);
+    }
+
+    @NonNull
+    @Contract("_ -> new")
+    public static long[] get_RX_TX_Subtraction(@NonNull Context context){
+        sp = context.getSharedPreferences(PREFS_NETWORK_USAGE, MODE_PRIVATE);
+        return new long[]{sp.getLong("pref_rx", 0), sp.getLong("pref_tx", 0)};
+    }
+
+    public static String get_NetWorkStartCount(@NonNull Context context){
+        sp = context.getSharedPreferences(PREFS_NETWORK_USAGE, MODE_PRIVATE);
+        return sp.getString("pref_start_time", null);
     }
 
     public static void logOut(@NonNull Context context){

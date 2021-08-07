@@ -94,6 +94,7 @@ import dev.kaua.squash.Notifications.Sender;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.KeyboardUtils;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
@@ -218,7 +219,7 @@ public class MessageActivity extends AppCompatActivity {
         user_im_chat = chatDB.get_Single_User(userId);
         LoadAnotherUserInfo();
 
-        if(Methods.isOnline(this)){
+        if(ConnectionHelper.isOnline(this)){
             reference.addValueEventListener(new ValueEventListener() {
             @SuppressLint("UseCompatLoadingForDrawables")
             @Override
@@ -809,7 +810,7 @@ public class MessageActivity extends AppCompatActivity {
         Calendar c = Calendar.getInstance();
         mMessage = new ArrayList<>();
 
-        if(Methods.isOnline(instance)){
+        if(ConnectionHelper.isOnline(instance)){
             reference = FirebaseDatabase.getInstance().getReference().child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
             reference.addValueEventListener(new ValueEventListener() {
                 @Override

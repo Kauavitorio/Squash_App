@@ -146,4 +146,13 @@
     <string name="services_and_how_we_process_your_data">1- Mais informações sobre como funciona o Squash; incluindo como processamos dados e mantemos sua conta segura.</string>
     <string name="please_accept_these_terms">Aceite estes <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">termos</a></font> para continuar usando o Squash após esta data. Saiba mais sobre como processamos seus dados em nossa <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">política de privacidade atualizada.</a></font></string>
     <string name="accept">Aceitar</string>
+    <string name="network_usage">Uso de rede</string>
+    <string name="usage">Uso</string>
+    <string name="sent">Enviado</string>
+    <string name="received">Recebido</string>
+    <string name="network_usage_since">Uso da rede desde</string>
+    <string name="reset_statistics">Limpar estatísticas</string>
+    <string name="last_reset_time">Último reinício</string>
+    <string name="reset">Redefinir</string>
+    <string name="never">Nunca</string>
 </resources>

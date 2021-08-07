@@ -42,7 +42,7 @@ import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
-import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
@@ -135,7 +135,7 @@ public class MainFragment extends Fragment {
 
     private void loadCheckSystemInfo() {
         if(getContext() != null)
-        if(Methods.isOnline(getContext())){
+        if(ConnectionHelper.isOnline(getContext())){
             int currentVersionCode = BuildConfig.VERSION_CODE;
 
             reference = FirebaseDatabase.getInstance().getReference("System");
@@ -143,7 +143,7 @@ public class MainFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                     if(getContext() != null)
-                    if(Methods.isOnline(getContext())){
+                    if(ConnectionHelper.isOnline(getContext())){
                         DtoSystem system = snapshot.getValue(DtoSystem.class);
                         if(system != null){
                             if(currentVersionCode < system.getVersionCode()){

@@ -41,6 +41,14 @@
         <activity
             android:name=".Activitys.ForgotPasswordActivity"
             android:exported="true" />
+        <activity
+            android:name=".Activitys.ConnectionUsageActivity"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".Activitys.ShareContentActivity" />
         <activity android:name=".Activitys.SettingActivity" />
         <activity android:name=".Activitys.WebActivity" />

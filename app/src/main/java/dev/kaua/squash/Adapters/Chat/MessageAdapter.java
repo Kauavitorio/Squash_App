@@ -61,6 +61,7 @@ import dev.kaua.squash.Firebase.ConfFirebase;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
@@ -336,7 +337,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         alertDialog.setTitle(mContext.getString(R.string.delete_message_for_everyone));
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.yes),
                 (dialog, which) -> {
-                    if(Methods.isOnline(mContext)){
+                    if(ConnectionHelper.isOnline(mContext)){
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                         Query applesQuery = ref.child("Chats").child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(id_msg);
 
