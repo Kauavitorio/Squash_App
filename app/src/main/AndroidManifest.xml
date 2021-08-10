@@ -9,8 +9,9 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -20,19 +21,34 @@
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
+        android:resizeableActivity="false"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash"
-        android:usesCleartextTraffic="true"
-        android:resizeableActivity="false"
-        android:requestLegacyExternalStorage="true">
+        android:usesCleartextTraffic="true">
+        <!-- Image Crop Activity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="fullSensor"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".Activitys.PrivacyPolicyUpdateActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.ViewMediaActivity"
+            android:exported="true" />
         <activity
             android:name=".Activitys.ForgotPasswordActivity"
             android:exported="true" />
+        <activity
+            android:name=".Activitys.ConnectionUsageActivity"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".Activitys.ShareContentActivity" />
         <activity android:name=".Activitys.SettingActivity" />
         <activity android:name=".Activitys.WebActivity" />
@@ -90,13 +106,6 @@
 
                 <data android:mimeType="text/plain" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="image/*" />
-            </intent-filter>
         </activity> <!-- Start Service to message notification -->
         <service
             android:name=".Notifications.MyFirebaseIdService"
@@ -118,4 +127,5 @@
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
     </application>
+
 </manifest>

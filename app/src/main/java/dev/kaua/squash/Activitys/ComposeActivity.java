@@ -39,7 +39,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
@@ -158,7 +158,7 @@ public class ComposeActivity extends AppCompatActivity {
                 if(filePath != null) {
 
                     //uploading the image
-                    storageReference = ConfFirebase.getFirebaseStorage().child("user").child("posts").child("medias").child(fUser.getUid()).child("post_"
+                    storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("posts").child("medias").child(fUser.getUid()).child("post_"
                             + getFileName(filePath).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(5));
                     storageReference.putFile(filePath).continueWithTask(task -> {
                         if (!task.isSuccessful()) {
@@ -283,7 +283,7 @@ public class ComposeActivity extends AppCompatActivity {
     }
 
     private void Ids() {
-        fUser = ConfFirebase.getFirebaseUser();
+        fUser = myFirebaseHelper.getFirebaseUser();
         userAccount = MyPrefs.getUserInformation(this);
         btn_post = findViewById(R.id.btn_post);
         compose_img01 = findViewById(R.id.compose_img01);

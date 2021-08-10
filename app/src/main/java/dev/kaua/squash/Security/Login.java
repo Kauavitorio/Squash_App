@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 
@@ -29,7 +30,11 @@ import dev.kaua.squash.Activitys.SplashActivity;
 import dev.kaua.squash.Activitys.ValidateEmailActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.LocalDataBase.DaoAccount;
+import dev.kaua.squash.LocalDataBase.DaoChat;
+import dev.kaua.squash.LocalDataBase.DaoFollowing;
+import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
@@ -110,14 +115,14 @@ public abstract class Login {
                     editor.apply();
 
                     //  Getting Followers and Followings
-                    Methods.LoadFollowersAndFollowing(context, 0);
+                    Methods.LoadFollowersAndFollowing(context, 1);
 
                     //  Log in User On Firebase
-                    mAuth = ConfFirebase.getFirebaseAuth();
+                    mAuth = myFirebaseHelper.getFirebaseAuth();
                     mAuth.signOut();
 
                     //  Init Analytics
-                    mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(context);
+                    mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(context);
 
                     //  Login user in firebase to get user instance
                     mAuth.signInWithEmailAndPassword(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail())), Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
@@ -255,33 +260,54 @@ public abstract class Login {
 
     static Handler timer = new Handler();
     public static void LogOut(Context context, int status){
-        FirebaseAuth.getInstance().signOut();
-        Methods.status_chat("offline", context);
-        clearApplicationData(context);
-        LoadingDialog loadingDialog = new LoadingDialog((Activity)context);
+        loadingDialog = null;
+        loadingDialog = new LoadingDialog((Activity)context);
         loadingDialog.startLoading();
+        Methods.status_chat("offline", context); // Set User status with offline
+
+        myFirebaseHelper.LogOut(); // LogOut on firebase
+
+        clearApplicationData(context); // Clear app cache and data
+
+        MyPrefs.logOut(context); // Remove all preferences on app
+
         timer.postDelayed(() -> {
-            FirebaseAuth.getInstance().signOut();
-            mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-            mPrefs.edit().clear().apply();
-            ((Activity)context).finishAffinity();
-            Intent i;
-            if(status == 0 ) i = new Intent(context, SplashActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            else i = new Intent(context, SplashActivity.class);
-            context.startActivity(i);
             loadingDialog.dismissDialog();
-        },1000);
+            loadingDialog = null;
+            loadingDialog = new LoadingDialog((Activity)context);
+            loadingDialog.startLoading();
+
+            DaoAccount daoAccount = new DaoAccount(context);
+            daoAccount.DropTable(); //  Drop follower and following information
+
+            DaoChat daoChat = new DaoChat(context);
+            daoChat.DropTable(DaoChat.DROP_ALL); // Drop all information on chat system
+
+            DaoFollowing daoFollowing = new DaoFollowing(context);
+            daoFollowing.DropTable();
+
+            DaoPosts daoPosts = new DaoPosts(context);
+            daoPosts.DropTable(DaoPosts.DROP_ALL);
+
+            timer.postDelayed(() -> {
+                ((Activity)context).finishAffinity();
+                final Intent i;
+                if(status == 0 ) i = new Intent(context, SplashActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                else i = new Intent(context, SplashActivity.class);
+                context.startActivity(i);
+                loadingDialog.dismissDialog();
+            },1000);
+        }, 500);
     }
 
-    public static void clearApplicationData(Context context) {
+    public static void clearApplicationData(@NonNull Context context) {
         File cacheDirectory = context.getCacheDir();
         File applicationDirectory = new File(Objects.requireNonNull(cacheDirectory.getParent()));
         if (applicationDirectory.exists()) {
             String[] fileNames = applicationDirectory.list();
+            if(fileNames != null)
             for (String fileName : fileNames) {
-                if (!fileName.equals("lib")) {
-                    deleteFile(new File(applicationDirectory, fileName));
-                }
+                if (!fileName.equals("lib")) deleteFile(new File(applicationDirectory, fileName));
             }
         }
     }
@@ -290,12 +316,12 @@ public abstract class Login {
         if (file != null) {
             if (file.isDirectory()) {
                 String[] children = file.list();
-                for (int i = 0; i < children.length; i++) {
-                    deletedAll = deleteFile(new File(file, children[i])) && deletedAll;
-                }
-            } else {
+                if(children != null)
+                    for (String child : children) {
+                        deletedAll = deleteFile(new File(file, child)) && deletedAll;
+                    }
+            } else
                 deletedAll = file.delete();
-            }
         }
         return deletedAll;
     }

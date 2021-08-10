@@ -3,6 +3,7 @@ package dev.kaua.squash.Adapters;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import java.util.regex.Pattern;
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.PostDetailsActivity;
+import dev.kaua.squash.Activitys.ViewMediaActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
@@ -169,6 +171,18 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                             .apply(myOptions)
                             .load(EncryptHelper.decrypt(img_list.getPost_images().get(i)))
                             .into(holder.img_firstImage_post);
+
+                    int finalI = i;
+                    holder.img_firstImage_post.setOnClickListener(v -> {
+                        Intent intent = new Intent(mContext, ViewMediaActivity.class);
+                        intent.putExtra("image_url", EncryptHelper.decrypt(img_list.getPost_images().get(finalI)));
+                        intent.putExtra("receive_time", "post");
+                        String id = list.get(position).getUsername() + "_" + list.get(position).getPost_id();
+                        if(id.length() < 11) id += "posts_media";
+                        intent.putExtra("chat_id", id);
+                        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
+                        ActivityCompat.startActivity(mContext, intent, activityOptionsCompat.toBundle());
+                    });
                 }
             }else{
                 RequestOptions myOptions = new RequestOptions()
@@ -226,7 +240,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         holder.btn_share_post.setOnClickListener(v -> {
             Intent myIntent = new Intent(Intent.ACTION_SEND);
             myIntent.setType("text/plain");
-            String body = Methods.BASE_URL + "share/" + list.get(position).getUsername() + "/post/" +  list.get(position).getPost_id()
+            String body = Methods.BASE_URL_HTTPS + "share/" + list.get(position).getUsername() + "/post/" +  list.get(position).getPost_id()
                     + "?s=" + Methods.RandomCharactersWithoutSpecials(3);
             myIntent.putExtra(Intent.EXTRA_TEXT,body);
             mContext.startActivity(Intent.createChooser(myIntent, "Share Using"));
@@ -258,53 +272,56 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                         ((Activity)mContext).findViewById(R.id.sheet_menu_post_action));
 
                 sheetView.findViewById(R.id.btn_delete_post).setOnClickListener(v1 -> {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
-                    alert.setTitle(mContext.getString(R.string.delete_post));
-                    alert.setMessage(mContext.getString(R.string.delete_post_message));
-                    alert.setNeutralButton(mContext.getString(R.string.no), null);
-                    alert.setPositiveButton(mContext.getString(R.string.yes), (dialog, which) -> {
-                        PostServices services = retrofit.create(PostServices.class);
-                        Call<DtoPost> call = services.delete_post(dtoPost);
+                    AlertDialog.Builder alert = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle)
+                            .setTitle(mContext.getString(R.string.delete_post))
+                            .setMessage(mContext.getString(R.string.delete_post_message))
+                            .setPositiveButton(mContext.getString(R.string.yes), (dialog, which) -> {
+                                dialog.dismiss();
+                                PostServices services = retrofit.create(PostServices.class);
+                                Call<DtoPost> call = services.delete_post(dtoPost);
 
-                        LoadingDialog loadingDialog = new LoadingDialog((Activity) mContext);
-                        loadingDialog.startLoading();
-                        call.enqueue(new Callback<DtoPost>() {
-                            @Override
-                            public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                                loadingDialog.dismissDialog();
-                                if(response.code() == 200){
-                                    DtoPost img_list = daoPosts.get_post_img(Long.parseLong(list.get(position).getPost_id()));
-                                    if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0){
-                                        for (int i = 0; i < img_list.getPost_images().size(); i++){
-                                            if(img_list.getPost_images().get(i) != null){
-                                                firebaseStorage = FirebaseStorage.getInstance();
-                                                StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(img_list.getPost_images().get(i))));
-                                                photoRef.delete().addOnSuccessListener(aVoid -> {
-                                                    // File deleted successfully
-                                                    Log.d("POSTS_ADAPTER", "onSuccess: deleted file");
-                                                }).addOnFailureListener(exception -> {
-                                                    // Uh-oh, an error occurred!
-                                                    Log.d("POSTS_ADAPTER", "onFailure: did not delete file");
-                                                });
+                                LoadingDialog loadingDialog = new LoadingDialog((Activity) mContext);
+                                loadingDialog.startLoading();
+                                call.enqueue(new Callback<DtoPost>() {
+                                    @Override
+                                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                                        loadingDialog.dismissDialog();
+                                        if(response.code() == 200){
+                                            DtoPost img_list = daoPosts.get_post_img(Long.parseLong(list.get(position).getPost_id()));
+                                            if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0){
+                                                for (int i = 0; i < img_list.getPost_images().size(); i++){
+                                                    if(img_list.getPost_images().get(i) != null){
+                                                        firebaseStorage = FirebaseStorage.getInstance();
+                                                        StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(img_list.getPost_images().get(i))));
+                                                        photoRef.delete().addOnSuccessListener(aVoid -> {
+                                                            // File deleted successfully
+                                                            Log.d("POSTS_ADAPTER", "onSuccess: deleted file");
+                                                        }).addOnFailureListener(exception -> {
+                                                            // Uh-oh, an error occurred!
+                                                            Log.d("POSTS_ADAPTER", "onFailure: did not delete file");
+                                                        });
+                                                    }
+                                                }
                                             }
-                                        }
+                                            list.remove(position);
+                                            notifyDataSetChanged();
+                                            MainFragment.RefreshRecycler();
+                                        }else
+                                            Warnings.showWeHaveAProblem(mContext);
                                     }
-                                    list.remove(position);
-                                    notifyDataSetChanged();
-                                    MainFragment.RefreshRecycler();
-                                }else
-                                    Warnings.showWeHaveAProblem(mContext);
-                            }
 
-                            @Override
-                            public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
-                                loadingDialog.dismissDialog();
-                                Warnings.showWeHaveAProblem(mContext);
-                            }
-                        });
-                    });
+                                    @Override
+                                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                                        loadingDialog.dismissDialog();
+                                        Warnings.showWeHaveAProblem(mContext);
+                                    }
+                                });
+                            })
+                            .setNeutralButton(mContext.getString(R.string.no), (dialogInterface, i) -> dialogInterface.dismiss());
+                    Dialog mDialog = alert.create();
+                    mDialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
+                    mDialog.show();
                     bottomSheetDialog.dismiss();
-                    alert.show();
                 });
 
                 sheetView.findViewById(R.id.btn_cancel_actions).setOnClickListener(v1 -> bottomSheetDialog.dismiss());

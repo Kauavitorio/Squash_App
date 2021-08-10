@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,13 +32,15 @@ import java.util.List;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Activitys.ShareContentActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.Methods;
 
 public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHolder> {
@@ -84,10 +87,12 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
             intent.putExtra("chat_id", account.getChat_id());
             if(share){
                 int shareType = ShareContentActivity.getInstance().GetShareType();
-                intent.putExtra("shared", 1);
+                intent.putExtra("shared", MainActivity.SHARED_ID);
                 intent.putExtra("shared_type", shareType);
-                if(shareType == 1)
-                intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
+                if(shareType == MainActivity.SHARED_PLAIN_TEXT)
+                    intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
+                else if(shareType == MainActivity.SHARED_IMAGE)
+                    intent.putExtra("shared_content", (Uri) ShareContentActivity.getInstance().GetShareContent());
                 ((Activity)mContext).finish();
             }else intent.putExtra("shared", 0);
             mContext.startActivity(intent);
@@ -103,7 +108,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         }else holder.verification_ic.setVisibility(View.GONE);
 
         if(isChat){
-            if(Methods.isOnline(mContext)){
+            if(ConnectionHelper.isOnline(mContext)){
                 if (account.getStatus_chat().equals("online")){
                     holder.last_seen.setText(mContext.getString(R.string.online));
                     holder.img_on.setVisibility(View.VISIBLE);
@@ -153,7 +158,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     //  check for last message
     private void lastMessage(String userId, CardView ic_not_seen){
         theLastMessage  = "default";
-        FirebaseUser firebaseUser = ConfFirebase.getFirebaseUser();
+        FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
         reference.addValueEventListener(new ValueEventListener() {
             @SuppressLint("SetTextI18n")

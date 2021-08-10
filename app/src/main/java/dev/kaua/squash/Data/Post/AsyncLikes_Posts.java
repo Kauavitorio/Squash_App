@@ -9,10 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
-import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.JsonHandler;
@@ -37,7 +34,7 @@ public class AsyncLikes_Posts extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        String json =  JsonHandler.getJson( Methods.BASE_URL + "post/list/likes?account_id=" + EncryptHelper.encrypt(account_id + "")
+        String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "post/list/likes?account_id=" + EncryptHelper.encrypt(account_id + "")
                 .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9") + "&key="
                 + Methods.RandomCharactersWithoutSpecials(9));
         try {

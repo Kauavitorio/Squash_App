@@ -2,7 +2,6 @@ package dev.kaua.squash.Activitys;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,7 +12,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.os.Vibrator;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -33,7 +31,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
@@ -85,7 +82,7 @@ import dev.kaua.squash.Adapters.Chat.ViewProxy;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Data.Message.DtoMessage;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
@@ -97,13 +94,13 @@ import dev.kaua.squash.Notifications.Sender;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.KeyboardUtils;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.UserPermissions;
-import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -115,7 +112,7 @@ import retrofit2.Response;
  *  @author Kaua Vitorio
  **/
 
-@SuppressLint("SetTextI18n")
+@SuppressLint({"SetTextI18n", "ClickableViewAccessibility", "UseCompatLoadingForDrawables"})
 @SuppressWarnings({"deprecation", "StaticFieldLeak", "FieldCanBeLocal"})
 public class MessageActivity extends AppCompatActivity {
 
@@ -144,7 +141,7 @@ public class MessageActivity extends AppCompatActivity {
 
     private static DaoChat chatDB;
     private static DatabaseReference reference;
-    private static MessageAdapter messageAdapter;
+    static MessageAdapter messageAdapter;
     private static List<DtoMessage> mMessage;
     private List<String> medias_pin = new ArrayList<>();
     private static String userId;
@@ -152,14 +149,14 @@ public class MessageActivity extends AppCompatActivity {
     String another_user_image = "";
     private Animation myAnim;
 
-    APIService apiService;
+    private APIService apiService;
 
     boolean notify = false;
     public static final int PIC_CROP = 111;
     public static final int PICK_IMAGE_REQUEST = 222;
     public static final int PICK_IMAGE_REQUEST_MEDIA = 333;
     public static final int OPEN_CAMERA = 444;
-    public static final String TAG = "MESSAGE_ACTIVITY";
+    private static final String TAG = "MESSAGE_ACTIVITY";
     public static StorageReference storageReference;
 
     Intent intent;
@@ -175,11 +172,10 @@ public class MessageActivity extends AppCompatActivity {
     long timeSwapBuff = 0L;
     long updatedTime = 0L;
     private Timer timer;
-    private float x1,x2;
+    float x1,x2;
     static final int MIN_DISTANCE = dp(400);
-    AudioRecorder audioRecorder;
+    private static AudioRecorder audioRecorder;
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -197,8 +193,8 @@ public class MessageActivity extends AppCompatActivity {
         intent = getIntent();
         userId = intent.getStringExtra("userId");
         chat_id = intent.getStringExtra("chat_id");
-        fUser = ConfFirebase.getFirebaseUser();
-        reference = ConfFirebase.getFirebaseDatabase().getReference("Users").child(userId);
+        fUser = myFirebaseHelper.getFirebaseUser();
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(userId);
 
         CheckShared();
         GenerateChatID();
@@ -214,53 +210,26 @@ public class MessageActivity extends AppCompatActivity {
             String msg = text_send.getText().toString();
             if(!msg.equals("") && msg.trim().replaceAll(" +", "").length() > 0)
                 sendMessage(fUser.getUid(), userId, msg);
-            else ToastHelper.toast(this, getString(R.string.the_message_cannot_be_empty), 0);
+            else ToastHelper.toast(this, getString(R.string.the_message_cannot_be_empty), ToastHelper.SHORT_DURATION);
             text_send.setText("");
         });
 
         //  Loop to get user who user having a chat information
-        reference.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("UseCompatLoadingForDrawables")
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                user_im_chat = snapshot.getValue(DtoAccount.class);
-                if(user_im_chat != null){
+        user_im_chat = chatDB.get_Single_User(userId);
+        LoadAnotherUserInfo();
 
-                    txt_user_name.setText(user_im_chat.getName_user());
-                    if(!another_user_image.equals(user_im_chat.getImageURL())){
-                        another_user_image = user_im_chat.getImageURL();
-                        if(user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
-                        else Picasso.get().load(EncryptHelper.decrypt(another_user_image)).into(profile_image);
-                    }
-                    //readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
-                    checkChatList(userId);
-
-                    //  check typing status
-                    if(user_im_chat.getTypingTo().equals(fUser.getUid())){
-                        txt_isOnline_chat.setVisibility(View.VISIBLE);
-                        txt_isOnline_chat.setText(getString(R.string.typing));
-                    }
-                    else{
-                        if(user_im_chat.getStatus_chat().equals("online")){
-                            txt_isOnline_chat.setVisibility(View.VISIBLE);
-                            txt_isOnline_chat.setText(getString(R.string.online));
-                        }
-                        else txt_isOnline_chat.setText(Methods.loadLastSeen(MessageActivity.this, user_im_chat.getLast_seen()));
-                    }
-
-                    if(user_im_chat.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level()))) > 0){
-                        verification_ic.setVisibility(View.VISIBLE);
-                        int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level())));
-                        if (verified == 2)
-                            verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
-                        else
-                            verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
-                    }else verification_ic.setVisibility(View.GONE);
+        if(ConnectionHelper.isOnline(this)){
+            reference.addValueEventListener(new ValueEventListener() {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    user_im_chat = snapshot.getValue(DtoAccount.class);
+                    LoadAnotherUserInfo();
                 }
-            }
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            });
+        }else ToastHelper.toast(this, getString(R.string.you_are_without_internet_messages), ToastHelper.SHORT_DURATION);
 
         //  check edittext is typing
         text_send.addTextChangedListener(new TextWatcher() {
@@ -319,7 +288,7 @@ public class MessageActivity extends AppCompatActivity {
 
             sheetView.findViewById(R.id.container_btn_video).setOnClickListener(view -> {
                 dialog.dismiss();
-                ToastHelper.toast(this, getString(R.string.under_development), 0);
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
             });
             dialog.setContentView(sheetView);
             dialog.show();
@@ -414,6 +383,46 @@ public class MessageActivity extends AppCompatActivity {
         setRecyclerSwipe();
     }
 
+    private void LoadAnotherUserInfo() {
+        if(user_im_chat != null && user_im_chat.getId() != null){
+            LoadAdapter(""); // First Load on adapter
+
+            txt_user_name.setText(user_im_chat.getName_user());
+            if(!another_user_image.equals(user_im_chat.getImageURL())){
+                another_user_image = user_im_chat.getImageURL();
+                if(user_im_chat.getImageURL() == null || user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
+                else Picasso.get().load(EncryptHelper.decrypt(another_user_image)).into(profile_image);
+            }
+            //readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
+            checkChatList(userId);
+
+            //  check typing status
+            if(user_im_chat.getTypingTo() != null && user_im_chat.getTypingTo().equals(fUser.getUid())){
+                txt_isOnline_chat.setVisibility(View.VISIBLE);
+                txt_isOnline_chat.setText(getString(R.string.typing));
+            }
+            else{
+                if(user_im_chat.getStatus_chat() != null){
+                    txt_isOnline_chat.setVisibility(View.VISIBLE);
+                    if(user_im_chat.getStatus_chat().equals("online")){
+                        txt_isOnline_chat.setVisibility(View.VISIBLE);
+                        txt_isOnline_chat.setText(getString(R.string.online));
+                    }
+                    else txt_isOnline_chat.setText(Methods.loadLastSeen(MessageActivity.this, user_im_chat.getLast_seen()));
+                }else txt_isOnline_chat.setVisibility(View.GONE);
+            }
+
+            if(user_im_chat.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level()))) > 0){
+                verification_ic.setVisibility(View.VISIBLE);
+                int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level())));
+                if (verified == 2)
+                    verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
+                else
+                    verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
+            }else verification_ic.setVisibility(View.GONE);
+        }
+    }
+
     private static String fileName = null;
     private MyTimerTask myTimerTask;
     private void StartRecord() {
@@ -438,17 +447,17 @@ public class MessageActivity extends AppCompatActivity {
                 if(myTimerTask != null) myTimerTask = null;
                 myTimerTask = new MyTimerTask();
                 timer.schedule(myTimerTask, 1000, 1000);
-                vibrate();
+                Methods.vibrate(this, Methods.VIBRATE_SHORT);
             }catch (Exception ex){
-                recording = false;
+                ToastHelper.toast(this, getString(R.string.weHaveAProblem), ToastHelper.SHORT_DURATION);
                 Log.d(TAG, ex.getMessage());
+                recording = false;
                 StopRecord(true);
-                Warnings.showWeHaveAProblem(this);
             }
         }
     }
 
-    private void StopRecord(boolean cancel) {
+    private void StopRecord(final boolean cancel) {
         recording = false;
         try {
             if (!cancel) {
@@ -463,7 +472,7 @@ public class MessageActivity extends AppCompatActivity {
                     Uri uriAudio = Uri.fromFile(new File(audio_path).getAbsoluteFile());
                     LoadingDialog loadingDialog = new LoadingDialog(this);
                     loadingDialog.startLoading();
-                    storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid())
+                    storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid())
                             .child("audios").child("squash_audio_" + timeStamp + ".3gp");
                     storageReference.putFile(uriAudio).addOnCompleteListener(task -> {
                         if (!task.isSuccessful()) {
@@ -491,7 +500,7 @@ public class MessageActivity extends AppCompatActivity {
                     timer.cancel();
 
                 recordTimeText.setText("00:00");
-                vibrate();
+                Methods.vibrate(this, Methods.VIBRATE_SHORT);
             } else {
                 recordPanel.setVisibility(View.GONE);
                 container_edit_text.setVisibility(View.VISIBLE);
@@ -503,24 +512,15 @@ public class MessageActivity extends AppCompatActivity {
                     timer.cancel();
 
                 recordTimeText.setText("00:00");
-                vibrate();
+                Methods.vibrate(this, Methods.VIBRATE_SHORT);
             }
         }catch (Exception ex){
             Log.d(TAG, ex.toString());
-            Warnings.showWeHaveAProblem(this);
+            ToastHelper.toast(this, getString(R.string.weHaveAProblem), ToastHelper.SHORT_DURATION);
         }
     }
 
-    private void vibrate() {
-        try {
-            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            v.vibrate(200);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static int dp(float value) {
+    public static int dp(final float value) {
         return (int) Math.ceil(1 * value);
     }
 
@@ -554,7 +554,7 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
-    private void checkChatList(String userId) {
+    private void checkChatList(final String userId) {
         reference = FirebaseDatabase.getInstance().getReference("Chatslist").child(fUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -573,7 +573,7 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void GenerateChatID() {
+    void GenerateChatID() {
         if(chat_id == null){
             String first_sequence = Methods.RandomCharactersWithoutSpecials(20);
             String second_sequence = Methods.RandomCharactersWithoutSpecials(5);
@@ -587,15 +587,19 @@ public class MessageActivity extends AppCompatActivity {
         else container_no_message_yet.setVisibility(View.GONE);
     }
 
-    private void CheckShared() {
+    void CheckShared() {
         Bundle bundle = getIntent().getExtras();
-        if(bundle.getInt("shared") == 1){
-            if(bundle.getInt("shared_type") == 1)
+        if(bundle.getInt("shared") == MainActivity.SHARED_ID){
+            int shared_type = bundle.getInt("shared_type");
+            if(shared_type == MainActivity.SHARED_PLAIN_TEXT)
                 text_send.setText(bundle.getString("shared_content"));
+            else if(shared_type == MainActivity.SHARED_IMAGE){
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
+            }
         }
     }
 
-    private void Ids() {
+    void Ids() {
         myAnim = AnimationUtils.loadAnimation(this,R.anim.click_anim);
         instance = MessageActivity.this;
         chatDB = new DaoChat(MessageActivity.this);
@@ -603,8 +607,7 @@ public class MessageActivity extends AppCompatActivity {
         recordPanel = findViewById(R.id.record_panel);
         recordTimeText = findViewById(R.id.recording_time_text);
         btn_more_medias = findViewById(R.id.btn_more_medias);
-        TextView textView = findViewById(R.id.slideToCancelTextView);
-        textView.setText(getString(R.string.slide_to_cancel));
+        ((TextView) findViewById(R.id.slideToCancelTextView)).setText(getString(R.string.slide_to_cancel));
         container_no_message_yet = findViewById(R.id.container_no_message_yet);
         txt_user_name = findViewById(R.id.txt_username_chat);
         slideText = findViewById(R.id.slideText);
@@ -620,8 +623,10 @@ public class MessageActivity extends AppCompatActivity {
         text_send = findViewById(R.id.text_send);
         btn_send = findViewById(R.id.container_btn_send);
         btn_send.setElevation(0);
-        recycler_view_msg.setHasFixedSize(false);
-        recycler_view_msg.setNestedScrollingEnabled(true);
+        recycler_view_msg.setHasFixedSize(true);
+        recycler_view_msg.setItemViewCacheSize(20);
+        recycler_view_msg.setDrawingCacheEnabled(true);
+        recycler_view_msg.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
         recycler_view_msg.setLayoutManager(linearLayoutManager);
@@ -630,7 +635,7 @@ public class MessageActivity extends AppCompatActivity {
         container_edit_text.setVisibility(View.VISIBLE);
     }
 
-    private void seenMessage(String userUid){
+    void seenMessage(String userUid){
         reference = FirebaseDatabase.getInstance().getReference().child("Chats");
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -653,18 +658,20 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void sendMessage(String sender, String receiver, String message){
-        Calendar c = Calendar.getInstance();
+    void sendMessage(String sender, String receiver, String message){
+        final Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd-MM-yyyy HH:mm a");
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_id = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
-        String formattedDate = df_time.format(c.getTime());
-        String formattedDate_id = df_time_id.format(c.getTime());
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        HashMap<String, Object> hashMap = new HashMap<>();
+        final String formattedDate = df_time.format(c.getTime());
+        final String formattedDate_id = df_time_id.format(c.getTime());
+        String id_msg = Methods.shuffle(Methods.RandomCharactersWithoutSpecials(8) + formattedDate_id.replace("-","")
+                .replace(" ","").replace(":","") + Methods.shuffle(fUser.getUid()));
+
+        DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference();
+        final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
-        hashMap.put("id_msg", Methods.RandomCharactersWithoutSpecials(8) + formattedDate_id.replace("-","")
-                .replace(" ","").replace(":","") + fUser.getUid());
+        hashMap.put("id_msg", id_msg);
         if(message_to_reply != null && message_to_reply.length() > 0){
             hashMap.put("reply_from", reply_from);
             hashMap.put("reply_content", EncryptHelper.encrypt(message_to_reply));
@@ -777,11 +784,8 @@ public class MessageActivity extends AppCompatActivity {
                                     Log.w(TAG, "Send Message Notification -> Failed");
                             }
                         }
-
                         @Override
-                        public void onFailure(@NotNull Call<MyResponse> call, @NotNull Throwable t) {
-                            Warnings.showWeHaveAProblem(MessageActivity.this);
-                        }
+                        public void onFailure(@NotNull Call<MyResponse> call, @NotNull Throwable t) {}
                     });
                 }
             }
@@ -802,57 +806,73 @@ public class MessageActivity extends AppCompatActivity {
     private static void readMessage(String myID, String userId, String imageURl){
         Calendar c = Calendar.getInstance();
         mMessage = new ArrayList<>();
-        reference = FirebaseDatabase.getInstance().getReference().child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                mMessage.clear();
-                DtoMessage messageBase = new DtoMessage();
-                messageBase.setSender("base_start");
-                mMessage.add(messageBase);
-                for (DataSnapshot snapshot : datasnapshot.getChildren()){
-                    DtoMessage message = snapshot.getValue(DtoMessage.class);
-                    if(message != null)
-                        if(message.getReceiver() != null)
-                            if (message.getReceiver().equals(myID) && message.getSender().equals(userId)
-                                    || message.getReceiver().equals(userId) && message.getSender().equals(myID)){
-                                mMessage.add(message);
+
+        if(ConnectionHelper.isOnline(instance)){
+            reference = FirebaseDatabase.getInstance().getReference().child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                    mMessage.clear();
+                    DtoMessage messageBase = new DtoMessage();
+                    messageBase.setSender("base_start");
+                    mMessage.add(messageBase);
+                    for (DataSnapshot snapshot : datasnapshot.getChildren()){
+                        DtoMessage message = snapshot.getValue(DtoMessage.class);
+                        if(message != null)
+                            if(message.getReceiver() != null)
+                                if (message.getReceiver().equals(myID) && message.getSender().equals(userId)
+                                        || message.getReceiver().equals(userId) && message.getSender().equals(myID)){
+                                    mMessage.add(message);
+                                }
+                    }
+                    if(mMessage.size() > 1){
+                        if(mMessageFinal.size() != mMessage.size()) {
+                            Log.d(TAG, "OKAY not need to reset");
+                            if(joinNow <= 100) joinNow++;
+                            else joinNow = 1;
+                        } else joinNow = 0;
+
+                        if(mMessageFinal.size() > 1 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())
+                                || mMessageFinal.size() > 0 && mMessageFinal.get(mMessageFinal.size() -1).getIsSeen() != mMessage.get(mMessage.size() -1).getIsSeen()){
+                            Log.d(TAG, "OKAY NEW MSG OR IS SEEN");
+                            chatDB.REGISTER_CHAT(mMessage, EncryptHelper.decrypt(chat_id));
+                            LoadAdapter(imageURl);
+                            base_load = false;
+
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                            user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
+                            chatDB.UPDATE_A_CHAT(user_im_chat, 1);
+                        }
+
+                        if(base_load) {
+                            chatDB.REGISTER_CHAT(mMessage, EncryptHelper.decrypt(chat_id));
+                            LoadAdapter(imageURl);
+                        }
+
+                        if(!base_load && mMessageFinal.size() != mMessage.size()) LoadAdapter(imageURl);
                     }
                 }
-                if(mMessage.size() > 1){
-                    if(mMessageFinal.size() != mMessage.size()) {
-                        Log.d(TAG, "OKAY not need to reset");
-                        if(joinNow <= 100) joinNow++;
-                        else joinNow = 1;
-                    } else joinNow = 0;
 
-                    if(mMessageFinal.size() > 0 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())
-                            || mMessageFinal.size() > 0 && mMessageFinal.get(mMessageFinal.size() -1).getIsSeen() != mMessage.get(mMessage.size() -1).getIsSeen()){
-                        Log.d(TAG, "OKAY NEW MSG OR IS SEEN");
-                        LoadAdapter(imageURl);
-                        base_load = false;
-
-                        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                        user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
-                        chatDB.UPDATE_A_CHAT(user_im_chat, 1);
-                    }
-
-                    if(base_load) LoadAdapter(imageURl);
-
-                    if(!base_load && mMessageFinal.size() != mMessage.size()) LoadAdapter(imageURl);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            });
+        }else LoadAdapter(imageURl);
     }
 
     private static void LoadAdapter(String imageURl) {
-        mMessageFinal.clear();
-        mMessageFinal.addAll(mMessage);
-        messageAdapter = new MessageAdapter(instance, mMessage, imageURl, joinNow, recycler_view_msg,
+        if(mMessageFinal != null && mMessage != null){
+            mMessageFinal.clear();
+            mMessageFinal.addAll(mMessage);
+        }
+        final List<DtoMessage> LocalMessages = new ArrayList<>();
+        DtoMessage messageBase = new DtoMessage();
+        messageBase.setSender("base_start");
+        LocalMessages.add(messageBase);
+        LocalMessages.addAll(chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)));
+
+        messageAdapter = new MessageAdapter(instance, LocalMessages, imageURl, joinNow, recycler_view_msg,
                 MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername(), chat_id);
+        messageAdapter.setHasStableIds(true);
         recycler_view_msg.setAdapter(messageAdapter);
     }
 
@@ -914,13 +934,13 @@ public class MessageActivity extends AppCompatActivity {
                 OpenUserProfile();
                 return true;
             case R.id.medias_profile:
-                ToastHelper.toast(this, getString(R.string.under_development), 0);
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
                 return true;
             case R.id.pin_message:
-                Methods.PinAUser_Chat(MessageActivity.this, userId);
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
                 return true;
             case R.id.wallpaper_profile:
-                ToastHelper.toast(this, getString(R.string.under_development), 1);
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
                 //BackgroundHelper.OpenGallery();
                 return true;
         }
@@ -993,7 +1013,7 @@ public class MessageActivity extends AppCompatActivity {
                                 }
                                 catch (Exception ex){
                                     dialog.dismissDialog();
-                                    Warnings.showWeHaveAProblem(MessageActivity.this);
+                                    ToastHelper.toast(MessageActivity.this, getString(R.string.unable_to_locate_the_image), ToastHelper.SHORT_DURATION);
                                     Log.d(TAG, ex.toString());
                                 }
                             }
@@ -1003,7 +1023,7 @@ public class MessageActivity extends AppCompatActivity {
 
             }catch (Exception ex){
                 dialog.dismissDialog();
-                Warnings.showWeHaveAProblem(MessageActivity.this);
+                ToastHelper.toast(MessageActivity.this, getString(R.string.unable_to_locate_the_image), ToastHelper.SHORT_DURATION);
                 Log.d(TAG, ex.toString());
             }
         }
@@ -1018,9 +1038,9 @@ public class MessageActivity extends AppCompatActivity {
             if(data != null){
                 final Throwable cropError = UCrop.getError(data);
                 if(cropError != null)
-                Log.d(TAG, cropError.toString());
+                    Log.d(TAG, cropError.toString());
             }
-            Warnings.showWeHaveAProblem(this);
+            ToastHelper.toast(this, getString(R.string.weHaveAProblem), ToastHelper.SHORT_DURATION);
         }
     }
 
@@ -1030,7 +1050,7 @@ public class MessageActivity extends AppCompatActivity {
             if(resultUri != null) {
 
                 //uploading the image
-                storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
+                storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
                         + getFileName(resultUri).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(3));
                 storageReference.putFile(resultUri).continueWithTask(task -> {
                     if (!task.isSuccessful()) {
@@ -1047,18 +1067,18 @@ public class MessageActivity extends AppCompatActivity {
 
                     } else {
                         loadingDialog.dismissDialog();
-                        Warnings.showWeHaveAProblem(MessageActivity.this);
+                        ToastHelper.toast(this, getString(R.string.there_was_a_communication_problem), ToastHelper.LONG_DURATION);
                         Log.d(TAG, Objects.requireNonNull(task.getException()).toString());
                     }
                 });
             }
             else{
-                ToastHelper.toast(this, getString(R.string.select_an_image), 0);
+                ToastHelper.toast(this, getString(R.string.select_an_image), ToastHelper.SHORT_DURATION);
                 loadingDialog.dismissDialog();
             }
         } catch (Exception ex) {
             loadingDialog.dismissDialog();
-            Warnings.showWeHaveAProblem(this);
+            ToastHelper.toast(this, getString(R.string.there_was_a_communication_problem), ToastHelper.LONG_DURATION);
             Log.d(TAG, ex.toString());
         }
     }
@@ -1090,6 +1110,8 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
+    public static MessageActivity getInstance(){ return instance; }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -1101,7 +1123,12 @@ public class MessageActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         reference.removeEventListener(seenListener);
-        Methods.status_chat("offline", this);
+        try {
+            MainActivity instance = MainActivity.getInstance();
+            if(instance == null) Methods.status_chat("offline", this);
+        }catch (Exception ex){
+            Methods.status_chat("offline", this);
+        }
         Methods.typingTo_chat_Status("noOne");
         currentUser("none");
     }

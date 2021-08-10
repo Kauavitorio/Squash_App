@@ -1,7 +1,6 @@
 package dev.kaua.squash.Data.Post;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -17,7 +16,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import dev.kaua.squash.Adapters.Comments_Adapters;
 import dev.kaua.squash.Adapters.Posts_Adapters;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -52,7 +50,7 @@ public class AsyncRecommended_Posts_feed extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        String json =  JsonHandler.getJson( Methods.BASE_URL + "post/list/recommended/feed?token="
+        String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "post/list/recommended/feed?token="
                 + Methods.shuffle(Methods.RandomCharactersWithoutSpecials(46) + "SQUASH"));
         Posts_Adapters posts_adapters = null;
         try {

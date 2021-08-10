@@ -30,11 +30,11 @@ import java.util.Objects;
 
 import dev.kaua.squash.Adapters.Chat.UserChatAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
-import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
 
 public class UsersFragment extends Fragment {
@@ -82,8 +82,8 @@ public class UsersFragment extends Fragment {
 
     private void searchUsers(String str) {
         if(getContext() != null){
-            if(Methods.isOnline(getContext())){
-                FirebaseUser fUser = ConfFirebase.getFirebaseUser();
+            if(ConnectionHelper.isOnline(getContext())){
+                FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
                 Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
                         .startAt(str)
                         .endAt(str + "\uf8ff");
@@ -113,7 +113,7 @@ public class UsersFragment extends Fragment {
 
     private void readAccounts() {
         if(getContext() != null){
-            if(Methods.isOnline(getContext())){
+            if(ConnectionHelper.isOnline(getContext())){
                 FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                 Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("status_chat");
 

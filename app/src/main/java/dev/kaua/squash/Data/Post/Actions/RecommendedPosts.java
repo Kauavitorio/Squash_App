@@ -26,6 +26,7 @@ import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
 import retrofit2.Call;
@@ -61,7 +62,7 @@ public class RecommendedPosts extends MainFragment {
         LoadPostsFromLocal(context, recyclerView, loadingPanel, loading_posts, daoPosts);
 
         //  Checking if user is connected to a network
-        if(Methods.isOnline(context)){
+        if(ConnectionHelper.isOnline(context)){
             call.enqueue(new Callback<ArrayList<DtoPost>>() {
                 @Override
                 public void onResponse(@NotNull Call<ArrayList<DtoPost>> call, @NotNull Response<ArrayList<DtoPost>> response) {
@@ -138,7 +139,7 @@ public class RecommendedPosts extends MainFragment {
 
 
         //  Checking if user is connected to a network
-        if(Methods.isOnline(context)){
+        if(ConnectionHelper.isOnline(context)){
             call.enqueue(new Callback<ArrayList<DtoPost>>() {
                 @Override
                 public void onResponse(@NotNull Call<ArrayList<DtoPost>> call, @NotNull Response<ArrayList<DtoPost>> response) {

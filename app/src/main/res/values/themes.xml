@@ -38,6 +38,12 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="MyAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowEnterAnimation">@anim/anim_scale_in</item>
+        <item name="android:windowExitAnimation">@anim/anim_scale_out</item>
+        <item name="colorAccent">@color/base_color</item>
+    </style>
+
     <style name="Theme.River.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.River.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

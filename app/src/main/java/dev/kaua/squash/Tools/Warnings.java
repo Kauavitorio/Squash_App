@@ -23,6 +23,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import org.jetbrains.annotations.NotNull;
 
+import dev.kaua.squash.Activitys.PrivacyPolicyUpdateActivity;
 import dev.kaua.squash.Activitys.SignInActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Validation.ValidationServices;
@@ -85,6 +86,7 @@ public class Warnings {
 
     //  Create Show To Base Message
     public static void Base_Sheet_Alert(Activity context, String msg, boolean cancelable) {
+        bottomSheetDialog = null;
         bottomSheetDialog = new BottomSheetDialog(context, R.style.BottomSheetTheme);
         bottomSheetDialog.setCancelable(cancelable);
         //  Creating View for SheetMenu
@@ -221,5 +223,12 @@ public class Warnings {
         txtCancel_alert.setOnClickListener(c -> Dialog.dismiss());
 
         Dialog.show();
+    }
+
+    public static void goToUpdateInPrivacyPolicy(Activity context, long privacy_policy) {
+        Intent i = new Intent(context, PrivacyPolicyUpdateActivity.class);
+        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context,R.anim.move_to_left_go, R.anim.move_to_right_go);
+        i.putExtra("privacy_policy", privacy_policy);
+        ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
     }
 }

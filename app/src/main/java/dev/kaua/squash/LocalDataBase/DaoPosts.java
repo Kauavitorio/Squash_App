@@ -21,6 +21,9 @@ public class DaoPosts extends SQLiteOpenHelper {
     private final String TABLE_LIKES = "TBL_POSTS_LIKES";
     private final String TABLE_LIKES_COMMENTS = "TBL_POSTS_LIKES_COMMENTS";
     private final String TABLE_POST_IMAGE = "tbl_posts_image";
+    public static final int DROP_POST_AND_IMAGE = 0;
+    public static final int DROP_LIKES = 1;
+    public static final int DROP_ALL = 9999;
 
 
     public DaoPosts(@Nullable Context context) {
@@ -203,12 +206,18 @@ public class DaoPosts extends SQLiteOpenHelper {
 
     public void DropTable(int type){
         SQLiteDatabase db = this.getWritableDatabase();
-        if(type == 0){
+        if(type == DROP_POST_AND_IMAGE){
             db.delete(TABLE_POSTS,null,null);
             db.delete(TABLE_POST_IMAGE,null,null);
         }
-        else if(type == 1)
+        else if(type == DROP_LIKES)
             db.delete(TABLE_LIKES,null,null);
+        else if(type == DROP_ALL){
+            db.delete(TABLE_POSTS,null,null);
+            db.delete(TABLE_POST_IMAGE,null,null);
+            db.delete(TABLE_LIKES,null,null);
+            db.delete(TABLE_LIKES_COMMENTS,null,null);
+        }
         else
             db.delete(TABLE_LIKES_COMMENTS,null,null);
         Log.d("InsertPost", "Dropped");

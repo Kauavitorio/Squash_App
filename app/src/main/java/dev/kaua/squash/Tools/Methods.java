@@ -14,9 +14,9 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.MediaScannerConnection;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.text.SpannableStringBuilder;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
@@ -47,17 +47,15 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeMap;
 
-import dev.kaua.squash.Activitys.IntroActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.WebActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts_Comment;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -77,9 +75,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public abstract class Methods extends MainActivity {
 
     //  Base API URL
-    public static final String BASE_URL = "https://squash-social.herokuapp.com/";
+    public static final String BASE_URL_HTTPS = "https://squash-social.herokuapp.com/";
+    public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
     public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.;])[A-Za-z\\d@$!%*#?&.;]{8,}$";
+    public static final String POLICY_PRIVACY_LINK = "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
 
@@ -111,7 +111,7 @@ public abstract class Methods extends MainActivity {
     }
 
     @NonNull
-    public static String RandomCharactersWithoutSpecials (int CharactersAmount) {
+    public static String RandomCharactersWithoutSpecials (final int CharactersAmount) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < CharactersAmount; i++) {
             int ch = rand.nextInt (lettersWithoutSpecials.length);
@@ -125,7 +125,7 @@ public abstract class Methods extends MainActivity {
     @Contract(" -> new")
     public static Retrofit GetRetrofitBuilder(){
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(BASE_URL_HTTPS)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
@@ -151,7 +151,7 @@ public abstract class Methods extends MainActivity {
         return output;
     }
 
-    public static void LoadFollowersAndFollowing(Context context, int base){
+    public static void LoadFollowersAndFollowing(@NonNull Context context, final int base){
         SharedPreferences sp_First = context.getSharedPreferences("myPrefs", MODE_PRIVATE);
         if(base == 0){
             AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
@@ -202,7 +202,7 @@ public abstract class Methods extends MainActivity {
         suffixes.put(1_000_000_000_000_000_000L, "E");
     }
 
-    public static String NumberTrick(long value) {
+    public static String NumberTrick(final long value) {
         //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
         if (value == Long.MIN_VALUE) return NumberTrick(Long.MIN_VALUE + 1);
         if (value < 0) return "-" + NumberTrick(-value);
@@ -217,13 +217,6 @@ public abstract class Methods extends MainActivity {
         //noinspection IntegerDivisionInFloatingPointContext
         boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
         return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
-    }
-
-    //  Method to know if user is has internet connection
-    public static boolean isOnline(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return manager.getActiveNetworkInfo() != null &&
-                manager.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
     protected static void makeLinkClickable(Context context, SpannableStringBuilder strBuilder, final URLSpan span)
@@ -254,9 +247,10 @@ public abstract class Methods extends MainActivity {
         Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
         String formattedDate = df_date.format(c.getTime());
-        firebaseUser = ConfFirebase.getFirebaseUser();
+        firebaseUser = myFirebaseHelper.getFirebaseUser();
         //noinspection ConstantConditions
         if(firebaseUser.getUid() != null){
+            reference = null;
             reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
             HashMap<String, Object> hashMap = new HashMap<>();
             if(status.equals("offline"))
@@ -270,7 +264,9 @@ public abstract class Methods extends MainActivity {
 
     //  Method to update typing status for chat system
     public static void typingTo_chat_Status(String typing){
-        firebaseUser = ConfFirebase.getFirebaseUser();
+        firebaseUser = null;
+        reference = null;
+        firebaseUser = myFirebaseHelper.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("typingTo", typing);
@@ -352,33 +348,17 @@ public abstract class Methods extends MainActivity {
         return result;
     }
 
-    private static SharedPreferences mPrefs;
-    @SuppressLint("MutatingSharedPrefs")
-    public static void PinAUser_Chat(Context context, String userId){
-        ToastHelper.toast((Activity)context, context.getString(R.string.under_development), 0);
-        /*mPrefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        //Retrieve the values
-        Set<String> set = mPrefs.getStringSet("pinned_users_chat", null);
-        SharedPreferences.Editor editor = mPrefs.edit();
-
-        if (set == null)
-            set = new HashSet<>();
-
-        if(!set.contains(userId))
-            set.add(userId);
-
-        //Set the values
-        Set<String> set_list = new HashSet<>(set);
-        editor.putStringSet("pinned_users_chat", set_list);
-        editor.apply();*/
+    public static final int VIBRATE_SHORT = 200;
+    public static final int VIBRATE_LONG = 500;
+    private static Vibrator vibrator;
+    public static void vibrate(Context context, int VIBRATE_TIME) {
+        try {
+            if(vibrator == null) vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(VIBRATE_TIME);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
-    public static Set<String> GetPinnedChat(Context context){
-        mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        //Retrieve the values
-        return mPrefs.getStringSet("pinned_users_chat", null);
-    }
-
 
     public static File SaveImage(Context mContext, Bitmap finalBitmap, @NonNull String chat_id, String timeReceive) {
         String root = Environment.getExternalStoragePublicDirectory(
@@ -444,7 +424,6 @@ public abstract class Methods extends MainActivity {
         }
         return uri;
     }
-
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {

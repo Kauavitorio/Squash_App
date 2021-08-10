@@ -39,10 +39,10 @@ import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
 import dev.kaua.squash.Data.System.DtoSystem;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
-import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
@@ -135,7 +135,7 @@ public class MainFragment extends Fragment {
 
     private void loadCheckSystemInfo() {
         if(getContext() != null)
-        if(Methods.isOnline(getContext())){
+        if(ConnectionHelper.isOnline(getContext())){
             int currentVersionCode = BuildConfig.VERSION_CODE;
 
             reference = FirebaseDatabase.getInstance().getReference("System");
@@ -143,7 +143,7 @@ public class MainFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                     if(getContext() != null)
-                    if(Methods.isOnline(getContext())){
+                    if(ConnectionHelper.isOnline(getContext())){
                         DtoSystem system = snapshot.getValue(DtoSystem.class);
                         if(system != null){
                             if(currentVersionCode < system.getVersionCode()){
@@ -151,6 +151,9 @@ public class MainFragment extends Fragment {
                                     if(MyPrefs.getUpdateRequest_Show(getContext()) == 0 || system.getNeedUpdate() == 1)
                                         Warnings.showNeedUpdate(requireContext(), system.getVersionName(), system.getVersionCode(), (int) system.getNeedUpdate());
                             }
+
+                            if(MyPrefs.Privacy_Policy_Version(getContext()) < system.getPrivacy_policy())
+                                Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
                         }
                     }
                 }
@@ -171,7 +174,7 @@ public class MainFragment extends Fragment {
         instance = requireActivity();
         requireActivity().getWindow().setStatusBarColor(requireActivity().getColor(R.color.background_menu_sheet));
         requireActivity().getWindow().setNavigationBarColor(requireActivity().getColor(R.color.base_color));
-        firebaseUser = ConfFirebase.getFirebaseUser();
+        firebaseUser = myFirebaseHelper.getFirebaseUser();
         account = MyPrefs.getUserInformation(requireContext());
         loadingPanel = view.findViewById(R.id.loadingPanel);
         loading_posts = view.findViewById(R.id.loading_posts);

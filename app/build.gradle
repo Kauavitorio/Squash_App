@@ -10,8 +10,8 @@ android {
         applicationId "dev.kaua.squash"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 10
-        versionName "1.7.8"
+        versionCode 13
+        versionName "1.8.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,6 +25,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -78,6 +81,9 @@ dependencies {
 
     //  UCrop for edit images
     implementation 'com.github.yalantis:ucrop:2.2.6-native'
+
+    //  Zoom Image
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
 
     //  Encrypt Dependencies
     implementation 'org.slf4j:slf4j-api:1.7.25'

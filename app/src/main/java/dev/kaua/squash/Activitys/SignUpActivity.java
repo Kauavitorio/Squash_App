@@ -18,6 +18,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
@@ -27,8 +28,11 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,12 +45,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import dev.kaua.squash.Data.Account.AccountServices;
-import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Firebase.ConfFirebase;
-import dev.kaua.squash.Fragments.SearchFragment;
+import dev.kaua.squash.Data.System.DtoSystem;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -81,7 +85,6 @@ public class SignUpActivity extends AppCompatActivity {
     private static SharedPreferences mPrefs;
     private TextView txt_policy_and_privacy;
     private CheckBox policy_and_privacy_check;
-    private final String POLICY_PRIVACY_LINK = "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf";
 
     int age_user = 0;
     boolean policy_and_privacy = false;
@@ -119,7 +122,7 @@ public class SignUpActivity extends AppCompatActivity {
         };
 
         //  Privacy Policy click
-        txt_policy_and_privacy.setOnClickListener(v -> Methods.browseTo(this, POLICY_PRIVACY_LINK));
+        txt_policy_and_privacy.setOnClickListener(v -> Methods.browseTo(this, Methods.POLICY_PRIVACY_LINK));
 
         //  Privacy Policy check status
         policy_and_privacy_check.setOnClickListener(v -> policy_and_privacy = policy_and_privacy_check.isChecked());
@@ -198,11 +201,11 @@ public class SignUpActivity extends AppCompatActivity {
                 account.setToken(EncryptHelper.encrypt(token));
 
                 //  Register User in Firebase
-                mAuth = ConfFirebase.getFirebaseAuth();
+                mAuth = myFirebaseHelper.getFirebaseAuth();
                 FirebaseUser currentUser = mAuth.getCurrentUser();
                 if(currentUser != null) mAuth.signOut();
 
-                mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
+                mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(this);
 
 
                 AccountServices services = retrofitUser.create(AccountServices.class);
@@ -215,6 +218,8 @@ public class SignUpActivity extends AppCompatActivity {
                                     .addOnCompleteListener(task -> {
                                         if (task.isSuccessful()) {
                                             loadingDialog.dismissDialog();
+
+                                            Privacy_PolicyCheck();
 
                                             // Sign in success, now go to register user into API
                                             FirebaseUser user = mAuth.getCurrentUser();
@@ -308,6 +313,24 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    //  Method to get last version of Privacy Policy
+    private void Privacy_PolicyCheck(){
+        if(ConnectionHelper.isOnline(SignUpActivity.this)){
+            reference = FirebaseDatabase.getInstance().getReference("System");
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(ConnectionHelper.isOnline(SignUpActivity.this)){
+                        DtoSystem system = snapshot.getValue(DtoSystem.class);
+                        if(system != null) MyPrefs.setPrivacy_Policy(SignUpActivity.this, system.getPrivacy_policy());
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {}
+            });
+        }
     }
 
     //  Method to check what is the error the register got
