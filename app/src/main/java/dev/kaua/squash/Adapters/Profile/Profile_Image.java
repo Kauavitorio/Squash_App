@@ -1,7 +1,6 @@
 package dev.kaua.squash.Adapters.Profile;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -17,7 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
 import dev.kaua.squash.Activitys.EditProfileActivity;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.CompressImage;
 import dev.kaua.squash.Tools.LoadingDialog;
@@ -46,8 +45,8 @@ public class Profile_Image extends EditProfileActivity {
                 Log.d("UPDATE_PROFILE_IMAGE", "Resize size -> " + BitmapCompat.getAllocationByteCount(bitMapSendUpload));
                 byte[] dataUpload = baos.toByteArray();
                 ic_edit_ProfileUser.setCircleBackgroundColor(context.getColor(R.color.base_color));
-                storageReference = ConfFirebase.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
-                        "_" + ConfFirebase.getFirebaseAuth().getUid());
+                storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
+                        "_" + myFirebaseHelper.getFirebaseAuth().getUid());
                 storageReference.putBytes(dataUpload).addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
                         loadingDialog.dismissDialog();
@@ -86,8 +85,8 @@ public class Profile_Image extends EditProfileActivity {
        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] data = baos.toByteArray();
-        storageReference = ConfFirebase.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
-                "_" + ConfFirebase.getFirebaseAuth().getUid());
+        storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
+                "_" + myFirebaseHelper.getFirebaseAuth().getUid());
         storageReference.putBytes(data).addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 loadingDialog.dismissDialog();

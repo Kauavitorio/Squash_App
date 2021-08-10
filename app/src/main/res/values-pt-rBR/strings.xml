@@ -155,4 +155,10 @@
     <string name="last_reset_time">Último reinício</string>
     <string name="reset">Redefinir</string>
     <string name="never">Nunca</string>
+    <string name="there_was_a_communication_problem">Ocorreu um problema de comunicação entre o seu dispositivo e nossos servidores, tente novamente mais tarde.</string>
+    <string name="unable_to_locate_the_image">Não foi possível localizar a imagem em seu dispositivo, tente novamente mais tarde.</string>
+    <string name="you_are_without_internet_messages">Você não tem conexão com a internet, não será possível receber novas mensagens.</string>
+    <string name="copy_message">Copiar mensagem</string>
+    <string name="delete_messag">Apagar mensagem</string>
+    <string name="copied_message">Mensagem copiada</string>
 </resources>

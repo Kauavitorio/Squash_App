@@ -49,6 +49,7 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp"
                 android:minHeight="42dp"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 tools:ignore="UseCompoundDrawables">
 
@@ -57,7 +58,7 @@
                     android:layout_width="25dp"
                     android:layout_gravity="center"
                     android:layout_height="25dp"
-                    android:src="@drawable/ic_not_secure_lock"
+                    android:src="@drawable/ic_notification"
                     tools:ignore="ContentDescription" />
 
                 <!-- Setting Text -->
@@ -77,6 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="30dp"
+                android:visibility="gone"
                 android:background="@color/dividing_line_settings"/>
 
             <!-- Privacy and Security -->
@@ -85,6 +87,7 @@
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
                 android:minHeight="42dp"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 tools:ignore="UseCompoundDrawables">
 
@@ -113,6 +116,7 @@
                 android:layout_width="match_parent"
                 android:layout_marginStart="30dp"
                 android:layout_height="1dp"
+                android:visibility="gone"
                 android:background="@color/dividing_line_settings"/>
 
             <!-- Data and Storage -->
@@ -157,6 +161,7 @@
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
                 android:minHeight="42dp"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 tools:ignore="UseCompoundDrawables">
 
@@ -165,7 +170,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_not_secure_lock"
+                    android:src="@drawable/ic_chat_setting"
                     tools:ignore="ContentDescription" />
 
                 <!-- Setting Text -->
@@ -185,6 +190,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="30dp"
+                android:visibility="gone"
                 android:background="@color/dividing_line_settings"/>
 
             <!-- Languages -->
@@ -193,6 +199,7 @@
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
                 android:minHeight="42dp"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 tools:ignore="UseCompoundDrawables">
 
@@ -201,7 +208,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_not_secure_lock"
+                    android:src="@drawable/ic_translation"
                     tools:ignore="ContentDescription" />
 
                 <!-- Setting Text -->
@@ -251,6 +258,7 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp"
                 android:minHeight="42dp"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 tools:ignore="UseCompoundDrawables">
 
@@ -259,7 +267,7 @@
                     android:layout_width="25dp"
                     android:layout_gravity="center"
                     android:layout_height="25dp"
-                    android:src="@drawable/ic_not_secure_lock"
+                    android:src="@drawable/ic_ask_question"
                     tools:ignore="ContentDescription" />
 
                 <!-- Help Text -->
@@ -279,6 +287,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="30dp"
+                android:visibility="gone"
                 android:background="@color/dividing_line_settings"/>
 
             <!-- Common questions -->
@@ -287,6 +296,7 @@
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
                 android:minHeight="42dp"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 tools:ignore="UseCompoundDrawables">
 
@@ -315,6 +325,7 @@
                 android:layout_width="match_parent"
                 android:layout_marginStart="30dp"
                 android:layout_height="1dp"
+                android:visibility="gone"
                 android:background="@color/dividing_line_settings"/>
 
             <!-- Policy and Privacy -->

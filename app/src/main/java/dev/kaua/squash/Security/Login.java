@@ -30,7 +30,7 @@ import dev.kaua.squash.Activitys.SplashActivity;
 import dev.kaua.squash.Activitys.ValidateEmailActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
@@ -118,11 +118,11 @@ public abstract class Login {
                     Methods.LoadFollowersAndFollowing(context, 1);
 
                     //  Log in User On Firebase
-                    mAuth = ConfFirebase.getFirebaseAuth();
+                    mAuth = myFirebaseHelper.getFirebaseAuth();
                     mAuth.signOut();
 
                     //  Init Analytics
-                    mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(context);
+                    mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(context);
 
                     //  Login user in firebase to get user instance
                     mAuth.signInWithEmailAndPassword(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail())), Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
@@ -265,7 +265,7 @@ public abstract class Login {
         loadingDialog.startLoading();
         Methods.status_chat("offline", context); // Set User status with offline
 
-        ConfFirebase.LogOut(); // LogOut on firebase
+        myFirebaseHelper.LogOut(); // LogOut on firebase
 
         clearApplicationData(context); // Clear app cache and data
 

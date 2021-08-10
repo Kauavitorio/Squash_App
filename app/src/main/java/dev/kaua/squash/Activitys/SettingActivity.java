@@ -5,11 +5,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
@@ -23,6 +20,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 
 /**
@@ -37,6 +35,7 @@ public class SettingActivity extends AppCompatActivity {
     CircleImageView profile_image;
     TextView txt_app_version;
     private LinearLayout btn_notifications, btn_data;
+    private LinearLayout btn_policy_and_Privacy;
     private DtoAccount mAccount;
     private Animation myAnim;
 
@@ -61,6 +60,12 @@ public class SettingActivity extends AppCompatActivity {
             Intent intent = new Intent(this, ConnectionUsageActivity.class);
             startActivity(intent);
         });
+
+        //  Privacy Policy click
+        btn_policy_and_Privacy.setOnClickListener(v -> {
+            btn_policy_and_Privacy.startAnimation(myAnim);
+            Methods.browseTo(this, Methods.POLICY_PRIVACY_LINK);
+        });
     }
 
     @SuppressLint("SetTextI18n")
@@ -73,6 +78,7 @@ public class SettingActivity extends AppCompatActivity {
         txt_username = findViewById(R.id.txt_username_setting);
         btn_notifications = findViewById(R.id.btn_notifications);
         btn_data = findViewById(R.id.btn_data);
+        btn_policy_and_Privacy = findViewById(R.id.btn_policy_and_Privacy);
         profile_image = findViewById(R.id.profile_image_setting);
 
         txt_app_version.setText(getString(R.string.squash_for_mobile, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE) + " " + getAbi());

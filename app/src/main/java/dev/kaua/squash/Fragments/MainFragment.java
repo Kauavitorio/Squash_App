@@ -39,7 +39,7 @@ import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
 import dev.kaua.squash.Data.System.DtoSystem;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ConnectionHelper;
@@ -174,7 +174,7 @@ public class MainFragment extends Fragment {
         instance = requireActivity();
         requireActivity().getWindow().setStatusBarColor(requireActivity().getColor(R.color.background_menu_sheet));
         requireActivity().getWindow().setNavigationBarColor(requireActivity().getColor(R.color.base_color));
-        firebaseUser = ConfFirebase.getFirebaseUser();
+        firebaseUser = myFirebaseHelper.getFirebaseUser();
         account = MyPrefs.getUserInformation(requireContext());
         loadingPanel = view.findViewById(R.id.loadingPanel);
         loading_posts = view.findViewById(R.id.loading_posts);

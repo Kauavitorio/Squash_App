@@ -5,14 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,7 +27,7 @@ import java.util.List;
 import dev.kaua.squash.Adapters.Chat.UserChatAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 
@@ -56,7 +54,7 @@ public class ShareContentActivity extends AppCompatActivity {
         Ids();
         mAccounts = new ArrayList<>();
         usersList = new ArrayList<>();
-        fUser = ConfFirebase.getFirebaseUser();
+        fUser = myFirebaseHelper.getFirebaseUser();
 
         reference = FirebaseDatabase.getInstance().getReference("Chatslist").child(fUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
@@ -102,7 +100,7 @@ public class ShareContentActivity extends AppCompatActivity {
     }
 
     private void searchUsers(String str) {
-        FirebaseUser fUser = ConfFirebase.getFirebaseUser();
+        FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
         Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
                 .startAt(str)
                 .endAt(str + "\uf8ff");

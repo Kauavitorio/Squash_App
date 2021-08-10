@@ -19,7 +19,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.FragmentPageAdapter;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
@@ -194,12 +194,12 @@ public class MainActivity extends AppCompatActivity {
         btn_search_main = findViewById(R.id.btn_search_main);
         btn_home_main = findViewById(R.id.btn_home_main);
         container_btn_profile_main = findViewById(R.id.container_btn_profile_main);
-        mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
+        mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(this);
         btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
 
         //  Creating analytic for open app event
         Bundle bundle_Analytics = new Bundle();
-        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, ConfFirebase.getFirebaseUser().getUid());
+        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, myFirebaseHelper.getFirebaseUser().getUid());
         bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(account.getUsername()));
         bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle_Analytics);

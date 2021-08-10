@@ -14,7 +14,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.MediaScannerConnection;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Vibrator;
@@ -56,7 +55,7 @@ import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts_Comment;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -80,6 +79,7 @@ public abstract class Methods extends MainActivity {
     public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
     public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.;])[A-Za-z\\d@$!%*#?&.;]{8,}$";
+    public static final String POLICY_PRIVACY_LINK = "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
 
@@ -247,7 +247,7 @@ public abstract class Methods extends MainActivity {
         Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
         String formattedDate = df_date.format(c.getTime());
-        firebaseUser = ConfFirebase.getFirebaseUser();
+        firebaseUser = myFirebaseHelper.getFirebaseUser();
         //noinspection ConstantConditions
         if(firebaseUser.getUid() != null){
             reference = null;
@@ -266,7 +266,7 @@ public abstract class Methods extends MainActivity {
     public static void typingTo_chat_Status(String typing){
         firebaseUser = null;
         reference = null;
-        firebaseUser = ConfFirebase.getFirebaseUser();
+        firebaseUser = myFirebaseHelper.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("typingTo", typing);

@@ -28,7 +28,7 @@ import java.util.Map;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Tools.MyPrefs;
 
@@ -44,7 +44,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
-        FirebaseUser firebaseUser = ConfFirebase.getFirebaseUser();
+        FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
         if (firebaseUser != null) updateToken(s);
     }
 

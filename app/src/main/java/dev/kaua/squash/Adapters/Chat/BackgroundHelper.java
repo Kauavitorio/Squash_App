@@ -3,36 +3,25 @@ package dev.kaua.squash.Adapters.Chat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.Objects;
 
-import dev.kaua.squash.Activitys.EditProfileActivity;
 import dev.kaua.squash.Activitys.MessageActivity;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.LoadingDialog;
@@ -85,7 +74,7 @@ public abstract class BackgroundHelper extends MessageActivity {
             if(filePath != null) {
 
                 //uploading the image
-                storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("background").child("bg_" + fUser.getUid() + "_"
+                storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("chat").child("background").child("bg_" + fUser.getUid() + "_"
                         + user_im_chat.getId());
                 storageReference .putFile(filePath).continueWithTask(task -> {
                     if (!task.isSuccessful()) {
@@ -122,7 +111,7 @@ public abstract class BackgroundHelper extends MessageActivity {
        /* ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
-        storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("background").child("bg_" + fUser.getUid() + "_"
+        storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("chat").child("background").child("bg_" + fUser.getUid() + "_"
                 + user_im_chat.getId());
         storageReference.putBytes(data).addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {

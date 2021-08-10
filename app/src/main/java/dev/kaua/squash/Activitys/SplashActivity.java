@@ -40,6 +40,9 @@ public class SplashActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.base_color));
         getWindow().setNavigationBarColor(getColor(R.color.base_color));
 
+        SharedPreferences sp_network = getSharedPreferences(MyPrefs.PREFS_NETWORK_USAGE, MODE_PRIVATE);
+        if (!sp_network.contains("pref_start_time")) MyPrefs.InsertNetworkCount(this);
+
         Intent intent = getIntent();
         Uri data = intent.getData();
         String action = intent.getAction();

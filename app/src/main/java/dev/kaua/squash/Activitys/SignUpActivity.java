@@ -45,11 +45,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import dev.kaua.squash.Data.Account.AccountServices;
-import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.System.DtoSystem;
-import dev.kaua.squash.Firebase.ConfFirebase;
-import dev.kaua.squash.Fragments.SearchFragment;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
@@ -87,7 +85,6 @@ public class SignUpActivity extends AppCompatActivity {
     private static SharedPreferences mPrefs;
     private TextView txt_policy_and_privacy;
     private CheckBox policy_and_privacy_check;
-    private final String POLICY_PRIVACY_LINK = "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf";
 
     int age_user = 0;
     boolean policy_and_privacy = false;
@@ -125,7 +122,7 @@ public class SignUpActivity extends AppCompatActivity {
         };
 
         //  Privacy Policy click
-        txt_policy_and_privacy.setOnClickListener(v -> Methods.browseTo(this, POLICY_PRIVACY_LINK));
+        txt_policy_and_privacy.setOnClickListener(v -> Methods.browseTo(this, Methods.POLICY_PRIVACY_LINK));
 
         //  Privacy Policy check status
         policy_and_privacy_check.setOnClickListener(v -> policy_and_privacy = policy_and_privacy_check.isChecked());
@@ -204,11 +201,11 @@ public class SignUpActivity extends AppCompatActivity {
                 account.setToken(EncryptHelper.encrypt(token));
 
                 //  Register User in Firebase
-                mAuth = ConfFirebase.getFirebaseAuth();
+                mAuth = myFirebaseHelper.getFirebaseAuth();
                 FirebaseUser currentUser = mAuth.getCurrentUser();
                 if(currentUser != null) mAuth.signOut();
 
-                mFirebaseAnalytics = ConfFirebase.getFirebaseAnalytics(this);
+                mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(this);
 
 
                 AccountServices services = retrofitUser.create(AccountServices.class);

@@ -32,7 +32,7 @@ import java.util.Objects;
 import dev.kaua.squash.Adapters.Chat.UserChatAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
@@ -56,7 +56,7 @@ public class ChatsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
         Ids(view);
 
-        fUser = ConfFirebase.getFirebaseUser();
+        fUser = myFirebaseHelper.getFirebaseUser();
         usersList = new ArrayList<>();
 
         chatList();
@@ -103,7 +103,7 @@ public class ChatsFragment extends Fragment {
     }
 
     private void searchUsers(String str) {
-        FirebaseUser fUser = ConfFirebase.getFirebaseUser();
+        FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
         Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
                 .startAt(str)
                 .endAt(str + "\uf8ff");

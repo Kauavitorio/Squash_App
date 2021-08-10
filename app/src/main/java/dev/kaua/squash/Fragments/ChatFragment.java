@@ -38,7 +38,7 @@ import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.SettingActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.Fragments.Chat.UsersFragment;
 import dev.kaua.squash.R;
@@ -78,7 +78,7 @@ public class ChatFragment extends Fragment {
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("");
 
 
-        firebaseUser = ConfFirebase.getFirebaseUser();
+        firebaseUser = myFirebaseHelper.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
 
@@ -155,7 +155,6 @@ public class ChatFragment extends Fragment {
                 ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
                 return true;
             case R.id.setting_chat:
-                ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
                 Intent i = new Intent(requireActivity(), SettingActivity.class);
                 startActivity(i);
                 return true;

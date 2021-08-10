@@ -51,7 +51,7 @@ import dev.kaua.squash.Data.Post.AsyncComments_Posts;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.Notifications.APIService;
@@ -413,7 +413,7 @@ public class PostDetailsActivity extends AppCompatActivity {
     }
 
     private void Ids() {
-        fUser = ConfFirebase.getFirebaseUser();
+        fUser = myFirebaseHelper.getFirebaseUser();
         apiService = Client.getClient(Methods.FCM_URL).create(APIService.class);
         daoPosts = new DaoPosts(this);
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);

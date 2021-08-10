@@ -9,7 +9,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class ConfFirebase {
+public class myFirebaseHelper {
     private static FirebaseAnalytics firebaseAnalytics;
     private static FirebaseAuth firebaseAuth;
     private static FirebaseUser firebaseUser;

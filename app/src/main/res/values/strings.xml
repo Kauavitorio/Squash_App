@@ -163,4 +163,10 @@
     <string name="last_reset_time">Last reset time</string>
     <string name="reset">Reset</string>
     <string name="never">Never</string>
+    <string name="there_was_a_communication_problem">There was a communication problem between your device and our servers, please try again later.</string>
+    <string name="unable_to_locate_the_image">Unable to locate the image on your device, please try again later.</string>
+    <string name="you_are_without_internet_messages">You have no internet connection, it will not be possible to receive new messages.</string>
+    <string name="copy_message">Copy message</string>
+    <string name="delete_messag">Delete message</string>
+    <string name="copied_message">Copied message</string>
 </resources>

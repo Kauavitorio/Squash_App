@@ -46,7 +46,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Adapters.Profile.Profile_Image;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -130,7 +130,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             editor.apply();
 
                             //  Register new user on Firebase Database
-                            reference = FirebaseDatabase.getInstance().getReference("Users").child(Objects.requireNonNull(ConfFirebase.getFirebaseAuth().getUid()));
+                            reference = FirebaseDatabase.getInstance().getReference("Users").child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
                             HashMap<String, Object> hashMap = new HashMap<>();
 
                             hashMap.put("username", edit_username.getText().toString().trim());

@@ -37,7 +37,7 @@ import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Activitys.ShareContentActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
@@ -158,7 +158,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     //  check for last message
     private void lastMessage(String userId, CardView ic_not_seen){
         theLastMessage  = "default";
-        FirebaseUser firebaseUser = ConfFirebase.getFirebaseUser();
+        FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
         reference.addValueEventListener(new ValueEventListener() {
             @SuppressLint("SetTextI18n")

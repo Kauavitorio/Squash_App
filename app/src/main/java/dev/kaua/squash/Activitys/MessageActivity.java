@@ -82,7 +82,7 @@ import dev.kaua.squash.Adapters.Chat.ViewProxy;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Data.Message.DtoMessage;
-import dev.kaua.squash.Firebase.ConfFirebase;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
@@ -101,7 +101,6 @@ import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.UserPermissions;
-import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -173,7 +172,7 @@ public class MessageActivity extends AppCompatActivity {
     long timeSwapBuff = 0L;
     long updatedTime = 0L;
     private Timer timer;
-    private float x1,x2;
+    float x1,x2;
     static final int MIN_DISTANCE = dp(400);
     private static AudioRecorder audioRecorder;
 
@@ -194,8 +193,8 @@ public class MessageActivity extends AppCompatActivity {
         intent = getIntent();
         userId = intent.getStringExtra("userId");
         chat_id = intent.getStringExtra("chat_id");
-        fUser = ConfFirebase.getFirebaseUser();
-        reference = ConfFirebase.getFirebaseDatabase().getReference("Users").child(userId);
+        fUser = myFirebaseHelper.getFirebaseUser();
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(userId);
 
         CheckShared();
         GenerateChatID();
@@ -211,7 +210,7 @@ public class MessageActivity extends AppCompatActivity {
             String msg = text_send.getText().toString();
             if(!msg.equals("") && msg.trim().replaceAll(" +", "").length() > 0)
                 sendMessage(fUser.getUid(), userId, msg);
-            else ToastHelper.toast(this, getString(R.string.the_message_cannot_be_empty), 0);
+            else ToastHelper.toast(this, getString(R.string.the_message_cannot_be_empty), ToastHelper.SHORT_DURATION);
             text_send.setText("");
         });
 
@@ -221,16 +220,16 @@ public class MessageActivity extends AppCompatActivity {
 
         if(ConnectionHelper.isOnline(this)){
             reference.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("UseCompatLoadingForDrawables")
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                user_im_chat = snapshot.getValue(DtoAccount.class);
-                LoadAnotherUserInfo();
-            }
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
-        }
+                @SuppressLint("UseCompatLoadingForDrawables")
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    user_im_chat = snapshot.getValue(DtoAccount.class);
+                    LoadAnotherUserInfo();
+                }
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            });
+        }else ToastHelper.toast(this, getString(R.string.you_are_without_internet_messages), ToastHelper.SHORT_DURATION);
 
         //  check edittext is typing
         text_send.addTextChangedListener(new TextWatcher() {
@@ -289,7 +288,7 @@ public class MessageActivity extends AppCompatActivity {
 
             sheetView.findViewById(R.id.container_btn_video).setOnClickListener(view -> {
                 dialog.dismiss();
-                ToastHelper.toast(this, getString(R.string.under_development), 0);
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
             });
             dialog.setContentView(sheetView);
             dialog.show();
@@ -450,15 +449,15 @@ public class MessageActivity extends AppCompatActivity {
                 timer.schedule(myTimerTask, 1000, 1000);
                 Methods.vibrate(this, Methods.VIBRATE_SHORT);
             }catch (Exception ex){
-                recording = false;
+                ToastHelper.toast(this, getString(R.string.weHaveAProblem), ToastHelper.SHORT_DURATION);
                 Log.d(TAG, ex.getMessage());
+                recording = false;
                 StopRecord(true);
-                Warnings.showWeHaveAProblem(this);
             }
         }
     }
 
-    private void StopRecord(boolean cancel) {
+    private void StopRecord(final boolean cancel) {
         recording = false;
         try {
             if (!cancel) {
@@ -473,7 +472,7 @@ public class MessageActivity extends AppCompatActivity {
                     Uri uriAudio = Uri.fromFile(new File(audio_path).getAbsoluteFile());
                     LoadingDialog loadingDialog = new LoadingDialog(this);
                     loadingDialog.startLoading();
-                    storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid())
+                    storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid())
                             .child("audios").child("squash_audio_" + timeStamp + ".3gp");
                     storageReference.putFile(uriAudio).addOnCompleteListener(task -> {
                         if (!task.isSuccessful()) {
@@ -517,11 +516,11 @@ public class MessageActivity extends AppCompatActivity {
             }
         }catch (Exception ex){
             Log.d(TAG, ex.toString());
-            Warnings.showWeHaveAProblem(this);
+            ToastHelper.toast(this, getString(R.string.weHaveAProblem), ToastHelper.SHORT_DURATION);
         }
     }
 
-    public static int dp(float value) {
+    public static int dp(final float value) {
         return (int) Math.ceil(1 * value);
     }
 
@@ -555,7 +554,7 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
-    private void checkChatList(String userId) {
+    private void checkChatList(final String userId) {
         reference = FirebaseDatabase.getInstance().getReference("Chatslist").child(fUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -574,7 +573,7 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void GenerateChatID() {
+    void GenerateChatID() {
         if(chat_id == null){
             String first_sequence = Methods.RandomCharactersWithoutSpecials(20);
             String second_sequence = Methods.RandomCharactersWithoutSpecials(5);
@@ -588,19 +587,19 @@ public class MessageActivity extends AppCompatActivity {
         else container_no_message_yet.setVisibility(View.GONE);
     }
 
-    private void CheckShared() {
+    void CheckShared() {
         Bundle bundle = getIntent().getExtras();
         if(bundle.getInt("shared") == MainActivity.SHARED_ID){
             int shared_type = bundle.getInt("shared_type");
             if(shared_type == MainActivity.SHARED_PLAIN_TEXT)
                 text_send.setText(bundle.getString("shared_content"));
             else if(shared_type == MainActivity.SHARED_IMAGE){
-                ToastHelper.toast(this, getString(R.string.under_development), 0);
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
             }
         }
     }
 
-    private void Ids() {
+    void Ids() {
         myAnim = AnimationUtils.loadAnimation(this,R.anim.click_anim);
         instance = MessageActivity.this;
         chatDB = new DaoChat(MessageActivity.this);
@@ -608,8 +607,7 @@ public class MessageActivity extends AppCompatActivity {
         recordPanel = findViewById(R.id.record_panel);
         recordTimeText = findViewById(R.id.recording_time_text);
         btn_more_medias = findViewById(R.id.btn_more_medias);
-        TextView textView = findViewById(R.id.slideToCancelTextView);
-        textView.setText(getString(R.string.slide_to_cancel));
+        ((TextView) findViewById(R.id.slideToCancelTextView)).setText(getString(R.string.slide_to_cancel));
         container_no_message_yet = findViewById(R.id.container_no_message_yet);
         txt_user_name = findViewById(R.id.txt_username_chat);
         slideText = findViewById(R.id.slideText);
@@ -637,7 +635,7 @@ public class MessageActivity extends AppCompatActivity {
         container_edit_text.setVisibility(View.VISIBLE);
     }
 
-    private void seenMessage(String userUid){
+    void seenMessage(String userUid){
         reference = FirebaseDatabase.getInstance().getReference().child("Chats");
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -660,18 +658,20 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void sendMessage(String sender, String receiver, String message){
-        Calendar c = Calendar.getInstance();
+    void sendMessage(String sender, String receiver, String message){
+        final Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd-MM-yyyy HH:mm a");
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_id = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
-        String formattedDate = df_time.format(c.getTime());
-        String formattedDate_id = df_time_id.format(c.getTime());
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        HashMap<String, Object> hashMap = new HashMap<>();
+        final String formattedDate = df_time.format(c.getTime());
+        final String formattedDate_id = df_time_id.format(c.getTime());
+        String id_msg = Methods.shuffle(Methods.RandomCharactersWithoutSpecials(8) + formattedDate_id.replace("-","")
+                .replace(" ","").replace(":","") + Methods.shuffle(fUser.getUid()));
+
+        DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference();
+        final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
-        hashMap.put("id_msg", Methods.RandomCharactersWithoutSpecials(8) + formattedDate_id.replace("-","")
-                .replace(" ","").replace(":","") + fUser.getUid());
+        hashMap.put("id_msg", id_msg);
         if(message_to_reply != null && message_to_reply.length() > 0){
             hashMap.put("reply_from", reply_from);
             hashMap.put("reply_content", EncryptHelper.encrypt(message_to_reply));
@@ -784,11 +784,8 @@ public class MessageActivity extends AppCompatActivity {
                                     Log.w(TAG, "Send Message Notification -> Failed");
                             }
                         }
-
                         @Override
-                        public void onFailure(@NotNull Call<MyResponse> call, @NotNull Throwable t) {
-                            Warnings.showWeHaveAProblem(MessageActivity.this);
-                        }
+                        public void onFailure(@NotNull Call<MyResponse> call, @NotNull Throwable t) {}
                     });
                 }
             }
@@ -937,13 +934,13 @@ public class MessageActivity extends AppCompatActivity {
                 OpenUserProfile();
                 return true;
             case R.id.medias_profile:
-                ToastHelper.toast(this, getString(R.string.under_development), 0);
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
                 return true;
             case R.id.pin_message:
-                ToastHelper.toast(this, getString(R.string.under_development), 0);
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
                 return true;
             case R.id.wallpaper_profile:
-                ToastHelper.toast(this, getString(R.string.under_development), 1);
+                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
                 //BackgroundHelper.OpenGallery();
                 return true;
         }
@@ -1016,7 +1013,7 @@ public class MessageActivity extends AppCompatActivity {
                                 }
                                 catch (Exception ex){
                                     dialog.dismissDialog();
-                                    Warnings.showWeHaveAProblem(MessageActivity.this);
+                                    ToastHelper.toast(MessageActivity.this, getString(R.string.unable_to_locate_the_image), ToastHelper.SHORT_DURATION);
                                     Log.d(TAG, ex.toString());
                                 }
                             }
@@ -1026,7 +1023,7 @@ public class MessageActivity extends AppCompatActivity {
 
             }catch (Exception ex){
                 dialog.dismissDialog();
-                Warnings.showWeHaveAProblem(MessageActivity.this);
+                ToastHelper.toast(MessageActivity.this, getString(R.string.unable_to_locate_the_image), ToastHelper.SHORT_DURATION);
                 Log.d(TAG, ex.toString());
             }
         }
@@ -1041,9 +1038,9 @@ public class MessageActivity extends AppCompatActivity {
             if(data != null){
                 final Throwable cropError = UCrop.getError(data);
                 if(cropError != null)
-                Log.d(TAG, cropError.toString());
+                    Log.d(TAG, cropError.toString());
             }
-            Warnings.showWeHaveAProblem(this);
+            ToastHelper.toast(this, getString(R.string.weHaveAProblem), ToastHelper.SHORT_DURATION);
         }
     }
 
@@ -1053,7 +1050,7 @@ public class MessageActivity extends AppCompatActivity {
             if(resultUri != null) {
 
                 //uploading the image
-                storageReference = ConfFirebase.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
+                storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
                         + getFileName(resultUri).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(3));
                 storageReference.putFile(resultUri).continueWithTask(task -> {
                     if (!task.isSuccessful()) {
@@ -1070,18 +1067,18 @@ public class MessageActivity extends AppCompatActivity {
 
                     } else {
                         loadingDialog.dismissDialog();
-                        Warnings.showWeHaveAProblem(MessageActivity.this);
+                        ToastHelper.toast(this, getString(R.string.there_was_a_communication_problem), ToastHelper.LONG_DURATION);
                         Log.d(TAG, Objects.requireNonNull(task.getException()).toString());
                     }
                 });
             }
             else{
-                ToastHelper.toast(this, getString(R.string.select_an_image), 0);
+                ToastHelper.toast(this, getString(R.string.select_an_image), ToastHelper.SHORT_DURATION);
                 loadingDialog.dismissDialog();
             }
         } catch (Exception ex) {
             loadingDialog.dismissDialog();
-            Warnings.showWeHaveAProblem(this);
+            ToastHelper.toast(this, getString(R.string.there_was_a_communication_problem), ToastHelper.LONG_DURATION);
             Log.d(TAG, ex.toString());
         }
     }
