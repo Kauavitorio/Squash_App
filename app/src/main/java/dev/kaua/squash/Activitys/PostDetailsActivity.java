@@ -3,6 +3,8 @@ package dev.kaua.squash.Activitys;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -315,6 +317,17 @@ public class PostDetailsActivity extends AppCompatActivity {
                 });
             }
             else Warnings.NeedLoginWithShortCutAlert(this, 0);
+        });
+
+        img_firstImage_post.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ViewMediaActivity.class);
+            intent.putExtra("image_url", EncryptHelper.decrypt(post_info.getPost_images().get(0)));
+            intent.putExtra("receive_time", "post");
+            String id = post_info.getUsername() + "_" + post_info.getPost_id();
+            if (id.length() < 11) id += "posts_media";
+            intent.putExtra("chat_id", id);
+            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.move_to_left_go, R.anim.move_to_right_go);
+            ActivityCompat.startActivity(this, intent, activityOptionsCompat.toBundle());
         });
     }
 
