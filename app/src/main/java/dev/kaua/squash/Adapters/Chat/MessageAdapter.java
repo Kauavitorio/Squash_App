@@ -9,7 +9,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -24,12 +23,10 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -38,9 +35,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -56,7 +50,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Activitys.ViewMediaActivity;
 import dev.kaua.squash.Data.Message.DtoMessage;
@@ -74,6 +67,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     public static final int MSG_TYPE_LEFT = 0;
     public static final int MSG_TYPE_RIGHT = 1;
+    public static final int MSG_TYPE_RIGHT_AUDIO = 2;
+    public static final int MSG_TYPE_LEFT_AUDIO = 3;
+    public static final int MSG_TYPE_RIGHT_MEDIA = 4;
+    public static final int MSG_TYPE_LEFT_MEDIA = 5;
     public static final int MSG_TYPE_START = -1;
     private final MessageActivity mContext;
     private static List<DtoMessage> mMessages;
@@ -89,6 +86,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private Runnable runnable;
     private final Animation myAnim;
     private final DaoChat daoChat;
+    private static int LayoutType;
     FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
 
     public MessageAdapter(MessageActivity mContext, List<DtoMessage> mMessages, String imageURL, int joinNow, RecyclerView recycler_view_msg
@@ -113,14 +111,21 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @NonNull
     @Override
     public MessageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutType = viewType;
         Context context = parent.getContext();
         View view;
-        if(viewType == MSG_TYPE_RIGHT){
+        if(LayoutType == MSG_TYPE_RIGHT || LayoutType == MSG_TYPE_RIGHT_MEDIA){
             view = LayoutInflater.from(context).inflate(R.layout.adapter_chat_item_right, parent, false);
             return new ViewHolder(view);
         }
-        else if(viewType == MSG_TYPE_START){
+        else if(LayoutType == MSG_TYPE_START){
             view = LayoutInflater.from(context).inflate(R.layout.adapter_start_chat, parent, false);
+            return new ViewHolder(view);
+        }else if(LayoutType == MSG_TYPE_RIGHT_AUDIO){
+            view = LayoutInflater.from(context).inflate(R.layout.adapter_chat_audio_right, parent, false);
+            return new ViewHolder(view);
+        }else if(LayoutType == MSG_TYPE_LEFT_AUDIO){
+            view = LayoutInflater.from(context).inflate(R.layout.adapter_chat_audio_left, parent, false);
             return new ViewHolder(view);
         }
         else{
@@ -132,191 +137,196 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
     @Override
     public void onBindViewHolder(@NonNull @NotNull MessageAdapter.ViewHolder holder, int position) {
-        Context context = holder.itemView.getContext();
+        holder.setIsRecyclable(false);
+        final Context context = holder.itemView.getContext();
         final ViewHolder viewHolder = holder;
-        DtoMessage message = mMessages.get(position);
-        viewHolder.msg_chat_item.setText(EncryptHelper.decrypt(message.getMessage()));
-        //  Apply all url on Texts Views
-        Linkify.addLinks(viewHolder.msg_chat_item, Linkify.WEB_URLS);
+        final DtoMessage message = mMessages.get(position);
 
-        //  URL CLICK'S listener
-        viewHolder.msg_chat_item.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
-            if (Patterns.WEB_URL.matcher(url).matches()) {
-                //An web url is detected
-                Methods.browseTo(context, url);
-                return true;
-            }
-            return false;
-        }));
-        if(message.getTime() != null){
-            String[] time = EncryptHelper.decrypt(message.getTime()).replace("-", "/").split("/");
-            viewHolder.msgTime_chat_item.setText(time[2].substring(4));
-        }
+        if(LayoutType != MSG_TYPE_START){
+            if(LayoutType == MSG_TYPE_RIGHT || LayoutType == MSG_TYPE_LEFT || LayoutType == MSG_TYPE_LEFT_MEDIA || LayoutType == MSG_TYPE_RIGHT_MEDIA){
+                if(viewHolder.container_msg != null) viewHolder.container_msg.setVisibility(View.VISIBLE);
+                if(viewHolder.msg_chat_item != null){
+                    viewHolder.msg_chat_item.setText(EncryptHelper.decrypt(message.getMessage()));
+                    //  Apply all url on Texts Views
+                    Linkify.addLinks(viewHolder.msg_chat_item, Linkify.WEB_URLS);
 
-        if(message.getReply_from() != null && !message.getReply_from().equals("noOne") && !message.getReply_content().equals("empty")){
-            viewHolder.container_reply.setVisibility(View.VISIBLE);
-            if(fUser.getUid().equals(message.getReply_from()))
-                viewHolder.txt_reply_from.setText(mContext.getString(R.string.reply_to) + " " + myUsername);
-            else
-                viewHolder.txt_reply_from.setText(mContext.getString(R.string.reply_to) + " " + chat_Username);
+                    //  URL CLICK'S listener
+                    viewHolder.msg_chat_item.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
+                        if (Patterns.WEB_URL.matcher(url).matches()) {
+                            //An web url is detected
+                            Methods.browseTo(context, url);
+                            return true;
+                        }
+                        return false;
+                    }));
 
-            viewHolder.reply_content.setText(EncryptHelper.decrypt(message.getReply_content()));
-        }
+                    if(message.getReply_from() != null && !message.getReply_from().equals("noOne") && !message.getReply_content().equals("empty")){
+                        viewHolder.container_reply.setVisibility(View.VISIBLE);
+                        if(fUser.getUid().equals(message.getReply_from()))
+                            viewHolder.txt_reply_from.setText(mContext.getString(R.string.reply_to) + " " + myUsername);
+                        else
+                            viewHolder.txt_reply_from.setText(mContext.getString(R.string.reply_to) + " " + chat_Username);
 
-        viewHolder.container_msg.setVisibility(View.VISIBLE);
-        holder.voicePlayerView.setVisibility(View.GONE);
-        if(mMessages.get(position).getMedia() != null && message.getMedia() != null && message.getMedia().size() > 0
-        && !mMessages.get(position).getMedia().get(0).equals("")){
-            if(EncryptHelper.decrypt(mMessages.get(position).getMessage()) == null || EncryptHelper.decrypt(message.getMessage()).length() <= 0)
-                viewHolder.msg_chat_item.setVisibility(View.GONE);
+                        viewHolder.reply_content.setText(EncryptHelper.decrypt(message.getReply_content()));
 
-            holder.voicePlayerView.setVisibility(View.VISIBLE);
-            viewHolder.container_msg.setVisibility(View.GONE);
-            String extension = mMessages.get(position).getMedia().get(0).substring(message.getMedia().get(0).lastIndexOf("."));
-            Log.d("Audio_Loader", extension.substring(0, 4));
-            if(extension.startsWith(".3gp")){
+                        viewHolder.container_reply.setOnClickListener(v -> {
+                            recycler_view_msg.scrollToPosition(41);
+                            viewHolder.container_reply.startAnimation(myAnim);
+                            String current_message = EncryptHelper.decrypt(message.getReply_content());
+                            for (int i = 0; i < mMessages.size(); i++){
+                                String get_reply = EncryptHelper.decrypt(mMessages.get(i).getReply_content());
+                                if(current_message.equals(get_reply))
+                                    MessageActivity.ScrollRecycler(position, i);
 
-                holder.audio_timer.setText(convertFormat(MediaPlayer.create(mContext, Uri.parse(message.getMedia().get(0))).getDuration()));
+                                //viewHolder.itemView.setBackgroundColor(mContext.getColor(R.color.color_hover));
+                            }
+                        });
+                    }
 
-                holder.play_button.setOnClickListener(v -> {
-                    AudioManager am = (AudioManager) context.getSystemService(AUDIO_SERVICE);
-                    if(am.getStreamVolume(AudioManager.STREAM_MUSIC) == 0)
-                        ToastHelper.toast(mContext, mContext.getString(R.string.increase_media_volume), ToastHelper.SHORT_DURATION);
+                    if(EncryptHelper.decrypt(mMessages.get(position).getMessage()) == null || EncryptHelper.decrypt(message.getMessage()).length() <= 0)
+                        viewHolder.msg_chat_item.setVisibility(View.GONE);
 
-                    ResetHandlers();
-                    mediaPlayer = MediaPlayer.create(context, Uri.parse(message.getMedia().get(0)));
-                    runnable = new Runnable() {
+                    viewHolder.msg_chat_item.setOnLongClickListener(v -> {
+                        viewHolder.container_msg.startAnimation(myAnim);
+                        viewHolder.voicePlayerView.startAnimation(myAnim);
+                        message_Action(fUser.getUid(), viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
+                        return false;
+                    });
+                }
+
+                if(LayoutType == MSG_TYPE_LEFT_MEDIA || LayoutType == MSG_TYPE_RIGHT_MEDIA){
+                    viewHolder.container_msg.setVisibility(View.VISIBLE);
+                    viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
+                    viewHolder.media_img.setVisibility(View.VISIBLE);
+                    Glide.with(context).load(message.getMedia().get(0)).dontAnimate().diskCacheStrategy(DiskCacheStrategy.ALL).thumbnail(0.5f).into(holder.media_img);
+
+                    viewHolder.container_media_img_chat.setOnClickListener(v -> {
+                        viewHolder.container_media_img_chat.startAnimation(myAnim);
+                        Intent i = new Intent(mContext, ViewMediaActivity.class);
+                        i.putExtra("image_url", message.getMedia().get(0));
+                        i.putExtra("receive_time", EncryptHelper.decrypt(message.getTime()).replace("-", "/"));
+                        i.putExtra("chat_id", chat_id);
+                        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
+                        ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
+                    });
+                }else if(viewHolder.container_media_img_chat != null) viewHolder.container_media_img_chat.setVisibility(View.GONE);
+
+                if(joinNow != 0){
+                    if(viewHolder.container_msg != null){
+                        if(position == mMessages.size() - 1){
+                            Animation CartAnim = AnimationUtils.loadAnimation(context, R.anim.slide_up);
+                            viewHolder.container_msg.startAnimation(CartAnim);
+                        }
+                    }
+                }
+
+            }else if(LayoutType == MSG_TYPE_RIGHT_AUDIO || LayoutType == MSG_TYPE_LEFT_AUDIO){
+                if(viewHolder.voicePlayerView != null && viewHolder.audio_timer != null
+                        && viewHolder.play_button != null && viewHolder.pause_button != null && viewHolder.audio_seek_bar != null){
+                    viewHolder.voicePlayerView.setVisibility(View.VISIBLE);
+
+                    viewHolder.audio_timer.setText(convertFormat(MediaPlayer.create(mContext, Uri.parse(message.getMedia().get(0))).getDuration()));
+
+                    viewHolder.play_button.setOnClickListener(v -> {
+                        AudioManager am = (AudioManager) context.getSystemService(AUDIO_SERVICE);
+                        if(am.getStreamVolume(AudioManager.STREAM_MUSIC) == 0)
+                            ToastHelper.toast(mContext, mContext.getString(R.string.increase_media_volume), ToastHelper.SHORT_DURATION);
+
+                        ResetHandlers();
+                        mediaPlayer = MediaPlayer.create(context, Uri.parse(message.getMedia().get(0)));
+                        runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                //  Set progress on SeekBar
+                                holder.audio_seek_bar.setProgress(mediaPlayer.getCurrentPosition());
+                                //  Handler post delay for 0.5 seconds
+                                handler.postDelayed(this, 500);
+                            }
+                        };
+
+                        //  Get audio duration
+                        int duration = mediaPlayer.getDuration();
+                        // Convert Duration to minute and second
+                        String sDuration = convertFormat(duration);
+                        holder.audio_timer.setText(sDuration);
+
+                        holder.pause_button.setVisibility(View.VISIBLE);
+                        holder.play_button.setVisibility(View.GONE);
+
+                        // Start Audio
+                        mediaPlayer.start();
+
+                        //Set max on Seek bar
+                        holder.audio_seek_bar.setMax(mediaPlayer.getDuration());
+                        handler.postDelayed(runnable, 0);
+                    });
+
+                    viewHolder.pause_button.setOnClickListener(v -> {
+                        holder.pause_button.setVisibility(View.GONE);
+                        holder.play_button.setVisibility(View.VISIBLE);
+
+                        mediaPlayer.pause();
+
+                        handler.removeCallbacks(runnable);
+                    });
+
+                    viewHolder.audio_seek_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                         @Override
-                        public void run() {
-                            //  Set progress on SeekBar
-                            holder.audio_seek_bar.setProgress(mediaPlayer.getCurrentPosition());
-                            //  Handler post delay for 0.5 seconds
-                            handler.postDelayed(this, 500);
-                        }
-                    };
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            if(fromUser){
+                                if(mediaPlayer != null)
+                                    mediaPlayer.seekTo(progress);
+                            }
+                            if(mediaPlayer != null){
 
-                    //  Get audio duration
-                    int duration = mediaPlayer.getDuration();
-                    // Convert Duration to minute and second
-                    String sDuration = convertFormat(duration);
-                    holder.audio_timer.setText(sDuration);
+                                //  Get audio duration
+                                int duration = mediaPlayer.getDuration();
+                                // Convert Duration to minute and second
+                                String sDuration = convertFormat(duration);
+                                holder.audio_timer.setText(convertFormat(mediaPlayer.getCurrentPosition()) + " / " + sDuration);
 
-                    holder.pause_button.setVisibility(View.VISIBLE);
-                    holder.play_button.setVisibility(View.GONE);
+                                if(mediaPlayer.getCurrentPosition() == duration){
+                                    holder.pause_button.setVisibility(View.GONE);
+                                    holder.play_button.setVisibility(View.VISIBLE);
 
-                    // Start Audio
-                    mediaPlayer.start();
+                                    mediaPlayer.pause();
 
-                    //Set max on Seek bar
-                    holder.audio_seek_bar.setMax(mediaPlayer.getDuration());
-                    handler.postDelayed(runnable, 0);
-                });
-
-                holder.pause_button.setOnClickListener(v -> {
-                    holder.pause_button.setVisibility(View.GONE);
-                    holder.play_button.setVisibility(View.VISIBLE);
-
-                    mediaPlayer.pause();
-
-                    handler.removeCallbacks(runnable);
-                });
-
-                holder.audio_seek_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        if(fromUser){
-                            if(mediaPlayer != null)
-                                mediaPlayer.seekTo(progress);
-                        }
-                        if(mediaPlayer != null){
-
-                            //  Get audio duration
-                            int duration = mediaPlayer.getDuration();
-                            // Convert Duration to minute and second
-                            String sDuration = convertFormat(duration);
-                            holder.audio_timer.setText(convertFormat(mediaPlayer.getCurrentPosition()) + " / " + sDuration);
-
-                            if(mediaPlayer.getCurrentPosition() == duration){
-                                holder.pause_button.setVisibility(View.GONE);
-                                holder.play_button.setVisibility(View.VISIBLE);
-
-                                mediaPlayer.pause();
-
-                                handler.removeCallbacks(runnable);
-                                mediaPlayer.seekTo(0);
-                                holder.audio_seek_bar.setProgress(0);
-                                holder.audio_timer.setText(convertFormat(duration));
+                                    handler.removeCallbacks(runnable);
+                                    mediaPlayer.seekTo(0);
+                                    holder.audio_seek_bar.setProgress(0);
+                                    holder.audio_timer.setText(convertFormat(duration));
+                                }
                             }
                         }
-                    }
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {}
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {}
-                });
-            }else{
-                viewHolder.container_msg.setVisibility(View.VISIBLE);
-                holder.voicePlayerView.setVisibility(View.GONE);
-                viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
-                viewHolder.media_img.setVisibility(View.VISIBLE);
-                Glide.with(context).load(message.getMedia().get(0)).dontAnimate().diskCacheStrategy(DiskCacheStrategy.ALL).thumbnail(0.5f).listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        viewHolder.progress_media_img_chat.setVisibility(View.GONE);
-                        return false;
-                    }
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
-                        viewHolder.progress_media_img_chat.setVisibility(View.GONE);
-                        return false;
-                    }
-                }).into(holder.media_img);
-
-                viewHolder.container_media_img_chat.setOnClickListener(v -> {
-                    viewHolder.container_media_img_chat.startAnimation(myAnim);
-                    Intent i = new Intent(mContext, ViewMediaActivity.class);
-                    i.putExtra("image_url", message.getMedia().get(0));
-                    i.putExtra("receive_time", EncryptHelper.decrypt(message.getTime()).replace("-", "/"));
-                    i.putExtra("chat_id", chat_id);
-                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
-                    ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
-                });
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {}
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {}
+                    });
+                }
             }
-        }else{
-            viewHolder.container_media_img_chat.setVisibility(View.GONE);
-            viewHolder.progress_media_img_chat.setVisibility(View.GONE);
+
+
+            //  Default Action
+            //  This action and items contain in all adapters
+            if(message.getSender().equals(fUser.getUid())){
+                viewHolder.message_container.setPadding(2, 2, 20, 2);
+                if(position == mMessages.size() - 1){
+                    if (message.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_seen));
+                    else viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_delivered));
+                }else viewHolder.img_seen.setVisibility(View.GONE);
+            }else if(viewHolder.img_seen != null) viewHolder.img_seen.setVisibility(View.GONE);
+            if(message.getTime() != null){
+                String[] time = EncryptHelper.decrypt(message.getTime()).replace("-", "/").split("/");
+                viewHolder.msgTime_chat_item.setText(time[2].substring(4));
+            }
+            viewHolder.message_container.setOnLongClickListener(v -> {
+                if(viewHolder.container_msg != null) viewHolder.container_msg.startAnimation(myAnim);
+                if(viewHolder.voicePlayerView != null) viewHolder.voicePlayerView.startAnimation(myAnim);
+                message_Action(fUser.getUid(), viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
+                return false;
+            });
         }
-
-        //Disable to future updates
-        //if(imageURL == null || imageURL.equals("default")) holder.profile_image_item.setImageResource(R.drawable.pumpkin_default_image);
-        //else Picasso.get().load(EncryptHelper.decrypt(imageURL)).into(holder.profile_image_item);
-
-        if(message.getSender().equals(fUser.getUid())){
-            viewHolder.message_container.setPadding(2, 2, 20, 2);
-            if(position == mMessages.size() - 1){
-                if (message.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(mContext.getDrawable(R.drawable.ic_seen));
-                else viewHolder.img_seen.setImageDrawable(mContext.getDrawable(R.drawable.ic_delivered));
-            }else viewHolder.img_seen.setVisibility(View.GONE);
-
-            if(joinNow != 0){
-                Animation CartAnim = AnimationUtils.loadAnimation(mContext, R.anim.slide_up);
-                viewHolder.container_msg.setAnimation(CartAnim);
-            }
-        }else viewHolder.img_seen.setVisibility(View.GONE);
-
-        viewHolder.message_container.setOnLongClickListener(v -> {
-            viewHolder.container_msg.startAnimation(myAnim);
-            viewHolder.voicePlayerView.startAnimation(myAnim);
-            message_Action(fUser.getUid(), viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
-            return false;
-        });
-
-        viewHolder.msg_chat_item.setOnLongClickListener(v -> {
-            viewHolder.container_msg.startAnimation(myAnim);
-            viewHolder.voicePlayerView.startAnimation(myAnim);
-            message_Action(fUser.getUid(), viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
-            return false;
-        });
     }
 
 
@@ -415,41 +425,48 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        private final TextView msg_chat_item, msgTime_chat_item, txt_reply_from, reply_content;
-        private final CircleImageView profile_image_item;
-        private final ConstraintLayout container_msg, message_container;
-        private final ConstraintLayout container_reply;
-        private final ConstraintLayout container_media_img_chat;
+        TextView msg_chat_item, txt_reply_from, reply_content;
+        ConstraintLayout container_msg;
+        ConstraintLayout container_reply;
+        ConstraintLayout container_media_img_chat;
+
+        //  Base Items
         private final ImageView media_img;
         private final ImageView img_seen;
-        private final TextView audio_timer;
-        private final SeekBar audio_seek_bar;
-        private final CardView play_button, pause_button;
-        private final LinearLayout voicePlayerView;
-        private final ProgressBar progress_media_img_chat;
+        private final TextView msgTime_chat_item;
+        private final ConstraintLayout message_container;
+
+        //  Audio Items
+        private TextView audio_timer;
+        private SeekBar audio_seek_bar;
+        private CardView play_button, pause_button;
+        private LinearLayout voicePlayerView;
 
         @SuppressLint("CutPasteId")
         public ViewHolder(View itemView){
             super(itemView);
-            setIsRecyclable(false);
-            msg_chat_item = itemView.findViewById(R.id.msg_chat_item);
-            img_seen = itemView.findViewById(R.id.img_seen);
-            play_button = itemView.findViewById(R.id.play_button);
-            pause_button = itemView.findViewById(R.id.pause_button);
-            audio_timer = itemView.findViewById(R.id.audio_timer);
-            audio_seek_bar = itemView.findViewById(R.id.audio_seek_bar);
-            message_container = itemView.findViewById(R.id.message_container);
+            setIsRecyclable(true);
+            //  Base Items
             media_img = itemView.findViewById(R.id.media_img);
-            voicePlayerView = itemView.findViewById(R.id.voicePlayerView);
-            progress_media_img_chat = itemView.findViewById(R.id.progress_media_img_chat);
+            img_seen = itemView.findViewById(R.id.img_seen);
+            msgTime_chat_item = itemView.findViewById(R.id.msgTime_chat_item);
+            message_container = itemView.findViewById(R.id.message_container);
+
+            msg_chat_item = itemView.findViewById(R.id.msg_chat_item);
             reply_content = itemView.findViewById(R.id.reply_content);
             container_media_img_chat = itemView.findViewById(R.id.container_media_img_chat);
-            profile_image_item = itemView.findViewById(R.id.profile_image_chat_item);
             txt_reply_from = itemView.findViewById(R.id.txt_reply_from);
-            msgTime_chat_item = itemView.findViewById(R.id.msgTime_chat_item);
             container_reply = itemView.findViewById(R.id.container_reply);
             container_msg = itemView.findViewById(R.id.container_msg);
-            container_msg.setVisibility(View.GONE);
+
+
+            if(LayoutType == MSG_TYPE_LEFT_AUDIO || LayoutType == MSG_TYPE_RIGHT_AUDIO){
+                audio_timer = itemView.findViewById(R.id.audio_timer);
+                voicePlayerView = itemView.findViewById(R.id.voicePlayerView);
+                pause_button = itemView.findViewById(R.id.pause_button);
+                play_button = itemView.findViewById(R.id.play_button);
+                audio_seek_bar = itemView.findViewById(R.id.audio_seek_bar);
+            }
         }
 
         public static DtoMessage GetMessage(int pos){
@@ -460,9 +477,30 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        if(mMessages.get(position).getSender().equals(fUser.getUid())) return MSG_TYPE_RIGHT;
-        else if(mMessages.get(position).getSender().equals("base_start"))
+        final DtoMessage message = mMessages.get(position);
+        if(message.getSender().equals(fUser.getUid())) {
+            if(message.getMedia() != null && message.getMedia() != null && message.getMedia().size() > 0
+                    && !message.getMedia().get(0).equals("")){
+                String extension = message.getMedia().get(0).substring(message.getMedia().get(0).lastIndexOf("."));
+                Log.d("Audio_Loader", extension.substring(0, 4));
+                if(extension.startsWith(".3gp")) return MSG_TYPE_RIGHT_AUDIO;
+                else return MSG_TYPE_RIGHT_MEDIA;
+            }
+            else
+                return MSG_TYPE_RIGHT;
+        }
+        else if(message.getSender().equals("base_start"))
             return MSG_TYPE_START;
-        else return MSG_TYPE_LEFT;
+        else {
+            if(message.getMedia() != null && message.getMedia() != null && message.getMedia().size() > 0
+                    && !message.getMedia().get(0).equals("")){
+                String extension = message.getMedia().get(0).substring(message.getMedia().get(0).lastIndexOf("."));
+                Log.d("Audio_Loader", extension.substring(0, 4));
+                if(extension.startsWith(".3gp")) return MSG_TYPE_LEFT_AUDIO;
+                else return MSG_TYPE_LEFT_MEDIA;
+            }
+            else
+                return MSG_TYPE_LEFT;
+        }
     }
 }
