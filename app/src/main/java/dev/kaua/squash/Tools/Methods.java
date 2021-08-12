@@ -59,6 +59,7 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -121,11 +122,13 @@ public abstract class Methods extends MainActivity {
     }
 
     //  Method to return Default Retrofit Builder
+    static final OkHttpClient okHttpClient = new OkHttpClient();
     @NonNull
     @Contract(" -> new")
     public static Retrofit GetRetrofitBuilder(){
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL_HTTPS)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }

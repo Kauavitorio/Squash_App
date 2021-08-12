@@ -46,10 +46,8 @@ public class TermsAccountActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = mPrefs.edit();
             editor.putString("terms_list", terms_list);
             editor.apply();
-            timer.postDelayed(() -> {
-                finish();
-                loadingDialog.dismissDialog();
-            }, 500);
+            loadingDialog.dismissDialog();
+            finish();
         });
     }
 
