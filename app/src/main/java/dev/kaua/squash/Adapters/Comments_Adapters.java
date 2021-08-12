@@ -220,35 +220,39 @@ public class Comments_Adapters extends RecyclerView.Adapter<Comments_Adapters.My
             DtoAccount user = MyPrefs.getUserInformation(mContext);
 
             boolean result_like = daoPosts.get_A_Like_comment(Long.parseLong(comment_id), Long.parseLong(user.getAccount_id() + ""));
+            long like_now = Long.parseLong(list.get((int) position).getLikes());
             if(result_like) {
                 holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
-                long like_now = Long.parseLong(list.get((int) position).getLikes());
                 like_now = like_now - 1;
-                holder.txt_likes_comment.setText(Methods.NumberTrick(like_now));
+                daoPosts.delete_like_comment(Long.parseLong(comment_id), Long.parseLong(user.getAccount_id() + ""));
             }else{
                 holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
-                long like_now = Long.parseLong(list.get((int) position).getLikes());
                 like_now = like_now + 1;
-                holder.txt_likes_comment.setText(Methods.NumberTrick(like_now));
+                daoPosts.Register_A_Like_Comment(Long.parseLong(comment_id), Long.parseLong(user.getAccount_id() + ""));
             }
 
-            //  Do Like or Un Like
-            DtoPost dtoPost = new DtoPost();
-            dtoPost.setComment_id(EncryptHelper.encrypt(comment_id));
-            dtoPost.setPost_id(EncryptHelper.encrypt(list.get((int) position).getPost_id()));
-            dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
-            PostServices services = retrofit.create(PostServices.class);
-            Call<DtoPost> call = services.like_Un_Like_A_Post_Comment(dtoPost);
-            call.enqueue(new Callback<DtoPost>() {
-                @Override
-                public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                    AsyncLikes_Posts_Comment async = new AsyncLikes_Posts_Comment((Activity) mContext , Long.parseLong(user.getAccount_id() + ""));
-                    //noinspection unchecked
-                    async.execute();
-                }
-                @Override
-                public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(mContext); }
-            });
+            if(like_now >= 0){
+                list.get((int) position).setLikes(like_now + "");
+                holder.txt_likes_comment.setText(Methods.NumberTrick(like_now));
+
+                //  Do Like or Un Like
+                DtoPost dtoPost = new DtoPost();
+                dtoPost.setComment_id(EncryptHelper.encrypt(comment_id));
+                dtoPost.setPost_id(EncryptHelper.encrypt(list.get((int) position).getPost_id()));
+                dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
+                PostServices services = retrofit.create(PostServices.class);
+                Call<DtoPost> call = services.like_Un_Like_A_Post_Comment(dtoPost);
+                call.enqueue(new Callback<DtoPost>() {
+                    @Override
+                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                        AsyncLikes_Posts_Comment async = new AsyncLikes_Posts_Comment((Activity) mContext , Long.parseLong(user.getAccount_id() + ""));
+                        //noinspection unchecked
+                        async.execute();
+                    }
+                    @Override
+                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(mContext); }
+                });
+            }
         }else Warnings.NeedLoginWithShortCutAlert((Activity) mContext, 0);
     }
 

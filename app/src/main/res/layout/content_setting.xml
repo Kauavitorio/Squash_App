@@ -223,6 +223,44 @@
 
             </LinearLayout>
 
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="30dp"
+                android:visibility="visible"
+                android:background="@color/dividing_line_settings"/>
+
+            <!-- Logout -->
+            <LinearLayout
+                android:id="@+id/btn_logout"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:minHeight="42dp"
+                android:visibility="visible"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Logout Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_logout"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Logout Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/logout"/>
+
+            </LinearLayout>
+
         </LinearLayout>
 
         <!-- Help Menu -->
@@ -337,15 +375,15 @@
                 android:layout_height="wrap_content"
                 tools:ignore="UseCompoundDrawables">
 
-                <!-- Help Image -->
+                <!-- Policy and Privacy Image -->
                 <ImageView
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_not_secure_lock"
+                    android:src="@drawable/ic_privacy_policy"
                     tools:ignore="ContentDescription" />
 
-                <!-- Help Text -->
+                <!-- Policy and Privacy Text -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -186,6 +186,16 @@ public class DaoPosts extends SQLiteOpenHelper {
         @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
         return cursor.moveToFirst();
     }
+
+    public void delete_like(long post_id, long account_id){
+        String command = "SELECT * FROM " + TABLE_LIKES + " WHERE  post_id = ? and account_id = ?";
+        String[] params = {String.valueOf(post_id), String.valueOf(account_id)};
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        if(cursor.moveToFirst()){
+            getWritableDatabase().delete(TABLE_LIKES, "post_id = ? and account_id = ?", new String[]{String.valueOf(post_id), String.valueOf(account_id)});
+        }
+    }
+
     public void Register_Likes_Comments(ArrayList<DtoPost> post){
         DropTable(2);
         if(post != null && post.size() > 0)
@@ -195,6 +205,31 @@ public class DaoPosts extends SQLiteOpenHelper {
                 values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
                 getWritableDatabase().insert(TABLE_LIKES_COMMENTS, null, values);
             }
+    }
+
+    public void Register_A_Like(long post_id, long account_id){
+        ContentValues values = new ContentValues();
+        values.put("post_id", post_id);
+        values.put("account_id", account_id);
+
+        getWritableDatabase().insert(TABLE_LIKES, null, values);
+    }
+
+
+    public void delete_like_comment(long comment_id, long account_id){
+        String command = "SELECT * FROM " + TABLE_LIKES + " WHERE  post_id = ? and account_id = ?";
+        String[] params = {String.valueOf(comment_id), String.valueOf(account_id)};
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        if(cursor.moveToFirst()){
+            getWritableDatabase().delete(TABLE_LIKES, "comment_id = ? and account_id = ?", new String[]{String.valueOf(comment_id), String.valueOf(account_id)});
+        }
+    }
+
+    public void Register_A_Like_Comment(long comment_id, long account_id){
+        ContentValues values = new ContentValues();
+        values.put("comment_id", comment_id);
+        values.put("account_id", account_id);
+        getWritableDatabase().insert(TABLE_LIKES_COMMENTS, null, values);
     }
 
     public boolean get_A_Like_comment(long comment_id, long account_id){

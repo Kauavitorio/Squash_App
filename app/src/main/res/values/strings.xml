@@ -169,4 +169,7 @@
     <string name="copy_message">Copy message</string>
     <string name="delete_messag">Delete message</string>
     <string name="copied_message">Copied message</string>
+    <string name="really_want_to_log_out">Do you really want to log out of your account?</string>
+    <string name="share_using">Share Using</string>
+    <string name="problem_performing_this_action">There was a problem performing this action, please try again.</string>
 </resources>

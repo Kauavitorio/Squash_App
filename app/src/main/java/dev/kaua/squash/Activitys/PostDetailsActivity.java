@@ -282,39 +282,39 @@ public class PostDetailsActivity extends AppCompatActivity {
                 DtoAccount user = MyPrefs.getUserInformation(this);
 
                 boolean result_like = daoPosts.get_A_Like(post_id, Long.parseLong(user.getAccount_id() + ""));
+                long like_now = current_likes;
                 if(result_like) {
                     img_heart_like_post.setImageDrawable(getDrawable(R.drawable.ic_heart));
-                    long like_now = current_likes;
                     like_now = like_now - 1;
-                    txt_likes_post.setText(Methods.NumberTrick(like_now));
+                    daoPosts.delete_like(post_id, Long.parseLong(user.getAccount_id() + ""));
                 }else{
                     img_heart_like_post.setImageDrawable(getDrawable(R.drawable.red_heart));
-                    long like_now = current_likes;
                     like_now = like_now + 1;
-                    txt_likes_post.setText(Methods.NumberTrick(like_now));
+                    daoPosts.Register_A_Like(post_id, Long.parseLong(user.getAccount_id() + ""));
                 }
+                if(like_now >= 0){
+                    txt_likes_post.setText(Methods.NumberTrick(like_now));
+                    current_likes = like_now;
 
-                //  Do Like or Un Like
-                DtoPost dtoPost = new DtoPost();
-                dtoPost.setPost_id(EncryptHelper.encrypt(post_id + ""));
-                dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
-                PostServices services = retrofit.create(PostServices.class);
-                Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
-                call.enqueue(new Callback<DtoPost>() {
-                    @Override
-                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                        AsyncLikes_Posts async = new AsyncLikes_Posts(PostDetailsActivity.this , Long.parseLong(user.getAccount_id() + ""));
-                        //noinspection unchecked
-                        async.execute();
-                        try {
-                            MainFragment.RefreshRecycler();
-                        }catch (Exception ex){
-                            Log.d("Post_Details", ex.getMessage());
+                    //  Do Like or Un Like
+                    DtoPost dtoPost = new DtoPost();
+                    dtoPost.setPost_id(EncryptHelper.encrypt(post_id + ""));
+                    dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
+                    PostServices services = retrofit.create(PostServices.class);
+                    Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
+                    call.enqueue(new Callback<DtoPost>() {
+                        @Override
+                        public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                            try {
+                                MainFragment.RefreshRecycler();
+                            }catch (Exception ex){
+                                Log.d("Post_Details", ex.getMessage());
+                            }
                         }
-                    }
-                    @Override
-                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(PostDetailsActivity.this); }
-                });
+                        @Override
+                        public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(PostDetailsActivity.this); }
+                    });
+                }
             }
             else Warnings.NeedLoginWithShortCutAlert(this, 0);
         });

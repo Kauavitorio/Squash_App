@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -52,6 +53,7 @@ import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
@@ -77,14 +79,18 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     private static BottomSheetDialog bottomSheetDialog;
     private final Animation myAnim;
     FirebaseStorage firebaseStorage;
+    private static FirebaseAnalytics mFirebaseAnalytics;
+    private static Posts_Adapters instance;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
     public Posts_Adapters(ArrayList<DtoPost> ArrayList, Context mContext) {
         this.mPostList = ArrayList;
+        instance = this;
         Posts_Adapters.mContext = mContext;
         daoPosts = new DaoPosts(mContext);
         myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
+        mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(mContext);
     }
 
     @NonNull
@@ -244,8 +250,15 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             myIntent.setType("text/plain");
             String body = Methods.BASE_URL_HTTPS + "share/" + mPostList.get(position).getUsername() + "/post/" +  mPostList.get(position).getPost_id()
                     + "?s=" + Methods.RandomCharactersWithoutSpecials(3);
-            myIntent.putExtra(Intent.EXTRA_TEXT,body);
-            mContext.startActivity(Intent.createChooser(myIntent, "Share Using"));
+            myIntent.putExtra(Intent.EXTRA_TEXT, body);
+            mContext.startActivity(Intent.createChooser(myIntent, mContext.getString(R.string.share_using)));
+
+            //  Creating analytic for share action
+            Bundle bundle_Analytics = new Bundle();
+            bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, myFirebaseHelper.getFirebaseUser().getUid() + "_" + mPostList.get(position).getPost_id());
+            bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, mPostList.get(position).getPost_id());
+            bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, mPostList.get(position).getUsername());
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, bundle_Analytics);
         });
 
         EnableActions(holder, position);
@@ -383,34 +396,42 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
 
         boolean result_like = daoPosts.get_A_Like(Long.parseLong(post_id), Long.parseLong(user.getAccount_id() + ""));
+        long like_now = Long.parseLong(mPostList.get((int) position).getPost_likes());
         if(result_like) {
             holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
-            long like_now = Long.parseLong(mPostList.get((int) position).getPost_likes());
             like_now = like_now - 1;
-            holder.txt_likes_post.setText(Methods.NumberTrick(like_now));
+            daoPosts.delete_like(Long.parseLong(post_id), Long.parseLong(user.getAccount_id() + ""));
         }else{
             holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
-            long like_now = Long.parseLong(mPostList.get((int) position).getPost_likes());
             like_now = like_now + 1;
-            holder.txt_likes_post.setText(Methods.NumberTrick(like_now));
+            daoPosts.Register_A_Like(Long.parseLong(post_id), Long.parseLong(user.getAccount_id() + ""));
         }
+        if(like_now >= 0){
+            holder.txt_likes_post.setText(Methods.NumberTrick(like_now));
+            mPostList.get((int)position).setPost_likes(like_now + "");
 
-        //  Do Like or Un Like
-        DtoPost dtoPost = new DtoPost();
-        dtoPost.setPost_id(EncryptHelper.encrypt(post_id));
-        dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
-        PostServices services = retrofit.create(PostServices.class);
-        Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
-        call.enqueue(new Callback<DtoPost>() {
-            @Override
-            public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) mContext , Long.parseLong(user.getAccount_id() + ""));
-                //noinspection unchecked
-                async.execute();
-            }
-            @Override
-            public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(mContext); }
-        });
+            //  Do Like or Un Like
+            DtoPost dtoPost = new DtoPost();
+            dtoPost.setPost_id(EncryptHelper.encrypt(post_id));
+            dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
+            PostServices services = retrofit.create(PostServices.class);
+            Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
+            call.enqueue(new Callback<DtoPost>() {
+                @Override
+                public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {}
+                @Override
+                public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                    ToastHelper.toast((Activity) mContext, mContext.getString(R.string.problem_performing_this_action), ToastHelper.SHORT_DURATION);
+                    notifyItemChanged((int) position);
+                }
+            });
+        }
+    }
+
+    public static Posts_Adapters getInstance(){ return instance; }
+
+    public void NotifyChanged(long position){
+        notifyItemChanged((int) position);
     }
 
     @Override

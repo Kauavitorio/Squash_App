@@ -30,6 +30,7 @@ import dev.kaua.squash.Activitys.SplashActivity;
 import dev.kaua.squash.Activitys.ValidateEmailActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoChat;
@@ -114,6 +115,10 @@ public abstract class Login {
                     editor.putString("pref_password", EncryptHelper.encrypt(password));
                     editor.putString("pref_verification_level", response.body().getVerification_level());
                     editor.apply();
+
+                    AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getAccount_id_cry()))), AsyncLikes_Posts.NOT_NOTIFY);
+                    //noinspection unchecked
+                    async.execute();
 
                     //  Getting Followers and Followings
                     Methods.LoadFollowersAndFollowing(context, 1);

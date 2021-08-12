@@ -158,9 +158,6 @@ public class ChatFragment extends Fragment {
                 Intent i = new Intent(requireActivity(), SettingActivity.class);
                 startActivity(i);
                 return true;
-            case R.id.logout:
-                Login.LogOut(requireContext(), 0);
-                return true;
         }
         return false;
     }

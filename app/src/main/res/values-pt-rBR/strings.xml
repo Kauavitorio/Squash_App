@@ -161,4 +161,7 @@
     <string name="copy_message">Copiar mensagem</string>
     <string name="delete_messag">Apagar mensagem</string>
     <string name="copied_message">Mensagem copiada</string>
+    <string name="really_want_to_log_out">Tem certeza de que deseja sair da sua conta?</string>
+    <string name="share_using">Compartilhar usando</string>
+    <string name="problem_performing_this_action">Ocorreu um problema ao executar esta ação, tente novamente.</string>
 </resources>
