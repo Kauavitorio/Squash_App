@@ -58,6 +58,7 @@ public abstract class Login {
     @SuppressLint("StaticFieldLeak")
     private static LoadingDialog loadingDialog;
     private static FirebaseAuth mAuth;
+    private final static String TAG = "LOGIN_ACTIONS";
 
     //  Set preferences
     private static SharedPreferences mPrefs;
@@ -72,12 +73,12 @@ public abstract class Login {
         //  Getting user mobile information and date time
         String device_login = Build.MANUFACTURER + ", " + Build.MODEL;
         Calendar c = Calendar.getInstance();
-        Log.d("DateTime", "Current time => "+c.getTime());
+        Log.d(TAG, "Current time => "+c.getTime());
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("MMMM dd");
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("HH:mm a z");
         String formattedDate = df.format(c.getTime()) + " at " + df_time.format(c.getTime());
-        Log.d("DateTime", "Current date => "+ formattedDate);
+        Log.d(TAG, "Current date => "+ formattedDate);
 
         DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), EncryptHelper.encrypt(password),
                 EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))), EncryptHelper.encrypt("0-river-reliable"), EncryptHelper.encrypt(formattedDate), 0);
@@ -128,8 +129,8 @@ public abstract class Login {
                     mAuth.signInWithEmailAndPassword(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail())), Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
                             .addOnCompleteListener(task -> {
                                 loadingDialog.dismissDialog();
-                                Log.d("Auth", "Login Ok");
-                                Log.d("Auth", "User " + mAuth.getUid());
+                                Log.d(TAG, "Login Ok");
+                                Log.d(TAG, "User " + mAuth.getUid());
 
                                 //  Creating analytic for login event
                                 Bundle bundle_Analytics = new Bundle();
@@ -146,7 +147,7 @@ public abstract class Login {
                                 ((Activity) context).finish();
                             });
                 }else if(response.code() == 206){
-                    Log.d("LoginActions", "Email not validated");
+                    Log.d(TAG, "Email not validated");
                     loadingDialog.dismissDialog();
                     mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
@@ -187,13 +188,13 @@ public abstract class Login {
         //  Getting user mobile information and date time
         String device_login = Build.MANUFACTURER + ", " + Build.MODEL;
         Calendar c = Calendar.getInstance();
-        Log.d("DateTime", "Current time => "+ c.getTime());
+        Log.d(TAG, "Current time => "+ c.getTime());
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("MMMM dd");
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("HH:mm a z");
         String formattedDate = df.format(c.getTime()) + " at " + df_time.format(c.getTime());
-        Log.d("DateTime", "Current date => "+ formattedDate);
-        Log.d("LoginActions", "Device => "+ device_login);
+        Log.d(TAG, "Current date => "+ formattedDate);
+        Log.d(TAG, "Device => "+ device_login);
 
         DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), EncryptHelper.encrypt(password),
                 EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))), EncryptHelper.encrypt("0-river"), EncryptHelper.encrypt(formattedDate), 0);
@@ -202,7 +203,7 @@ public abstract class Login {
         call.enqueue(new Callback<DtoAccount>() {
             @Override
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                Log.d("LoginActions", "Login Status => " + response.code());
+                Log.d(TAG, "Login Status => " + response.code());
                 //  Checking api return code
                 if(response.code() == 200){
                     if(response.body() != null){
@@ -235,7 +236,7 @@ public abstract class Login {
                         Methods.LoadFollowersAndFollowing(context, 1);
                     }
                 }else if(response.code() == 206){
-                    Log.d("LoginActions", "Email not validated");
+                    Log.d(TAG, "Email not validated");
                     mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
                     Intent i = new Intent(context, ValidateEmailActivity.class);
@@ -248,13 +249,13 @@ public abstract class Login {
                     ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
                     ((Activity) context).finish();
                 }else if(response.code() == 401) {
-                    Log.d("LoginActions", "Login Method or Password is not valid");
+                    Log.d(TAG, "Login Method or Password is not valid");
                     loadingDialog.dismissDialog();
                     LogOut(context, 1);
                 }
             }
             @Override
-            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) { Log.d("LoginActions", t.getMessage()); }
+            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) { Log.d(TAG, t.getMessage()); }
         });
     }
 

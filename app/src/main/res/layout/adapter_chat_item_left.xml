@@ -8,120 +8,14 @@
     android:orientation="vertical"
     android:layout_height="wrap_content">
 
-    <!-- Text User Image -->
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image_chat_item"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@mipmap/ic_launcher"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Container Audio Media -->
-    <LinearLayout
-        android:id="@+id/voicePlayerView"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        android:background="@drawable/background_audio_chat"
-        app:layout_constraintBottom_toTopOf="@+id/msgTime_chat_item"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <!-- Btn play and pause -->
-        <LinearLayout
-            android:layout_width="32dp"
-            android:layout_height="match_parent">
-
-            <!-- Btn play -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/play_button"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
-                app:cardBackgroundColor="@color/base_color"
-                app:cardCornerRadius="20dp">
-
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_play"
-                    tools:ignore="ContentDescription" />
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Btn pause -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/pause_button"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/base_color"
-                app:cardCornerRadius="20dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_pause"
-                    tools:ignore="ContentDescription" />
-
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-        <!-- Audio Body -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_marginStart="5dp"
-            android:layout_height="match_parent">
-
-            <!-- SeekBar -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_weight="1"
-                android:layout_height="match_parent">
-
-                <SeekBar
-                    android:id="@+id/audio_seek_bar"
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center"
-                    android:thumb="@drawable/thumb"
-                    android:layout_height="wrap_content"/>
-
-            </LinearLayout>
-
-            <!-- Timer -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_weight="0"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/audio_timer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:text="@string/app_name"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
     <!-- Container Message Main -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:visibility="gone"
+        android:visibility="visible"
+        android:maxWidth="270dp"
         android:background="@drawable/background_left_msg"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
@@ -157,6 +51,7 @@
                 android:text="@string/starred_messages"
                 android:textColor="@color/black"
                 android:textSize="9sp"
+                android:maxWidth="270dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -184,18 +79,18 @@
             android:id="@+id/msg_chat_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:paddingEnd="10dp"
-            android:paddingStart="10dp"
-            android:layout_marginBottom="5dp"
             android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="5dp"
+            android:maxWidth="270dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="5dp"
             android:text="@string/desc_encrypted_message_chat"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0" />
@@ -213,15 +108,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/container_reply">
-
-            <ProgressBar
-                android:id="@+id/progress_media_img_chat"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/media_img"

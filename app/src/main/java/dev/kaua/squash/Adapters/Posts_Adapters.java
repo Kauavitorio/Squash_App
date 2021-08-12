@@ -13,6 +13,8 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -34,7 +36,10 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -66,18 +71,20 @@ import retrofit2.Retrofit;
 
 @SuppressLint({"UseCompatLoadingForDrawables", "StaticFieldLeak"})
 public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolderPosts> {
-    ArrayList<DtoPost> list;
+    ArrayList<DtoPost> mPostList;
     static Context mContext;
     static DaoPosts daoPosts;
     private static BottomSheetDialog bottomSheetDialog;
+    private final Animation myAnim;
     FirebaseStorage firebaseStorage;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
     public Posts_Adapters(ArrayList<DtoPost> ArrayList, Context mContext) {
-        this.list = ArrayList;
+        this.mPostList = ArrayList;
         Posts_Adapters.mContext = mContext;
         daoPosts = new DaoPosts(mContext);
+        myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
     }
 
     @NonNull
@@ -91,21 +98,22 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
     @Override
     public void onBindViewHolder(@NonNull MyHolderPosts holder, int position) {
-        if(Integer.parseInt(Objects.requireNonNull(list.get(position).getVerification_level())) != 0){
+        if(Integer.parseInt(Objects.requireNonNull(mPostList.get(position).getVerification_level())) != 0){
             holder.ic_account_badge.setVisibility(View.VISIBLE);
-            if (Integer.parseInt(Objects.requireNonNull(list.get(position).getVerification_level())) == 1)
+            if (Integer.parseInt(Objects.requireNonNull(mPostList.get(position).getVerification_level())) == 1)
                 holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
             else
                 holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
+            holder.ic_account_badge.startAnimation(myAnim);
 
         }else holder.ic_account_badge.setVisibility(View.GONE);
         holder.img_secondImage_post.setVisibility(View.GONE);
         holder.container_third_img.setVisibility(View.GONE);
-        Glide.with(mContext).load(list.get(position).getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+        Glide.with(mContext).load(mPostList.get(position).getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(holder.icon_user_profile_post);
-        holder.txt_name_user_post.setText(list.get(position).getName_user());
-        holder.txt_username_post.setText( "| @" + list.get(position).getUsername());
-        holder.txt_post_content.setText(list.get(position).getPost_content());
+        holder.txt_name_user_post.setText(mPostList.get(position).getName_user());
+        holder.txt_username_post.setText( "| @" + mPostList.get(position).getUsername());
+        holder.txt_post_content.setText(mPostList.get(position).getPost_content());
         new PatternEditableBuilder().
                 addPattern(Pattern.compile("\\@(\\w+)"), mContext.getColor(R.color.base_color),
                         text -> {
@@ -154,40 +162,28 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
         Check_Like(holder, position);
 
-        holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(list.get(position).getPost_likes())));
-        holder.txt_date_time_post.setText(" • " + list.get(position).getPost_time());
-        holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(list.get(position).getPost_comments_amount())));
+        holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(mPostList.get(position).getPost_likes())));
+        holder.txt_date_time_post.setText(LastSeenRefactor(position));
+        holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(mPostList.get(position).getPost_comments_amount())));
 
-        DtoPost img_list = daoPosts.get_post_img(Long.parseLong(list.get(position).getPost_id()));
+        final DtoPost img_list = daoPosts.get_post_img(Long.parseLong(mPostList.get(position).getPost_id()));
         if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0 && !img_list.getPost_images().get(0).equals("NaN")){
+            RequestOptions myOptions = new RequestOptions()
+                    .fitCenter() // or centerCrop
+                    .override(500, 500);
             int ImagesAmount = img_list.getPost_images().size();
             if(ImagesAmount < 2){
+                holder.img_firstImage_post.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
                 for (int i = 0; i < 1; i++){
-                    RequestOptions myOptions = new RequestOptions()
-                            .fitCenter() // or centerCrop
-                            .override(500, 500);
                     Glide.with(mContext)
                             .asBitmap()
                             .apply(myOptions)
                             .load(EncryptHelper.decrypt(img_list.getPost_images().get(i)))
                             .into(holder.img_firstImage_post);
-
-                    int finalI = i;
-                    holder.img_firstImage_post.setOnClickListener(v -> {
-                        Intent intent = new Intent(mContext, ViewMediaActivity.class);
-                        intent.putExtra("image_url", EncryptHelper.decrypt(img_list.getPost_images().get(finalI)));
-                        intent.putExtra("receive_time", "post");
-                        String id = list.get(position).getUsername() + "_" + list.get(position).getPost_id();
-                        if(id.length() < 11) id += "posts_media";
-                        intent.putExtra("chat_id", id);
-                        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
-                        ActivityCompat.startActivity(mContext, intent, activityOptionsCompat.toBundle());
-                    });
                 }
             }else{
-                RequestOptions myOptions = new RequestOptions()
-                        .fitCenter() // or centerCrop
-                        .override(100, 100);
+                holder.img_firstImage_post.setMaxWidth(250);
+                holder.img_secondImage_post.setMaxWidth(250);
                 Glide.with(mContext)
                         .asBitmap()
                         .apply(myOptions)
@@ -213,9 +209,15 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             }
         }else holder.img_firstImage_post.setVisibility(View.GONE);
 
+
+        holder.img_firstImage_post.setOnClickListener(v -> CreateImageViewIntent(0, img_list));
+
+        holder.img_secondImage_post.setOnClickListener(v -> CreateImageViewIntent(1, img_list));
+
         holder.icon_user_profile_post.setOnClickListener(v -> {
+            holder.icon_user_profile_post.startAnimation(myAnim);
             Bundle bundle = new Bundle();
-            bundle.putString("account_id", list.get(position).getAccount_id());
+            bundle.putString("account_id", mPostList.get(position).getAccount_id());
             bundle.putInt("control", 0);
             MainActivity.getInstance().GetBundleProfile(bundle);
             MainActivity.getInstance().CallProfile();
@@ -224,7 +226,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
         holder.container_post_adapter.setOnClickListener(v -> {
             Intent i = new Intent(mContext, PostDetailsActivity.class);
-            i.putExtra("post_id", Long.parseLong(list.get(position).getPost_id()));
+            i.putExtra("post_id", Long.parseLong(mPostList.get(position).getPost_id()));
             i.putExtra("comment", 0);
             ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
             ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
@@ -232,7 +234,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
         holder.btn_comment_post.setOnClickListener(v -> {
             Intent i = new Intent(mContext, PostDetailsActivity.class);
-            i.putExtra("post_id", Long.parseLong(list.get(position).getPost_id()));
+            i.putExtra("post_id", Long.parseLong(mPostList.get(position).getPost_id()));
             i.putExtra("comment", 1);
             mContext.startActivity(i);
         });
@@ -240,7 +242,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         holder.btn_share_post.setOnClickListener(v -> {
             Intent myIntent = new Intent(Intent.ACTION_SEND);
             myIntent.setType("text/plain");
-            String body = Methods.BASE_URL_HTTPS + "share/" + list.get(position).getUsername() + "/post/" +  list.get(position).getPost_id()
+            String body = Methods.BASE_URL_HTTPS + "share/" + mPostList.get(position).getUsername() + "/post/" +  mPostList.get(position).getPost_id()
                     + "?s=" + Methods.RandomCharactersWithoutSpecials(3);
             myIntent.putExtra(Intent.EXTRA_TEXT,body);
             mContext.startActivity(Intent.createChooser(myIntent, "Share Using"));
@@ -248,23 +250,58 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
         EnableActions(holder, position);
 
-        holder.btn_like_post.setOnClickListener(v -> Like_Un_Like_A_Post(holder, position, list.get(position).getPost_id()));
+        holder.btn_like_post.setOnClickListener(v -> Like_Un_Like_A_Post(holder, position, mPostList.get(position).getPost_id()));
 
-        if(list.get(position).isSuggestion()) {
+        if(mPostList.get(position).isSuggestion()) {
             holder.suggestion_container.setVisibility(View.VISIBLE);
-            if(list.get(position).getAccount_id().equals("5")) holder.txt_suggestion.setText(mContext.getString(R.string.developer_post));
+            if(mPostList.get(position).getAccount_id().equals("5")) holder.txt_suggestion.setText(mContext.getString(R.string.developer_post));
         }
         else holder.suggestion_container.setVisibility(View.GONE);
     }
 
+    private String LastSeenRefactor(final int position) {
+        String date = mPostList.get(position).getPost_date();
+        try{
+            final String[] split_date = date.split("/");
+            if(split_date.length >= 5){
+                @SuppressLint("SimpleDateFormat") Date date_change = new SimpleDateFormat("MMMM").parse(split_date[1]);
+                if(date_change != null){
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(date_change);
+                    String mouthNumber = cal.get(Calendar.MONTH) + "";
+                    if(cal.get(Calendar.MONTH) < 10) mouthNumber = "0" + mouthNumber;
+                    date = date.replace(split_date[1], mouthNumber);
+                    char[] chars = date.toCharArray();
+                    chars[10] = ' ';
+                    chars[16] = ' ';
+                    date = new String(chars);
+                }
+            }
+            return Methods.loadLastSeenUser(mContext, date);
+        }catch (Exception ex){
+            return Methods.loadLastSeenUser(mContext, date);
+        }
+    }
+
+    private void CreateImageViewIntent(int position, DtoPost img_list) {
+        Intent intent = new Intent(mContext, ViewMediaActivity.class);
+        intent.putExtra("image_url", EncryptHelper.decrypt(img_list.getPost_images().get(position)));
+        intent.putExtra("receive_time", "post");
+        String id = mPostList.get(position).getUsername() + "_" + mPostList.get(position).getPost_id();
+        if (id.length() < 11) id += "posts_media";
+        intent.putExtra("chat_id", id);
+        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
+        ActivityCompat.startActivity(mContext, intent, activityOptionsCompat.toBundle());
+    }
+
     private void EnableActions(MyHolderPosts holder, int position) {
         DtoAccount user = MyPrefs.getUserInformation(mContext);
-        if(Long.parseLong(list.get(position).getAccount_id()) == Long.parseLong(user.getAccount_id() + "")){
+        if(Long.parseLong(mPostList.get(position).getAccount_id()) == Long.parseLong(user.getAccount_id() + "")){
             holder.btn_actions.setVisibility(View.VISIBLE);
             holder.btn_actions.setOnClickListener(v -> {
                 DtoPost dtoPost = new DtoPost();
                 dtoPost.setAccount_id(EncryptHelper.encrypt(user.getAccount_id() + ""));
-                dtoPost.setPost_id(EncryptHelper.encrypt(list.get(position).getPost_id()));
+                dtoPost.setPost_id(EncryptHelper.encrypt(mPostList.get(position).getPost_id()));
                 bottomSheetDialog = new BottomSheetDialog(mContext, R.style.BottomSheetTheme);
                 bottomSheetDialog.setCancelable(true);
                 //  Creating View for SheetMenu
@@ -287,7 +324,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                                     public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
                                         loadingDialog.dismissDialog();
                                         if(response.code() == 200){
-                                            DtoPost img_list = daoPosts.get_post_img(Long.parseLong(list.get(position).getPost_id()));
+                                            DtoPost img_list = daoPosts.get_post_img(Long.parseLong(mPostList.get(position).getPost_id()));
                                             if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0){
                                                 for (int i = 0; i < img_list.getPost_images().size(); i++){
                                                     if(img_list.getPost_images().get(i) != null){
@@ -303,8 +340,8 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                                                     }
                                                 }
                                             }
-                                            list.remove(position);
-                                            notifyDataSetChanged();
+                                            mPostList.remove(position);
+                                            notifyItemRemoved(position);
                                             MainFragment.RefreshRecycler();
                                         }else
                                             Warnings.showWeHaveAProblem(mContext);
@@ -334,7 +371,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     private void Check_Like(@NotNull MyHolderPosts holder, int position) {
         DtoAccount user = MyPrefs.getUserInformation(mContext);
-        boolean result_like = daoPosts.get_A_Like(Long.parseLong(list.get(position).getPost_id()), Long.parseLong(user.getAccount_id() + ""));
+        boolean result_like = daoPosts.get_A_Like(Long.parseLong(mPostList.get(position).getPost_id()), Long.parseLong(user.getAccount_id() + ""));
         if(result_like) holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
         else holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
     }
@@ -342,16 +379,18 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     private void Like_Un_Like_A_Post(@NotNull MyHolderPosts holder, long position, String post_id) {
         //  Get User info
         DtoAccount user = MyPrefs.getUserInformation(mContext);
+        holder.img_heart_like.startAnimation(myAnim);
+
 
         boolean result_like = daoPosts.get_A_Like(Long.parseLong(post_id), Long.parseLong(user.getAccount_id() + ""));
         if(result_like) {
             holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
-            long like_now = Long.parseLong(list.get((int) position).getPost_likes());
+            long like_now = Long.parseLong(mPostList.get((int) position).getPost_likes());
             like_now = like_now - 1;
             holder.txt_likes_post.setText(Methods.NumberTrick(like_now));
         }else{
             holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
-            long like_now = Long.parseLong(list.get((int) position).getPost_likes());
+            long like_now = Long.parseLong(mPostList.get((int) position).getPost_likes());
             like_now = like_now + 1;
             holder.txt_likes_post.setText(Methods.NumberTrick(like_now));
         }
@@ -375,7 +414,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     }
 
     @Override
-    public int getItemCount() { return list.size(); }
+    public int getItemCount() { return mPostList.size(); }
 
     static class MyHolderPosts extends RecyclerView.ViewHolder{
         CircleImageView icon_user_profile_post;

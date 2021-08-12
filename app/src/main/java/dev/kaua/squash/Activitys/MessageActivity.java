@@ -122,7 +122,7 @@ public class MessageActivity extends AppCompatActivity {
     public static ImageView btn_more_medias;
     public static LinearLayout container_edit_text;
     public static MessageActivity instance;
-    private TextView txt_user_name, txt_isOnline_chat, txtQuotedMsg;
+    private static TextView txt_user_name, txt_isOnline_chat, txtQuotedMsg;
     private static RecyclerView recycler_view_msg;
     private EditText text_send;
     private CardView btn_send, btn_rec_audio;
@@ -194,7 +194,6 @@ public class MessageActivity extends AppCompatActivity {
         userId = intent.getStringExtra("userId");
         chat_id = intent.getStringExtra("chat_id");
         fUser = myFirebaseHelper.getFirebaseUser();
-        reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(userId);
 
         CheckShared();
         GenerateChatID();
@@ -219,12 +218,16 @@ public class MessageActivity extends AppCompatActivity {
         LoadAnotherUserInfo();
 
         if(ConnectionHelper.isOnline(this)){
+            reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(userId);
             reference.addValueEventListener(new ValueEventListener() {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                    user_im_chat = snapshot.getValue(DtoAccount.class);
-                    LoadAnotherUserInfo();
+                    DtoAccount account = snapshot.getValue(DtoAccount.class);
+                    if(account != null){
+                        user_im_chat = account;
+                        LoadAnotherUserInfo();
+                    }
                 }
                 @Override
                 public void onCancelled(@NonNull @NotNull DatabaseError error) {}
@@ -381,6 +384,11 @@ public class MessageActivity extends AppCompatActivity {
 
         seenMessage(userId);
         setRecyclerSwipe();
+    }
+
+    public static void ScrollRecycler(int current, int position){
+        recycler_view_msg.scrollToPosition(position);
+        new Handler().postDelayed(() -> recycler_view_msg.smoothScrollToPosition(position), 100); //sometime not working, need some delay
     }
 
     private void LoadAnotherUserInfo() {
@@ -599,6 +607,7 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
+    static LinearLayoutManager linearLayoutManager;
     void Ids() {
         myAnim = AnimationUtils.loadAnimation(this,R.anim.click_anim);
         instance = MessageActivity.this;
@@ -627,7 +636,7 @@ public class MessageActivity extends AppCompatActivity {
         recycler_view_msg.setItemViewCacheSize(20);
         recycler_view_msg.setDrawingCacheEnabled(true);
         recycler_view_msg.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
         recycler_view_msg.setLayoutManager(linearLayoutManager);
         getWindow().setStatusBarColor(getColor(R.color.black_intro));
@@ -870,10 +879,13 @@ public class MessageActivity extends AppCompatActivity {
         LocalMessages.add(messageBase);
         LocalMessages.addAll(chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)));
 
-        messageAdapter = new MessageAdapter(instance, LocalMessages, imageURl, joinNow, recycler_view_msg,
-                MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername(), chat_id);
-        messageAdapter.setHasStableIds(true);
-        recycler_view_msg.setAdapter(messageAdapter);
+        if(mMessageFinal != null && !LocalMessages.equals(mMessageFinal)){
+            recycler_view_msg.setItemAnimator(null);
+            messageAdapter = new MessageAdapter(instance, LocalMessages, imageURl, joinNow, recycler_view_msg,
+                    MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername(), chat_id);
+            messageAdapter.setHasStableIds(true);
+            recycler_view_msg.setAdapter(messageAdapter);
+        }
     }
 
     @Override

@@ -360,19 +360,19 @@ public abstract class Methods extends MainActivity {
         }
     }
 
-    public static File SaveImage(Context mContext, Bitmap finalBitmap, @NonNull String chat_id, String timeReceive) {
+    public static File SaveImage(Context mContext, Bitmap finalBitmap, @NonNull String image_id, String timeReceive) {
         String root = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES).toString();
         File myDir = new File(root + "/Squash Images");
         //noinspection ResultOfMethodCallIgnored
         myDir.mkdirs();
 
-        String fName = "IMG-"+ timeReceive + chat_id.substring(0, 11) + ".jpg";
+        String fName = "IMG-"+ timeReceive + image_id.substring(0, 11) + ".jpg";
         File file = new File (myDir, fName.toUpperCase());
         if (file.exists()) {
             Log.d("ExternalStorage", "Image already exists");
         }else{
-            fName = "IMG-"+ timeReceive + "_" + chat_id.substring(0, 11) + ".jpg";
+            fName = "IMG-"+ timeReceive + "_" + image_id.substring(0, 11) + ".jpg";
             file = new File (myDir, fName.toUpperCase());
             try {
                 FileOutputStream out = new FileOutputStream(file);

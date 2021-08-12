@@ -32,6 +32,7 @@
     <color name="text_version">#72FFFFFF</color>
     <color name="BarColor">#DDDADA</color>
     <color name="base_color">#FF6C26</color>
+    <color name="color_hover">#46FF6C26</color>
     <color name="stroke_chat_left">#0562D0</color>
     <color name="background_my_message_top">#FF7830</color>
     <color name="background_my_message_middle">#FD6A3B</color>

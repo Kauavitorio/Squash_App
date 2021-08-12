@@ -93,9 +93,9 @@ public class ComposeActivity extends AppCompatActivity {
                 LoadingDialog loadingDialog = new LoadingDialog(this);
                 loadingDialog.startLoading();
                 Calendar c = Calendar.getInstance();
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("HH:mm a");
-                String date = df_date.format(c.getTime()).replace(" ", "/");
+                String date = df_date.format(c.getTime());
                 String time = df_time.format(c.getTime());
 
                 //  Set on DtoPost post information
