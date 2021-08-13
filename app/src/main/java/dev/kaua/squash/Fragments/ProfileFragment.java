@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +18,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -71,10 +73,12 @@ import retrofit2.Retrofit;
 @SuppressLint({"UseCompatLoadingForDrawables", "StaticFieldLeak"})
 public class ProfileFragment extends Fragment {
     //  Fragments Items
-    private static ImageView img_banner_profile, ic_account_badge_profile, btn_go_chat_profile;
+    private static ImageView img_banner_profile, ic_account_badge_profile;
     private static CircleImageView ic_ProfileUser_profile;
-    private static TextView txt_user_name, txt_username_name, txt_user_bio_profile, txt_amount_following_profile, txt_amount_followers_profile;
-    private static Button btn_follow_following_profile;
+    private static final String TAG = "PROFILE_FRAGMENT";
+    private static TextView txt_user_name, txt_username_name, txt_user_bio_profile,
+            txt_amount_following_profile, txt_amount_followers_profile, txt_joined;
+    private static Button btn_follow_following_profile, btn_go_chat_profile;
     private RelativeLayout noPost_profile;
     private CardView btn_plus_story_profile;
     private String username;
@@ -137,6 +141,7 @@ public class ProfileFragment extends Fragment {
                 btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
                 txt_amount_followers_profile.setText((actual - 1) + "");
+                btn_go_chat_profile.setVisibility(View.GONE);
                 account = new DtoAccount();
                 account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
                 account.setAccount_id_following(EncryptHelper.encrypt(account_another_user + ""));
@@ -210,19 +215,6 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(visible_control)
-            if(control > 0) LoadAnotherUser();
-    }
-
-    @Override
-    public void setMenuVisibility(final boolean visible) {
-        super.setMenuVisibility(visible);
-        visible_control = visible;
-    }
-
     public static ProfileFragment getInstance(){ return instance;}
 
     public void ReloadRecycler(){ RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);}
@@ -260,6 +252,7 @@ public class ProfileFragment extends Fragment {
                                 txt_user_name.setText(EncryptHelper.decrypt(response.body().getName_user()));
                                 txt_username_name.setText( "@" + EncryptHelper.decrypt(response.body().getUsername()));
                                 txt_user_bio_profile.setText(EncryptHelper.decrypt(response.body().getBio_user()));
+                                txt_joined.setText(LoadJoined(EncryptHelper.decrypt(response.body().getJoined_date())));
                                 Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
                                 username = EncryptHelper.decrypt(response.body().getUsername());
                                 txt_amount_following_profile.setText(Methods.NumberTrick(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowing())))));
@@ -305,6 +298,19 @@ public class ProfileFragment extends Fragment {
         }else GetUserInfo(requireActivity());
     }
 
+    private String LoadJoined(final String date) {
+        String format_date = date;
+        if(date != null){
+            try {
+                String[] split_date = format_date.split("/");
+                format_date = Methods.getMonth(Integer.parseInt(split_date[1])) + " " + split_date[2];
+            }catch (Exception ex){
+                Log.d(TAG, "Joined -> " + ex.toString());
+            }
+        }
+        return requireActivity().getString(R.string.joined) + " " + format_date;
+    }
+
     @SuppressLint("SetTextI18n")
     public void GetUserInfo(Activity activity) {
         Login.ReloadUserinfo(requireContext(), MyPrefs.getUserInformation(requireContext()).getEmail(), MyPrefs.getUserInformation(requireContext()).getPassword());
@@ -336,6 +342,7 @@ public class ProfileFragment extends Fragment {
         txt_user_name.setText(user.getName_user());
         txt_username_name.setText("@" + user.getUsername());
         txt_user_bio_profile.setText(user.getBio_user());
+        txt_joined.setText(LoadJoined(user.getJoined_date()));
         btn_follow_following_profile.setBackground(activity.getDrawable(R.drawable.background_button_following));
         btn_follow_following_profile.setEnabled(true);
         btn_follow_following_profile.setText(activity.getString(R.string.edit_profile));
@@ -349,6 +356,7 @@ public class ProfileFragment extends Fragment {
         img_banner_profile = view.findViewById(R.id.img_banner_profile);
         btn_go_chat_profile = view.findViewById(R.id.btn_go_chat_profile);
         btn_plus_story_profile = view.findViewById(R.id.btn_plus_story_profile);
+        txt_joined = view.findViewById(R.id.txt_joined);
         recyclerView_Posts_profile = view.findViewById(R.id.recyclerView_Posts_profile);
         noPost_profile = view.findViewById(R.id.noPost_profile);
         ic_account_badge_profile = view.findViewById(R.id.ic_account_badge_profile);
@@ -369,5 +377,21 @@ public class ProfileFragment extends Fragment {
         txt_amount_followers_profile = view.findViewById(R.id.txt_amount_followers_profile);
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         recyclerView_Posts_profile.setLayoutManager(linearLayout);
+    }
+
+    @Override
+    public void setMenuVisibility(final boolean visible) {
+        super.setMenuVisibility(visible);
+        visible_control = visible;
+        if (visible){
+            if(getContext() != null){
+                Toolbar toolbar = view.findViewById(R.id.toolbar_profile);
+                ((AppCompatActivity)requireActivity()).setSupportActionBar(toolbar);
+                Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("");
+                Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+                Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayShowTitleEnabled(false); // Hide default toolbar title
+                toolbar.setNavigationOnClickListener(v -> MainActivity.getInstance().LoadMainFragment());
+            }
+        }
     }
 }

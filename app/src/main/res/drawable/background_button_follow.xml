@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <solid android:color="@color/border_button_following" />
+    <solid android:color="@color/base_color" />
 
     <stroke
         android:width="4dp"
-        android:color="@color/border_button_following" />
+        android:color="@color/base_color" />
 
     <padding
         android:left="5dp"

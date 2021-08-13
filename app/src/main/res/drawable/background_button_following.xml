@@ -5,7 +5,7 @@
 
     <stroke
         android:width="4dp"
-        android:color="@color/border_button_following" />
+        android:color="@color/base_color" />
 
     <padding
         android:left="5dp"

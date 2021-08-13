@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -263,6 +264,10 @@ public abstract class Methods extends MainActivity {
 
             reference.updateChildren(hashMap);
         }
+    }
+
+    public static String getMonth(int month) {
+        return new DateFormatSymbols().getMonths()[month-1];
     }
 
     //  Method to update typing status for chat system

@@ -12,7 +12,7 @@
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/toolbar_chat"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@color/black_intro"

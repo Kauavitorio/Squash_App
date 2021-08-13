@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setCurrentItem(PROFILE_POSITION, true);
         adapter.notifyDataSetChanged();
         try {
-            ProfileFragment.getInstance().onResume();
+            ProfileFragment.getInstance().GetUserInfo(this);
         }catch (Exception ex){
             Log.d(TAG, "Profile Resume -> " +  ex.getMessage());
         }
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 .into(btn_profile_main);
     }
 
-    private void LoadMainFragment() {
+    public void LoadMainFragment() {
         viewPager.setCurrentItem(MAIN_POSITION, true);
         adapter.notifyDataSetChanged();
     }
@@ -222,5 +222,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Methods.status_chat("offline", this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        int currentItem = viewPager.getCurrentItem();
+        if (currentItem != MAIN_POSITION){
+            if(currentItem == CHAT_POSITION)
+                viewPager.setCurrentItem(MAIN_POSITION, true);
+            else
+                viewPager.setCurrentItem(currentItem - 1, true);
+        }
+        else
+            super.onBackPressed();
     }
 }
