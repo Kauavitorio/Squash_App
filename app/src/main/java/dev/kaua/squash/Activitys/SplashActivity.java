@@ -139,7 +139,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void LoadBaseInfoAndMain() {
-        Methods.LoadFollowersAndFollowing(this, 0);
+        Methods.LoadFollowersAndFollowing(this, 1);
         timer.postDelayed(this::GoToMain, 150);
     }
 

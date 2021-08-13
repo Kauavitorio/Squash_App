@@ -1,5 +1,8 @@
 package dev.kaua.squash.Fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -11,6 +14,8 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -52,7 +57,7 @@ import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
-import dev.kaua.squash.Security.Login;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -130,6 +135,7 @@ public class ProfileFragment extends Fragment {
                             btn_go_chat_profile.setVisibility(View.VISIBLE);
                             SearchFragment.getInstance().LoadSearch();
                             Methods.LoadFollowersAndFollowing(requireActivity(), 1);
+                            MainFragment.RefreshRecycler();
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
                             asyncUser_follow.execute();
                         }
@@ -236,70 +242,75 @@ public class ProfileFragment extends Fragment {
             recyclerView_Posts_profile.setVisibility(View.GONE);
             control = bundle.getInt("control");
             if(bundle.getString("account_id") != null && Long.parseLong(bundle.getString("account_id")) != account.getAccount_id()){
-                LoadingDialog loadingDialog = new LoadingDialog(requireActivity());
-                loadingDialog.startLoading();
-                btn_plus_story_profile.setVisibility(View.GONE);
-                DtoAccount account = new DtoAccount();
-                account_another_user = Long.parseLong(bundle.getString("account_id"));
-                account.setAccount_id_cry(EncryptHelper.encrypt(bundle.getString("account_id")));
-                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);
-                AccountServices services = retrofitUser.create(AccountServices.class);
-                Call<DtoAccount> call = services.getUserInfo(account);
-                call.enqueue(new Callback<DtoAccount>() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                        loadingDialog.dismissDialog();
-                        if(response.code() == 200){
-                            if(response.body() != null){
-                                Glide.with(requireActivity()).load(EncryptHelper.decrypt(response.body().getProfile_image())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                                        .into(ic_ProfileUser_profile);
-                                txt_user_name.setText(EncryptHelper.decrypt(response.body().getName_user()));
-                                txt_username_name.setText( "@" + EncryptHelper.decrypt(response.body().getUsername()));
-                                txt_user_bio_profile.setText(EncryptHelper.decrypt(response.body().getBio_user()));
-                                txt_joined.setText(LoadJoined(EncryptHelper.decrypt(response.body().getJoined_date())));
-                                Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
-                                LoadUserMentions();
-                                username = EncryptHelper.decrypt(response.body().getUsername());
-                                txt_amount_following_profile.setText(Methods.NumberTrick(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowing())))));
-                                txt_amount_followers_profile.setText(Methods.NumberTrick(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowers())))));
-                                btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_follow));
-                                btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
-                                btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
+                if(getContext() != null){
+                    if(ConnectionHelper.isOnline(getContext())){
+                        LoadingDialog loadingDialog = new LoadingDialog(requireActivity());
+                        loadingDialog.startLoading();
+                        btn_plus_story_profile.setVisibility(View.GONE);
+                        DtoAccount account = new DtoAccount();
+                        account_another_user = Long.parseLong(bundle.getString("account_id"));
+                        account.setAccount_id_cry(EncryptHelper.encrypt(bundle.getString("account_id")));
+                        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);
+                        AccountServices services = retrofitUser.create(AccountServices.class);
+                        Call<DtoAccount> call = services.getUserInfo(account);
+                        call.enqueue(new Callback<DtoAccount>() {
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                                loadingDialog.dismissDialog();
+                                if(response.code() == 200){
+                                    if(response.body() != null){
+                                        Glide.with(requireActivity()).load(EncryptHelper.decrypt(response.body().getProfile_image())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                                .into(ic_ProfileUser_profile);
+                                        txt_user_name.setText(EncryptHelper.decrypt(response.body().getName_user()));
+                                        txt_username_name.setText( "@" + EncryptHelper.decrypt(response.body().getUsername()));
+                                        txt_user_bio_profile.setText(EncryptHelper.decrypt(response.body().getBio_user()));
+                                        txt_joined.setText(LoadJoined(EncryptHelper.decrypt(response.body().getJoined_date())));
+                                        Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
+                                        LoadUserMentions();
+                                        username = EncryptHelper.decrypt(response.body().getUsername());
+                                        txt_amount_following_profile.setText(Methods.NumberTrick(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowing())))));
+                                        txt_amount_followers_profile.setText(Methods.NumberTrick(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowers())))));
+                                        btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_follow));
+                                        btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
+                                        btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
 
-                                int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getVerification_level())));
-                                if(verified != 0){
-                                    if (verified == 2)
-                                        ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_employee_account));
-                                     else
-                                        ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
-                                    ic_account_badge_profile.setVisibility(View.VISIBLE);
-                                }
-                                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);
+                                        int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getVerification_level())));
+                                        if(verified != 0){
+                                            if (verified == 2)
+                                                ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_employee_account));
+                                            else
+                                                ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
+                                            ic_account_badge_profile.setVisibility(View.VISIBLE);
+                                            BangedAnimation();
+                                        }
+                                        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);
 
-                                DaoFollowing daoFollowing = new DaoFollowing(getContext());
-                                ArrayList<DtoAccount> accounts = daoFollowing.get_followers_following(account_id, Long.parseLong(bundle.getString("account_id")));
-                                if(accounts.size() > 0){
-                                    btn_go_chat_profile.setVisibility(View.VISIBLE);
-                                    btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
-                                    btn_follow_following_profile.setText(requireContext().getString(R.string.following));
-                                    btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.black));
+                                        DaoFollowing daoFollowing = new DaoFollowing(getContext());
+                                        ArrayList<DtoAccount> accounts = daoFollowing.get_followers_following(account_id, Long.parseLong(bundle.getString("account_id")));
+                                        if(accounts.size() > 0){
+                                            btn_go_chat_profile.setVisibility(View.VISIBLE);
+                                            btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
+                                            btn_follow_following_profile.setText(requireContext().getString(R.string.following));
+                                            btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.black));
+                                        }
+                                        MainActivity.getInstance().ResetBundleProfile();
+                                        timer.postDelayed(() -> control++,500);
+                                    }
+                                }else{
+                                    ToastHelper.toast(requireActivity(), getString(R.string.user_not_found), 0);
+                                    GetUserInfo(requireActivity());
                                 }
-                                MainActivity.getInstance().ResetBundleProfile();
-                                timer.postDelayed(() -> control++,500);
                             }
-                        }else{
-                            ToastHelper.toast(requireActivity(), getString(R.string.user_not_found), 0);
-                            GetUserInfo(requireActivity());
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
-                        loadingDialog.dismissDialog();
-                        Warnings.showWeHaveAProblem(requireContext());
-                    }
-                });
+                            @Override
+                            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
+                                loadingDialog.dismissDialog();
+                                Warnings.showWeHaveAProblem(requireContext());
+                            }
+                        });
+                    }else ToastHelper.toast((Activity) getContext(), getContext().getString(R.string.you_are_without_internet), 0);
+                }else MainActivity.getInstance().LoadMainFragment();
             }else GetUserInfo(requireActivity());
         }else GetUserInfo(requireActivity());
     }
@@ -319,7 +330,6 @@ public class ProfileFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     public void GetUserInfo(Activity activity) {
-        Login.ReloadUserinfo(requireContext(), MyPrefs.getUserInformation(requireContext()).getEmail(), MyPrefs.getUserInformation(requireContext()).getPassword());
         ic_account_badge_profile.setVisibility(View.GONE);
         btn_go_chat_profile.setVisibility(View.GONE);
         btn_plus_story_profile.setVisibility(View.VISIBLE);
@@ -341,6 +351,7 @@ public class ProfileFragment extends Fragment {
             else
                 ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
             ic_account_badge_profile.setVisibility(View.VISIBLE);
+            BangedAnimation();
         }
 
         Glide.with(requireActivity()).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
@@ -431,6 +442,24 @@ public class ProfileFragment extends Fragment {
                 return false;
             }));
         }
+    }
+
+    void BangedAnimation(){
+
+        final ObjectAnimator oa1 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 1f, 0f);
+        final ObjectAnimator oa2 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 0f, 1f);
+        oa1.setInterpolator(new DecelerateInterpolator());
+        oa2.setInterpolator(new AccelerateDecelerateInterpolator());
+        oa1.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                oa2.start();
+            }
+        });
+        oa1.setDuration(1500);
+        oa2.setDuration(1500);
+        oa1.start();
     }
 
     @Override

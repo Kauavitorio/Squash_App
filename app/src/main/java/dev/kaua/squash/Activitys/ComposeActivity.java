@@ -23,6 +23,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -32,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -114,9 +116,31 @@ public class ComposeActivity extends AppCompatActivity {
                     public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
                         loadingDialog.dismissDialog();
                         if(response.code() == 201){
-                            MainFragment.RefreshRecycler();
-                            ProfileFragment.getInstance().ReloadRecycler();
-                            finish();
+                            if(response.body() != null){
+                                String post_id = response.body().getPost_id();
+
+                                DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference();
+                                final HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("post_id", post_id);
+                                hashMap.put("account_id", EncryptHelper.encrypt(userAccount.getAccount_id() + ""));
+                                hashMap.put("post_time", EncryptHelper.encrypt(time));
+                                hashMap.put("post_date", EncryptHelper.encrypt(date));
+                                hashMap.put("post_content", EncryptHelper.encrypt(compose_text));
+                                hashMap.put("post_topic", EncryptHelper.encrypt(""));
+                                hashMap.put("post_images", post_image);
+
+                                hashMap.put("name_user", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getName_user()));
+                                hashMap.put("username", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getUsername()));
+                                hashMap.put("verification_level", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getVerification_level()));
+                                hashMap.put("profile_image", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getProfile_image()));
+                                hashMap.put("post_likes", EncryptHelper.encrypt(0 + ""));
+                                hashMap.put("post_comments_amount", EncryptHelper.encrypt(0 + ""));
+                                reference.child("Posts").child("Published").push().setValue(hashMap);
+
+                                MainFragment.RefreshRecycler();
+                                ProfileFragment.getInstance().ReloadRecycler();
+                                finish();
+                            }
                         }else Warnings.showWeHaveAProblem(ComposeActivity.this);
                     }
 

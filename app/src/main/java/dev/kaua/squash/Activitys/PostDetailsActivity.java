@@ -45,6 +45,7 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -236,6 +237,29 @@ public class PostDetailsActivity extends AppCompatActivity {
 
                             swipeRefreshLayout_comments.setVisibility(View.VISIBLE);
                             current_comments++;
+
+                            //  Update post comment number
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                            Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
+                                    .equalTo(EncryptHelper.encrypt(post_id + ""));
+
+                            final long FinalCurrent_comments = current_comments;
+                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                        HashMap<String, Object> hashMap = new HashMap<>();
+                                        hashMap.put("post_comments_amount", EncryptHelper.encrypt(FinalCurrent_comments + ""));
+                                        appleSnapshot.getRef().updateChildren(hashMap);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NotNull DatabaseError databaseError) {
+                                    Log.e("PostsAdapter", "onCancelled", databaseError.toException());
+                                }
+                            });
+
                             txt_comments_post.setText(Methods.NumberTrick(current_comments));
                             btn_post_comment.setEnabled(true);
                             container_compose_comment.setVisibility(View.GONE);
@@ -354,9 +378,10 @@ public class PostDetailsActivity extends AppCompatActivity {
 
                     if(account_chat.getAccount_id_cry() != null){
                         if(account_chat.getUsername().equals(EncryptHelper.decrypt(post_info.getUsername())) && account_chat.getChat_id().equals("go")
-                        && !base_comment.equals(comment)){
-                            sendNotification(account_chat.getId(),MyPrefs.getUserInformation(PostDetailsActivity.this).getUsername(),
-                                    comment);
+                                && !base_comment.equals(comment)){
+                            if(!account_chat.getId().equals(myFirebaseHelper.getFirebaseUser().getUid()))
+                                sendNotification(account_chat.getId(),MyPrefs.getUserInformation(PostDetailsActivity.this).getUsername(),
+                                        comment);
                             account_chat.setChat_id(account_chat.getId());
                             base_comment = comment;
                         }

@@ -166,30 +166,32 @@ public abstract class Methods extends MainActivity {
             posts_comment.execute();
         }
 
-        final Retrofit retrofitUser = GetRetrofitBuilder();
-        SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        DtoAccount account = new DtoAccount();
-        account.setAccount_id_cry(sp.getString("pref_account_id", null));
-        AccountServices services = retrofitUser.create(AccountServices.class);
-        Call<DtoAccount> call = services.get_followers_following(account);
-        call.enqueue(new Callback<DtoAccount>() {
-            @Override
-            public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                if(response.code() == 200){
-                    DtoAccount info = new DtoAccount();
-                    info.setAccount_id(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(sp.getString("pref_account_id", null)))));
-                    assert response.body() != null;
-                    info.setFollowers(response.body().getFollowers());
-                    info.setFollowing(response.body().getFollowing());
-                    DaoAccount daoAccount = new DaoAccount(context);
-                    long lines = daoAccount.Register_Followers_Following(info);
-                    if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
-                    else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+        if(base != 999){
+            final Retrofit retrofitUser = GetRetrofitBuilder();
+            SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+            DtoAccount account = new DtoAccount();
+            account.setAccount_id_cry(sp.getString("pref_account_id", null));
+            AccountServices services = retrofitUser.create(AccountServices.class);
+            Call<DtoAccount> call = services.get_followers_following(account);
+            call.enqueue(new Callback<DtoAccount>() {
+                @Override
+                public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                    if(response.code() == 200){
+                        DtoAccount info = new DtoAccount();
+                        info.setAccount_id(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(sp.getString("pref_account_id", null)))));
+                        assert response.body() != null;
+                        info.setFollowers(response.body().getFollowers());
+                        info.setFollowing(response.body().getFollowing());
+                        DaoAccount daoAccount = new DaoAccount(context);
+                        long lines = daoAccount.Register_Followers_Following(info);
+                        if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
+                        else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+                    }
                 }
-            }
-            @Override
-            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
-        });
+                @Override
+                public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+            });
+        }
     }
 
     //  Method "NumberTrick" is for change number

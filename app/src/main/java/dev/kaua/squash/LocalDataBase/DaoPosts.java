@@ -27,7 +27,7 @@ public class DaoPosts extends SQLiteOpenHelper {
 
 
     public DaoPosts(@Nullable Context context) {
-        super(context, "DB_POSTS", null, 2);
+        super(context, "DB_POSTS", null, 4);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class DaoPosts extends SQLiteOpenHelper {
 
     public void Register_Home_Posts(ArrayList<DtoPost> post){
         //DropTable();
-        int size = Math.min(post.size(), 50);
+        int size = Math.min(post.size(), 100);
         for (int i = 0; i< size; i++){
             ContentValues values = new ContentValues();
             values.put("post_id", Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id())));

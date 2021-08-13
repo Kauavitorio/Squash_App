@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +17,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -60,12 +58,10 @@ public class MainFragment extends Fragment {
     //private static SwipeRefreshLayout swipe_main;
     private ConstraintLayout btn_create_new_story_main;
     private static RecyclerView recyclerView_Posts;
-    public static SwipeRefreshLayout swipe_posts;
     private ImageView btn_chat_main, btn_compose_main;
     private CircleImageView icon_ProfileUser_main;
     private CardView card_msg_notRead_main;
     private LinearLayout header_main;
-    private static ProgressBar loading_posts;
     private static Context instance;
     private static ConstraintLayout loadingPanel;
     private final Handler timer = new Handler();
@@ -86,8 +82,6 @@ public class MainFragment extends Fragment {
         btn_create_new_story_main.setOnClickListener(v -> StoryClick());
         btn_chat_main.setOnClickListener(v -> MainActivity.getInstance().CallChat());
         btn_compose_main.setOnClickListener(v -> MainActivity.getInstance().CallComposePost());
-
-        swipe_posts.setOnRefreshListener(MainFragment::RefreshRecycler);
 
         //loadMsgNotRead();
         loadCheckSystemInfo();
@@ -167,8 +161,7 @@ public class MainFragment extends Fragment {
         ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
     }
 
-
-    public static void RefreshRecycler(){ RecommendedPosts.getRecommendedPosts(instance, recyclerView_Posts, loadingPanel, loading_posts); }
+    public static void RefreshRecycler(){ RecommendedPosts.getFeedPosts(instance, recyclerView_Posts, loadingPanel); }
 
     private void Ids(View view) {
         instance = requireActivity();
@@ -177,8 +170,6 @@ public class MainFragment extends Fragment {
         firebaseUser = myFirebaseHelper.getFirebaseUser();
         account = MyPrefs.getUserInformation(requireContext());
         loadingPanel = view.findViewById(R.id.loadingPanel);
-        loading_posts = view.findViewById(R.id.loading_posts);
-        swipe_posts = view.findViewById(R.id.swipe_posts);
         icon_ProfileUser_main = view.findViewById(R.id.icon_ProfileUser_main);
         btn_create_new_story_main = view.findViewById(R.id.btn_create_new_story_main);
         card_msg_notRead_main = view.findViewById(R.id.card_msg_notRead_main);
