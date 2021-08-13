@@ -1009,7 +1009,8 @@ public class MessageActivity extends AppCompatActivity {
             LoadingDialog dialog = new LoadingDialog(this);
             dialog.startLoading();
             try {
-                Glide.with(this)
+                Upload_Image(dialog, filePath);
+                /*Glide.with(this)
                         .asBitmap()
                         .load(filePath)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -1031,7 +1032,7 @@ public class MessageActivity extends AppCompatActivity {
                             }
                             @Override
                             public void onLoadCleared(@Nullable Drawable placeholder) { }
-                        });
+                        });*/
 
             }catch (Exception ex){
                 dialog.dismissDialog();

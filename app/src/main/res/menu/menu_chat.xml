@@ -10,6 +10,7 @@
     <item
         android:id="@+id/starred_messages_chat"
         android:title="@string/starred_messages"
+        android:visible="false"
         app:showAsAction="never"/>
 
     <item

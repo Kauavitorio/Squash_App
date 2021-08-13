@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.EditProfileActivity;
@@ -46,6 +47,7 @@ import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
+import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
@@ -54,6 +56,7 @@ import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.PatternEditableBuilder;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
@@ -90,6 +93,8 @@ public class ProfileFragment extends Fragment {
     private static long account_another_user = 0, account_id;
     private static int control;
     private boolean visible_control;
+
+    final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
     // User Info
     private static DtoAccount account = new DtoAccount();
@@ -254,6 +259,7 @@ public class ProfileFragment extends Fragment {
                                 txt_user_bio_profile.setText(EncryptHelper.decrypt(response.body().getBio_user()));
                                 txt_joined.setText(LoadJoined(EncryptHelper.decrypt(response.body().getJoined_date())));
                                 Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
+                                LoadUserMentions();
                                 username = EncryptHelper.decrypt(response.body().getUsername());
                                 txt_amount_following_profile.setText(Methods.NumberTrick(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowing())))));
                                 txt_amount_followers_profile.setText(Methods.NumberTrick(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowers())))));
@@ -348,6 +354,7 @@ public class ProfileFragment extends Fragment {
         btn_follow_following_profile.setText(activity.getString(R.string.edit_profile));
         btn_follow_following_profile.setTextColor(activity.getColor(R.color.black));
         Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
+        LoadUserMentions();
     }
 
     private void Ids(View view) {
@@ -372,11 +379,58 @@ public class ProfileFragment extends Fragment {
             }
             return false;
         }));
+
+
         btn_follow_following_profile = view.findViewById(R.id.btn_follow_following_profile);
         txt_amount_following_profile = view.findViewById(R.id.txt_amount_following_profile);
         txt_amount_followers_profile = view.findViewById(R.id.txt_amount_followers_profile);
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         recyclerView_Posts_profile.setLayoutManager(linearLayout);
+    }
+
+    void LoadUserMentions(){
+        if(getContext() != null){
+            new PatternEditableBuilder().
+                    addPattern(Pattern.compile("@(\\w+)"), getContext().getColor(R.color.base_color),
+                            text -> {
+                                DtoAccount account = new DtoAccount();
+                                account.setUsername(text.replace("@", ""));
+                                AccountServices services = retrofit.create(AccountServices.class);
+                                Call<DtoPost> call = services.search_with_username(account);
+                                LoadingDialog loadingDialog = new LoadingDialog(((Activity)getContext()));
+                                loadingDialog.startLoading();
+                                call.enqueue(new Callback<DtoPost>() {
+                                    @Override
+                                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                                        loadingDialog.dismissDialog();
+                                        if(response.code() == 200){
+                                            if(response.body() != null){
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("account_id", response.body().getAccount_id());
+                                                bundle.putInt("control", 0);
+                                                MainActivity.getInstance().GetBundleProfile(bundle);
+                                                MainActivity.getInstance().CallProfile();
+                                                ProfileFragment.getInstance().LoadAnotherUser();
+                                            }
+                                        }else ToastHelper.toast(((Activity) requireContext()), requireContext().getString(R.string.user_not_found), 0);
+                                    }
+                                    @Override
+                                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                                        loadingDialog.dismissDialog();
+                                        Warnings.showWeHaveAProblem(requireContext());
+                                    }
+                                });
+                            }).into(txt_user_bio_profile);
+
+            txt_user_bio_profile.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
+                if (Patterns.WEB_URL.matcher(url).matches()) {
+                    //An web url is detected
+                    Methods.browseTo(requireContext(), url);
+                    return true;
+                }
+                return false;
+            }));
+        }
     }
 
     @Override

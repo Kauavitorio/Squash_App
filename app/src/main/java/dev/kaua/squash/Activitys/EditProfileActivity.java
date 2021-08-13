@@ -252,7 +252,9 @@ public class EditProfileActivity extends AppCompatActivity {
             LoadingDialog dialog = new LoadingDialog(this);
             dialog.startLoading();
             try {
-                Glide.with(this)
+                dialog.dismissDialog();
+                Profile_Image.SendToCrop(this, filePath);
+                /*Glide.with(this)
                         .asBitmap()
                         .load(filePath)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -274,7 +276,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             }
                             @Override
                             public void onLoadCleared(@Nullable Drawable placeholder) { }
-                        });
+                        });*/
 
             }catch (Exception ex){
                 dialog.dismissDialog();
