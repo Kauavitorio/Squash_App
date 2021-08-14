@@ -27,6 +27,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".Activitys.DeletePostReportActivity"
+            android:exported="true" />
         <!-- Image Crop Activity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
@@ -43,9 +46,10 @@
             android:exported="true" />
         <activity
             android:name=".Activitys.ConnectionUsageActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

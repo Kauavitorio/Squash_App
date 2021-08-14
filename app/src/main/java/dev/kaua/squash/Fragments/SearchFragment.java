@@ -34,6 +34,7 @@ import dev.kaua.squash.Data.Account.AsyncUser_Search;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
@@ -49,10 +50,10 @@ public class SearchFragment extends Fragment {
     private RecyclerView recycler_post_feed;
     private TextView txt_empty_feed;
     private View view;
-    private boolean control_visible = false;
-    private boolean base_load = true;
+    private long size = 0;
     private static DatabaseReference reference_posts;
     private static SearchFragment instance;
+    private static DaoFollowing daoFollowing;
     private DtoAccount account;
 
     @Nullable
@@ -76,7 +77,7 @@ public class SearchFragment extends Fragment {
             edit_search.setText(null);
         });
 
-        swipe_post_feed.setOnRefreshListener(this::loadFeed);
+        swipe_post_feed.setOnRefreshListener(this::Apply_ArrayList);
 
         return view;
     }
@@ -89,57 +90,45 @@ public class SearchFragment extends Fragment {
         asyncProductsSearchMain.execute();
     }
 
+    final ArrayList<DtoPost> arrayListDto = new ArrayList<>();
     Posts_Adapters posts_adapters = null;
     private void loadFeed() {
         reference_posts = null;
-        final ArrayList<DtoPost> arrayListDto = new ArrayList<>();
         if(getContext() != null){
+            daoFollowing = new DaoFollowing(getContext());
             if(ConnectionHelper.isOnline(getContext())){
                 reference_posts = myFirebaseHelper.getFirebaseDatabase().getReference("Posts").child("Published");
                 reference_posts.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot datasnapshot) {
-                        base_load = false;
-                        if(control_visible){
-                            swipe_post_feed.setRefreshing(true);
-                            arrayListDto.clear();
-                            for(DataSnapshot snapshot: datasnapshot.getChildren()){
-                                DtoPost post = snapshot.getValue(DtoPost.class);
-                                if(post != null && getContext() != null){
-                                    if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))) != MyPrefs.getUserInformation(getContext()).getAccount_id()){
-                                        post.setPost_id(EncryptHelper.decrypt(post.getPost_id()));
-                                        post.setAccount_id(EncryptHelper.decrypt(post.getAccount_id()));
-                                        post.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
-                                        post.setName_user(EncryptHelper.decrypt(post.getName_user()));
-                                        post.setUsername(EncryptHelper.decrypt(post.getUsername()));
-                                        post.setProfile_image(EncryptHelper.decrypt(post.getProfile_image()));
-                                        post.setPost_date(EncryptHelper.decrypt(post.getPost_date()));
-                                        post.setPost_time(EncryptHelper.decrypt(post.getPost_time()));
-                                        post.setPost_content(EncryptHelper.decrypt(post.getPost_content()));
-                                        if(post.getPost_images() != null && post.getPost_images().size() != 0) post.setPost_images(post.getPost_images());
-                                        else post.setPost_images(null);
-                                        post.setPost_likes(EncryptHelper.decrypt(post.getPost_likes()));
-                                        post.setPost_comments_amount(EncryptHelper.decrypt(post.getPost_comments_amount()));
-                                        post.setPost_topic(EncryptHelper.decrypt(post.getPost_topic()));
-                                        post.setSuggestion(false);
-                                        arrayListDto.add(post);
-                                    }
+                        arrayListDto.clear();
+                        for(DataSnapshot snapshot: datasnapshot.getChildren()){
+                            DtoPost post = snapshot.getValue(DtoPost.class);
+                            if(post != null && getContext() != null){
+                                if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))) != MyPrefs.getUserInformation(getContext()).getAccount_id()
+                                        && !daoFollowing.check_if_follow(MyPrefs.getUserInformation(getContext()).getAccount_id(),
+                                        Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))))){
+                                    post.setPost_id(EncryptHelper.decrypt(post.getPost_id()));
+                                    post.setAccount_id(EncryptHelper.decrypt(post.getAccount_id()));
+                                    post.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
+                                    post.setName_user(EncryptHelper.decrypt(post.getName_user()));
+                                    post.setUsername(EncryptHelper.decrypt(post.getUsername()));
+                                    post.setProfile_image(EncryptHelper.decrypt(post.getProfile_image()));
+                                    post.setPost_date(EncryptHelper.decrypt(post.getPost_date()));
+                                    post.setPost_time(EncryptHelper.decrypt(post.getPost_time()));
+                                    post.setPost_content(EncryptHelper.decrypt(post.getPost_content()));
+                                    if(post.getPost_images() != null && post.getPost_images().size() != 0) post.setPost_images(post.getPost_images());
+                                    else post.setPost_images(null);
+                                    post.setPost_likes(EncryptHelper.decrypt(post.getPost_likes()));
+                                    post.setPost_comments_amount(EncryptHelper.decrypt(post.getPost_comments_amount()));
+                                    post.setPost_topic(EncryptHelper.decrypt(post.getPost_topic()));
+                                    post.setSuggestion(false);
+                                    arrayListDto.add(post);
                                 }
                             }
-                            Collections.shuffle(arrayListDto);
-                            posts_adapters = new Posts_Adapters(arrayListDto, getContext());
-                            if(arrayListDto.size() > 0) posts_adapters.notifyItemRangeChanged(0, arrayListDto.size()-1);
-                            if (arrayListDto.size() <= 0){
-                                swipe_post_feed.setVisibility(View.GONE);
-                                txt_empty_feed.setVisibility(View.VISIBLE);
-                            }else{
-                                recycler_post_feed.setAdapter(posts_adapters);
-                                recycler_post_feed.getRecycledViewPool().clear();
-                                swipe_post_feed.setVisibility(View.VISIBLE);
-                                txt_empty_feed.setVisibility(View.GONE);
-                                new Handler().postDelayed(() -> swipe_post_feed.setRefreshing(false), 500);
-                            }
                         }
+                        if(size != arrayListDto.size())
+                            swipe_post_feed.setRefreshing(true);
                     }
 
                     @Override
@@ -152,8 +141,6 @@ public class SearchFragment extends Fragment {
     @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
-        control_visible = visible;
-        if(!base_load) loadFeed();
         if (visible){
             if(getContext() != null){
                 Toolbar toolbar = view.findViewById(R.id.toolbar_search);
@@ -162,7 +149,27 @@ public class SearchFragment extends Fragment {
                 Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
                 Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayShowTitleEnabled(false); // Hide default toolbar title
                 toolbar.setNavigationOnClickListener(v -> MainActivity.getInstance().LoadMainFragment());
+
+                Apply_ArrayList();
             }
+        }
+    }
+
+    private void Apply_ArrayList() {
+        swipe_post_feed.setRefreshing(true);
+        if(size != arrayListDto.size()) Collections.shuffle(arrayListDto);
+        posts_adapters = new Posts_Adapters(arrayListDto, getContext());
+        if(arrayListDto.size() > 0) posts_adapters.notifyItemRangeChanged(0, arrayListDto.size()-1);
+        if (arrayListDto.size() <= 0){
+            swipe_post_feed.setVisibility(View.GONE);
+            txt_empty_feed.setVisibility(View.VISIBLE);
+        }else{
+            size = arrayListDto.size();
+            recycler_post_feed.setAdapter(posts_adapters);
+            recycler_post_feed.getRecycledViewPool().clear();
+            swipe_post_feed.setVisibility(View.VISIBLE);
+            txt_empty_feed.setVisibility(View.GONE);
+            new Handler().postDelayed(() -> swipe_post_feed.setRefreshing(false), 500);
         }
     }
 

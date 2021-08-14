@@ -49,6 +49,7 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.WebActivity;
@@ -123,7 +124,11 @@ public abstract class Methods extends MainActivity {
     }
 
     //  Method to return Default Retrofit Builder
-    static final OkHttpClient okHttpClient = new OkHttpClient();
+    static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(35, TimeUnit.SECONDS).build();
+
     @NonNull
     @Contract(" -> new")
     public static Retrofit GetRetrofitBuilder(){

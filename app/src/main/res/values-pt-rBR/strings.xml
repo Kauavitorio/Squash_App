@@ -166,4 +166,7 @@
     <string name="problem_performing_this_action">Ocorreu um problema ao executar esta ação, tente novamente.</string>
     <string name="message">Mensagem</string>
     <string name="joined">Entrou</string>
+    <string name="reason">Motivo</string>
+    <string name="desc_delete_post_report">Você está prestes à deletar este post. É necessário que informe o motivo de o mesmo estar deletando este post, pois a mensagem que será escrita abaixo, será a mesma recebida pelo usuário.</string>
+    <string name="need_to_insert_reason_delete_post">É necessário especificar o motivo da remoção, mínimo de caracteres: 20.</string>
 </resources>

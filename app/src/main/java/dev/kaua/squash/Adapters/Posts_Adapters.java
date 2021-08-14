@@ -52,6 +52,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Activitys.DeletePostReportActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.PostDetailsActivity;
 import dev.kaua.squash.Activitys.ViewMediaActivity;
@@ -235,7 +236,8 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             ProfileFragment.getInstance().LoadAnotherUser();
         });
 
-        holder.container_post_adapter.setOnClickListener(v -> {
+        holder.itemView.setOnClickListener(v -> {
+            holder.itemView.startAnimation(myAnim);
             if(ConnectionHelper.isOnline(mContext)){
                 Intent i = new Intent(mContext, PostDetailsActivity.class);
                 i.putExtra("post_id", Long.parseLong(mPostList.get(position).getPost_id()));
@@ -246,6 +248,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         });
 
         holder.btn_comment_post.setOnClickListener(v -> {
+            holder.btn_comment_post.startAnimation(myAnim);
             if(ConnectionHelper.isOnline(mContext)){
                 Intent i = new Intent(mContext, PostDetailsActivity.class);
                 i.putExtra("post_id", Long.parseLong(mPostList.get(position).getPost_id()));
@@ -255,6 +258,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         });
 
         holder.btn_share_post.setOnClickListener(v -> {
+            holder.btn_share_post.startAnimation(myAnim);
             Intent myIntent = new Intent(Intent.ACTION_SEND);
             myIntent.setType("text/plain");
             String body = Methods.BASE_URL_HTTPS + "share/" + mPostList.get(position).getUsername() + "/post/" +  mPostList.get(position).getPost_id()
@@ -319,109 +323,127 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     }
 
     private void EnableActions(MyHolderPosts holder, int position) {
-        DtoAccount user = MyPrefs.getUserInformation(mContext);
-        if(Long.parseLong(mPostList.get(position).getAccount_id()) == Long.parseLong(user.getAccount_id() + "")){
-            holder.btn_actions.setVisibility(View.VISIBLE);
-            holder.btn_actions.setOnClickListener(v -> {
-                DtoPost dtoPost = new DtoPost();
-                dtoPost.setAccount_id(EncryptHelper.encrypt(user.getAccount_id() + ""));
-                dtoPost.setPost_id(EncryptHelper.encrypt(mPostList.get(position).getPost_id()));
-                bottomSheetDialog = new BottomSheetDialog(mContext, R.style.BottomSheetTheme);
-                bottomSheetDialog.setCancelable(true);
-                //  Creating View for SheetMenu
-                View sheetView = LayoutInflater.from(mContext).inflate(R.layout.adapter_sheet_menu_post_action,
-                        ((Activity)mContext).findViewById(R.id.sheet_menu_post_action));
+        try{
+            DtoAccount user = MyPrefs.getUserInformation(mContext);
+            int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(user.getVerification_level())));
+            if(mPostList.get(position).getAccount_id() != null && Long.parseLong(mPostList.get(position).getAccount_id()) == Long.parseLong(user.getAccount_id() + "")
+            || verified == 2){
+                holder.btn_actions.setVisibility(View.VISIBLE);
+                holder.btn_actions.setOnClickListener(v -> {
+                    DtoPost dtoPost = new DtoPost();
+                    final String user_id;
+                    if(verified == 2 && Long.parseLong(mPostList.get(position).getAccount_id()) != user.getAccount_id())
+                        user_id = mPostList.get(position).getAccount_id();
+                    else user_id = user.getAccount_id() + "";
+                    dtoPost.setAccount_id(EncryptHelper.encrypt(user_id));
+                    dtoPost.setPost_id(EncryptHelper.encrypt(mPostList.get(position).getPost_id()));
+                    dtoPost.setDelete_by(EncryptHelper.encrypt("byUser"));
+                    bottomSheetDialog = new BottomSheetDialog(mContext, R.style.BottomSheetTheme);
+                    bottomSheetDialog.setCancelable(true);
+                    //  Creating View for SheetMenu
+                    View sheetView = LayoutInflater.from(mContext).inflate(R.layout.adapter_sheet_menu_post_action,
+                            ((Activity)mContext).findViewById(R.id.sheet_menu_post_action));
 
-                sheetView.findViewById(R.id.btn_delete_post).setOnClickListener(v1 -> {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle)
-                            .setTitle(mContext.getString(R.string.delete_post))
-                            .setMessage(mContext.getString(R.string.delete_post_message))
-                            .setPositiveButton(mContext.getString(R.string.yes), (dialog, which) -> {
-                                if(ConnectionHelper.isOnline(mContext)){
-                                    dialog.dismiss();
-                                    try {
-                                        PostServices services = retrofit.create(PostServices.class);
-                                        Call<DtoPost> call = services.delete_post(dtoPost);
+                    sheetView.findViewById(R.id.btn_delete_post).setOnClickListener(v1 -> {
+                        AlertDialog.Builder alert = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle)
+                                .setTitle(mContext.getString(R.string.delete_post))
+                                .setMessage(mContext.getString(R.string.delete_post_message))
+                                .setPositiveButton(mContext.getString(R.string.yes), (dialog, which) -> {
+                                    if(ConnectionHelper.isOnline(mContext)){
+                                        dialog.dismiss();
+                                        if(verified == 2 &&  Long.parseLong(mPostList.get(position).getAccount_id()) != user.getAccount_id()){
+                                            Intent i = new Intent(mContext, DeletePostReportActivity.class);
+                                            i.putExtra("post_id", mPostList.get(position).getPost_id());
+                                            i.putExtra("user_id", user_id);
+                                            mContext.startActivity(i);
+                                        }else{
+                                            try {
+                                                PostServices services = retrofit.create(PostServices.class);
+                                                Call<DtoPost> call = services.delete_post(dtoPost);
 
-                                        LoadingDialog loadingDialog = new LoadingDialog((Activity) mContext);
-                                        loadingDialog.startLoading();
+                                                LoadingDialog loadingDialog = new LoadingDialog((Activity) mContext);
+                                                loadingDialog.startLoading();
 
-                                        DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-                                        Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
-                                                .equalTo(EncryptHelper.encrypt(mPostList.get(position).getPost_id()));
+                                                DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                                                Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
+                                                        .equalTo(EncryptHelper.encrypt(mPostList.get(position).getPost_id()));
 
-                                        //  Delete post in firebase
-                                        applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                                                for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                                                    appleSnapshot.getRef().removeValue();
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NotNull DatabaseError databaseError) {
-                                                Log.e("PostsAdapter", "onCancelled", databaseError.toException());
-                                            }
-                                        });
-
-                                        //  Delete post in api
-                                        call.enqueue(new Callback<DtoPost>() {
-                                            @Override
-                                            public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                                                loadingDialog.dismissDialog();
-                                                if(response.code() == 200){
-                                                    try{
-                                                        if(mPostList.size() > 0 && mPostList.size() >= position){
-                                                            DtoPost img_list = daoPosts.get_post_img(Long.parseLong(mPostList.get(position).getPost_id()));
-                                                            if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0){
-                                                                for (int i = 0; i < img_list.getPost_images().size(); i++){
-                                                                    if(img_list.getPost_images().get(i) != null){
-                                                                        firebaseStorage = myFirebaseHelper.getFirebaseStorageInstance();
-                                                                        StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(img_list.getPost_images().get(i))));
-                                                                        photoRef.delete().addOnSuccessListener(aVoid -> {
-                                                                            // File deleted successfully
-                                                                            Log.d("POSTS_ADAPTER", "onSuccess: deleted file");
-                                                                        }).addOnFailureListener(exception -> {
-                                                                            // Uh-oh, an error occurred!
-                                                                            Log.d("POSTS_ADAPTER", "onFailure: did not delete file");
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }
-                                                            MainFragment.RefreshRecycler();
+                                                //  Delete post in firebase
+                                                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                                                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                                            appleSnapshot.getRef().removeValue();
                                                         }
-                                                    }catch (Exception ex){
-                                                        Log.d("POSTS_ADAPTER", ex.toString());
                                                     }
-                                                }else
-                                                    Warnings.showWeHaveAProblem(mContext);
-                                            }
+                                                    @Override
+                                                    public void onCancelled(@NotNull DatabaseError databaseError) {
+                                                        Log.e("PostsAdapter", "onCancelled", databaseError.toException());
+                                                    }
+                                                });
 
-                                            @Override
-                                            public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
-                                                loadingDialog.dismissDialog();
-                                                Warnings.showWeHaveAProblem(mContext);
+                                                //  Delete post in api
+                                                call.enqueue(new Callback<DtoPost>() {
+                                                    @Override
+                                                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                                                        loadingDialog.dismissDialog();
+                                                        if(response.code() == 200){
+                                                            try{
+                                                                if(mPostList.size() > 0 && mPostList.size() >= position){
+                                                                    DtoPost img_list = daoPosts.get_post_img(Long.parseLong(mPostList.get(position).getPost_id()));
+                                                                    if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0){
+                                                                        for (int i = 0; i < img_list.getPost_images().size(); i++){
+                                                                            if(img_list.getPost_images().get(i) != null){
+                                                                                firebaseStorage = myFirebaseHelper.getFirebaseStorageInstance();
+                                                                                StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(img_list.getPost_images().get(i))));
+                                                                                photoRef.delete().addOnSuccessListener(aVoid -> {
+                                                                                    // File deleted successfully
+                                                                                    Log.d("POSTS_ADAPTER", "onSuccess: deleted file");
+                                                                                }).addOnFailureListener(exception -> {
+                                                                                    // Uh-oh, an error occurred!
+                                                                                    Log.d("POSTS_ADAPTER", "onFailure: did not delete file");
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    MainFragment.RefreshRecycler();
+                                                                }
+                                                            }catch (Exception ex){
+                                                                Log.d("POSTS_ADAPTER", ex.toString());
+                                                            }
+                                                        }else
+                                                            Warnings.showWeHaveAProblem(mContext);
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                                                        loadingDialog.dismissDialog();
+                                                        Warnings.showWeHaveAProblem(mContext);
+                                                    }
+                                                });
+                                            }catch (Exception ex){
+                                                Log.d("POSTS_ADAPTER", ex.toString());
                                             }
-                                        });
-                                    }catch (Exception ex){
-                                        Log.d("POSTS_ADAPTER", ex.toString());
-                                    }
-                                }else ToastHelper.toast((Activity)mContext , mContext.getString(R.string.you_are_without_internet), 0);
-                            })
-                            .setNeutralButton(mContext.getString(R.string.no), (dialogInterface, i) -> dialogInterface.dismiss());
-                    Dialog mDialog = alert.create();
-                    mDialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
-                    mDialog.show();
-                    bottomSheetDialog.dismiss();
+                                        }
+                                    }else ToastHelper.toast((Activity)mContext , mContext.getString(R.string.you_are_without_internet), 0);
+                                })
+                                .setNeutralButton(mContext.getString(R.string.no), (dialogInterface, i) -> dialogInterface.dismiss());
+                        Dialog mDialog = alert.create();
+                        mDialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
+                        mDialog.show();
+                        bottomSheetDialog.dismiss();
+                    });
+
+                    sheetView.findViewById(R.id.btn_cancel_actions).setOnClickListener(v1 -> bottomSheetDialog.dismiss());
+
+                    bottomSheetDialog.setContentView(sheetView);
+                    bottomSheetDialog.show();
                 });
-
-                sheetView.findViewById(R.id.btn_cancel_actions).setOnClickListener(v1 -> bottomSheetDialog.dismiss());
-
-                bottomSheetDialog.setContentView(sheetView);
-                bottomSheetDialog.show();
-            });
-        }else holder.btn_actions.setVisibility(View.GONE);
+            }else holder.btn_actions.setVisibility(View.GONE);
+        }catch (Exception ex){
+            Log.w("POST_ADAPTER", ex.toString());
+            holder.btn_actions.setVisibility(View.GONE);
+        }
     }
 
     private void Check_Like(@NotNull MyHolderPosts holder, int position) {

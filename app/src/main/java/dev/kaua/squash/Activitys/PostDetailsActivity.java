@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,6 +24,8 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -45,6 +50,9 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -548,7 +556,7 @@ public class PostDetailsActivity extends AppCompatActivity {
 
                         txt_name_user_post.setText(EncryptHelper.decrypt(post_info.getName_user()));
                         txt_username_post.setText("| @" + EncryptHelper.decrypt(post_info.getUsername()));
-                        txt_date_time_post.setText(" • " + EncryptHelper.decrypt(post_info.getPost_time()));
+                        txt_date_time_post.setText(LastSeenRefactor(EncryptHelper.decrypt(post_info.getPost_date())));
                         txt_post_content.setText(EncryptHelper.decrypt(post_info.getPost_content()));
                         Linkify.addLinks(txt_post_content, Linkify.ALL);
                         txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_likes())))));
@@ -582,6 +590,7 @@ public class PostDetailsActivity extends AppCompatActivity {
                                     ic_account_badge_profile_compose_comment.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
                                 else
                                     ic_account_badge_profile_compose_comment.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
+                                BangedAnimation();
                             }else ic_account_badge_profile_compose_comment.setVisibility(View.GONE);
                             container_compose_comment.setVisibility(View.VISIBLE);
                             edit_comment_msg.requestFocus();
@@ -604,6 +613,48 @@ public class PostDetailsActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private String LastSeenRefactor(final String date_get) {
+        String date = date_get;
+        try{
+            final String[] split_date = date.split("/");
+            if(split_date.length >= 5){
+                @SuppressLint("SimpleDateFormat") Date date_change = new SimpleDateFormat("MMMM").parse(split_date[1]);
+                if(date_change != null){
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(date_change);
+                    String mouthNumber = cal.get(Calendar.MONTH) + "";
+                    if(cal.get(Calendar.MONTH) < 10) mouthNumber = "0" + mouthNumber;
+                    date = date.replace(split_date[1], mouthNumber);
+                    char[] chars = date.toCharArray();
+                    chars[10] = ' ';
+                    chars[16] = ' ';
+                    date = new String(chars);
+                }
+            }
+            return Methods.loadLastSeenUser(this, date);
+        }catch (Exception ex){
+            return Methods.loadLastSeenUser(this, date);
+        }
+    }
+
+    void BangedAnimation(){
+
+        final ObjectAnimator oa1 = ObjectAnimator.ofFloat(ic_account_badge_post, "scaleX", 1f, 0f);
+        final ObjectAnimator oa2 = ObjectAnimator.ofFloat(ic_account_badge_post, "scaleX", 0f, 1f);
+        oa1.setInterpolator(new DecelerateInterpolator());
+        oa2.setInterpolator(new AccelerateDecelerateInterpolator());
+        oa1.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                oa2.start();
+            }
+        });
+        oa1.setDuration(1500);
+        oa2.setDuration(1500);
+        oa1.start();
     }
 
     private void LoadComments(long post_id) {
