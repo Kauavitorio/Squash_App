@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,63 +71,69 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull @NotNull UserChatAdapter.ViewHolder holder, int position) {
         DtoAccount account = mAccounts.get(position);
-        holder.user_name.setText(account.getName_user());
-        if(account.getImageURL().equals("default")) holder.profile_image.setImageResource(R.drawable.pumpkin_default_image);
-        else Glide.with(mContext).load(EncryptHelper.decrypt(account.getImageURL())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .into(holder.profile_image);
+        if(account != null){
+            try{
+                holder.user_name.setText(account.getName_user());
+                if(account.getImageURL() == null || account.getImageURL().equals("default")) holder.profile_image.setImageResource(R.drawable.pumpkin_default_image);
+                else Glide.with(mContext).load(EncryptHelper.decrypt(account.getImageURL())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                        .into(holder.profile_image);
 
-        if(isChat)
-            lastMessage(account.getId(), holder.card_no_read_ic);
-        else holder.last_seen.setVisibility(View.GONE);
+                if(isChat)
+                    lastMessage(account.getId(), holder.card_no_read_ic);
+                else holder.last_seen.setVisibility(View.GONE);
 
-        holder.itemView.setOnClickListener(v -> {
-            final Animation myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
-            holder.itemView.startAnimation(myAnim);
-            Intent intent = new Intent(mContext, MessageActivity.class);
-            intent.putExtra("userId", account.getId());
-            intent.putExtra("chat_id", account.getChat_id());
-            if(share){
-                int shareType = ShareContentActivity.getInstance().GetShareType();
-                intent.putExtra("shared", MainActivity.SHARED_ID);
-                intent.putExtra("shared_type", shareType);
-                if(shareType == MainActivity.SHARED_PLAIN_TEXT)
-                    intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
-                else if(shareType == MainActivity.SHARED_IMAGE)
-                    intent.putExtra("shared_content", (Uri) ShareContentActivity.getInstance().GetShareContent());
-                ((Activity)mContext).finish();
-            }else intent.putExtra("shared", 0);
-            mContext.startActivity(intent);
-        });
+                holder.itemView.setOnClickListener(v -> {
+                    final Animation myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
+                    holder.itemView.startAnimation(myAnim);
+                    Intent intent = new Intent(mContext, MessageActivity.class);
+                    intent.putExtra("userId", account.getId());
+                    intent.putExtra("chat_id", account.getChat_id());
+                    if(share){
+                        int shareType = ShareContentActivity.getInstance().GetShareType();
+                        intent.putExtra("shared", MainActivity.SHARED_ID);
+                        intent.putExtra("shared_type", shareType);
+                        if(shareType == MainActivity.SHARED_PLAIN_TEXT)
+                            intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
+                        else if(shareType == MainActivity.SHARED_IMAGE)
+                            intent.putExtra("shared_content", (Uri) ShareContentActivity.getInstance().GetShareContent());
+                        ((Activity)mContext).finish();
+                    }else intent.putExtra("shared", 0);
+                    mContext.startActivity(intent);
+                });
 
-        if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
-            holder.verification_ic.setVisibility(View.VISIBLE);
-            int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level())));
-            if (verified == 2)
-                holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
-            else
-                holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
-        }else holder.verification_ic.setVisibility(View.GONE);
+                if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
+                    holder.verification_ic.setVisibility(View.VISIBLE);
+                    int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level())));
+                    if (verified == 2)
+                        holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
+                    else
+                        holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
+                }else holder.verification_ic.setVisibility(View.GONE);
 
-        if(isChat){
-            if(ConnectionHelper.isOnline(mContext)){
-                if (account.getStatus_chat().equals("online")){
-                    holder.last_seen.setText(mContext.getString(R.string.online));
-                    holder.img_on.setVisibility(View.VISIBLE);
-                    holder.img_off.setVisibility(View.GONE);
-                }else {
-                    holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
+                if(isChat){
+                    if(ConnectionHelper.isOnline(mContext)){
+                        if (account.getStatus_chat().equals("online")){
+                            holder.last_seen.setText(mContext.getString(R.string.online));
+                            holder.img_on.setVisibility(View.VISIBLE);
+                            holder.img_off.setVisibility(View.GONE);
+                        }else {
+                            holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
+                            holder.img_on.setVisibility(View.GONE);
+                            holder.img_off.setVisibility(View.VISIBLE);
+                        }
+                    }else {
+                        holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
+                        holder.img_on.setVisibility(View.GONE);
+                        holder.img_off.setVisibility(View.VISIBLE);
+                    }
+                }else{
                     holder.img_on.setVisibility(View.GONE);
-                    holder.img_off.setVisibility(View.VISIBLE);
+                    holder.img_off.setVisibility(View.GONE);
                 }
-            }else {
-                holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
-                holder.img_on.setVisibility(View.GONE);
-                holder.img_off.setVisibility(View.VISIBLE);
+            }catch (Exception ex){
+                Log.d("USER_ADAPTER", ex.toString());
             }
-        }else{
-            holder.img_on.setVisibility(View.GONE);
-            holder.img_off.setVisibility(View.GONE);
-        }
+        }else holder.itemView.setVisibility(View.GONE);
     }
 
     @Override

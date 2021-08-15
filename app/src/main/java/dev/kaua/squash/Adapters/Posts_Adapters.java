@@ -476,7 +476,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                 //mPostList.get((int)position).setPost_likes(like_now + "");
 
                 //  Set posts like in firebase
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
                 Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
                         .equalTo(EncryptHelper.encrypt(post_id));
 

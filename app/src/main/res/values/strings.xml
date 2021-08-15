@@ -177,4 +177,5 @@
     <string name="reason">Reason</string>
     <string name="desc_delete_post_report">You are about to delete this post. It is necessary to inform the reason why he is deleting this post, because the message that will be written below, will be the same received by the user.</string>
     <string name="need_to_insert_reason_delete_post">You must specify the reason for removal, minimum characters: 20.</string>
+    <string name="unable_to_reply_to_this_message">Unable to reply to this message.</string>
 </resources>

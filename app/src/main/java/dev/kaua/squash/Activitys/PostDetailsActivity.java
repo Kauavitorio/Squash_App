@@ -59,7 +59,6 @@ import java.util.Objects;
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncComments_Posts;
-import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
@@ -247,7 +246,7 @@ public class PostDetailsActivity extends AppCompatActivity {
                             current_comments++;
 
                             //  Update post comment number
-                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                            DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
                             Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
                                     .equalTo(EncryptHelper.encrypt(post_id + ""));
 
@@ -327,6 +326,27 @@ public class PostDetailsActivity extends AppCompatActivity {
                 if(like_now >= 0){
                     txt_likes_post.setText(Methods.NumberTrick(like_now));
                     current_likes = like_now;
+
+                    //  Set posts like in firebase
+                    DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                    Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
+                            .equalTo(EncryptHelper.encrypt(post_id + ""));
+
+                    final long finalLike_now = like_now;
+                    applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("post_likes", EncryptHelper.encrypt(finalLike_now + ""));
+                                appleSnapshot.getRef().updateChildren(hashMap);
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NotNull DatabaseError databaseError) {
+                            Log.e("PostInfo", "onCancelled", databaseError.toException());
+                        }
+                    });
 
                     //  Do Like or Un Like
                     DtoPost dtoPost = new DtoPost();
@@ -599,6 +619,30 @@ public class PostDetailsActivity extends AppCompatActivity {
                         }
 
                         LoadComments(post_id);
+
+                        //  Get current likes
+                        DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                        Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
+                                .equalTo(EncryptHelper.encrypt(post_id + ""));
+
+                        applesQuery.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
+                                    try {
+                                        DtoPost dtoPost = appleSnapshot.getValue(DtoPost.class);
+                                        if(dtoPost != null){
+                                            txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_likes())))));
+                                            txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_comments_amount())))));
+                                        }
+                                    }catch (Exception ex){
+                                        Log.d("PostDetails", ex.toString());
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {}
+                        });
 
                     }else{
                         Toast.makeText(PostDetailsActivity.this, getString(R.string.post_not_found), Toast.LENGTH_SHORT).show();
