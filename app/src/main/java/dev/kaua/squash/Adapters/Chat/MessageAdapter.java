@@ -79,7 +79,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private final String myUsername;
     private final String chat_id;
     FirebaseStorage firebaseStorage;
-    private final int joinNow;
+    private final boolean can_animate;
     private RecyclerView recycler_view_msg;
     private MediaPlayer mediaPlayer;
     private Handler handler = new Handler();
@@ -89,14 +89,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private static int LayoutType;
     FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
 
-    public MessageAdapter(MessageActivity mContext, List<DtoMessage> mMessages, String imageURL, int joinNow, RecyclerView recycler_view_msg
+    public MessageAdapter(MessageActivity mContext, List<DtoMessage> mMessages, String imageURL, boolean can_animate, RecyclerView recycler_view_msg
     , String myUsername, String chat_Username, String chat_id){
         this.mContext = mContext;
         MessageAdapter.mMessages = mMessages;
         this.imageURL = imageURL;
         this.chat_Username = chat_Username;
         this.myUsername = myUsername;
-        this.joinNow = joinNow;
+        this.can_animate = can_animate;
         this.recycler_view_msg = recycler_view_msg;
         this.chat_id = chat_id;
         this.daoChat = new DaoChat(mContext);
@@ -211,11 +211,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     });
                 }else if(viewHolder.container_media_img_chat != null) viewHolder.container_media_img_chat.setVisibility(View.GONE);
 
-                if(joinNow != 0){
+                if(can_animate){
                     if(viewHolder.container_msg != null){
                         if(position == mMessages.size() - 1){
                             Animation CartAnim = AnimationUtils.loadAnimation(context, R.anim.slide_up);
-                            viewHolder.container_msg.startAnimation(CartAnim);
+                            viewHolder.itemView.startAnimation(CartAnim);
                         }
                     }
                 }

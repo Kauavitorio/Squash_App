@@ -114,8 +114,8 @@ public class UsersFragment extends Fragment {
     private void readAccounts() {
         if(getContext() != null){
             if(ConnectionHelper.isOnline(getContext())){
-                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("status_chat");
+                FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseAuth().getCurrentUser();
+                Query query = myFirebaseHelper.getFirebaseDatabase().getReference("Users").orderByChild("status_chat");
 
                 query.addValueEventListener(new ValueEventListener() {
                     @Override

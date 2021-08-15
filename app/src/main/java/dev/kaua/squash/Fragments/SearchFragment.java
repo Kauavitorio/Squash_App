@@ -2,6 +2,7 @@ package dev.kaua.squash.Fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,16 +12,32 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
+
 import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Adapters.Posts_Adapters;
 import dev.kaua.squash.Data.Account.AsyncUser_Search;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Data.Post.AsyncRecommended_Posts_feed;
+import dev.kaua.squash.Data.Post.DtoPost;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -33,7 +50,10 @@ public class SearchFragment extends Fragment {
     private RecyclerView recycler_post_feed;
     private TextView txt_empty_feed;
     private View view;
+    private long size = 0;
+    private static DatabaseReference reference_posts;
     private static SearchFragment instance;
+    private static DaoFollowing daoFollowing;
     private DtoAccount account;
 
     @Nullable
@@ -57,7 +77,7 @@ public class SearchFragment extends Fragment {
             edit_search.setText(null);
         });
 
-        swipe_post_feed.setOnRefreshListener(this::loadFeed);
+        swipe_post_feed.setOnRefreshListener(this::Apply_ArrayList);
 
         return view;
     }
@@ -70,15 +90,87 @@ public class SearchFragment extends Fragment {
         asyncProductsSearchMain.execute();
     }
 
+    final ArrayList<DtoPost> arrayListDto = new ArrayList<>();
+    Posts_Adapters posts_adapters = null;
     private void loadFeed() {
-        AsyncRecommended_Posts_feed async = new AsyncRecommended_Posts_feed(requireContext(), recycler_post_feed, swipe_post_feed, txt_empty_feed);
-        async.execute();
+        reference_posts = null;
+        if(getContext() != null){
+            daoFollowing = new DaoFollowing(getContext());
+            if(ConnectionHelper.isOnline(getContext())){
+                reference_posts = myFirebaseHelper.getFirebaseDatabase().getReference("Posts").child("Published");
+                reference_posts.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot datasnapshot) {
+                        arrayListDto.clear();
+                        for(DataSnapshot snapshot: datasnapshot.getChildren()){
+                            DtoPost post = snapshot.getValue(DtoPost.class);
+                            if(post != null && getContext() != null){
+                                if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))) != MyPrefs.getUserInformation(getContext()).getAccount_id()
+                                        && !daoFollowing.check_if_follow(MyPrefs.getUserInformation(getContext()).getAccount_id(),
+                                        Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))))){
+                                    post.setPost_id(EncryptHelper.decrypt(post.getPost_id()));
+                                    post.setAccount_id(EncryptHelper.decrypt(post.getAccount_id()));
+                                    post.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
+                                    post.setName_user(EncryptHelper.decrypt(post.getName_user()));
+                                    post.setUsername(EncryptHelper.decrypt(post.getUsername()));
+                                    post.setProfile_image(EncryptHelper.decrypt(post.getProfile_image()));
+                                    post.setPost_date(EncryptHelper.decrypt(post.getPost_date()));
+                                    post.setPost_time(EncryptHelper.decrypt(post.getPost_time()));
+                                    post.setPost_content(EncryptHelper.decrypt(post.getPost_content()));
+                                    if(post.getPost_images() != null && post.getPost_images().size() != 0) post.setPost_images(post.getPost_images());
+                                    else post.setPost_images(null);
+                                    post.setPost_likes(EncryptHelper.decrypt(post.getPost_likes()));
+                                    post.setPost_comments_amount(EncryptHelper.decrypt(post.getPost_comments_amount()));
+                                    post.setPost_topic(EncryptHelper.decrypt(post.getPost_topic()));
+                                    post.setSuggestion(false);
+                                    arrayListDto.add(post);
+                                }
+                            }
+                        }
+                        if(size != arrayListDto.size())
+                            swipe_post_feed.setRefreshing(true);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+            }
+        }
     }
 
     @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
-        if (visible) LoadSearch();
+        if (visible){
+            if(getContext() != null){
+                Toolbar toolbar = view.findViewById(R.id.toolbar_search);
+                ((AppCompatActivity)requireActivity()).setSupportActionBar(toolbar);
+                Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("");
+                Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+                Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayShowTitleEnabled(false); // Hide default toolbar title
+                toolbar.setNavigationOnClickListener(v -> MainActivity.getInstance().LoadMainFragment());
+
+                Apply_ArrayList();
+            }
+        }
+    }
+
+    private void Apply_ArrayList() {
+        swipe_post_feed.setRefreshing(true);
+        if(size != arrayListDto.size()) Collections.shuffle(arrayListDto);
+        posts_adapters = new Posts_Adapters(arrayListDto, getContext());
+        if(arrayListDto.size() > 0) posts_adapters.notifyItemRangeChanged(0, arrayListDto.size()-1);
+        if (arrayListDto.size() <= 0){
+            swipe_post_feed.setVisibility(View.GONE);
+            txt_empty_feed.setVisibility(View.VISIBLE);
+        }else{
+            size = arrayListDto.size();
+            recycler_post_feed.setAdapter(posts_adapters);
+            recycler_post_feed.getRecycledViewPool().clear();
+            swipe_post_feed.setVisibility(View.VISIBLE);
+            txt_empty_feed.setVisibility(View.GONE);
+            new Handler().postDelayed(() -> swipe_post_feed.setRefreshing(false), 500);
+        }
     }
 
     private void Ids(@NonNull View view) {
@@ -90,6 +182,9 @@ public class SearchFragment extends Fragment {
         recycler_post_feed = view.findViewById(R.id.recycler_post_feed);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext());
         recycler_post_feed.setLayoutManager(linearLayoutManager);
+        swipe_post_feed.setVisibility(View.GONE);
+        txt_empty_feed.setVisibility(View.VISIBLE);
         loadFeed();
+        LoadSearch();
     }
 }

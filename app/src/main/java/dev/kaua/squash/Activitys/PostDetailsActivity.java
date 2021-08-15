@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,6 +24,8 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -45,12 +50,15 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncComments_Posts;
-import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
@@ -236,6 +244,29 @@ public class PostDetailsActivity extends AppCompatActivity {
 
                             swipeRefreshLayout_comments.setVisibility(View.VISIBLE);
                             current_comments++;
+
+                            //  Update post comment number
+                            DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                            Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
+                                    .equalTo(EncryptHelper.encrypt(post_id + ""));
+
+                            final long FinalCurrent_comments = current_comments;
+                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                        HashMap<String, Object> hashMap = new HashMap<>();
+                                        hashMap.put("post_comments_amount", EncryptHelper.encrypt(FinalCurrent_comments + ""));
+                                        appleSnapshot.getRef().updateChildren(hashMap);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NotNull DatabaseError databaseError) {
+                                    Log.e("PostsAdapter", "onCancelled", databaseError.toException());
+                                }
+                            });
+
                             txt_comments_post.setText(Methods.NumberTrick(current_comments));
                             btn_post_comment.setEnabled(true);
                             container_compose_comment.setVisibility(View.GONE);
@@ -282,39 +313,60 @@ public class PostDetailsActivity extends AppCompatActivity {
                 DtoAccount user = MyPrefs.getUserInformation(this);
 
                 boolean result_like = daoPosts.get_A_Like(post_id, Long.parseLong(user.getAccount_id() + ""));
+                long like_now = current_likes;
                 if(result_like) {
                     img_heart_like_post.setImageDrawable(getDrawable(R.drawable.ic_heart));
-                    long like_now = current_likes;
                     like_now = like_now - 1;
-                    txt_likes_post.setText(Methods.NumberTrick(like_now));
+                    daoPosts.delete_like(post_id, Long.parseLong(user.getAccount_id() + ""));
                 }else{
                     img_heart_like_post.setImageDrawable(getDrawable(R.drawable.red_heart));
-                    long like_now = current_likes;
                     like_now = like_now + 1;
-                    txt_likes_post.setText(Methods.NumberTrick(like_now));
+                    daoPosts.Register_A_Like(post_id, Long.parseLong(user.getAccount_id() + ""));
                 }
+                if(like_now >= 0){
+                    txt_likes_post.setText(Methods.NumberTrick(like_now));
+                    current_likes = like_now;
 
-                //  Do Like or Un Like
-                DtoPost dtoPost = new DtoPost();
-                dtoPost.setPost_id(EncryptHelper.encrypt(post_id + ""));
-                dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
-                PostServices services = retrofit.create(PostServices.class);
-                Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
-                call.enqueue(new Callback<DtoPost>() {
-                    @Override
-                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                        AsyncLikes_Posts async = new AsyncLikes_Posts(PostDetailsActivity.this , Long.parseLong(user.getAccount_id() + ""));
-                        //noinspection unchecked
-                        async.execute();
-                        try {
-                            MainFragment.RefreshRecycler();
-                        }catch (Exception ex){
-                            Log.d("Post_Details", ex.getMessage());
+                    //  Set posts like in firebase
+                    DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                    Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
+                            .equalTo(EncryptHelper.encrypt(post_id + ""));
+
+                    final long finalLike_now = like_now;
+                    applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("post_likes", EncryptHelper.encrypt(finalLike_now + ""));
+                                appleSnapshot.getRef().updateChildren(hashMap);
+                            }
                         }
-                    }
-                    @Override
-                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(PostDetailsActivity.this); }
-                });
+                        @Override
+                        public void onCancelled(@NotNull DatabaseError databaseError) {
+                            Log.e("PostInfo", "onCancelled", databaseError.toException());
+                        }
+                    });
+
+                    //  Do Like or Un Like
+                    DtoPost dtoPost = new DtoPost();
+                    dtoPost.setPost_id(EncryptHelper.encrypt(post_id + ""));
+                    dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
+                    PostServices services = retrofit.create(PostServices.class);
+                    Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
+                    call.enqueue(new Callback<DtoPost>() {
+                        @Override
+                        public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                            try {
+                                MainFragment.RefreshRecycler();
+                            }catch (Exception ex){
+                                Log.d("Post_Details", ex.getMessage());
+                            }
+                        }
+                        @Override
+                        public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(PostDetailsActivity.this); }
+                    });
+                }
             }
             else Warnings.NeedLoginWithShortCutAlert(this, 0);
         });
@@ -354,9 +406,10 @@ public class PostDetailsActivity extends AppCompatActivity {
 
                     if(account_chat.getAccount_id_cry() != null){
                         if(account_chat.getUsername().equals(EncryptHelper.decrypt(post_info.getUsername())) && account_chat.getChat_id().equals("go")
-                        && !base_comment.equals(comment)){
-                            sendNotification(account_chat.getId(),MyPrefs.getUserInformation(PostDetailsActivity.this).getUsername(),
-                                    comment);
+                                && !base_comment.equals(comment)){
+                            if(!account_chat.getId().equals(myFirebaseHelper.getFirebaseUser().getUid()))
+                                sendNotification(account_chat.getId(),MyPrefs.getUserInformation(PostDetailsActivity.this).getUsername(),
+                                        comment);
                             account_chat.setChat_id(account_chat.getId());
                             base_comment = comment;
                         }
@@ -523,7 +576,7 @@ public class PostDetailsActivity extends AppCompatActivity {
 
                         txt_name_user_post.setText(EncryptHelper.decrypt(post_info.getName_user()));
                         txt_username_post.setText("| @" + EncryptHelper.decrypt(post_info.getUsername()));
-                        txt_date_time_post.setText(" • " + EncryptHelper.decrypt(post_info.getPost_time()));
+                        txt_date_time_post.setText(LastSeenRefactor(EncryptHelper.decrypt(post_info.getPost_date())));
                         txt_post_content.setText(EncryptHelper.decrypt(post_info.getPost_content()));
                         Linkify.addLinks(txt_post_content, Linkify.ALL);
                         txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_likes())))));
@@ -557,6 +610,7 @@ public class PostDetailsActivity extends AppCompatActivity {
                                     ic_account_badge_profile_compose_comment.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
                                 else
                                     ic_account_badge_profile_compose_comment.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
+                                BangedAnimation();
                             }else ic_account_badge_profile_compose_comment.setVisibility(View.GONE);
                             container_compose_comment.setVisibility(View.VISIBLE);
                             edit_comment_msg.requestFocus();
@@ -565,6 +619,30 @@ public class PostDetailsActivity extends AppCompatActivity {
                         }
 
                         LoadComments(post_id);
+
+                        //  Get current likes
+                        DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                        Query applesQuery = ref.child("Posts").child("Published").orderByChild("post_id")
+                                .equalTo(EncryptHelper.encrypt(post_id + ""));
+
+                        applesQuery.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
+                                    try {
+                                        DtoPost dtoPost = appleSnapshot.getValue(DtoPost.class);
+                                        if(dtoPost != null){
+                                            txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_likes())))));
+                                            txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_comments_amount())))));
+                                        }
+                                    }catch (Exception ex){
+                                        Log.d("PostDetails", ex.toString());
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {}
+                        });
 
                     }else{
                         Toast.makeText(PostDetailsActivity.this, getString(R.string.post_not_found), Toast.LENGTH_SHORT).show();
@@ -579,6 +657,48 @@ public class PostDetailsActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private String LastSeenRefactor(final String date_get) {
+        String date = date_get;
+        try{
+            final String[] split_date = date.split("/");
+            if(split_date.length >= 5){
+                @SuppressLint("SimpleDateFormat") Date date_change = new SimpleDateFormat("MMMM").parse(split_date[1]);
+                if(date_change != null){
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(date_change);
+                    String mouthNumber = cal.get(Calendar.MONTH) + "";
+                    if(cal.get(Calendar.MONTH) < 10) mouthNumber = "0" + mouthNumber;
+                    date = date.replace(split_date[1], mouthNumber);
+                    char[] chars = date.toCharArray();
+                    chars[10] = ' ';
+                    chars[16] = ' ';
+                    date = new String(chars);
+                }
+            }
+            return Methods.loadLastSeenUser(this, date);
+        }catch (Exception ex){
+            return Methods.loadLastSeenUser(this, date);
+        }
+    }
+
+    void BangedAnimation(){
+
+        final ObjectAnimator oa1 = ObjectAnimator.ofFloat(ic_account_badge_post, "scaleX", 1f, 0f);
+        final ObjectAnimator oa2 = ObjectAnimator.ofFloat(ic_account_badge_post, "scaleX", 0f, 1f);
+        oa1.setInterpolator(new DecelerateInterpolator());
+        oa2.setInterpolator(new AccelerateDecelerateInterpolator());
+        oa1.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                oa2.start();
+            }
+        });
+        oa1.setDuration(1500);
+        oa2.setDuration(1500);
+        oa1.start();
     }
 
     private void LoadComments(long post_id) {

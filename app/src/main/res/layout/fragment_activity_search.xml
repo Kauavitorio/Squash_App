@@ -5,34 +5,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Edit Search -->
-    <AutoCompleteTextView
-        android:id="@+id/edit_Search_Main"
+    <!-- Toolbar Container -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_search"
         android:layout_width="match_parent"
-        android:layout_height="51dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:background="@drawable/custom_edit_register_new"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:hint="@string/search_with_dots"
-        android:imeOptions="actionSearch"
-        android:inputType="text"
-        android:scrollbarSize="4dp"
-        android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="Autofill" />
+        app:popupTheme="@style/MenuStyle"
+        app:theme="@style/ToolbarColoredWeb"
+        app:titleTextColor="@color/black">
+
+        <!-- Edit Search -->
+        <AutoCompleteTextView
+            android:id="@+id/edit_Search_Main"
+            android:layout_width="match_parent"
+            android:layout_height="41dp"
+            android:background="@drawable/custom_edit_register_new"
+            android:hint="@string/search_with_dots"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:scrollbarSize="4dp"
+            android:layout_marginEnd="10dp"
+            android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="Autofill" />
+
+    </androidx.appcompat.widget.Toolbar>
 
     <!-- Post Container -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="5dp"
         android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_Search_Main">
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_search">
 
         <!-- Text empty feed -->
         <TextView

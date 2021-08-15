@@ -42,7 +42,6 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.Fragments.Chat.UsersFragment;
 import dev.kaua.squash.R;
-import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
@@ -61,22 +60,11 @@ public class ChatFragment extends Fragment {
     DatabaseReference reference;
     ViewPaperAdapter viewPaperAdapter;
 
-    @Override
-    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_activity_chat, container, false);
         Ids(view);
-
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
-        ((AppCompatActivity)requireActivity()).setSupportActionBar(toolbar);
-        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("");
-
 
         firebaseUser = myFirebaseHelper.getFirebaseUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
@@ -85,14 +73,19 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
+
     @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
-        if (visible)
+        if (visible){
             if(getContext() != null){
+                Toolbar toolbar = view.findViewById(R.id.toolbar_chat);
+                ((AppCompatActivity)requireActivity()).setSupportActionBar(toolbar);
+                Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("");
                 txt_username_chat.setText(MyPrefs.getUserInformation(getContext()).getName_user());
                 Picasso.get().load(MyPrefs.getUserInformation(getContext()).getProfile_image()).into(profile_image);
             }
+        }
     }
 
     private void loadViewAdapter() {
@@ -139,7 +132,13 @@ public class ChatFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         requireActivity().getMenuInflater().inflate(R.menu.menu_chat, menu);
         super.onCreateOptionsMenu(menu,inflater);
     }
@@ -158,16 +157,9 @@ public class ChatFragment extends Fragment {
                 Intent i = new Intent(requireActivity(), SettingActivity.class);
                 startActivity(i);
                 return true;
-            case R.id.logout:
-                Login.LogOut(requireContext(), 0);
-                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return false;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     private void Ids(@NonNull View view) {

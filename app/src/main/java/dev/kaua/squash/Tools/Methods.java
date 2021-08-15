@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -48,6 +49,7 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.WebActivity;
@@ -59,6 +61,7 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -121,11 +124,17 @@ public abstract class Methods extends MainActivity {
     }
 
     //  Method to return Default Retrofit Builder
+    static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(35, TimeUnit.SECONDS).build();
+
     @NonNull
     @Contract(" -> new")
     public static Retrofit GetRetrofitBuilder(){
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL_HTTPS)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
@@ -154,7 +163,7 @@ public abstract class Methods extends MainActivity {
     public static void LoadFollowersAndFollowing(@NonNull Context context, final int base){
         SharedPreferences sp_First = context.getSharedPreferences("myPrefs", MODE_PRIVATE);
         if(base == 0){
-            AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
+            AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))), AsyncLikes_Posts.NOT_NOTIFY);
             //noinspection unchecked
             async.execute();
             AsyncLikes_Posts_Comment posts_comment = new AsyncLikes_Posts_Comment((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
@@ -162,30 +171,32 @@ public abstract class Methods extends MainActivity {
             posts_comment.execute();
         }
 
-        final Retrofit retrofitUser = GetRetrofitBuilder();
-        SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        DtoAccount account = new DtoAccount();
-        account.setAccount_id_cry(sp.getString("pref_account_id", null));
-        AccountServices services = retrofitUser.create(AccountServices.class);
-        Call<DtoAccount> call = services.get_followers_following(account);
-        call.enqueue(new Callback<DtoAccount>() {
-            @Override
-            public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                if(response.code() == 200){
-                    DtoAccount info = new DtoAccount();
-                    info.setAccount_id(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(sp.getString("pref_account_id", null)))));
-                    assert response.body() != null;
-                    info.setFollowers(response.body().getFollowers());
-                    info.setFollowing(response.body().getFollowing());
-                    DaoAccount daoAccount = new DaoAccount(context);
-                    long lines = daoAccount.Register_Followers_Following(info);
-                    if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
-                    else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+        if(base != 999){
+            final Retrofit retrofitUser = GetRetrofitBuilder();
+            SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+            DtoAccount account = new DtoAccount();
+            account.setAccount_id_cry(sp.getString("pref_account_id", null));
+            AccountServices services = retrofitUser.create(AccountServices.class);
+            Call<DtoAccount> call = services.get_followers_following(account);
+            call.enqueue(new Callback<DtoAccount>() {
+                @Override
+                public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                    if(response.code() == 200){
+                        DtoAccount info = new DtoAccount();
+                        info.setAccount_id(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(sp.getString("pref_account_id", null)))));
+                        assert response.body() != null;
+                        info.setFollowers(response.body().getFollowers());
+                        info.setFollowing(response.body().getFollowing());
+                        DaoAccount daoAccount = new DaoAccount(context);
+                        long lines = daoAccount.Register_Followers_Following(info);
+                        if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
+                        else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+                    }
                 }
-            }
-            @Override
-            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
-        });
+                @Override
+                public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+            });
+        }
     }
 
     //  Method "NumberTrick" is for change number
@@ -260,6 +271,10 @@ public abstract class Methods extends MainActivity {
 
             reference.updateChildren(hashMap);
         }
+    }
+
+    public static String getMonth(int month) {
+        return new DateFormatSymbols().getMonths()[month-1];
     }
 
     //  Method to update typing status for chat system

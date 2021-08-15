@@ -14,6 +14,7 @@ public class myFirebaseHelper {
     private static FirebaseAuth firebaseAuth;
     private static FirebaseUser firebaseUser;
     private static StorageReference firebaseStorage;
+    private static FirebaseStorage firebaseStorageInstance;
     private static FirebaseDatabase firebaseDatabase;
 
     public static FirebaseAnalytics getFirebaseAnalytics(Context context){
@@ -41,6 +42,11 @@ public class myFirebaseHelper {
         return firebaseStorage;
     }
 
+    public static FirebaseStorage getFirebaseStorageInstance(){
+        if (firebaseStorageInstance == null) firebaseStorageInstance = FirebaseStorage.getInstance();
+        return firebaseStorageInstance;
+    }
+
     public static void LogOut(){
         getFirebaseAuth().signOut();
         firebaseAnalytics = null;
@@ -48,5 +54,6 @@ public class myFirebaseHelper {
         firebaseUser = null;
         firebaseStorage = null;
         firebaseDatabase = null;
+        firebaseStorageInstance = null;
     }
 }

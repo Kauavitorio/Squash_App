@@ -23,6 +23,9 @@ public class DtoPost implements Comparable<DtoPost>{
 
     private String likes;
 
+    private String delete_by;
+    private String delete_reason;
+
     private String account_id;
 
     private String account_id_cry;
@@ -69,6 +72,22 @@ public class DtoPost implements Comparable<DtoPost>{
 
     public void setVerification_level(String verification_level) {
         this.verification_level = verification_level;
+    }
+
+    public String getDelete_by() {
+        return delete_by;
+    }
+
+    public void setDelete_by(String delete_by) {
+        this.delete_by = delete_by;
+    }
+
+    public String getDelete_reason() {
+        return delete_reason;
+    }
+
+    public void setDelete_reason(String delete_reason) {
+        this.delete_reason = delete_reason;
     }
 
     public String getLikes() {

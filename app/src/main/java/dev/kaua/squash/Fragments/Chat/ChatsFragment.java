@@ -159,59 +159,61 @@ public class ChatsFragment extends Fragment {
     public static ChatsFragment getInstance(){ return instance; }
 
     ArrayList<DtoAccount> mAccountsBase = new ArrayList<>();
-    boolean reload = true, base_reload = true;
+    boolean reload = true, base_reload = true, can_load = true;
     public void chatList() {
         mAccounts = chatDB.get_CHAT_LIST();
         LoadChatRecycler();
 
         if(getContext() != null)
         if(ConnectionHelper.isOnline(getContext())){
-            mAccounts = new ArrayList<>();
-            reference = FirebaseDatabase.getInstance().getReference("Users");
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                    mAccounts.clear();
-                    for(DataSnapshot snapshot : datasnapshot.getChildren()){
-                        DtoAccount account = snapshot.getValue(DtoAccount.class);
-                        if(account != null){
-                            for(Chatslist chatList : usersList){
-                                if(account.getId() != null && account.getId().equals(chatList.getId())){
-                                    account.setChat_id(chatList.getChat_id());
-                                    mAccounts.add(account);
+            if(can_load){
+                mAccounts = new ArrayList<>();
+                reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users");
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                        mAccounts.clear();
+                        can_load = false;
+                        for(DataSnapshot snapshot : datasnapshot.getChildren()){
+                            DtoAccount account = snapshot.getValue(DtoAccount.class);
+                            if(account != null){
+                                for(Chatslist chatList : usersList){
+                                    if(account.getId() != null && account.getId().equals(chatList.getId())){
+                                        account.setChat_id(chatList.getChat_id());
+                                        mAccounts.add(account);
+                                    }
                                 }
+                            }
+                        }
+
+                        if(mAccountsBase.size() != mAccounts.size()) mAccountsBase.addAll(mAccounts);
+
+                        //  Check if recyclerView need to be updated
+                        for (int i = 0; i < mAccounts.size(); i++){
+                            if(!mAccountsBase.get(i).getStatus_chat().equals(mAccounts.get(i).getStatus_chat()) ||
+                                    !mAccountsBase.get(i).getName_user().equals(mAccounts.get(i).getName_user()) ||
+                                    !mAccountsBase.get(i).getSearch().equals(mAccounts.get(i).getSearch()) ||
+                                    !mAccountsBase.get(i).getImageURL().equals(mAccounts.get(i).getImageURL()) ||
+                                    mAccountsBase.get(i).getVerification_level() != null && !mAccountsBase.get(i).getVerification_level().equals(mAccounts.get(i).getVerification_level())){
+                                reload = true;
                             }
                         }
                     }
 
-                    if(mAccountsBase.size() != mAccounts.size()) mAccountsBase.addAll(mAccounts);
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+                });
+            }
+            if(reload){
+                chatDB.REGISTER_CHAT_LIST(mAccounts);
+                LoadChatRecycler();
+            }
 
-                    //  Check if recyclerView need to be updated
-                    for (int i = 0; i < mAccounts.size(); i++){
-                        if(!mAccountsBase.get(i).getStatus_chat().equals(mAccounts.get(i).getStatus_chat()) ||
-                                !mAccountsBase.get(i).getName_user().equals(mAccounts.get(i).getName_user()) ||
-                                !mAccountsBase.get(i).getSearch().equals(mAccounts.get(i).getSearch()) ||
-                                !mAccountsBase.get(i).getImageURL().equals(mAccounts.get(i).getImageURL()) ||
-                                mAccountsBase.get(i).getVerification_level() != null && !mAccountsBase.get(i).getVerification_level().equals(mAccounts.get(i).getVerification_level())){
-                            reload = true;
-                        }
-                    }
-
-                    if(reload){
-                        chatDB.REGISTER_CHAT_LIST(mAccounts);
-                        LoadChatRecycler();
-                    }
-
-                    if(base_reload){
-                        chatDB.REGISTER_CHAT_LIST(mAccounts);
-                        LoadChatRecycler();
-                        base_reload = false;
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-            });
+            if(base_reload){
+                chatDB.REGISTER_CHAT_LIST(mAccounts);
+                LoadChatRecycler();
+                base_reload = false;
+            }
         }
     }
 

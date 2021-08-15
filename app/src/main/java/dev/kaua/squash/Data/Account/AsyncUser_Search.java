@@ -71,7 +71,7 @@ public class AsyncUser_Search extends AsyncTask {
         super.onPostExecute(arrayListDto);
         SearchItemArrayAdapter adapter = new SearchItemArrayAdapter(context, R.layout.adapter_search_layout, R.id.txt_user_name_search, (ArrayList<DtoAccount>) arrayListDto);
 
-        edit_search.setDropDownBackgroundDrawable(context.getDrawable(R.drawable.background_adapter_search));
+        //edit_search.setDropDownBackgroundDrawable(context.getDrawable(R.drawable.custom_edit_register_new));
         edit_search.setAdapter(adapter);
         edit_search.setOnTouchListener((v, event) -> {
             edit_search.showDropDown();

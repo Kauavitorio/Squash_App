@@ -8,10 +8,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Main Container -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <!-- Toolbar Container -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_profile"
+            app:theme="@style/ToolbarColoredWeb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:titleTextColor="@color/black"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:popupTheme="@style/MenuStyle">
+
+            <!-- Text Username -->
+            <TextView
+                android:id="@+id/txt_username_name"
+                android:layout_width="wrap_content"
+                android:textSize="15sp"
+                android:layout_marginStart="2dp"
+                android:textColor="@color/black"
+                android:layout_height="wrap_content"
+                android:text="@string/username"/>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <!-- User banner  -->
         <!-- Will Be available in future updates -->
@@ -49,8 +71,8 @@
                     <!-- Img User Story -->
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/ic_ProfileUser_profile"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
+                        android:layout_width="63dp"
+                        android:layout_height="63dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_profile_default"
                         app:civ_border_color="@color/base_color"
@@ -87,7 +109,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/btn_create_new_story_profile"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="7dp"
                     android:text="@string/app_name"
                     android:textColor="@color/black"
                     android:textSize="17sp"
@@ -96,25 +118,38 @@
                 <!-- Badge Account -->
                 <ImageView
                     android:id="@+id/ic_account_badge_profile"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_below="@+id/btn_create_new_story_profile"
                     android:layout_marginStart="2dp"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="10dp"
                     android:layout_toEndOf="@+id/txt_user_name"
                     android:src="@drawable/ic_verified_account"
                     android:visibility="gone"
                     tools:ignore="ContentDescription" />
 
-                <!-- Text Username -->
+                <!-- Image Calendar -->
+                <ImageView
+                    android:id="@+id/icon_calendar_profile"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_calendar"
+                    android:layout_marginTop="4dp"
+                    android:layout_below="@+id/txt_user_name"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Text Joined -->
                 <TextView
-                    android:id="@+id/txt_username_name"
+                    android:id="@+id/txt_joined"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/icon_calendar_profile"
                     android:layout_below="@+id/txt_user_name"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginStart="2dp"
                     android:text="@string/app_name"
                     android:textColor="@color/hint_time_message"
-                    android:textSize="15sp" />
+                    android:textSize="17sp" />
 
                 <!-- Container Followers and Followings -->
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -143,7 +178,7 @@
                             android:gravity="center"
                             android:text="@string/following"
                             android:textColor="@color/black"
-                            android:textSize="18sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -156,7 +191,7 @@
                             android:gravity="center"
                             android:text="@string/following"
                             android:textColor="@color/black"
-                            android:textSize="18sp" />
+                            android:textSize="17sp" />
 
                     </LinearLayout>
 
@@ -177,7 +212,7 @@
                             android:layout_gravity="center"
                             android:text="@string/followers"
                             android:textColor="@color/black"
-                            android:textSize="18sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
 
@@ -189,7 +224,7 @@
                             android:layout_marginTop="5dp"
                             android:text="@string/following"
                             android:textColor="@color/black"
-                            android:textSize="18sp" />
+                            android:textSize="17sp" />
 
                     </LinearLayout>
 
@@ -197,7 +232,7 @@
 
             </RelativeLayout>
 
-            <!-- Container Bio and Main Button -->
+            <!-- Container Bio and Buttons -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -213,33 +248,42 @@
                     android:textColor="@color/black"
                     android:textSize="17sp" />
 
-                <!-- Btn Follow / Following -->
-                <Button
-                    android:id="@+id/btn_follow_following_profile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="35dp"
+                <!-- Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
                     android:layout_below="@+id/txt_user_bio_profile"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/background_button_follow"
-                    android:minWidth="200dp"
-                    android:text="@string/follow"
-                    android:textColor="@color/black" />
+                    android:orientation="horizontal">
 
-                <!-- Img Btn Chat -->
-                <ImageView
-                    android:id="@+id/btn_go_chat_profile"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_below="@+id/txt_user_bio_profile"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_toEndOf="@id/btn_follow_following_profile"
-                    android:src="@drawable/ic_chat_dark_profile"
-                    tools:ignore="ContentDescription" />
+                    <!-- Btn Follow / Following -->
+                    <Button
+                        android:id="@+id/btn_follow_following_profile"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/background_button_follow"
+                        android:minWidth="200dp"
+                        android:text="@string/follow"
+                        android:textColor="@color/white"
+                        tools:ignore="ButtonStyle" />
+
+                    <!-- Btn Chat -->
+                    <Button
+                        android:id="@+id/btn_go_chat_profile"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/background_button_following"
+                        android:minWidth="200dp"
+                        android:text="@string/message"
+                        android:textColor="@color/black"
+                        tools:ignore="ButtonStyle" />
+
+                </LinearLayout>
 
             </RelativeLayout>
 
@@ -267,10 +311,10 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView_Posts_profile"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout_body_profile" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
 </ScrollView>

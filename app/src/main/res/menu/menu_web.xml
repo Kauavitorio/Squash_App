@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/report_webSite"
+        android:visible="false"
         android:title="@string/report_website"
         app:showAsAction="never"/>
 

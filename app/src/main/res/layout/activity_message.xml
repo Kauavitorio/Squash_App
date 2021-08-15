@@ -172,6 +172,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
+                android:maxHeight="100dp"
                 android:visibility="gone">
 
                 <androidx.cardview.widget.CardView
@@ -189,6 +190,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
+                    <!-- Reply message -->
                     <TextView
                         android:id="@+id/txtQuotedMsg"
                         android:layout_width="wrap_content"
@@ -198,7 +200,9 @@
                         android:padding="8dp"
                         android:textColor="@color/hint"
                         android:textSize="14sp"
-                        tools:text=" h ghgdhg fgd" />
+                        android:maxLength="145"
+                        tools:text="This is a test message" />
+
                 </androidx.cardview.widget.CardView>
 
                 <ImageButton
@@ -420,6 +424,39 @@
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/halloween_pumpkin_black_cat" />
 
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Scroll Button -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/btn_scroll_down_chat"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/recycler_view_msg"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_scroll_down"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            app:cardBackgroundColor="@color/base_color"
+            app:cardCornerRadius="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:src="@drawable/icon_arrow_down"
+                tools:ignore="ContentDescription" />
+
+        </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

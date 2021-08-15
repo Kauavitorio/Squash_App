@@ -16,20 +16,29 @@ import androidx.core.app.ActivityOptionsCompat;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Objects;
 
+import dev.kaua.squash.Activitys.EditProfileActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.SignInActivity;
 import dev.kaua.squash.Activitys.SplashActivity;
 import dev.kaua.squash.Activitys.ValidateEmailActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoChat;
@@ -63,6 +72,7 @@ public abstract class Login {
     //  Set preferences
     private static SharedPreferences mPrefs;
     private static FirebaseAnalytics mFirebaseAnalytics;
+    private static DatabaseReference reference;
 
     static final Retrofit retrofitUser = Methods.GetRetrofitBuilder();
 
@@ -114,6 +124,10 @@ public abstract class Login {
                     editor.putString("pref_password", EncryptHelper.encrypt(password));
                     editor.putString("pref_verification_level", response.body().getVerification_level());
                     editor.apply();
+
+                    AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getAccount_id_cry()))), AsyncLikes_Posts.NOT_NOTIFY);
+                    //noinspection unchecked
+                    async.execute();
 
                     //  Getting Followers and Followings
                     Methods.LoadFollowersAndFollowing(context, 1);
@@ -209,10 +223,41 @@ public abstract class Login {
                     if(response.body() != null){
                         //  Clear all prefs before login user
                         mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-                        mPrefs.edit().clear().apply();
 
+                        if(MyPrefs.getUserInformation(context).getVerification_level() != null && !MyPrefs.getUserInformation(context).getVerification_level().equals(EncryptHelper.decrypt(response.body().getVerification_level()))){
+                            //  Register new user on Firebase Database
+                            reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("verification_level", response.body().getVerification_level());
+
+                            reference.updateChildren(hashMap).addOnCompleteListener(task1 -> {
+                                if(task1.isSuccessful()) Log.d(TAG, "Register in Realtime database Successful");
+                            });
+
+                            //  Update all user posts
+                            DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                            Query applesQuery = ref.child("Posts").child("Published").orderByChild("account_id")
+                                    .equalTo(EncryptHelper.encrypt(MyPrefs.getUserInformation(context).getAccount_id() + ""));
+                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                        HashMap<String, Object> hashMap = new HashMap<>();
+                                        hashMap.put("verification_level", response.body().getVerification_level());
+                                        appleSnapshot.getRef().updateChildren(hashMap);
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NotNull DatabaseError databaseError) {
+                                    Log.e("EditProfile", "onCancelled", databaseError.toException());
+                                }
+                            });
+                        }
+
+                        mPrefs.edit().clear().apply();
                         //  Add User prefs
                         SharedPreferences.Editor editor = mPrefs.edit();
+                        //noinspection ConstantConditions
                         editor.putString("pref_account_id", response.body().getAccount_id_cry());
                         editor.putString("pref_uid", response.body().getUID());
                         editor.putString("pref_name_user", response.body().getName_user());

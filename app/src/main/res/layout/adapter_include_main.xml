@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <!-- Main Container -->
@@ -107,38 +108,25 @@
             android:layout_height="match_parent"
             android:gravity="center" >
 
-            <ProgressBar
-                android:id="@+id/loading_posts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:indeterminate="true"
-                android:layout_marginTop="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <!-- No Post Main Container -->
             <androidx.cardview.widget.CardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/loading_posts"
-                android:layout_marginTop="40dp"
-                android:minWidth="300dp"
-                android:layout_marginBottom="20dp"
                 android:maxWidth="350dp"
+                android:minWidth="300dp"
                 app:cardBackgroundColor="#E5E5E5"
                 app:cardCornerRadius="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/loading_posts">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <!-- Main Container -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="300dp"
                     android:maxWidth="350dp"
+                    android:minWidth="300dp"
                     android:padding="10dp">
 
                     <!-- Cat Animation -->
@@ -157,11 +145,11 @@
                     <!-- Reason Empty TimeLine -->
                     <TextView
                         android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/desc_reason_empty_timeline"
                         android:textAlignment="center"
                         android:textColor="@color/black"
                         android:textSize="16sp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/desc_reason_empty_timeline"
                         app:layout_constraintEnd_toStartOf="@+id/anim_cat_main"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -174,22 +162,14 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Swipe Posts -->
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        <!-- Posts -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_Posts"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/swipe_posts"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/header_main"
-            android:layout_marginTop="5dp">
-
-            <!-- Container To Posts -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView_Posts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="visible"/>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            android:layout_marginTop="5dp"
+            android:visibility="visible"/>
 
     </RelativeLayout>
 

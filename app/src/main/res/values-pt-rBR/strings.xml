@@ -99,7 +99,7 @@
     <string name="desc_remove_image_post">Quer remover a imagem selecionada da sua postagem?</string>
     <string name="username_is_already_in_use">Nome de usuário já está em uso.</string>
     <string name="required_field">Campo obrigatório</string>
-    <string name="desc_reason_empty_timeline">Olá, sua linha do tempo está vazia porque você ainda não segue ninguém</string>
+    <string name="desc_reason_empty_timeline">Olá, sua linha do tempo está vazia, é a hora de você mostrar seus interesses para o mundo, faça sua primeira postagem</string>
     <string name="username">Username</string>
     <string name="delete_post">Apagar a postagem</string>
     <string name="delete_post_message">Deseja realmente apagar sua postagem?\nIsso resultara na perda das curtidas e comentarios.</string>
@@ -161,4 +161,13 @@
     <string name="copy_message">Copiar mensagem</string>
     <string name="delete_messag">Apagar mensagem</string>
     <string name="copied_message">Mensagem copiada</string>
+    <string name="really_want_to_log_out">Tem certeza de que deseja sair da sua conta?</string>
+    <string name="share_using">Compartilhar usando</string>
+    <string name="problem_performing_this_action">Ocorreu um problema ao executar esta ação, tente novamente.</string>
+    <string name="message">Mensagem</string>
+    <string name="joined">Entrou</string>
+    <string name="reason">Motivo</string>
+    <string name="desc_delete_post_report">Você está prestes à deletar este post. É necessário que informe o motivo de o mesmo estar deletando este post, pois a mensagem que será escrita abaixo, será a mesma recebida pelo usuário.</string>
+    <string name="need_to_insert_reason_delete_post">É necessário especificar o motivo da remoção, mínimo de caracteres: 20.</string>
+    <string name="unable_to_reply_to_this_message">Incapaz de responder a esta mensagem.</string>
 </resources>

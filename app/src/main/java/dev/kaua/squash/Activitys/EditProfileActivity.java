@@ -27,8 +27,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.yalantis.ucrop.UCrop;
 
@@ -130,7 +134,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             editor.apply();
 
                             //  Register new user on Firebase Database
-                            reference = FirebaseDatabase.getInstance().getReference("Users").child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
+                            reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
                             HashMap<String, Object> hashMap = new HashMap<>();
 
                             hashMap.put("username", edit_username.getText().toString().trim());
@@ -140,6 +144,29 @@ public class EditProfileActivity extends AppCompatActivity {
 
                             reference.updateChildren(hashMap).addOnCompleteListener(task1 -> {
                                 if(task1.isSuccessful()) Log.d(TAG, "Register in Realtime database Successful");
+                            });
+
+                            //  Update all user posts
+                            DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                            Query applesQuery = ref.child("Posts").child("Published").orderByChild("account_id")
+                                    .equalTo(EncryptHelper.encrypt(MyPrefs.getUserInformation(EditProfileActivity.this).getAccount_id() + ""));
+
+                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                        HashMap<String, Object> hashMap = new HashMap<>();
+                                        hashMap.put("username", EncryptHelper.encrypt(edit_username.getText().toString().trim()));
+                                        hashMap.put("name_user", EncryptHelper.encrypt(edit_name.getText().toString().trim()));
+                                        hashMap.put("profile_image", EncryptHelper.encrypt(new_image));
+                                        appleSnapshot.getRef().updateChildren(hashMap);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NotNull DatabaseError databaseError) {
+                                    Log.e("EditProfile", "onCancelled", databaseError.toException());
+                                }
                             });
 
                             ProfileFragment.getInstance().GetUserInfo(EditProfileActivity.this);
@@ -252,7 +279,9 @@ public class EditProfileActivity extends AppCompatActivity {
             LoadingDialog dialog = new LoadingDialog(this);
             dialog.startLoading();
             try {
-                Glide.with(this)
+                dialog.dismissDialog();
+                Profile_Image.SendToCrop(this, filePath);
+                /*Glide.with(this)
                         .asBitmap()
                         .load(filePath)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -274,7 +303,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             }
                             @Override
                             public void onLoadCleared(@Nullable Drawable placeholder) { }
-                        });
+                        });*/
 
             }catch (Exception ex){
                 dialog.dismissDialog();

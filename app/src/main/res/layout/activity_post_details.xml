@@ -69,8 +69,9 @@
                     <!-- Badge Account -->
                     <ImageView
                         android:id="@+id/ic_account_badge_post"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="3dp"
                         android:src="@drawable/ic_verified_account"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/txt_name_user_post_details"
@@ -91,32 +92,31 @@
                         app:layout_constraintStart_toEndOf="@+id/ic_account_badge_post"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <!-- User DateTime -->
-                    <TextView
-                        android:id="@+id/txt_date_time_post_details"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="10dp"
-                        android:maxLength="20"
-                        android:text="@string/app_name"
-                        android:textColor="@color/hint"
-                        android:textSize="13sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toEndOf="@+id/txt_username_post_details"
-                        app:layout_constraintTop_toTopOf="parent" />
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
+
+            <!-- User DateTime -->
+            <TextView
+                android:id="@+id/txt_date_time_post_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:maxLength="20"
+                android:layout_marginStart="10dp"
+                android:text="@string/app_name"
+                android:textColor="@color/hint"
+                android:textSize="13sp"
+                android:layout_below="@+id/container_user_info_post"
+                android:layout_toEndOf="@+id/icon_user_profile_post_details"/>
+
 
             <!-- Text Post Content -->
             <TextView
                 android:id="@+id/txt_post_content_details"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/container_user_info_post"
+                android:layout_below="@+id/txt_date_time_post_details"
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@+id/icon_user_profile_post_details"
                 android:text="@string/receive_email_terms"
@@ -436,42 +436,67 @@
                     android:layout_marginTop="10dp"
                     app:cardBackgroundColor="@color/base_color"
                     app:cardCornerRadius="10dp"
+                    android:layout_marginBottom="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/edit_comment_msg">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/cancel"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:paddingEnd="5dp"
+                        android:paddingStart="5dp"
+                        android:minWidth="100dp"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:textAlignment="center"
+                            android:text="@string/cancel"
+                            android:minWidth="100dp"
+                            android:textColor="@color/white"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
 
                 <!-- Btn Post Comment -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btn_post_comment"
-                    android:layout_width="100dp"
+                    android:layout_width="wrap_content"
+                    android:minWidth="100dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="10dp"
+                    android:layout_marginBottom="4dp"
                     app:cardBackgroundColor="@color/base_color"
                     app:cardCornerRadius="10dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/edit_comment_msg">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/post"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:paddingEnd="5dp"
+                        android:paddingStart="5dp"
+                        android:minWidth="100dp"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:textAlignment="center"
+                            android:text="@string/post"
+                            android:minWidth="100dp"
+                            android:textColor="@color/white"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
 

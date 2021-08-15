@@ -4,18 +4,42 @@
     android:id="@+id/sheet_menu_post_action"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="20dp"
+    android:padding="10dp"
     android:orientation="vertical"
     android:layout_gravity="center"
     android:background="@drawable/background_sheet_base"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Btn Login Now -->
+    <!-- Btn Delete Post -->
+    <LinearLayout
+        android:id="@+id/btn_delete_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:minWidth="130dp"
+        android:minHeight="50dp"
+        android:background="@drawable/custom_edit_chat"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/hint"
+            android:textSize="17sp"
+            android:text="@string/delete_post"/>
+
+    </LinearLayout>
+
+    <!-- Btn Cancel -->
     <androidx.cardview.widget.CardView
         android:id="@+id/btn_cancel_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
         android:minWidth="130dp"
         android:minHeight="50dp"
@@ -36,30 +60,5 @@
             android:textStyle="bold" />
 
     </androidx.cardview.widget.CardView>
-
-    <!-- Btn No -->
-    <LinearLayout
-        android:id="@+id/btn_delete_post"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="10dp"
-        android:minWidth="130dp"
-        android:minHeight="50dp"
-        android:background="@drawable/background_continue_intro"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:textColor="@color/hint"
-            android:textSize="17sp"
-            android:text="@string/delete_post"/>
-
-    </LinearLayout>
 
 </LinearLayout>

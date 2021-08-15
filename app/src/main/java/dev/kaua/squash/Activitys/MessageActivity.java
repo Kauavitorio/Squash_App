@@ -7,10 +7,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.provider.OpenableColumns;
 import android.text.Editable;
@@ -30,7 +30,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
@@ -42,17 +41,12 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
@@ -117,7 +111,7 @@ import retrofit2.Response;
 public class MessageActivity extends AppCompatActivity {
 
     private CircleImageView profile_image;
-    public static ConstraintLayout container_no_message_yet;
+    public static ConstraintLayout container_no_message_yet, btn_scroll_down_chat;
     public static ImageView background_chat;
     public static ImageView btn_more_medias;
     public static LinearLayout container_edit_text;
@@ -173,7 +167,7 @@ public class MessageActivity extends AppCompatActivity {
     long updatedTime = 0L;
     private Timer timer;
     float x1,x2;
-    static final int MIN_DISTANCE = dp(400);
+    static final int MIN_DISTANCE = dp(380);
     private static AudioRecorder audioRecorder;
 
     @Override
@@ -563,7 +557,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void checkChatList(final String userId) {
-        reference = FirebaseDatabase.getInstance().getReference("Chatslist").child(fUser.getUid());
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference("Chatslist").child(fUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
@@ -625,6 +619,7 @@ public class MessageActivity extends AppCompatActivity {
         txt_isOnline_chat = findViewById(R.id.txt_isOnline_chat);
         btn_rec_audio = findViewById(R.id.container_btn_rec_audio);
         reply_layout = findViewById(R.id.reply_layout);
+        btn_scroll_down_chat = findViewById(R.id.btn_scroll_down_chat);
         background_chat = findViewById(R.id.background_chat);
         container_edit_text = findViewById(R.id.container_edit_text_chat);
         txtQuotedMsg = findViewById(R.id.txtQuotedMsg);
@@ -632,6 +627,7 @@ public class MessageActivity extends AppCompatActivity {
         text_send = findViewById(R.id.text_send);
         btn_send = findViewById(R.id.container_btn_send);
         btn_send.setElevation(0);
+        ((CardView) findViewById(R.id.card_scroll_down)).setElevation(0);
         recycler_view_msg.setHasFixedSize(true);
         recycler_view_msg.setItemViewCacheSize(20);
         recycler_view_msg.setDrawingCacheEnabled(true);
@@ -642,10 +638,32 @@ public class MessageActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.black_intro));
         recordPanel.setVisibility(View.GONE);
         container_edit_text.setVisibility(View.VISIBLE);
+
+        btn_scroll_down_chat.setOnClickListener(v -> {
+            recycler_view_msg.smoothScrollToPosition(recycler_view_msg.getBottom());
+        });
+
+        recycler_view_msg.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if(!scroll_base_down && !can_state_scroll_base_down){
+                    Log.d("MESSAGE_END_TEST", newState + "");
+                    if(recyclerView.canScrollVertically(1)) btn_scroll_down_chat.setVisibility(View.VISIBLE);
+
+                    if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        btn_scroll_down_chat.startAnimation(AnimationUtils.loadAnimation(MessageActivity.this, R.anim.slide_right));
+                        btn_scroll_down_chat.setVisibility(View.GONE);
+                    }
+                }
+            }
+        });
+
+        new Handler().postDelayed(() -> can_state_scroll_base_down = false, 100);
     }
 
     void seenMessage(String userUid){
-        reference = FirebaseDatabase.getInstance().getReference().child("Chats");
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference().child("Chats");
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
@@ -667,45 +685,65 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
+    static SimpleDateFormat df_time;
+    static SimpleDateFormat df_time_id;
+    DatabaseReference reference_message;
+    @SuppressLint("SimpleDateFormat")
     void sendMessage(String sender, String receiver, String message){
-        final Calendar c = Calendar.getInstance();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd-MM-yyyy HH:mm a");
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_id = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        c = Calendar.getInstance();
+        if(df_time == null) df_time = new SimpleDateFormat("dd-MM-yyyy HH:mm a");
+        if(df_time_id == null) df_time_id = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         final String formattedDate = df_time.format(c.getTime());
         final String formattedDate_id = df_time_id.format(c.getTime());
         String id_msg = Methods.shuffle(Methods.RandomCharactersWithoutSpecials(8) + formattedDate_id.replace("-","")
                 .replace(" ","").replace(":","") + Methods.shuffle(fUser.getUid()));
 
-        DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference();
+        if(reference_message == null) reference_message = myFirebaseHelper.getFirebaseDatabase().getReference();
+        final DtoMessage new_message = new DtoMessage();
+
         final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
         hashMap.put("id_msg", id_msg);
+        new_message.setId_msg(id_msg);
+        new_message.setSender(sender);
+        new_message.setReceiver(receiver);
         if(message_to_reply != null && message_to_reply.length() > 0){
             hashMap.put("reply_from", reply_from);
             hashMap.put("reply_content", EncryptHelper.encrypt(message_to_reply));
+            new_message.setReply_from(reply_from);
+            new_message.setReply_content(EncryptHelper.encrypt(message_to_reply));
         }
         else{
             hashMap.put("reply_from", "noOne");
             hashMap.put("reply_content", "empty");
+            new_message.setReply_from("noOne");
+            new_message.setReply_content("empty");
         }
         hashMap.put("message", EncryptHelper.encrypt(message));
         hashMap.put("isSeen", 0);
         hashMap.put("time", EncryptHelper.encrypt(formattedDate));
         hashMap.put("media", medias_pin);
+        new_message.setMessage(EncryptHelper.encrypt(message));
+        new_message.setIsSeen(0);
+        new_message.setTime(EncryptHelper.encrypt(formattedDate));
+        new_message.setMedia(medias_pin);
 
-        reference.child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id))).push().setValue(hashMap);
+        //mMessage.add(new_message);
+        //InsertMessagesInAdapter("");
+
+        reference_message.child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id))).push().setValue(hashMap);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
         chatDB.UPDATE_A_CHAT(user_im_chat, 1);
 
         //  add User to chat fragment
-        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatslist")
+        final DatabaseReference chatRef = myFirebaseHelper.getFirebaseDatabase().getReference("Chatslist")
                 .child(fUser.getUid())
                 .child(userId);
 
-        final DatabaseReference chatRefANOTHER_USER = FirebaseDatabase.getInstance().getReference("Chatslist")
+        final DatabaseReference chatRefANOTHER_USER = myFirebaseHelper.getFirebaseDatabase().getReference("Chatslist")
                 .child(userId)
                 .child(fUser.getUid());
 
@@ -761,7 +799,7 @@ public class MessageActivity extends AppCompatActivity {
         }catch (Exception exception){
             Log.d(TAG, "Cant load list");
         }
-
+        recycler_view_msg.smoothScrollToPosition(recycler_view_msg.getBottom());
         hideReplayLayout();
     }
 
@@ -772,7 +810,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void sendNotification(String receiver, String username, String message, String chat_id){
-        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        DatabaseReference tokens = myFirebaseHelper.getFirebaseDatabase().getReference("Tokens");
         Query query = tokens.orderByKey().equalTo(receiver);
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -809,82 +847,107 @@ public class MessageActivity extends AppCompatActivity {
         readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
     }
 
-    static int joinNow = 0;
+    static boolean can_animate = true;
     static boolean base_load = true;
-    static List<DtoMessage> mMessageFinal = new ArrayList<>();
+    static boolean can_load = true;
+    final static List<DtoMessage> mMessageFinal = new ArrayList<>();
     private static void readMessage(String myID, String userId, String imageURl){
-        Calendar c = Calendar.getInstance();
         mMessage = new ArrayList<>();
-
         if(ConnectionHelper.isOnline(instance)){
-            reference = FirebaseDatabase.getInstance().getReference().child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                    mMessage.clear();
-                    DtoMessage messageBase = new DtoMessage();
-                    messageBase.setSender("base_start");
-                    mMessage.add(messageBase);
-                    for (DataSnapshot snapshot : datasnapshot.getChildren()){
-                        DtoMessage message = snapshot.getValue(DtoMessage.class);
-                        if(message != null)
-                            if(message.getReceiver() != null)
-                                if (message.getReceiver().equals(myID) && message.getSender().equals(userId)
-                                        || message.getReceiver().equals(userId) && message.getSender().equals(myID)){
-                                    mMessage.add(message);
-                                }
-                    }
-                    if(mMessage.size() > 1){
-                        if(mMessageFinal.size() != mMessage.size()) {
-                            Log.d(TAG, "OKAY not need to reset");
-                            if(joinNow <= 100) joinNow++;
-                            else joinNow = 1;
-                        } else joinNow = 0;
-
-                        if(mMessageFinal.size() > 1 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())
-                                || mMessageFinal.size() > 0 && mMessageFinal.get(mMessageFinal.size() -1).getIsSeen() != mMessage.get(mMessage.size() -1).getIsSeen()){
-                            Log.d(TAG, "OKAY NEW MSG OR IS SEEN");
-                            chatDB.REGISTER_CHAT(mMessage, EncryptHelper.decrypt(chat_id));
-                            LoadAdapter(imageURl);
-                            base_load = false;
-
-                            @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                            user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
-                            chatDB.UPDATE_A_CHAT(user_im_chat, 1);
+            if(can_load){
+                reference = myFirebaseHelper.getFirebaseDatabase().getReference().child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot datasnapshot) {
+                        can_load = false;
+                        mMessage.clear();
+                        final DtoMessage messageBase = new DtoMessage();
+                        messageBase.setSender("base_start");
+                        mMessage.add(messageBase);
+                        for (DataSnapshot snapshot : datasnapshot.getChildren()){
+                            DtoMessage message = snapshot.getValue(DtoMessage.class);
+                            if(message != null)
+                                if(message.getReceiver() != null)
+                                    if (message.getReceiver().equals(myID) && message.getSender().equals(userId)
+                                            || message.getReceiver().equals(userId) && message.getSender().equals(myID)){
+                                        mMessage.add(message);
+                                    }
                         }
-
-                        if(base_load) {
-                            chatDB.REGISTER_CHAT(mMessage, EncryptHelper.decrypt(chat_id));
-                            LoadAdapter(imageURl);
-                        }
-
-                        if(!base_load && mMessageFinal.size() != mMessage.size()) LoadAdapter(imageURl);
+                        InsertMessagesInAdapter(imageURl);
                     }
-                }
-
-                @Override
-                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+            }
         }else LoadAdapter(imageURl);
     }
 
+    private static Calendar c;
+    private static Parcelable recyclerViewState;
+    private static void InsertMessagesInAdapter(String imageURl) {
+        c = Calendar.getInstance();
+        if(recycler_view_msg.getLayoutManager() != null) recyclerViewState = recycler_view_msg.getLayoutManager().onSaveInstanceState();
+        if(mMessage.size() > 1){
+
+            if(mMessageFinal.size() > 1 && !mMessageFinal.get(mMessageFinal.size() -1).getMessage().equals(mMessage.get(mMessage.size() -1).getMessage())
+                    || mMessageFinal.size() > 0 && mMessageFinal.get(mMessageFinal.size() -1).getIsSeen() != mMessage.get(mMessage.size() -1).getIsSeen()){
+                Log.d(TAG, "OKAY NEW MSG OR IS SEEN");
+                chatDB.REGISTER_CHAT(mMessage, EncryptHelper.decrypt(chat_id));
+                LoadAdapter(imageURl);
+                base_load = false;
+
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
+                chatDB.UPDATE_A_CHAT(user_im_chat, 1);
+            }
+
+            if(base_load) {
+                chatDB.REGISTER_CHAT(mMessage, EncryptHelper.decrypt(chat_id));
+                LoadAdapter(imageURl);
+            }
+
+            if(!base_load && mMessageFinal.size() != mMessage.size()) LoadAdapter(imageURl);
+        }
+    }
+
     private static void LoadAdapter(String imageURl) {
-        if(mMessageFinal != null && mMessage != null){
+        if(mMessage != null){
+            can_animate = mMessage.size() != mMessageFinal.size();
             mMessageFinal.clear();
             mMessageFinal.addAll(mMessage);
         }
         final List<DtoMessage> LocalMessages = new ArrayList<>();
-        DtoMessage messageBase = new DtoMessage();
+        final DtoMessage messageBase = new DtoMessage();
         messageBase.setSender("base_start");
-        LocalMessages.add(messageBase);
+        if(chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)).size() > 0) LocalMessages.add(messageBase);
         LocalMessages.addAll(chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)));
 
-        if(mMessageFinal != null && !LocalMessages.equals(mMessageFinal)){
+        if(!LocalMessages.equals(mMessageFinal)){
             recycler_view_msg.setItemAnimator(null);
-            messageAdapter = new MessageAdapter(instance, LocalMessages, imageURl, joinNow, recycler_view_msg,
+            messageAdapter = new MessageAdapter(instance, LocalMessages, imageURl, can_animate, recycler_view_msg,
                     MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername(), chat_id);
             messageAdapter.setHasStableIds(true);
             recycler_view_msg.setAdapter(messageAdapter);
+            if(recyclerViewState != null && recycler_view_msg.getLayoutManager() != null) recycler_view_msg.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+        }
+
+        if (isRecyclerScrollable()) {
+            btn_scroll_down_chat.setVisibility(View.VISIBLE);
+        }else btn_scroll_down_chat.setVisibility(View.GONE);
+    }
+
+    static boolean scroll_base_down = true;
+    static boolean can_state_scroll_base_down = true;
+    public static boolean isRecyclerScrollable() {
+        if(!scroll_base_down && !can_state_scroll_base_down){
+            LinearLayoutManager layoutManager = (LinearLayoutManager) recycler_view_msg.getLayoutManager();
+            //noinspection rawtypes
+            RecyclerView.Adapter adapter = recycler_view_msg.getAdapter();
+            if (layoutManager == null || adapter == null) return false;
+            return layoutManager.findLastCompletelyVisibleItemPosition() < adapter.getItemCount() - 1;
+        }else {
+            scroll_base_down = false;
+            return false;
         }
     }
 
@@ -899,7 +962,11 @@ public class MessageActivity extends AppCompatActivity {
         SwipeReply swipeReplyController = new SwipeReply(this, position -> {
             //GET YOUR ADAPTER ITEM ON WHICH THE SWIPE REPLY IS CALLED
             DtoMessage message = MessageAdapter.ViewHolder.GetMessage(position);
-            showQuotedMessage(EncryptHelper.decrypt(message.getMessage()), message.getSender());
+            if(message != null){
+                String msg = EncryptHelper.decrypt(message.getMessage());
+                if(msg != null)
+                    showQuotedMessage(msg, message.getSender());
+            } else ToastHelper.toast(this, getString(R.string.unable_to_reply_to_this_message), ToastHelper.SHORT_DURATION);
         });
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeReplyController);
@@ -907,14 +974,17 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void showQuotedMessage(String msg, String from){
-        message_to_reply = msg;
-        reply_from = from;
-        text_send.requestFocus();
-        KeyboardUtils.showKeyboard(this);
-        txtQuotedMsg.setText(msg);
-        reply_layout.setVisibility(View.VISIBLE);
-        btn_rec_audio.setVisibility(View.GONE);
-        btn_send.setVisibility(View.VISIBLE);
+        if(msg != null &&  from != null){
+            message_to_reply = msg;
+            reply_from = from;
+            text_send.requestFocus();
+            KeyboardUtils.showKeyboard(this);
+            if(msg.length() > 142)  msg = msg.substring(0, 142) + "...";
+            txtQuotedMsg.setText(msg);
+            reply_layout.setVisibility(View.VISIBLE);
+            btn_rec_audio.setVisibility(View.GONE);
+            btn_send.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideReplayLayout() {
@@ -1009,7 +1079,8 @@ public class MessageActivity extends AppCompatActivity {
             LoadingDialog dialog = new LoadingDialog(this);
             dialog.startLoading();
             try {
-                Glide.with(this)
+                Upload_Image(dialog, filePath);
+                /*Glide.with(this)
                         .asBitmap()
                         .load(filePath)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -1031,7 +1102,7 @@ public class MessageActivity extends AppCompatActivity {
                             }
                             @Override
                             public void onLoadCleared(@Nullable Drawable placeholder) { }
-                        });
+                        });*/
 
             }catch (Exception ex){
                 dialog.dismissDialog();
