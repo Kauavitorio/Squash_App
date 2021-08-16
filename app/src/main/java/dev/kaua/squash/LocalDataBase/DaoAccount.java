@@ -18,7 +18,7 @@ public class DaoAccount extends SQLiteOpenHelper {
 
 
     public DaoAccount(@Nullable Context context) {
-        super(context, "DB_ACCOUNT", null, 2);
+        super(context, "DB_ACCOUNT", null, 3);
     }
 
     @Override

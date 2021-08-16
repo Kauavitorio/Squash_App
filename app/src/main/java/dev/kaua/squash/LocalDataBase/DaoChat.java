@@ -27,7 +27,7 @@ public class DaoChat extends SQLiteOpenHelper {
     public static final int DROP_ALL = 999;
 
     public DaoChat(@Nullable Context context) {
-        super(context, "DB_CHAT", null, 25);
+        super(context, "DB_CHAT", null, 38);
     }
 
     @Override
@@ -239,8 +239,8 @@ public class DaoChat extends SQLiteOpenHelper {
                     getWritableDatabase().update(TABLE_CHAT_LIST, values, where, params);
                 }
             }else{
+                ContentValues values = new ContentValues();
                 if(where_is_updating != 0){
-                    ContentValues values = new ContentValues();
                     values.put("last_chat", account.getLast_chat());
                     values.put("account_id_cry",account.getAccount_id_cry());
                     values.put("id", account.getId());
@@ -254,15 +254,14 @@ public class DaoChat extends SQLiteOpenHelper {
                     values.put("username", account.getUsername());
                     values.put("chat_id", account.getChat_id());
 
-                    getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
                 }else{
-                    ContentValues values = new ContentValues();
-                    values.put("last_chat", account.getLast_chat());
+                    values.put("last_chat", account.getStatus_chat());
                     values.put("id", account.getId());
                     values.put("chat_id", account.getChat_id());
+                    values.put("name_user", account.getName_user());
 
-                    getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
                 }
+                getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
             }
         }
 

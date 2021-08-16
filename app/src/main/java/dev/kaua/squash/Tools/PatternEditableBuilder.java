@@ -1,4 +1,5 @@
 package dev.kaua.squash.Tools;
+
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -11,25 +12,25 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
+/**
      Create clickable spans within a TextView
      made easy with pattern matching!
      Created by: Nathan Esquenazi
      Usage 1: Apply spannable strings to a TextView based on pattern
-        new PatternEditableBuilder().
-           addPattern(Pattern.compile("\\@(\\w+)")).
-           into(textView);
+     new PatternEditableBuilder().
+     addPattern(Pattern.compile("\\@(\\w+)")).
+     into(textView);
      Usage 2: Apply clickable spans to a TextView
-         new PatternEditableBuilder().
-             addPattern(Pattern.compile("\\@(\\w+)"), Color.BLUE,
-             new PatternEditableBuilder.SpannableClickedListener() {
-                @Override
-                public void onSpanClicked(String text) {
-                    // Do something here
-                }
-             }).into(textView);
+     new PatternEditableBuilder().
+     addPattern(Pattern.compile("\\@(\\w+)"), Color.BLUE,
+     new PatternEditableBuilder.SpannableClickedListener() {
+        @Override
+        public void onSpanClicked(String text) {
+            // Do something here
+        }
+        }).into(textView);
      See README for more details.
- */
+ **/
 
 public class PatternEditableBuilder {
     // Records the pattern spans to apply to a TextView
@@ -37,7 +38,7 @@ public class PatternEditableBuilder {
 
     /* This stores a particular pattern item
        complete with pattern, span styles, and click listener */
-    public class SpannablePatternItem {
+    public static class SpannablePatternItem {
         public SpannablePatternItem(Pattern pattern, SpannableStyleListener styles, SpannableClickedListener listener) {
             this.pattern = pattern;
             this.styles = styles;
@@ -74,7 +75,7 @@ public class PatternEditableBuilder {
        to handle user clicks to our pattern spans
        applying the styles and invoking click listener.
      */
-    public class StyledClickableSpan extends ClickableSpan {
+    public static class StyledClickableSpan extends ClickableSpan {
         SpannablePatternItem item;
 
         public StyledClickableSpan(SpannablePatternItem item) {

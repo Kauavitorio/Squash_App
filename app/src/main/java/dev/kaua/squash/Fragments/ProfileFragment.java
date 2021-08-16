@@ -48,6 +48,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.EditProfileActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.MessageActivity;
+import dev.kaua.squash.Activitys.QrCodeActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
@@ -89,6 +90,7 @@ public class ProfileFragment extends Fragment {
     private static Button btn_follow_following_profile, btn_go_chat_profile;
     private RelativeLayout noPost_profile;
     private CardView btn_plus_story_profile;
+    private ImageView btn_qr_code;
     private String username;
     private RecyclerView recyclerView_Posts_profile;
 
@@ -250,7 +252,9 @@ public class ProfileFragment extends Fragment {
                         DtoAccount account = new DtoAccount();
                         account_another_user = Long.parseLong(bundle.getString("account_id"));
                         account.setAccount_id_cry(EncryptHelper.encrypt(bundle.getString("account_id")));
-                        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);
+                        DtoAccount search_account = new DtoAccount();
+                        search_account.setAccount_id(account_another_user);
+                        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, search_account);
                         AccountServices services = retrofitUser.create(AccountServices.class);
                         Call<DtoAccount> call = services.getUserInfo(account);
                         call.enqueue(new Callback<DtoAccount>() {
@@ -260,6 +264,7 @@ public class ProfileFragment extends Fragment {
                                 loadingDialog.dismissDialog();
                                 if(response.code() == 200){
                                     if(response.body() != null){
+
                                         Glide.with(requireActivity()).load(EncryptHelper.decrypt(response.body().getProfile_image())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                                 .into(ic_ProfileUser_profile);
                                         txt_user_name.setText(EncryptHelper.decrypt(response.body().getName_user()));
@@ -284,7 +289,7 @@ public class ProfileFragment extends Fragment {
                                             ic_account_badge_profile.setVisibility(View.VISIBLE);
                                             BangedAnimation();
                                         }
-                                        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, account);
+                                        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, search_account);
 
                                         DaoFollowing daoFollowing = new DaoFollowing(getContext());
                                         ArrayList<DtoAccount> accounts = daoFollowing.get_followers_following(account_id, Long.parseLong(bundle.getString("account_id")));
@@ -296,6 +301,16 @@ public class ProfileFragment extends Fragment {
                                         }
                                         MainActivity.getInstance().ResetBundleProfile();
                                         timer.postDelayed(() -> control++,500);
+
+                                        btn_qr_code.setVisibility(View.GONE);
+                                        /*btn_qr_code.setOnClickListener(v -> {
+                                            Intent i = new Intent(requireContext(), QrCodeActivity.class);
+                                            i.putExtra("image_profile", EncryptHelper.decrypt(response.body().getProfile_image()));
+                                            i.putExtra("name_user", EncryptHelper.decrypt(response.body().getName_user()));
+                                            i.putExtra("username", EncryptHelper.decrypt(response.body().getUsername()));
+                                            i.putExtra("account_id", account_another_user);
+                                            startActivity(i);
+                                        });*/
                                     }
                                 }else{
                                     ToastHelper.toast(requireActivity(), getString(R.string.user_not_found), 0);
@@ -341,8 +356,13 @@ public class ProfileFragment extends Fragment {
 
         DaoAccount db = new DaoAccount(activity);
         DtoAccount account_follow = db.get_followers_following(account_id);
-        txt_amount_following_profile.setText(Methods.NumberTrick(Integer.parseInt(account_follow.getFollowing())));
-        txt_amount_followers_profile.setText(Methods.NumberTrick(Integer.parseInt(account_follow.getFollowers())));
+        if(account_follow != null && account_follow.getFollowing() != null && account_follow.getFollowers() != null){
+            txt_amount_following_profile.setText(Methods.NumberTrick(Long.parseLong(account_follow.getFollowing())));
+            txt_amount_followers_profile.setText(Methods.NumberTrick(Long.parseLong(account_follow.getFollowers())));
+        }else{
+            txt_amount_following_profile.setText(Methods.NumberTrick(0));
+            txt_amount_followers_profile.setText(Methods.NumberTrick(0));
+        }
 
         int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(user.getVerification_level())));
         if(verified != 0){
@@ -366,6 +386,18 @@ public class ProfileFragment extends Fragment {
         btn_follow_following_profile.setTextColor(activity.getColor(R.color.black));
         Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
         LoadUserMentions();
+
+        btn_qr_code.setVisibility(View.VISIBLE);
+        btn_qr_code.setOnClickListener(v -> {
+            if(ConnectionHelper.isOnline(requireContext())){
+                Intent i = new Intent(requireContext(), QrCodeActivity.class);
+                i.putExtra("image_profile", user.getProfile_image());
+                i.putExtra("name_user", user.getName_user());
+                i.putExtra("username", user.getUsername());
+                i.putExtra("account_id", account_id);
+                startActivity(i);
+            }else ToastHelper.toast(requireActivity(), getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
+        });
     }
 
     private void Ids(View view) {
@@ -374,6 +406,7 @@ public class ProfileFragment extends Fragment {
         img_banner_profile = view.findViewById(R.id.img_banner_profile);
         btn_go_chat_profile = view.findViewById(R.id.btn_go_chat_profile);
         btn_plus_story_profile = view.findViewById(R.id.btn_plus_story_profile);
+        btn_qr_code = view.findViewById(R.id.btn_qr_code_profile);
         txt_joined = view.findViewById(R.id.txt_joined);
         recyclerView_Posts_profile = view.findViewById(R.id.recyclerView_Posts_profile);
         noPost_profile = view.findViewById(R.id.noPost_profile);

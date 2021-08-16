@@ -30,6 +30,7 @@ import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
+import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.MyPrefs;
 
 /**
@@ -108,7 +109,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             bundle.putString("chat_id", chat_id);
             intent.putExtras(bundle);
 
-            Update_Last_chat(user);
+            assert body != null;
+            Update_Last_chat(user, body);
         }
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -125,13 +127,16 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         oreoNotification.getManager().notify(i, builder.build());
     }
 
-    private void Update_Last_chat(String user) {
+    private void Update_Last_chat(String user, String body) {
         DaoChat daoChat = new DaoChat(this);
         DtoAccount account = new DtoAccount();
         Calendar c = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         account.setId(user);
         account.setLast_chat(df_time_last_chat.format(c.getTime()));
+        account.setStatus_chat(getString(R.string.waiting_for_reply));
+        String[] split = body.split(":");
+        if(split.length > 0) account.setName_user(split[0]);
         daoChat.UPDATE_A_CHAT(account, 0);
     }
 }

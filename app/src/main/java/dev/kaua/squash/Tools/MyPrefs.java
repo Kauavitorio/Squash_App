@@ -136,8 +136,5 @@ public abstract class MyPrefs {
         //  Clear User Terms Prefs
         sp = context.getSharedPreferences(PREFS_TERMS, MODE_PRIVATE);
         sp.edit().clear().apply();
-        //  Clear Privacy Policy Prefs
-        sp = context.getSharedPreferences(PREFS_PRIVACY_POLICY, MODE_PRIVATE);
-        sp.edit().clear().apply();
     }
 }

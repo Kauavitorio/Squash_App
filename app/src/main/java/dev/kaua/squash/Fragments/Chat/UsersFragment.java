@@ -1,5 +1,7 @@
 package dev.kaua.squash.Fragments.Chat;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,7 +15,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,21 +38,21 @@ import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
 
+@SuppressLint("StaticFieldLeak")
 public class UsersFragment extends Fragment {
-    private RecyclerView recycler_view_users;
+    private static RecyclerView recycler_view_users;
     private EditText search_users;
-    private DaoFollowing daoFollowing;
-    private DtoAccount myAccount;
+    private static DaoFollowing daoFollowing;
+    private static DtoAccount myAccount;
+    private static Context instance;
 
-    private UserChatAdapter userChatAdapter;
-    private List<DtoAccount> mAccounts;
+    private static UserChatAdapter userChatAdapter;
+    private final static List<DtoAccount> mAccounts = new ArrayList<>();;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_users, container, false);
         Ids(view);
-
-        mAccounts = new ArrayList<>();
         readAccounts();
 
         search_users.addTextChangedListener(new TextWatcher() {
@@ -69,6 +70,7 @@ public class UsersFragment extends Fragment {
     }
 
     private void Ids(View view) {
+        if(getContext() != null) instance = getContext();
         daoFollowing = new DaoFollowing(requireContext());
         myAccount = MyPrefs.getUserInformation(requireContext());
         recycler_view_users = view.findViewById(R.id.recycler_view_users);
@@ -83,7 +85,6 @@ public class UsersFragment extends Fragment {
     private void searchUsers(String str) {
         if(getContext() != null){
             if(ConnectionHelper.isOnline(getContext())){
-                FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
                 Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
                         .startAt(str)
                         .endAt(str + "\uf8ff");
@@ -94,21 +95,40 @@ public class UsersFragment extends Fragment {
                         mAccounts.clear();
                         for (DataSnapshot snapshot : datasnapshot.getChildren()){
                             DtoAccount account = snapshot.getValue(DtoAccount.class);
-                            assert account != null;
-                            if(!account.getId().equals(fUser.getUid())
-                                    && daoFollowing.check_if_follow(myAccount.getAccount_id(), Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getAccount_id_cry()))))){
+                            if(account != null)
                                 mAccounts.add(account);
-                            }
                         }
-                        userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
-                        recycler_view_users.setAdapter(userChatAdapter);
+                        LoadAdapter();
                     }
-
                     @Override
                     public void onCancelled(@NonNull @NotNull DatabaseError error) {}
                 });
             }
         }
+    }
+
+    final static List<DtoAccount> finalList = new ArrayList<>();
+    static void LoadAdapter(){
+        if(mAccounts.size() > 0){
+            final FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
+            finalList.clear();
+            for (DtoAccount accounts : mAccounts){
+                if(accounts != null && accounts.getAccount_id_cry() != null)
+                if(!accounts.getId().equals(fUser.getUid())
+                        && daoFollowing.check_if_follow(myAccount.getAccount_id(), Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(accounts.getAccount_id_cry()))))){
+                    finalList.add(accounts);
+                }
+            }
+            userChatAdapter = new UserChatAdapter(instance, finalList, true, false);
+            recycler_view_users.setAdapter(userChatAdapter);
+        }
+    }
+
+    @Override
+    public void setMenuVisibility(final boolean visible) {
+        super.setMenuVisibility(visible);
+        if(visible)
+            LoadAdapter();
     }
 
     private void readAccounts() {

@@ -1,8 +1,10 @@
 package dev.kaua.squash.Fragments.Chat;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,7 @@ import dev.kaua.squash.Adapters.Chat.UserChatAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.Fragments.ChatFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
@@ -124,8 +127,7 @@ public class ChatsFragment extends Fragment {
                         }
                     }
                 }
-                userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
-                recycler_myMsg.setAdapter(userChatAdapter);
+                LoadChatRecycler();
             }
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
@@ -153,7 +155,7 @@ public class ChatsFragment extends Fragment {
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
         if(visible)
-        LoadChatRecycler();
+            LoadChatRecycler();
     }
 
     public static ChatsFragment getInstance(){ return instance; }
@@ -161,12 +163,10 @@ public class ChatsFragment extends Fragment {
     ArrayList<DtoAccount> mAccountsBase = new ArrayList<>();
     boolean reload = true, base_reload = true, can_load = true;
     public void chatList() {
-        mAccounts = chatDB.get_CHAT_LIST();
         LoadChatRecycler();
 
         if(getContext() != null)
-        if(ConnectionHelper.isOnline(getContext())){
-            if(can_load){
+            if(ConnectionHelper.isOnline(getContext())){
                 mAccounts = new ArrayList<>();
                 reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users");
                 reference.addValueEventListener(new ValueEventListener() {
@@ -189,43 +189,62 @@ public class ChatsFragment extends Fragment {
                         if(mAccountsBase.size() != mAccounts.size()) mAccountsBase.addAll(mAccounts);
 
                         //  Check if recyclerView need to be updated
-                        for (int i = 0; i < mAccounts.size(); i++){
-                            if(!mAccountsBase.get(i).getStatus_chat().equals(mAccounts.get(i).getStatus_chat()) ||
-                                    !mAccountsBase.get(i).getName_user().equals(mAccounts.get(i).getName_user()) ||
-                                    !mAccountsBase.get(i).getSearch().equals(mAccounts.get(i).getSearch()) ||
-                                    !mAccountsBase.get(i).getImageURL().equals(mAccounts.get(i).getImageURL()) ||
-                                    mAccountsBase.get(i).getVerification_level() != null && !mAccountsBase.get(i).getVerification_level().equals(mAccounts.get(i).getVerification_level())){
-                                reload = true;
+                        try {
+                            for (int i = 0; i < mAccounts.size(); i++){
+                                if(mAccountsBase != null && mAccountsBase.get(i) != null)
+                                    if(!mAccountsBase.get(i).getStatus_chat().equals(mAccounts.get(i).getStatus_chat()) ||
+                                            !mAccountsBase.get(i).getName_user().equals(mAccounts.get(i).getName_user()) ||
+                                            !mAccountsBase.get(i).getSearch().equals(mAccounts.get(i).getSearch()) ||
+                                            !mAccountsBase.get(i).getImageURL().equals(mAccounts.get(i).getImageURL()) ||
+                                            mAccountsBase.get(i).getVerification_level() != null && !mAccountsBase.get(i).getVerification_level().equals(mAccounts.get(i).getVerification_level())){
+                                        reload = true;
+                                    }
                             }
+                        }catch (Exception ex){
+                            Log.d("CHAT", ex.toString());
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull @NotNull DatabaseError error) {}
                 });
-            }
-            if(reload){
-                chatDB.REGISTER_CHAT_LIST(mAccounts);
-                LoadChatRecycler();
-            }
 
-            if(base_reload){
-                chatDB.REGISTER_CHAT_LIST(mAccounts);
-                LoadChatRecycler();
-                base_reload = false;
+                if(reload){
+                    chatDB.REGISTER_CHAT_LIST(mAccounts);
+                    new Handler().postDelayed(() -> {
+                        if(ChatFragment.getInstance() != null) ChatFragment.getInstance().loadViewAdapter();
+                    }, 1000);
+                    LoadChatRecycler();
+                }
+
+                if(base_reload){
+                    chatDB.REGISTER_CHAT_LIST(mAccounts);
+                    LoadChatRecycler();
+                    base_reload = false;
+                }
             }
-        }
     }
 
+    final static List<DtoAccount> finalList = new ArrayList<>();
+    public static int Outstanding;
     public void LoadChatRecycler() {
         if(chatDB != null && mAccounts != null && recycler_myMsg != null){
+            mAccounts.clear();
+            finalList.clear();
+            Outstanding = 0;
             mAccounts = chatDB.get_CHAT_LIST();
-            userChatAdapter = new UserChatAdapter(getContext(), mAccounts, true, false);
+            for(DtoAccount account: mAccounts){
+                if(account.getAccount_id_cry() != null){
+                    finalList.add(account);
+                }else Outstanding++;
+            }
+            userChatAdapter = new UserChatAdapter(getContext(), finalList, true, false);
             ((SimpleItemAnimator) Objects.requireNonNull(recycler_myMsg.getItemAnimator())).setSupportsChangeAnimations(false);
             recycler_myMsg.setAdapter(userChatAdapter);
             mAccountsBase.clear();
             mAccountsBase.addAll(mAccounts);
             reload = false;
+
         }
     }
 

@@ -78,6 +78,7 @@ import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
+import dev.kaua.squash.Fragments.ChatFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.APIService;
@@ -390,7 +391,7 @@ public class MessageActivity extends AppCompatActivity {
             LoadAdapter(""); // First Load on adapter
 
             txt_user_name.setText(user_im_chat.getName_user());
-            if(!another_user_image.equals(user_im_chat.getImageURL())){
+            if(another_user_image != null && !another_user_image.equals(user_im_chat.getImageURL())){
                 another_user_image = user_im_chat.getImageURL();
                 if(user_im_chat.getImageURL() == null || user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
                 else Picasso.get().load(EncryptHelper.decrypt(another_user_image)).into(profile_image);

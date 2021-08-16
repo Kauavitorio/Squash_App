@@ -10,8 +10,8 @@ android {
         applicationId "dev.kaua.squash"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 24
-        versionName "1.9.9"
+        versionCode 29
+        versionName "1.10.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -106,6 +106,9 @@ dependencies {
 
     //  QRCODE Generator
     implementation 'com.github.kenglxn.QRGen:android:2.6.0'
+
+    //  Qr Code Reader
+    implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
 
     //  Click on URL
     implementation 'me.saket:better-link-movement-method:2.2.0'

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="dev.kaua.squash">
     <!--
     *  Copyright (c) 2021 Kauã Vitório
@@ -15,6 +16,10 @@
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -28,9 +33,16 @@
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".Activitys.DeletePostReportActivity"
+            android:name=".Adapters.CaptureAct"
+            android:screenOrientation="fullSensor"
+            android:stateNotNeeded="true"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".Activitys.QrCodeActivity"
             android:exported="true" />
-        <!-- Image Crop Activity -->
+        <activity
+            android:name=".Activitys.DeletePostReportActivity"
+            android:exported="true" /> <!-- Image Crop Activity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="fullSensor"

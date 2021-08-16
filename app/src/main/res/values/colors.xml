@@ -44,4 +44,11 @@
     <color name="tab_background_unselected">#10ace0</color>
     <color name="base_color_disable">#B248C5EF</color>
     <color name="base_color_click">#0F9CCC</color>
+
+    <!-- QRCODE READER -->
+    <color name="zxing_viewfinder_laser">#FF6C26</color>
+    <color name="zxing_result_view">#b0000000</color>
+    <color name="zxing_status_text">#ffffffff</color>
+    <color name="zxing_transparent">#00000000</color>
+    <color name="zxing_viewfinder_mask">#60000000</color>
 </resources>

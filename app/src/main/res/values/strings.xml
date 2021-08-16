@@ -178,4 +178,11 @@
     <string name="desc_delete_post_report">You are about to delete this post. It is necessary to inform the reason why he is deleting this post, because the message that will be written below, will be the same received by the user.</string>
     <string name="need_to_insert_reason_delete_post">You must specify the reason for removal, minimum characters: 20.</string>
     <string name="unable_to_reply_to_this_message">Unable to reply to this message.</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="no_results">No results</string>
+    <string name="error" translatable="false">Error</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="better_display_qr_code">For a better display of your QR Code we need to increase the brightness of your cell phone screen, could you give us permission?</string>
+    <string name="outstanding">Outstanding</string>
+    <string name="waiting_for_reply">Waiting for reply</string>
 </resources>
