@@ -276,7 +276,7 @@ public class ComposeActivity extends AppCompatActivity {
     }
 
     private void RemoveImage(LoadingDialog loadingDialog, int position) {
-        firebaseStorage = FirebaseStorage.getInstance();
+        firebaseStorage = myFirebaseHelper.getFirebaseStorageInstance();
         StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(post_image.get(position))));
         photoRef.delete().addOnSuccessListener(aVoid -> {
             // File deleted successfully

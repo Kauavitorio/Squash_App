@@ -185,4 +185,5 @@
     <string name="better_display_qr_code">For a better display of your QR Code we need to increase the brightness of your cell phone screen, could you give us permission?</string>
     <string name="outstanding">Outstanding</string>
     <string name="waiting_for_reply">Waiting for reply</string>
+    <string name="you_did_not_start_any_conversation">You haven\'t started any conversations yet!!!</string>
 </resources>

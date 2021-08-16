@@ -6,6 +6,7 @@
     android:background="@color/white"
     tools:context=".Fragments.Chat.ChatsFragment">
 
+    <!-- Search EditText -->
     <EditText
         android:id="@+id/search_users"
         android:layout_width="match_parent"
@@ -21,6 +22,19 @@
         android:hint="@string/search_with_dots"
         tools:ignore="Autofill" />
 
+    <!-- Text You haven't started any conversations -->
+    <TextView
+        android:id="@+id/txt_not_start_conversation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/search_users"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:text="@string/you_did_not_start_any_conversation"
+        android:textColor="@color/black"
+        android:textSize="18sp"/>
+
+    <!-- Scroll And Recycler Container -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_below="@+id/search_users"
@@ -29,7 +43,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/recycler_myMsg"/>
+            android:id="@+id/recycler_myMsg"
+            android:visibility="gone"/>
 
     </androidx.core.widget.NestedScrollView>
 

@@ -35,7 +35,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +53,7 @@ import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
 import dev.kaua.squash.Data.Post.DtoPost;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
@@ -189,7 +189,7 @@ public class ProfileFragment extends Fragment {
                 LoadingDialog loadingDialog = new LoadingDialog(requireActivity());
                 loadingDialog.startLoading();
                 DtoAccount account_chat = new DtoAccount();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+                DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users");
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot fullSnapshot) {

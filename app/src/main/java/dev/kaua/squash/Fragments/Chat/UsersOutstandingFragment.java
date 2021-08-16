@@ -78,20 +78,18 @@ public class UsersOutstandingFragment extends Fragment {
     final static List<DtoAccount> finalList = new ArrayList<>();
     void LoadAdapter(){
         if(getContext() != null){
-            if(ConnectionHelper.isOnline(getContext())){
-                if(chatDB != null && mAccounts != null && recycler_view_users != null){
-                    mAccounts.clear();
-                    finalList.clear();
-                    mAccounts = chatDB.get_CHAT_LIST();
-                    for(DtoAccount account: mAccounts){
-                        if(account.getAccount_id_cry() == null){
-                            finalList.add(account);
-                        }
+            if(chatDB != null && mAccounts != null && recycler_view_users != null){
+                mAccounts.clear();
+                finalList.clear();
+                mAccounts = chatDB.get_CHAT_LIST();
+                for(DtoAccount account: mAccounts){
+                    if(account.getAccount_id_cry() == null){
+                        finalList.add(account);
                     }
-                    userChatAdapter = new UserChatAdapter(getContext(), finalList, true, false);
-                    ((SimpleItemAnimator) Objects.requireNonNull(recycler_view_users.getItemAnimator())).setSupportsChangeAnimations(false);
-                    recycler_view_users.setAdapter(userChatAdapter);
                 }
+                userChatAdapter = new UserChatAdapter(getContext(), finalList, true, false);
+                ((SimpleItemAnimator) Objects.requireNonNull(recycler_view_users.getItemAnimator())).setSupportsChangeAnimations(false);
+                recycler_view_users.setAdapter(userChatAdapter);
             }
         }
     }

@@ -176,4 +176,5 @@
     <string name="better_display_qr_code">Para uma melhor visualização do seu QR Code precisamos aumentar o brilho da tela do seu celular, você poderia nos dar permissão?</string>
     <string name="outstanding">Pendentes</string>
     <string name="waiting_for_reply">Esperando por resposta</string>
+    <string name="you_did_not_start_any_conversation">Você ainda não iniciou nenhuma conversa !!!</string>
 </resources>

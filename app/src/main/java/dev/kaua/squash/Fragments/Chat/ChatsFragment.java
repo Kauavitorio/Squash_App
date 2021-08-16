@@ -2,6 +2,7 @@ package dev.kaua.squash.Fragments.Chat;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -20,7 +22,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -43,6 +44,7 @@ import dev.kaua.squash.Tools.ConnectionHelper;
 
 public class ChatsFragment extends Fragment {
     private RecyclerView recycler_myMsg;
+    private TextView txt_not_start_conversation;
     private UserChatAdapter userChatAdapter;
     private List<DtoAccount> mAccounts;
     private EditText search_users;
@@ -52,7 +54,7 @@ public class ChatsFragment extends Fragment {
     FirebaseUser fUser;
     DatabaseReference reference;
 
-    private List<Chatslist> usersList;
+    private final List<Chatslist> usersList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,10 +62,9 @@ public class ChatsFragment extends Fragment {
         Ids(view);
 
         fUser = myFirebaseHelper.getFirebaseUser();
-        usersList = new ArrayList<>();
 
         chatList();
-        reference = FirebaseDatabase.getInstance().getReference("Chatslist").child(fUser.getUid());
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference("Chatslist").child(fUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
@@ -107,7 +108,7 @@ public class ChatsFragment extends Fragment {
 
     private void searchUsers(String str) {
         FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
-        Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
+        Query query = myFirebaseHelper.getFirebaseDatabase().getReference("Users").orderByChild("search")
                 .startAt(str)
                 .endAt(str + "\uf8ff");
 
@@ -139,6 +140,7 @@ public class ChatsFragment extends Fragment {
         chatDB = new DaoChat(requireContext());
         recycler_myMsg = view.findViewById(R.id.recycler_myMsg);
         search_users = view.findViewById(R.id.search_users);
+        txt_not_start_conversation = view.findViewById(R.id.txt_not_start_conversation);
         recycler_myMsg.setHasFixedSize(true);
         recycler_myMsg.setItemViewCacheSize(20);
         ((SimpleItemAnimator) Objects.requireNonNull(recycler_myMsg.getItemAnimator())).setSupportsChangeAnimations(false);
@@ -146,7 +148,7 @@ public class ChatsFragment extends Fragment {
     }
 
     private void updateToken(String token){
-        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference("Tokens");
+        DatabaseReference reference1 = myFirebaseHelper.getFirebaseDatabase().getReference("Tokens");
         Token token1 = new Token(token);
         reference1.child(fUser.getUid()).setValue(token1);
     }
@@ -178,7 +180,8 @@ public class ChatsFragment extends Fragment {
                             DtoAccount account = snapshot.getValue(DtoAccount.class);
                             if(account != null){
                                 for(Chatslist chatList : usersList){
-                                    if(account.getId() != null && account.getId().equals(chatList.getId())){
+                                    if(account.getId() != null && account.getId().equals(chatList.getId()) &&
+                                            chatDB.test_has_chat(account.getId())){
                                         account.setChat_id(chatList.getChat_id());
                                         mAccounts.add(account);
                                     }
@@ -198,6 +201,8 @@ public class ChatsFragment extends Fragment {
                                             !mAccountsBase.get(i).getImageURL().equals(mAccounts.get(i).getImageURL()) ||
                                             mAccountsBase.get(i).getVerification_level() != null && !mAccountsBase.get(i).getVerification_level().equals(mAccounts.get(i).getVerification_level())){
                                         reload = true;
+                                        chatDB.REGISTER_CHAT_LIST(mAccounts);
+                                        LoadChatRecycler();
                                     }
                             }
                         }catch (Exception ex){
@@ -227,8 +232,10 @@ public class ChatsFragment extends Fragment {
 
     final static List<DtoAccount> finalList = new ArrayList<>();
     public static int Outstanding;
+    private static Parcelable recyclerViewState;
     public void LoadChatRecycler() {
         if(chatDB != null && mAccounts != null && recycler_myMsg != null){
+            if(recycler_myMsg.getLayoutManager() != null) recyclerViewState = recycler_myMsg.getLayoutManager().onSaveInstanceState();
             mAccounts.clear();
             finalList.clear();
             Outstanding = 0;
@@ -238,13 +245,20 @@ public class ChatsFragment extends Fragment {
                     finalList.add(account);
                 }else Outstanding++;
             }
+            if(finalList.size() > 0){
+                recycler_myMsg.setVisibility(View.VISIBLE);
+                txt_not_start_conversation.setVisibility(View.GONE);
+            }else{
+                recycler_myMsg.setVisibility(View.GONE);
+                txt_not_start_conversation.setVisibility(View.VISIBLE);
+            }
             userChatAdapter = new UserChatAdapter(getContext(), finalList, true, false);
             ((SimpleItemAnimator) Objects.requireNonNull(recycler_myMsg.getItemAnimator())).setSupportsChangeAnimations(false);
             recycler_myMsg.setAdapter(userChatAdapter);
             mAccountsBase.clear();
             mAccountsBase.addAll(mAccounts);
             reload = false;
-
+            if(recyclerViewState != null && recycler_myMsg.getLayoutManager() != null) recycler_myMsg.getLayoutManager().onRestoreInstanceState(recyclerViewState);
         }
     }
 

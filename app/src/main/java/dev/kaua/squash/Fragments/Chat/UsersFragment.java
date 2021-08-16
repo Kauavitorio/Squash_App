@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -47,7 +46,7 @@ public class UsersFragment extends Fragment {
     private static Context instance;
 
     private static UserChatAdapter userChatAdapter;
-    private final static List<DtoAccount> mAccounts = new ArrayList<>();;
+    private final static List<DtoAccount> mAccounts = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,7 +84,7 @@ public class UsersFragment extends Fragment {
     private void searchUsers(String str) {
         if(getContext() != null){
             if(ConnectionHelper.isOnline(getContext())){
-                Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("search")
+                Query query = myFirebaseHelper.getFirebaseDatabase().getReference("Users").orderByChild("search")
                         .startAt(str)
                         .endAt(str + "\uf8ff");
 

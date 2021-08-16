@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -31,7 +30,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Objects;
 
-import dev.kaua.squash.Activitys.EditProfileActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.SignInActivity;
 import dev.kaua.squash.Activitys.SplashActivity;

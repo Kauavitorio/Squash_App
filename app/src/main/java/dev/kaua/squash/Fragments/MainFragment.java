@@ -132,7 +132,7 @@ public class MainFragment extends Fragment {
         if(ConnectionHelper.isOnline(getContext())){
             int currentVersionCode = BuildConfig.VERSION_CODE;
 
-            reference = FirebaseDatabase.getInstance().getReference("System");
+            reference = myFirebaseHelper.getFirebaseDatabase().getReference("System");
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {

@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.List;
 
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
-import dev.kaua.squash.Data.Post.DtoPost;
 
 public class DaoChat extends SQLiteOpenHelper {
     private final String TABLE_BG = "TBL_BACKGROUND";
@@ -27,7 +25,7 @@ public class DaoChat extends SQLiteOpenHelper {
     public static final int DROP_ALL = 999;
 
     public DaoChat(@Nullable Context context) {
-        super(context, "DB_CHAT", null, 38);
+        super(context, "DB_CHAT", null, 42);
     }
 
     @Override
@@ -202,6 +200,20 @@ public class DaoChat extends SQLiteOpenHelper {
         return list;
     }
 
+    public boolean test_has_chat(String user_id){
+        String command = "SELECT * FROM " + TABLE_CHAT + " WHERE receiver = ?";
+        String[] params = {user_id};
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+
+        boolean result = cursor.moveToFirst();
+        if(!result){
+            command = "SELECT * FROM " + TABLE_CHAT + " WHERE sender and receiver = ?";
+            cursor = getWritableDatabase().rawQuery(command, params);
+            result = cursor.moveToFirst();
+        }
+        return result;
+    }
+
     public void delete_message(String id_msg){
         getWritableDatabase().delete(TABLE_CHAT, "id_msg=?", new String[]{id_msg});
     }
@@ -319,7 +331,6 @@ public class DaoChat extends SQLiteOpenHelper {
         String command = "SELECT * FROM " + TABLE_BG + " WHERE  chat_name = ?";
         String[] params = {chat_name};
         @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
-        ArrayList<DtoPost> dtoPosts = new ArrayList<>();
 
         if (cursor.moveToNext()) {
             return cursor.getString(1);

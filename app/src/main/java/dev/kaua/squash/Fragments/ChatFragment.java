@@ -73,7 +73,7 @@ public class ChatFragment extends Fragment {
         Ids(view);
 
         firebaseUser = myFirebaseHelper.getFirebaseUser();
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(firebaseUser.getUid());
         viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
 
         return view;
@@ -102,7 +102,7 @@ public class ChatFragment extends Fragment {
 
         if(getContext() != null){
             if(ConnectionHelper.isOnline(getContext())){
-                reference = FirebaseDatabase.getInstance().getReference("Chats");
+                reference = myFirebaseHelper.getFirebaseDatabase().getReference("Chats");
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
