@@ -31,7 +31,7 @@
                 android:layout_marginStart="2dp"
                 android:textColor="@color/black"
                 android:layout_height="wrap_content"
-                android:text="@string/username"/>
+                tools:text="@string/username"/>
 
             <!-- QrCode -->
             <ImageView
@@ -120,18 +120,19 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/btn_create_new_story_profile"
                     android:layout_marginTop="7dp"
-                    android:text="@string/app_name"
+                    android:maxLength="25"
                     android:textColor="@color/black"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="@string/app_name" />
 
                 <!-- Badge Account -->
                 <ImageView
                     android:id="@+id/ic_account_badge_profile"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
                     android:layout_below="@+id/btn_create_new_story_profile"
-                    android:layout_marginStart="2dp"
+                    android:layout_marginStart="4dp"
                     android:layout_marginTop="10dp"
                     android:layout_toEndOf="@+id/txt_user_name"
                     android:src="@drawable/ic_verified_account"
@@ -141,11 +142,11 @@
                 <!-- Image Calendar -->
                 <ImageView
                     android:id="@+id/icon_calendar_profile"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_calendar"
-                    android:layout_marginTop="4dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_below="@+id/txt_user_name"
+                    android:layout_marginTop="4dp"
+                    android:src="@drawable/ic_calendar"
                     tools:ignore="ContentDescription" />
 
                 <!-- Text Joined -->
@@ -153,63 +154,30 @@
                     android:id="@+id/txt_joined"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@+id/icon_calendar_profile"
                     android:layout_below="@+id/txt_user_name"
-                    android:layout_marginTop="1dp"
                     android:layout_marginStart="2dp"
-                    android:text="@string/app_name"
+                    android:layout_marginTop="1dp"
+                    android:layout_toEndOf="@+id/icon_calendar_profile"
+                    tools:text="@string/app_name"
                     android:textColor="@color/hint_time_message"
-                    android:textSize="17sp" />
+                    android:textSize="16sp" />
 
                 <!-- Container Followers and Followings -->
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@+id/btn_create_new_story_profile"
                     android:minHeight="50dp"
                     android:orientation="horizontal"
-                    android:padding="8dp">
+                    android:padding="8dp"
+                    tools:ignore="DisableBaselineAlignment">
 
-                    <!-- Container Following -->
+                    <!-- Container Posts Size -->
                     <LinearLayout
-                        android:id="@+id/container_following_profile"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:visibility="visible"
-                        app:layout_constraintEnd_toStartOf="@+id/container_followers_profile"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:text="@string/following"
-                            android:textColor="@color/black"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/txt_amount_following_profile"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="5dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:text="@string/following"
-                            android:textColor="@color/black"
-                            android:textSize="17sp" />
-
-                    </LinearLayout>
-
-                    <!-- Container Followers -->
-                    <LinearLayout
-                        android:id="@+id/container_followers_profile"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:id="@+id/container_posts_size_profile"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:orientation="vertical"
                         android:visibility="visible"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -220,25 +188,96 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="@string/followers"
+                            android:text="@string/posts"
+                            android:textColor="@color/black"
+                            android:textSize="17sp" />
+
+                        <!-- Text Posts Size -->
+                        <TextView
+                            android:id="@+id/txt_posts_size_amount_profile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="5dp"
                             android:textColor="@color/black"
                             android:textSize="17sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="120" />
 
+                    </LinearLayout>
 
+                    <!-- Container Followers -->
+                    <LinearLayout
+                        android:id="@+id/container_followers_profile"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:visibility="visible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/container_following_profile">
+
+                        <!-- Tittle Followers -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/followers"
+                            android:textColor="@color/black"
+                            android:textSize="17sp" />
+
+                        <!-- Text Followers Amount -->
                         <TextView
                             android:id="@+id/txt_amount_followers_profile"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_marginTop="5dp"
+                            android:textColor="@color/black"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            tools:text="5M" />
+
+                    </LinearLayout>
+
+                    <!-- Container Following -->
+                    <LinearLayout
+                        android:id="@+id/container_following_profile"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:visibility="visible"
+                        app:layout_constraintEnd_toStartOf="@+id/container_followers_profile"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent">
+
+                        <!-- Title Following -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
                             android:text="@string/following"
                             android:textColor="@color/black"
                             android:textSize="17sp" />
 
+                        <!-- Text Following Amount -->
+                        <TextView
+                            android:id="@+id/txt_amount_following_profile"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="5dp"
+                            android:gravity="center"
+                            android:textColor="@color/black"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            tools:text="10" />
+
                     </LinearLayout>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
 
             </RelativeLayout>
 
@@ -246,7 +285,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="4dp"
                 android:orientation="vertical">
 
                 <!-- Text Bio -->
@@ -254,15 +293,15 @@
                     android:id="@+id/txt_user_bio_profile"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/account_will_not_be_validated_leave"
                     android:textColor="@color/black"
-                    android:textSize="17sp" />
+                    android:textSize="16sp"
+                    tools:text="@string/account_will_not_be_validated_leave" />
 
                 <!-- Buttons -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="3dp"
                     android:layout_below="@+id/txt_user_bio_profile"
                     android:orientation="horizontal">
 

@@ -177,4 +177,13 @@
     <string name="outstanding">Pendentes</string>
     <string name="waiting_for_reply">Esperando por resposta</string>
     <string name="you_did_not_start_any_conversation">Você ainda não iniciou nenhuma conversa !!!</string>
+    <string name="this_user_is_not_being_followed">Este usuário não está sendo seguido por nenhum usuário, que tal segui-lo?</string>
+    <string name="this_user_is_not_following">Este usuário não está seguindo nenhum usuário.</string>
+    <string name="sorted_by_default">Classificado por <b>Padrão</b></string>
+    <string name="sort_by">Ordenar por</string>
+    <string name="default_title">Padrão</string>
+    <string name="date_followed_latest">Data de seguimento: mais recente</string>
+    <string name="date_followed_earliest">Data de seguimento: mais antiga</string>
+    <string name="sorted_by_latest">Ordenar por <b> Data de seguimento: mais recente</b></string>
+    <string name="sorted_by_earliest">Ordenar por <b> Data de seguimento: mais antiga</b></string>
 </resources>

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Parcelable;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -25,6 +26,7 @@ import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
+import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 
@@ -125,7 +127,8 @@ public class RecommendedPosts extends MainFragment {
     }
 
     //  Method to get User Posts
-    public static void getUsersPosts(Context context, @NonNull RecyclerView recyclerView, RelativeLayout noPost_profile, DtoAccount account){
+    public static void getUsersPosts(Context context, @NonNull RecyclerView recyclerView,
+                                     RelativeLayout noPost_profile, TextView posts_size, DtoAccount account){
         recyclerViewState = Objects.requireNonNull(recyclerView.getLayoutManager()).onSaveInstanceState();
         ArrayList<DtoPost> arraylist = new ArrayList<>();
         recyclerView.setNestedScrollingEnabled(true);
@@ -141,6 +144,7 @@ public class RecommendedPosts extends MainFragment {
             applesQuery.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot datasnapshot) {
+                    arraylist.clear();
                     for(DataSnapshot snapshot: datasnapshot.getChildren()){
                         DtoPost dtoPost = snapshot.getValue(DtoPost.class);
                         DtoPost post = new DtoPost();
@@ -176,6 +180,7 @@ public class RecommendedPosts extends MainFragment {
                         noPost_profile.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
+                    posts_size.setText(Methods.NumberTrick(arraylist.size()));
                 }
 
                 @Override

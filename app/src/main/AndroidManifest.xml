@@ -33,6 +33,9 @@
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Activitys.ProfileInfoActivity"
+            android:exported="true" />
+        <activity
             android:name=".Adapters.CaptureAct"
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"

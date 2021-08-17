@@ -85,12 +85,16 @@ public abstract class Methods extends MainActivity {
     public static final String POLICY_PRIVACY_LINK = "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
+    private static long account_id_hold;
 
     //  Method to validate phone number.
     public static boolean isValidPhoneNumber(@NotNull String phone) {
         if (!phone.trim().equals("") && phone.length() > 10) return Patterns.PHONE.matcher(phone).matches();
         return false;
     }
+
+    public static void HoldId(long id){ account_id_hold = id;}
+    public static long getIdHold(){ return account_id_hold;}
 
     //  Method to remove Spaces from String.
     public static String RemoveSpace(String str){

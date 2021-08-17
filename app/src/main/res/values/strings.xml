@@ -186,4 +186,14 @@
     <string name="outstanding">Outstanding</string>
     <string name="waiting_for_reply">Waiting for reply</string>
     <string name="you_did_not_start_any_conversation">You haven\'t started any conversations yet!!!</string>
+    <string name="posts" translatable="false">Posts</string>
+    <string name="this_user_is_not_being_followed">This user is not being followed by any user, how about following him?</string>
+    <string name="this_user_is_not_following">This user is not following any user.</string>
+    <string name="sorted_by_default">Sorted by <b>Default</b></string>
+    <string name="sort_by">Sort by</string>
+    <string name="default_title">Default</string>
+    <string name="date_followed_latest">Date Followed: Latest</string>
+    <string name="date_followed_earliest">Date Followed: Earliest</string>
+    <string name="sorted_by_latest">Sort by<b> Date Followed: Latest</b></string>
+    <string name="sorted_by_earliest">Sort by<b> Date Followed: Earliest</b></string>
 </resources>
