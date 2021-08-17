@@ -360,8 +360,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.yes),
                     (dialog, which) -> {
                         if(ConnectionHelper.isOnline(mContext)){
-                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                            Query applesQuery = ref.child("Chats").child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(id_msg);
+                            DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                            Query applesQuery = ref.child(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(id_msg);
 
                             applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override

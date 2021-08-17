@@ -53,6 +53,7 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -308,13 +309,13 @@ public class SignUpActivity extends AppCompatActivity {
                         //  BadWord in user name
                         ReloadPage(406);
                     else
-                        Warnings.showWeHaveAProblem(SignUpActivity.this);
+                        Warnings.showWeHaveAProblem(SignUpActivity.this, ErrorHelper.SIGN_UP_ACTION);
                 }
 
                 @Override
                 public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                     loadingDialog.dismissDialog();
-                    Warnings.showWeHaveAProblem(SignUpActivity.this);
+                    Warnings.showWeHaveAProblem(SignUpActivity.this, ErrorHelper.SIGN_UP_ACTION);
                 }
             });
         }

@@ -47,6 +47,7 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -168,14 +169,14 @@ public class EditProfileActivity extends AppCompatActivity {
                         else if(response.code() == 400) showError(edit_username, getString(R.string.bad_username));
                         else if(response.code() == 405) showError(edit_name, getString(R.string.bad_username));
                         else if(response.code() == 401) showError(edit_username, getString(R.string.username_is_already_in_use));
-                        else Warnings.showWeHaveAProblem(EditProfileActivity.this);
+                        else Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT);
                     }
 
                     @Override
                     public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                         loadingDialog.dismissDialog();
                         btn_edit_profile.setEnabled(true);
-                        Warnings.showWeHaveAProblem(EditProfileActivity.this);
+                        Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT);
                     }
                 });
             }
@@ -300,7 +301,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
             }catch (Exception ex){
                 dialog.dismissDialog();
-                Warnings.showWeHaveAProblem(EditProfileActivity.this);
+                Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT_IMAGE_UPLOAD);
                 Log.d(TAG, ex.toString());
             }
         }
@@ -309,14 +310,14 @@ public class EditProfileActivity extends AppCompatActivity {
             if(data != null){
                 final Uri resultUri = UCrop.getOutput(data);
                 Profile_Image.SendToCrop(this, resultUri);
-            }else Warnings.showWeHaveAProblem(this);
+            }else Warnings.showWeHaveAProblem(this, ErrorHelper.PROFILE_EDIT_IMAGE_CROP);
         } else if (resultCode == UCrop.RESULT_ERROR) {
             if(data != null){
                 final Throwable cropError = UCrop.getError(data);
                 if(cropError != null)
                     Log.d(TAG, cropError.toString());
             }
-            Warnings.showWeHaveAProblem(this);
+            Warnings.showWeHaveAProblem(this, ErrorHelper.PROFILE_EDIT_IMAGE_CROP);
         }
     }
 

@@ -63,6 +63,7 @@ import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -149,7 +150,7 @@ public class ProfileFragment extends Fragment {
                     }
                     @Override
                     public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
-                        Warnings.showWeHaveAProblem(requireActivity());
+                        Warnings.showWeHaveAProblem(requireActivity(), ErrorHelper.PROFILE_FOLLOW_AN_USER);
                     }
                 });
             }
@@ -177,7 +178,7 @@ public class ProfileFragment extends Fragment {
 
                     @Override
                     public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
-                        Warnings.showWeHaveAProblem(requireActivity());
+                        Warnings.showWeHaveAProblem(requireActivity(), ErrorHelper.PROFILE_UNFOLLOW_AN_USER);
                     }
                 });
             }
@@ -316,15 +317,6 @@ public class ProfileFragment extends Fragment {
                                                 EncryptHelper.decrypt(response.body().getProfile_image()),
                                                 Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowing())))),
                                                 Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowers())))));
-
-                                        /*btn_qr_code.setOnClickListener(v -> {
-                                            Intent i = new Intent(requireContext(), QrCodeActivity.class);
-                                            i.putExtra("image_profile", EncryptHelper.decrypt(response.body().getProfile_image()));
-                                            i.putExtra("name_user", EncryptHelper.decrypt(response.body().getName_user()));
-                                            i.putExtra("username", EncryptHelper.decrypt(response.body().getUsername()));
-                                            i.putExtra("account_id", account_another_user);
-                                            startActivity(i);
-                                        });*/
                                     }
                                 }else{
                                     ToastHelper.toast(requireActivity(), getString(R.string.user_not_found), 0);
@@ -335,7 +327,7 @@ public class ProfileFragment extends Fragment {
                             @Override
                             public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                                 loadingDialog.dismissDialog();
-                                Warnings.showWeHaveAProblem(requireContext());
+                                Warnings.showWeHaveAProblem(requireContext(), ErrorHelper.PROFILE_GET_ANOTHER_USER_INFO);
                             }
                         });
                     }else ToastHelper.toast((Activity) getContext(), getContext().getString(R.string.you_are_without_internet), 0);
@@ -525,7 +517,7 @@ public class ProfileFragment extends Fragment {
                                     @Override
                                     public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                                         loadingDialog.dismissDialog();
-                                        Warnings.showWeHaveAProblem(requireContext());
+                                        Warnings.showWeHaveAProblem(requireContext(), ErrorHelper.PROFILE_MENTION_CLICK);
                                     }
                                 });
                             }).into(txt_user_bio_profile);

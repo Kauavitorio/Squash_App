@@ -42,6 +42,7 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.Warnings;
 
@@ -102,7 +103,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                         }else intent.putExtra("shared", 0);
                         mContext.startActivity(intent);
                     }catch (Exception exception){
-                        Warnings.showWeHaveAProblem(mContext);
+                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.USER_CHAT_ITEM_CLICK);
                     }
                 });
 

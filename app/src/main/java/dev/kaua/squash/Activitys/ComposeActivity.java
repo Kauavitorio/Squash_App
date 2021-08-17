@@ -46,6 +46,7 @@ import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -141,13 +142,13 @@ public class ComposeActivity extends AppCompatActivity {
                                 ProfileFragment.getInstance().ReloadRecycler();
                                 finish();
                             }
-                        }else Warnings.showWeHaveAProblem(ComposeActivity.this);
+                        }else Warnings.showWeHaveAProblem(ComposeActivity.this, ErrorHelper.NEW_POST_COMPOSE);
                     }
 
                     @Override
                     public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                         loadingDialog.dismissDialog();
-                        Warnings.showWeHaveAProblem(ComposeActivity.this);
+                        Warnings.showWeHaveAProblem(ComposeActivity.this, ErrorHelper.NEW_POST_COMPOSE);
                     }
                 });
             }
@@ -198,7 +199,7 @@ public class ComposeActivity extends AppCompatActivity {
 
                         } else {
                             loadingDialog.dismissDialog();
-                            Warnings.showWeHaveAProblem(ComposeActivity.this);
+                            Warnings.showWeHaveAProblem(ComposeActivity.this, ErrorHelper.NEW_POST_COMPOSE_IMAGE_UPLOAD);
                             Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
                         }
                     });
@@ -209,7 +210,7 @@ public class ComposeActivity extends AppCompatActivity {
                 }
             } catch (Exception ex) {
                 loadingDialog.dismissDialog();
-                Warnings.showWeHaveAProblem(this);
+                Warnings.showWeHaveAProblem(this, ErrorHelper.NEW_POST_COMPOSE_IMAGE_UPLOAD);
                 Log.d("MediaUpload", ex.toString());
             }
         }

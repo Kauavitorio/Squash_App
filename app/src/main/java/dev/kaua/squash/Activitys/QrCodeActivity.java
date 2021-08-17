@@ -37,6 +37,7 @@ import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ConnectionHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
@@ -175,7 +176,7 @@ public class QrCodeActivity extends AppCompatActivity {
                                 @Override
                                 public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                                     loadingDialog.dismissDialog();
-                                    Warnings.showWeHaveAProblem(QrCodeActivity.this);
+                                    Warnings.showWeHaveAProblem(QrCodeActivity.this, ErrorHelper.QRCODE_GET_USER);
                                 }
                             });
                         }catch (Exception ex){

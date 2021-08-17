@@ -108,20 +108,15 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
             @Override
             public void onPageSelected(int position) {
                 adapter.notifyDataSetChanged();
                 viewPager.setCurrentItem(position, true);
                 Check_Fragments(position);
             }
-
             @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
+            public void onPageScrollStateChanged(int state) {}
         });
     }
 
@@ -161,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getUserInformationAndLoadProfile(){
         account = MyPrefs.getUserInformation(this);
-        Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+        Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(btn_profile_main);
     }
 
@@ -179,9 +174,9 @@ public class MainActivity extends AppCompatActivity {
         btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search));
         btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home));
         btn_profile_main.setBorderWidth(0);
-        if(position == 1) btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
-        else if(position == 2) btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search_select));
-        else if(position == 3) btn_profile_main.setBorderWidth(3);
+        if(position == MAIN_POSITION) btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
+        else if(position == SEARCH_POSITION) btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search_select));
+        else if(position == PROFILE_POSITION) btn_profile_main.setBorderWidth(3);
     }
 
     private void Ids() {
@@ -212,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         getUserInformationAndLoadProfile();
-        Methods.status_chat("online", this);
+        Methods.status_chat(Methods.ONLINE, this);
         Methods.LoadFollowersAndFollowing(this, 1);
         AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());
         asyncUser_follow.execute();
@@ -221,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Methods.status_chat("offline", this);
+        Methods.status_chat(Methods.OFFLINE, this);
     }
 
     @Override

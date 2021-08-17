@@ -24,6 +24,7 @@ import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.UserPermissions;
@@ -98,7 +99,7 @@ public abstract class BackgroundHelper extends MessageActivity {
             else
                 ToastHelper.toast(context, context.getString(R.string.select_an_image), 0);
         } catch (Exception ex) {
-            Warnings.showWeHaveAProblem(context);
+            Warnings.showWeHaveAProblem(context, ErrorHelper.BACKGROUND_HELPER_UPLOAD);
             Log.d("ProfileUpload", ex.toString());
         }
     }

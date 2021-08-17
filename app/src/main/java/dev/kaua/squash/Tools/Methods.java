@@ -257,6 +257,8 @@ public abstract class Methods extends MainActivity {
         ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
     }
 
+    public static final String ONLINE = "online";
+    public static final String OFFLINE = "offline";
     //  Method to set new user status for chat system
     public static void status_chat(String status, Context context){
         Calendar c = Calendar.getInstance();
@@ -281,6 +283,7 @@ public abstract class Methods extends MainActivity {
         return new DateFormatSymbols().getMonths()[month-1];
     }
 
+    public static final String NO_ONE = "noOne";
     //  Method to update typing status for chat system
     public static void typingTo_chat_Status(String typing){
         firebaseUser = null;

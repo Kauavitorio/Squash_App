@@ -43,6 +43,7 @@ import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -179,18 +180,18 @@ public abstract class Login {
                     try {
                         SignInActivity.getInstance().Invalid_email_or_password();
                     }catch (Exception ex){
-                        Warnings.showWeHaveAProblem(context);
+                        Warnings.showWeHaveAProblem(context, ErrorHelper.LOGIN_ACTION_PASSWORD_EMAIL_WARNING);
                     }
                 }
                 else {
                     loadingDialog.dismissDialog();
-                    Warnings.showWeHaveAProblem(context);
+                    Warnings.showWeHaveAProblem(context, ErrorHelper.LOGIN_ACTION);
                 }
             }
             @Override
             public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                 loadingDialog.dismissDialog();
-                Warnings.showWeHaveAProblem(context);
+                Warnings.showWeHaveAProblem(context, ErrorHelper.LOGIN_ACTION);
             }
         });
     }

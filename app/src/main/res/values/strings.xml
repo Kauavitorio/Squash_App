@@ -180,7 +180,7 @@
     <string name="unable_to_reply_to_this_message">Unable to reply to this message.</string>
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="no_results">No results</string>
-    <string name="error" translatable="false">Error</string>
+    <string name="error_code" translatable="false">Error code: %1$s</string>
     <string name="dismiss">Dismiss</string>
     <string name="better_display_qr_code">For a better display of your QR Code we need to increase the brightness of your cell phone screen, could you give us permission?</string>
     <string name="outstanding">Outstanding</string>

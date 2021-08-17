@@ -136,7 +136,7 @@ public class Warnings {
                 @Override
                 public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                     loadingDialog.dismissDialog();
-                    Warnings.showWeHaveAProblem(context);
+                    Warnings.showWeHaveAProblem(context, ErrorHelper.EMAIL_SYSTEM_RE_SEND);
                 }
             });
         });
@@ -201,7 +201,7 @@ public class Warnings {
         bottomSheetDialog.show();
     }
 
-    public static void showWeHaveAProblem(Context context){
+    public static void showWeHaveAProblem(Context context, String ERROR_CODE){
         Dialog = new Dialog(context);
 
         TextView btnOk_WeHaveAProblem;
@@ -209,6 +209,7 @@ public class Warnings {
         Dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         btnOk_WeHaveAProblem = Dialog.findViewById(R.id.btnOk_WeHaveAProblem);
         Dialog.setCancelable(false);
+        ((TextView)Dialog.findViewById(R.id.error_title_problem_adapter)).setText(context.getString(R.string.error_code, ERROR_CODE));
 
         btnOk_WeHaveAProblem.setOnClickListener(v -> {
             btnOk_WeHaveAProblem.startAnimation(AnimationUtils.loadAnimation(context,R.anim.click_anim));

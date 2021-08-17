@@ -10,6 +10,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class myFirebaseHelper {
+    public static final String POSTS_REFERENCE = "Posts";
+    public static final String PUBLISHED_CHILD = "Published";
+    public static final String CHATS_REFERENCE = "Chats";
     private static FirebaseAnalytics firebaseAnalytics;
     private static FirebaseAuth firebaseAuth;
     private static FirebaseUser firebaseUser;

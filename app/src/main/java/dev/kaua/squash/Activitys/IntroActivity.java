@@ -22,9 +22,9 @@ import dev.kaua.squash.R;
  **/
 
 public class IntroActivity extends AppCompatActivity {
-    CardView btn_create_account;
-    ConstraintLayout btn_login_intro;
-    Handler timer = new Handler();
+    private CardView btn_create_account;
+    private ConstraintLayout btn_login_intro;
+    private final Handler timer = new Handler();
     private Animation myAnim;
 
     @Override

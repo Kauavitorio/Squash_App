@@ -44,6 +44,7 @@ import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.Warnings;
 
@@ -90,7 +91,7 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
                         ProfileFragment.getInstance().LoadAnotherUser();
                         ((Activity)mContext).finish();
                     }catch (Exception exception){
-                        Warnings.showWeHaveAProblem(mContext);
+                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.FOLLOWING_FOLLOWERS_CLICK);
                     }
                 });
 

@@ -407,7 +407,7 @@ public class MessageActivity extends AppCompatActivity {
             else{
                 if(user_im_chat.getStatus_chat() != null){
                     txt_isOnline_chat.setVisibility(View.VISIBLE);
-                    if(user_im_chat.getStatus_chat().equals("online")){
+                    if(user_im_chat.getStatus_chat().equals(Methods.ONLINE)){
                         txt_isOnline_chat.setVisibility(View.VISIBLE);
                         txt_isOnline_chat.setText(getString(R.string.online));
                     }
@@ -856,7 +856,7 @@ public class MessageActivity extends AppCompatActivity {
         mMessage = new ArrayList<>();
         if(ConnectionHelper.isOnline(instance)){
             if(can_load){
-                reference = myFirebaseHelper.getFirebaseDatabase().getReference().child("Chats").child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
+                reference = myFirebaseHelper.getFirebaseDatabase().getReference().child(myFirebaseHelper.CHATS_REFERENCE).child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)));
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot datasnapshot) {
@@ -1190,7 +1190,7 @@ public class MessageActivity extends AppCompatActivity {
             Intent openGallery = new Intent();
             openGallery.setType("image/*");
             openGallery.setAction(Intent.ACTION_PICK);
-            startActivityForResult(Intent.createChooser(openGallery, "Select Image"), PICK_IMAGE_REQUEST_MEDIA);
+            startActivityForResult(Intent.createChooser(openGallery, getString(R.string.select_an_image)), PICK_IMAGE_REQUEST_MEDIA);
         }
     }
 
@@ -1199,7 +1199,7 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Methods.status_chat("online", this);
+        Methods.status_chat(Methods.ONLINE, this);
         currentUser(userId);
     }
 
@@ -1209,11 +1209,11 @@ public class MessageActivity extends AppCompatActivity {
         reference.removeEventListener(seenListener);
         try {
             MainActivity instance = MainActivity.getInstance();
-            if(instance == null) Methods.status_chat("offline", this);
+            if(instance == null) Methods.status_chat(Methods.OFFLINE, this);
         }catch (Exception ex){
-            Methods.status_chat("offline", this);
+            Methods.status_chat(Methods.OFFLINE, this);
         }
-        Methods.typingTo_chat_Status("noOne");
+        Methods.typingTo_chat_Status(Methods.NO_ONE);
         currentUser("none");
     }
 }

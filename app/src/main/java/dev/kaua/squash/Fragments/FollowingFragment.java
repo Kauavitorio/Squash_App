@@ -27,6 +27,7 @@ import dev.kaua.squash.Data.Account.AsyncFollowingInfo;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ConnectionHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
@@ -125,7 +126,7 @@ public class FollowingFragment extends Fragment {
             progress_following.setVisibility(View.GONE);
         }catch (Exception ex){
             Log.d("FollowingLog", ex.toString());
-            Warnings.showWeHaveAProblem(instance_ac);
+            Warnings.showWeHaveAProblem(instance_ac, ErrorHelper.FOLLOWING_SHOW_LIST);
         }
     }
 

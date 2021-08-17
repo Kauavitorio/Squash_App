@@ -3,6 +3,7 @@ package dev.kaua.squash.Data.Post.Actions;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,9 +27,11 @@ import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
+import dev.kaua.squash.Tools.Warnings;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,6 +40,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class RecommendedPosts extends MainFragment {
+    private static final String TAG = "RECOMMENDED_POSTS";
 
     private static Parcelable recyclerViewState;
     private static DaoFollowing daoFollowing;
@@ -58,7 +62,7 @@ public class RecommendedPosts extends MainFragment {
         //  Checking if user is connected to a network
         if(ConnectionHelper.isOnline(context)){
             daoFollowing = new DaoFollowing(context);
-            reference_posts = myFirebaseHelper.getFirebaseDatabase().getReference("Posts").child("Published");
+            reference_posts = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD);
             reference_posts.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot datasnapshot) {
@@ -98,31 +102,36 @@ public class RecommendedPosts extends MainFragment {
             });
             LoadPostsFromLocal(context, recyclerView, loadingPanel, daoPosts);
 
-        }else ToastHelper.toast((Activity)context , context.getString(R.string.you_are_without_internet), 0);
+        }else ToastHelper.toast((Activity)context , context.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
     }
 
-    private static void LoadPostsFromLocal(Context context, RecyclerView recyclerView, ConstraintLayout loadingPanel, @NonNull DaoPosts daoPosts) {
-        ArrayList<DtoPost> listPostDB = daoPosts.get_post(0);
-        if (listPostDB.size() > 0) {
-            Posts_Adapters posts_adapters;
-            if(ConnectionHelper.isOnline(context)){
-                if(listPostDB.size() == 100 && arraylist_base.size() > 100) posts_adapters = new Posts_Adapters(arraylist_base, context);
-                else
-                if(!arraylist_base.equals(listPostDB)) {
-                    daoPosts.DropTable(0);
-                    daoPosts.Register_Home_Posts(arraylist_base);
-                    posts_adapters = new Posts_Adapters(daoPosts.get_post(0), context);
-                }
-                else posts_adapters = new Posts_Adapters(listPostDB, context);
-            }else posts_adapters = new Posts_Adapters(listPostDB, context);
-            recyclerView.setAdapter(posts_adapters);
-            recyclerView.getRecycledViewPool().clear();
-            if(recyclerViewState != null && recyclerView.getLayoutManager() != null) recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-            loadingPanel.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        } else {
-            recyclerView.setVisibility(View.GONE);
-            loadingPanel.setVisibility(View.VISIBLE);
+    private static void LoadPostsFromLocal(Context mContext, RecyclerView recyclerView, ConstraintLayout loadingPanel, @NonNull DaoPosts daoPosts) {
+        try{
+            ArrayList<DtoPost> listPostDB = daoPosts.get_post(0);
+            if (listPostDB.size() > 0) {
+                Posts_Adapters posts_adapters;
+                if(ConnectionHelper.isOnline(mContext)){
+                    if(listPostDB.size() == 100 && arraylist_base.size() > 100) posts_adapters = new Posts_Adapters(arraylist_base, mContext);
+                    else
+                    if(!arraylist_base.equals(listPostDB)) {
+                        daoPosts.DropTable(0);
+                        daoPosts.Register_Home_Posts(arraylist_base);
+                        posts_adapters = new Posts_Adapters(daoPosts.get_post(0), mContext);
+                    }
+                    else posts_adapters = new Posts_Adapters(listPostDB, mContext);
+                }else posts_adapters = new Posts_Adapters(listPostDB, mContext);
+                recyclerView.setAdapter(posts_adapters);
+                recyclerView.getRecycledViewPool().clear();
+                if(recyclerViewState != null && recyclerView.getLayoutManager() != null) recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                loadingPanel.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.GONE);
+                loadingPanel.setVisibility(View.VISIBLE);
+            }
+        }catch (Exception ex){
+            Log.d(TAG, "Load Feed -> " + ex.toString());
+            Warnings.showWeHaveAProblem(mContext, ErrorHelper.LOAD_FEED_POSTS);
         }
     }
 
@@ -139,8 +148,8 @@ public class RecommendedPosts extends MainFragment {
         //  Checking if user is connected to a network
         if(ConnectionHelper.isOnline(context)){
             reference_posts = myFirebaseHelper.getFirebaseDatabase().getReference();
-            Query applesQuery = reference_posts.child("Posts").child("Published").orderByChild("account_id")
-                    .equalTo(EncryptHelper.encrypt(account.getAccount_id() + ""));
+            Query applesQuery = reference_posts.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("account_id")
+                    .equalTo(EncryptHelper.encrypt(String.valueOf(account.getAccount_id())));
             applesQuery.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot datasnapshot) {

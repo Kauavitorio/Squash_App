@@ -26,6 +26,7 @@ import dev.kaua.squash.Data.Validation.ValidationServices;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.Login;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.Warnings;
@@ -136,13 +137,13 @@ public class ValidateEmailActivity extends AppCompatActivity {
                 else if(response.code() == 203) Warnings.Base_Sheet_Alert(ValidateEmailActivity.this, getString(R.string.the_validation_code_is_invalid), true);
 
                 //  API Server had an error
-                else Warnings.showWeHaveAProblem(ValidateEmailActivity.this);
+                else Warnings.showWeHaveAProblem(ValidateEmailActivity.this, ErrorHelper.EMAIL_VALIDATION_TRY_VALIDATE);
             }
 
             @Override
             public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                 loadingDialog.dismissDialog();
-                Warnings.showWeHaveAProblem(ValidateEmailActivity.this);
+                Warnings.showWeHaveAProblem(ValidateEmailActivity.this, ErrorHelper.EMAIL_VALIDATION_TRY_VALIDATE);
             }
         });
     }

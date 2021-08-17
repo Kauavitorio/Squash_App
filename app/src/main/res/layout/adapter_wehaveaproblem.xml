@@ -30,9 +30,9 @@
                 android:id="@+id/error_title_problem_adapter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/error"
+                android:text="@string/error_code"
                 android:textColor="@color/black"
-                android:textSize="19sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textAlignment="center"
                 android:layout_gravity="center"/>

@@ -72,6 +72,7 @@ import dev.kaua.squash.Notifications.Sender;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.KeyboardUtils;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
@@ -200,13 +201,13 @@ public class PostDetailsActivity extends AppCompatActivity {
                                     MainFragment.RefreshRecycler();
                                     finish();
                                 }else
-                                    Warnings.showWeHaveAProblem(PostDetailsActivity.this);
+                                    Warnings.showWeHaveAProblem(PostDetailsActivity.this, ErrorHelper.POST_DETAIL_DELETE_ACTION);
                             }
 
                             @Override
                             public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                                 loadingDialog.dismissDialog();
-                                Warnings.showWeHaveAProblem(PostDetailsActivity.this);
+                                Warnings.showWeHaveAProblem(PostDetailsActivity.this, ErrorHelper.POST_DETAIL_DELETE_ACTION);
                             }
                         });
                     });
@@ -293,7 +294,7 @@ public class PostDetailsActivity extends AppCompatActivity {
                     public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                         loadingDialog.dismissDialog();
                         hideSoftKeyboard(PostDetailsActivity.this);
-                        Warnings.showWeHaveAProblem(PostDetailsActivity.this);
+                        Warnings.showWeHaveAProblem(PostDetailsActivity.this, ErrorHelper.POST_DETAIL_COMMENT_ACTION);
                     }
                 });
             }else showError(edit_comment_msg, getString(R.string.required_field));
@@ -364,7 +365,7 @@ public class PostDetailsActivity extends AppCompatActivity {
                             }
                         }
                         @Override
-                        public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(PostDetailsActivity.this); }
+                        public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(PostDetailsActivity.this, ErrorHelper.POST_DETAIL_LIKE_ACTION); }
                     });
                 }
             }
@@ -449,7 +450,7 @@ public class PostDetailsActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(@NotNull Call<MyResponse> call, @NotNull Throwable t) {
-                            Warnings.showWeHaveAProblem(PostDetailsActivity.this);
+                            Warnings.showWeHaveAProblem(PostDetailsActivity.this, ErrorHelper.NOTIFICATION_SENDER_POST_COMMENT);
                         }
                     });
                 }
@@ -653,7 +654,7 @@ public class PostDetailsActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                 loadingDialog.dismissDialog();
-                Warnings.showWeHaveAProblem(PostDetailsActivity.this);
+                Warnings.showWeHaveAProblem(PostDetailsActivity.this, ErrorHelper.POST_DETAIL_LOAD_INFO);
             }
         });
 

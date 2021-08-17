@@ -26,6 +26,7 @@ import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
@@ -87,12 +88,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                         }else if(response.code() == 404){
                             email_forgot_password.requestFocus();
                             ToastHelper.toast(ForgotPasswordActivity.this, getString(R.string.user_not_found), ToastHelper.LONG_DURATION);
-                        } else Warnings.showWeHaveAProblem(ForgotPasswordActivity.this);
+                        } else Warnings.showWeHaveAProblem(ForgotPasswordActivity.this, ErrorHelper.FORGOT_PASSWORD_NEXT_API);
                     }
                     @Override
                     public void onFailure(@NonNull Call<DtoAccount> call, @NonNull Throwable t) {
                         loadingDialog.dismissDialog();
-                        Warnings.showWeHaveAProblem(ForgotPasswordActivity.this);
+                        Warnings.showWeHaveAProblem(ForgotPasswordActivity.this, ErrorHelper.FORGOT_PASSWORD_NEXT_API);
                     }
                 });
             }
@@ -127,7 +128,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Call<DtoAccount> call, @NonNull Throwable t) {
                         loadingDialog.dismissDialog();
-                        Warnings.showWeHaveAProblem(ForgotPasswordActivity.this);
+                        Warnings.showWeHaveAProblem(ForgotPasswordActivity.this, ErrorHelper.FORGOT_PASSWORD_CODE_VALIDATION_API);
                     }
                 });
             }
@@ -163,12 +164,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                         if(response.code() == 200){
                             ToastHelper.toast(ForgotPasswordActivity.this, getString(R.string.password_has_successfully_been_changed), ToastHelper.LONG_DURATION);
                             finish();
-                        }else Warnings.showWeHaveAProblem(ForgotPasswordActivity.this);
+                        }else Warnings.showWeHaveAProblem(ForgotPasswordActivity.this, ErrorHelper.FORGOT_PASSWORD_DO_PASSWORD_RESET);
                     }
                     @Override
                     public void onFailure(@NonNull Call<DtoAccount> call, @NonNull Throwable t) {
                         loadingDialog.dismissDialog();
-                        Warnings.showWeHaveAProblem(ForgotPasswordActivity.this);
+                        Warnings.showWeHaveAProblem(ForgotPasswordActivity.this, ErrorHelper.FORGOT_PASSWORD_DO_PASSWORD_RESET);
                     }
                 });
             }

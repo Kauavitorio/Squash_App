@@ -1,4 +1,5 @@
 package dev.kaua.squash.Adapters.Chat;
+
 import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -8,7 +9,6 @@ import android.view.animation.Transformation;
 
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
-
 
 /**
     Copyright 2012 Jake Wharton
@@ -27,7 +27,7 @@ public class ViewSwipeAnimation extends Animation {
 
     public static boolean NEED_PROXY = false;
 
-    private static final WeakHashMap<View, ViewSwipeAnimation> PROXIES = new WeakHashMap<View, ViewSwipeAnimation>();
+    private static final WeakHashMap<View, ViewSwipeAnimation> PROXIES = new WeakHashMap<>();
 
     public static ViewSwipeAnimation wrap(View view) {
         ViewSwipeAnimation proxy = PROXIES.get(view);
@@ -35,9 +35,8 @@ public class ViewSwipeAnimation extends Animation {
         if (proxy == null || proxy != animation && animation != null) {
             proxy = new ViewSwipeAnimation(view);
             PROXIES.put(view, proxy);
-        } else if (animation == null) {
+        } else if (animation == null)
             view.setAnimation(proxy);
-        }
         return proxy;
     }
 
@@ -64,7 +63,7 @@ public class ViewSwipeAnimation extends Animation {
         setDuration(0);
         setFillAfter(true);
         view.setAnimation(this);
-        mView = new WeakReference<View>(view);
+        mView = new WeakReference<>(view);
     }
 
     public float getAlpha() {
