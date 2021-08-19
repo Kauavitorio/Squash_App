@@ -33,6 +33,18 @@
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Activitys.WarnTheUserActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.Setting.AccountSettingActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.Background.BG_DemonstrationActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.Background.BackgroundActivity"
+            android:exported="true" />
+        <activity
             android:name=".Activitys.ProfileInfoActivity"
             android:exported="true" />
         <activity
@@ -60,7 +72,7 @@
             android:name=".Activitys.ForgotPasswordActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.ConnectionUsageActivity"
+            android:name=".Activitys.Setting.ConnectionUsageActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />

@@ -42,6 +42,45 @@
 
             </LinearLayout>
 
+            <!-- My Account -->
+            <LinearLayout
+                android:id="@+id/btn_account_setting"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:minHeight="42dp"
+                android:visibility="gone"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Setting Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_gravity="center"
+                    android:layout_height="25dp"
+                    android:src="@drawable/ic_account"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Setting Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/my_account"/>
+
+            </LinearLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="30dp"
+                android:visibility="gone"
+                android:background="@color/dividing_line_settings"/>
+
             <!-- Notification and Sounds -->
             <LinearLayout
                 android:id="@+id/btn_notifications"
@@ -410,10 +449,10 @@
                 android:id="@+id/txt_app_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/app_name"
+                tools:text="@string/squash_for_mobile"
                 android:textAlignment="center"
                 android:textColor="@color/text_version"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

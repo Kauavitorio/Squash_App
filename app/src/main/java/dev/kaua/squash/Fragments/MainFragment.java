@@ -97,7 +97,7 @@ public class MainFragment extends Fragment {
             if(getContext() != null){
                 DaoAccount db = new DaoAccount(getContext());
                 DtoAccount account_follow = db.get_followers_following(account.getAccount_id());
-                if(following != Long.parseLong(account_follow.getFollowing())) {
+                if(account_follow.getFollowing() != null && following != Long.parseLong(account_follow.getFollowing())) {
                     following = Long.parseLong(account_follow.getFollowing());
                     RefreshRecycler();
                 }

@@ -1,44 +1,22 @@
-package dev.kaua.squash.Activitys;
+package dev.kaua.squash.Activitys.Setting;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.usage.NetworkStatsManager;
-import android.content.Context;
-import android.net.TrafficStats;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Objects;
 
-import dev.kaua.squash.Data.Post.DtoPost;
-import dev.kaua.squash.Data.Post.PostServices;
-import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.R;
-import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
-import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.MyPrefs;
-import dev.kaua.squash.Tools.ToastHelper;
-import dev.kaua.squash.Tools.Warnings;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 @SuppressLint("SetTextI18n")
 public class ConnectionUsageActivity extends AppCompatActivity {

@@ -69,11 +69,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/txt_header_signUp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:maxWidth="320dp"
                 android:minWidth="320dp"
-                app:counterEnabled="true"
-                app:counterMaxLength="25"
                 app:counterTextColor="@color/hint"
                 app:hintEnabled="false"
                 app:hintTextColor="@color/hint">

@@ -241,7 +241,7 @@ public class ChatsFragment extends Fragment {
             Outstanding = 0;
             mAccounts = chatDB.get_CHAT_LIST();
             for(DtoAccount account: mAccounts){
-                if(account.getAccount_id_cry() != null){
+                if(account.getAccount_id_cry() != null && account.getActive() > DtoAccount.ACCOUNT_DISABLE){
                     finalList.add(account);
                 }else Outstanding++;
             }

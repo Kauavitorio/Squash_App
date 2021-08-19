@@ -142,8 +142,8 @@
                 <!-- Image Calendar -->
                 <ImageView
                     android:id="@+id/icon_calendar_profile"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
                     android:layout_below="@+id/txt_user_name"
                     android:layout_marginTop="4dp"
                     android:src="@drawable/ic_calendar"
@@ -158,9 +158,9 @@
                     android:layout_marginStart="2dp"
                     android:layout_marginTop="1dp"
                     android:layout_toEndOf="@+id/icon_calendar_profile"
-                    tools:text="@string/app_name"
                     android:textColor="@color/hint_time_message"
-                    android:textSize="16sp" />
+                    android:textSize="15sp"
+                    tools:text="@string/app_name" />
 
                 <!-- Container Followers and Followings -->
                 <LinearLayout

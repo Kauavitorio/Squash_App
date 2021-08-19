@@ -66,11 +66,11 @@ public class RecommendedPosts extends MainFragment {
             reference_posts.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot datasnapshot) {
-                    daoPosts.DropTable(0);
+                    daoPosts.DropTable(DaoPosts.DROP_POST_AND_IMAGE);
                     arraylist_base.clear();
                     for(DataSnapshot snapshot: datasnapshot.getChildren()){
                         DtoPost post = snapshot.getValue(DtoPost.class);
-                        if(post != null){
+                        if(post != null  && post.getActive() > DtoAccount.ACCOUNT_DISABLE){
                             if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))) == MyPrefs.getUserInformation(context).getAccount_id()||
                                     daoFollowing.check_if_follow(MyPrefs.getUserInformation(context).getAccount_id(),
                                             Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))))){
@@ -147,6 +147,7 @@ public class RecommendedPosts extends MainFragment {
 
         //  Checking if user is connected to a network
         if(ConnectionHelper.isOnline(context)){
+            reference_posts = null;
             reference_posts = myFirebaseHelper.getFirebaseDatabase().getReference();
             Query applesQuery = reference_posts.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("account_id")
                     .equalTo(EncryptHelper.encrypt(String.valueOf(account.getAccount_id())));
@@ -157,9 +158,9 @@ public class RecommendedPosts extends MainFragment {
                     for(DataSnapshot snapshot: datasnapshot.getChildren()){
                         DtoPost dtoPost = snapshot.getValue(DtoPost.class);
                         DtoPost post = new DtoPost();
-                        if(dtoPost != null){
+                        if(dtoPost != null && dtoPost.getAccount_id() != null && dtoPost.getActive() > DtoAccount.ACCOUNT_DISABLE){
                             post.setPost_id(EncryptHelper.decrypt(dtoPost.getPost_id()));
-                            post.setAccount_id(EncryptHelper.decrypt(EncryptHelper.decrypt(dtoPost.getAccount_id())));
+                            post.setAccount_id(EncryptHelper.decrypt(dtoPost.getAccount_id()));
                             post.setVerification_level(EncryptHelper.decrypt(dtoPost.getVerification_level()));
                             post.setName_user(EncryptHelper.decrypt(dtoPost.getName_user()));
                             post.setUsername(EncryptHelper.decrypt(dtoPost.getUsername()));

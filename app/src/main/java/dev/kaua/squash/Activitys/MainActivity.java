@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         bundle = getIntent().getExtras();
         if (sp.contains("pref_account_id") && sp.contains("pref_username")) StartNavigation();
-        else Login.LogOut(this, 1);
+        else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
 
         if(bundle != null){
             if(bundle.getInt(SHARED_TAG) == SHARED_ID){

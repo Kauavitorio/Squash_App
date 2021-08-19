@@ -1,14 +1,17 @@
 package dev.kaua.squash.Data.Account;
 
 public class DtoAccount implements Comparable<DtoAccount>{
-    private long account_id, id_user, verify, status;
+    public static final int ACCOUNT_ACTIVE = 2;
+    public static final int ACCOUNT_RESTRICTION = 1;
+    public static final int ACCOUNT_DISABLE = 0;
+    private long account_id, id_user, verify, status, active;
     private String account_id_cry, id_user_cry;
     private String name_user, username, email, phone_user, password, verify_id;
     private String banner_user, profile_image, bio_user, url_user, following, followers, born_date, joined_date;
     private String message, verification_level;
     private String login_method, token, login_info, trust, date_time_login, UID;
     private String id_following, imageURL, id, typingTo, last_seen;
-    private String account_id_following, status_chat, search, last_chat, chat_id;
+    private String account_id_following, status_chat, search, last_chat, chat_id, reason_warn;
 
     public DtoAccount (){}
 
@@ -21,7 +24,7 @@ public class DtoAccount implements Comparable<DtoAccount>{
         this.status = status;
     }
 
-    public DtoAccount(String account_id_cry, String email, String id, String imageURL, String status_chat, String typingTo, String last_seen, String verification_level) {
+    public DtoAccount(String account_id_cry, String email, String id, String imageURL, String status_chat, String typingTo, String last_seen, String verification_level, long active) {
         this.account_id_cry = account_id_cry;
         this.email = email;
         this.id = id;
@@ -30,6 +33,23 @@ public class DtoAccount implements Comparable<DtoAccount>{
         this.typingTo = typingTo;
         this.last_seen = last_seen;
         this.verification_level = verification_level;
+        this.active = active;
+    }
+
+    public String getReason_warn() {
+        return reason_warn;
+    }
+
+    public void setReason_warn(String reason_warn) {
+        this.reason_warn = reason_warn;
+    }
+
+    public long getActive() {
+        return active;
+    }
+
+    public void setActive(long active) {
+        this.active = active;
     }
 
     public String getChat_id() {

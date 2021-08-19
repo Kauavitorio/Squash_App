@@ -22,6 +22,7 @@ public class DtoPost implements Comparable<DtoPost>{
     private boolean suggestion;
 
     private String likes;
+    private long active;
 
     private String delete_by;
     private String delete_reason;
@@ -57,6 +58,14 @@ public class DtoPost implements Comparable<DtoPost>{
     private String comment_id;
 
     private String verification_level;
+
+    public long getActive() {
+        return active;
+    }
+
+    public void setActive(long active) {
+        this.active = active;
+    }
 
     public boolean isSuggestion() {
         return suggestion;

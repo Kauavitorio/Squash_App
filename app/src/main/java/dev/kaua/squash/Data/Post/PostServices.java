@@ -33,4 +33,7 @@ public interface PostServices {
 
     @POST("user/post/delete/")
     Call<DtoPost> delete_post(@Body DtoPost post );
+
+    @POST("user/admin/warn/user")
+    Call<DtoPost> warn_an_user(@Body DtoAccount account );
 }

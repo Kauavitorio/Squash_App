@@ -27,7 +27,7 @@ public class DaoPosts extends SQLiteOpenHelper {
 
 
     public DaoPosts(@Nullable Context context) {
-        super(context, "DB_POSTS", null, 5);
+        super(context, "DB_POSTS", null, 6);
     }
 
     @Override

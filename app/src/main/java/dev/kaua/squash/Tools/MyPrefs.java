@@ -21,6 +21,7 @@ public abstract class MyPrefs {
     public static final String PREFS_USER = "myPrefs";
     public static final String PREFS_NETWORK_USAGE = "myPrefsNetWorkUsage";
     public static final String PREFS_CONFIG = "myPrefsConfiguration";
+    public static final String PREFS_BASE = "myPrefsBASE01";
     public static final String PREFS_UPDATES = "myPrefsUpdates";
     public static final String PREFS_PRIVACY_POLICY = "myPrefsPrivacyPolicy";
     public static final String PREFS_NOTIFICATION = "myPrefsNotify";
@@ -51,6 +52,7 @@ public abstract class MyPrefs {
         account.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
         account.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
         account.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
+        account.setActive(sp.getLong("pref_active", 1));
 
         return account;
     }
@@ -92,6 +94,19 @@ public abstract class MyPrefs {
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("pref_start_time", timeStamp);
         editor.apply();
+    }
+
+    public static final String OKAY_RESET = "OKAY";
+    public static void setNeedResetAccount(@NonNull Context context, String type){
+        sp = context.getSharedPreferences(PREFS_BASE, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("pref_reset",  type);
+        editor.apply();
+    }
+
+    public static String getNeedResetAccount(@NonNull Context context){
+        sp = context.getSharedPreferences(PREFS_BASE, MODE_PRIVATE);
+        return sp.getString("pref_reset", null);
     }
 
     public static void InsertNetworkStatisticsReset(@NonNull Context context, long rx, long tx){

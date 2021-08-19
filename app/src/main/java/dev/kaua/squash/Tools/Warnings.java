@@ -220,6 +220,26 @@ public class Warnings {
         Dialog.show();
     }
 
+    public static void showAccountDisable(Context context){
+        Dialog = new Dialog(context);
+
+        TextView btnOk_WeHaveAProblem;
+        Dialog.setContentView(R.layout.adapter_wehaveaproblem);
+        Dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        btnOk_WeHaveAProblem = Dialog.findViewById(R.id.btnOk_WeHaveAProblem);
+        Dialog.setCancelable(false);
+        ((TextView)Dialog.findViewById(R.id.error_title_problem_adapter)).setText(context.getString(R.string.suspended_account));
+        ((TextView)Dialog.findViewById(R.id.txt_wehaveAProblemAlert)).setText(context.getString(R.string.your_account_has_been_suspended));
+
+        btnOk_WeHaveAProblem.setOnClickListener(v -> {
+            btnOk_WeHaveAProblem.startAnimation(AnimationUtils.loadAnimation(context,R.anim.click_anim));
+            Dialog.dismiss();
+        });
+
+        Dialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
+        Dialog.show();
+    }
+
     //  Create Show Need Login Message but with shortCut
     public static void NeedLoginWithShortCutAlert(Activity context, int shortCutId) {
         Dialog = new Dialog(context);

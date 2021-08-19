@@ -103,7 +103,7 @@ public class ComposeActivity extends AppCompatActivity {
 
                 //  Set on DtoPost post information
                 DtoPost post = new DtoPost();
-                post.setAccount_id(EncryptHelper.encrypt(userAccount.getAccount_id() + ""));
+                post.setAccount_id(EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
                 post.setPost_time(EncryptHelper.encrypt(time));
                 post.setPost_date(EncryptHelper.encrypt(date));
                 post.setPost_content(EncryptHelper.encrypt(compose_text));
@@ -136,6 +136,7 @@ public class ComposeActivity extends AppCompatActivity {
                                 hashMap.put("profile_image", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getProfile_image()));
                                 hashMap.put("post_likes", EncryptHelper.encrypt(0 + ""));
                                 hashMap.put("post_comments_amount", EncryptHelper.encrypt(0 + ""));
+                                hashMap.put("active", MyPrefs.getUserInformation(ComposeActivity.this).getActive());
                                 reference.child("Posts").child("Published").push().setValue(hashMap);
 
                                 MainFragment.RefreshRecycler();

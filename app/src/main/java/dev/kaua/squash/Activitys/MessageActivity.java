@@ -213,7 +213,7 @@ public class MessageActivity extends AppCompatActivity {
         LoadAnotherUserInfo();
 
         if(ConnectionHelper.isOnline(this)){
-            reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(userId);
+            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(userId);
             reference.addValueEventListener(new ValueEventListener() {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
@@ -664,7 +664,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     void seenMessage(String userUid){
-        reference = myFirebaseHelper.getFirebaseDatabase().getReference().child("Chats");
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference().child(myFirebaseHelper.CHATS_REFERENCE);
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {

@@ -47,6 +47,11 @@ public class SignInActivity extends AppCompatActivity {
         Ids();
         SetTextWatcher();
 
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null)
+            if(bundle.getInt(SplashActivity.ACCOUNT_DISABLE) == Login.DISABLE_ACCOUNT)
+                Warnings.showAccountDisable(this);
+
         btn_next.setOnClickListener(v -> {
             btn_next.startAnimation(myAnim);
             login_method = Objects.requireNonNull(edit_login_method.getText()).toString();

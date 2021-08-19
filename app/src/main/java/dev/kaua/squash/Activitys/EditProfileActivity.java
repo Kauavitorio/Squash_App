@@ -16,9 +16,12 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -60,10 +63,11 @@ import retrofit2.Retrofit;
 
 @SuppressLint("StaticFieldLeak")
 public class EditProfileActivity extends AppCompatActivity {
-    private static final String TAG = "EditProfile";
+    private static final String TAG = "EditProfileLOG";
     public static CircleImageView ic_edit_ProfileUser;
     TextInputEditText edit_name, edit_username, edit_bio;
     Button btn_edit_profile;
+    ImageView close_edit_profile;
     public static DtoAccount user;
     public static String new_image;
     public static StorageReference storageReference;
@@ -79,6 +83,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private LoadingDialog loadingDialog;
     private final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
     InputMethodManager imm;
+    private Animation myAnim;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
@@ -89,6 +94,7 @@ public class EditProfileActivity extends AppCompatActivity {
         Ids();
 
         btn_edit_profile.setOnClickListener(v -> {
+            btn_edit_profile.startAnimation(myAnim);
             if(!username_check) showError(edit_username, getString(R.string.username_is_already_in_use));
             else if(edit_username.getText() == null || edit_username.getText().toString().replace(" ", "").length() < 6)
                 showError(edit_username, getString(R.string.required_field));
@@ -128,7 +134,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             editor.apply();
 
                             //  Register new user on Firebase Database
-                            reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
+                            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
                             HashMap<String, Object> hashMap = new HashMap<>();
 
                             hashMap.put("username", edit_username.getText().toString().trim());
@@ -206,7 +212,9 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onTextChanged(final CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(final Editable s) {
-                if (s.length() >= 6 && !base_username.equals(s.toString())) {
+                boolean test_username = MyPrefs.getUserInformation(EditProfileActivity.this)
+                        .getUsername().equalsIgnoreCase(s.toString().replace(" ", ""));
+                if (!test_username && s.length() >= 5) {
                     timer = new Timer();
                     timer.schedule(new TimerTask() {
                         @Override
@@ -229,14 +237,22 @@ public class EditProfileActivity extends AppCompatActivity {
                             });
                         }
                     }, DELAY);
+                }else {
+                    if(s.toString().length() < 5) edit_username.setError(getString(R.string.your_username_must_contain_at_least));
+                    else edit_username.setError(null);
                 }
             }
         });
     }
 
     private void DoUsernameValidation() {
-        if(!username_check)
-            edit_username.setError(getString(R.string.username_is_already_in_use));
+        if(edit_username.getText() != null){
+            boolean test_username = MyPrefs.getUserInformation(EditProfileActivity.this)
+                    .getUsername().equalsIgnoreCase(edit_username.getText().toString().replace(" ", ""));
+            if(!username_check && !test_username)
+                edit_username.setError(getString(R.string.username_is_already_in_use));
+            else username_check = true;
+        }
     }
 
     private void OpenGallery() {
@@ -325,7 +341,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private void loadUserInfo() {
         user = MyPrefs.getUserInformation(this);
         new_image = user.getProfile_image();
-        Glide.with(this).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+        Glide.with(this).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(ic_edit_ProfileUser);
         edit_name.setText(user.getName_user());
         edit_username.setText(user.getUsername());
@@ -334,10 +350,13 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void Ids() {
+        myAnim = AnimationUtils.loadAnimation(this, R.anim.click_anim);
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         instance = this;
         loadingDialog = new LoadingDialog(this);
         ic_edit_ProfileUser = findViewById(R.id.ic_edit_ProfileUser);
+        close_edit_profile = findViewById(R.id.close_edit_profile);
+        close_edit_profile.setOnClickListener(v -> finish());
         edit_name = findViewById(R.id.edit_name);
         btn_edit_profile = findViewById(R.id.btn_edit_profile);
         edit_username = findViewById(R.id.edit_username);
