@@ -21,6 +21,7 @@ public abstract class MyPrefs {
     public static final String PREFS_USER = "myPrefs";
     public static final String PREFS_NETWORK_USAGE = "myPrefsNetWorkUsage";
     public static final String PREFS_CONFIG = "myPrefsConfiguration";
+    public static final String PREFS_BASE = "myPrefsBASE01";
     public static final String PREFS_UPDATES = "myPrefsUpdates";
     public static final String PREFS_PRIVACY_POLICY = "myPrefsPrivacyPolicy";
     public static final String PREFS_NOTIFICATION = "myPrefsNotify";
@@ -51,13 +52,13 @@ public abstract class MyPrefs {
         account.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
         account.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
         account.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
+        account.setActive(sp.getLong("pref_active", DtoAccount.ACCOUNT_ACTIVE));
 
         return account;
     }
 
     public static void setUpdateRequest_Show(@NonNull Context context, int request){
         sp = context.getSharedPreferences(PREFS_UPDATES, MODE_PRIVATE);
-        sp.edit().clear().apply();
 
         //  Add Request prefs
         SharedPreferences.Editor editor = sp.edit();
@@ -93,6 +94,8 @@ public abstract class MyPrefs {
         editor.putString("pref_start_time", timeStamp);
         editor.apply();
     }
+
+    public static final String OKAY_RESET = "OKAY";
 
     public static void InsertNetworkStatisticsReset(@NonNull Context context, long rx, long tx){
         sp = context.getSharedPreferences(PREFS_NETWORK_USAGE, MODE_PRIVATE);
@@ -135,9 +138,6 @@ public abstract class MyPrefs {
         sp.edit().clear().apply();
         //  Clear User Terms Prefs
         sp = context.getSharedPreferences(PREFS_TERMS, MODE_PRIVATE);
-        sp.edit().clear().apply();
-        //  Clear Privacy Policy Prefs
-        sp = context.getSharedPreferences(PREFS_PRIVACY_POLICY, MODE_PRIVATE);
         sp.edit().clear().apply();
     }
 }

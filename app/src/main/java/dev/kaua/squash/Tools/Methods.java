@@ -85,12 +85,16 @@ public abstract class Methods extends MainActivity {
     public static final String POLICY_PRIVACY_LINK = "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
+    private static long account_id_hold;
 
     //  Method to validate phone number.
     public static boolean isValidPhoneNumber(@NotNull String phone) {
         if (!phone.trim().equals("") && phone.length() > 10) return Patterns.PHONE.matcher(phone).matches();
         return false;
     }
+
+    public static void HoldId(long id){ account_id_hold = id;}
+    public static long getIdHold(){ return account_id_hold;}
 
     //  Method to remove Spaces from String.
     public static String RemoveSpace(String str){
@@ -183,14 +187,17 @@ public abstract class Methods extends MainActivity {
                 public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                     if(response.code() == 200){
                         DtoAccount info = new DtoAccount();
-                        info.setAccount_id(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(sp.getString("pref_account_id", null)))));
-                        assert response.body() != null;
-                        info.setFollowers(response.body().getFollowers());
-                        info.setFollowing(response.body().getFollowing());
-                        DaoAccount daoAccount = new DaoAccount(context);
-                        long lines = daoAccount.Register_Followers_Following(info);
-                        if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
-                        else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+                        String id = EncryptHelper.decrypt(sp.getString("pref_account_id", null));
+                        if(id != null){
+                            info.setAccount_id(Long.parseLong(id));
+                            assert response.body() != null;
+                            info.setFollowers(response.body().getFollowers());
+                            info.setFollowing(response.body().getFollowing());
+                            DaoAccount daoAccount = new DaoAccount(context);
+                            long lines = daoAccount.Register_Followers_Following(info);
+                            if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
+                            else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+                        }
                     }
                 }
                 @Override
@@ -201,8 +208,6 @@ public abstract class Methods extends MainActivity {
 
     //  Method "NumberTrick" is for change number
     //  For example 1000 to 1K and 10000 to 10K
-
-
     private static final NavigableMap<Long, String> suffixes = new TreeMap<>();
     static {
         suffixes.put(1_000L, "k");
@@ -253,6 +258,8 @@ public abstract class Methods extends MainActivity {
         ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
     }
 
+    public static final String ONLINE = "online";
+    public static final String OFFLINE = "offline";
     //  Method to set new user status for chat system
     public static void status_chat(String status, Context context){
         Calendar c = Calendar.getInstance();
@@ -260,7 +267,7 @@ public abstract class Methods extends MainActivity {
         String formattedDate = df_date.format(c.getTime());
         firebaseUser = myFirebaseHelper.getFirebaseUser();
         //noinspection ConstantConditions
-        if(firebaseUser.getUid() != null){
+        if(firebaseUser != null && firebaseUser.getUid() != null){
             reference = null;
             reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
             HashMap<String, Object> hashMap = new HashMap<>();
@@ -277,6 +284,7 @@ public abstract class Methods extends MainActivity {
         return new DateFormatSymbols().getMonths()[month-1];
     }
 
+    public static final String NO_ONE = "noOne";
     //  Method to update typing status for chat system
     public static void typingTo_chat_Status(String typing){
         firebaseUser = null;

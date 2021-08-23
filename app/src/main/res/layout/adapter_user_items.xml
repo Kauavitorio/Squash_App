@@ -19,8 +19,8 @@
         <!-- User Icon Image -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_image_users"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
             android:layout_centerVertical="true"
             android:src="@mipmap/ic_launcher" />
 
@@ -42,7 +42,7 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_centerVertical="true"
-            android:layout_marginStart="3dp"
+            android:layout_marginStart="4dp"
             android:layout_toEndOf="@+id/user_name_users"
             android:src="@drawable/ic_verified_account"
             tools:ignore="ContentDescription" />
@@ -82,11 +82,12 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/user_name_users"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/profile_image_users"
-            android:maxLength="38"
+            android:maxLength="40"
             android:maxLines="1"
-            android:paddingTop="5dp"
+            android:textSize="13sp"
+            tools:text="Kauã Vitorio"
             android:textColor="@color/hint" />
 
         <!-- Card un read message -->

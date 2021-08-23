@@ -9,9 +9,11 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -33,7 +35,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -49,10 +50,7 @@ public class Warnings {
     private static BottomSheetDialog bottomSheetDialog;
     private static Dialog Dialog;
     private static LoadingDialog loadingDialog;
-    static final Retrofit retrofitUser = new Retrofit.Builder()
-            .baseUrl("https://dev-river-api.herokuapp.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+    static final Retrofit retrofitUser = Methods.GetRetrofitBuilder();
 
     public static void showNeedUpdate(Context context, String versionName, long versionCode, int needUpdate){
         if(bottomSheetDialog != null) bottomSheetDialog.dismiss();
@@ -138,7 +136,7 @@ public class Warnings {
                 @Override
                 public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                     loadingDialog.dismissDialog();
-                    Warnings.showWeHaveAProblem(context);
+                    Warnings.showWeHaveAProblem(context, ErrorHelper.EMAIL_SYSTEM_RE_SEND);
                 }
             });
         });
@@ -164,7 +162,7 @@ public class Warnings {
             Intent goTo_intro = new Intent(context, SignInActivity.class);
             ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_right_go, R.anim.move_to_right_go);
             ActivityCompat.startActivity(context, goTo_intro, activityOptionsCompat.toBundle());
-            ((Activity) context).finish();
+            context.finish();
             bottomSheetDialog.dismiss();
         });
 
@@ -174,18 +172,71 @@ public class Warnings {
         bottomSheetDialog.show();
     }
 
-    public static void showWeHaveAProblem(Context context){
+    //  Create Show To Really want to leave?
+    public static void Sheet_Setting_Permissions(Activity context) {
+        bottomSheetDialog = new BottomSheetDialog(context, R.style.BottomSheetTheme);
+        bottomSheetDialog.setCancelable(false);
+        //  Creating View for SheetMenu
+        View sheetView = LayoutInflater.from(context).inflate(R.layout.adapter_sheet_menu_base,
+                context.findViewById(R.id.sheet_menu_base));
+        TextView txt_positive_button_sheet = sheetView.findViewById(R.id.txt_positive_button_sheet);
+        txt_positive_button_sheet.setText(context.getString(R.string.yes));
+
+        //  Set Main Message
+        TextView txt_main_text_sheet = sheetView.findViewById(R.id.txt_main_text_sheet);
+        txt_main_text_sheet.setText(context.getString(R.string.better_display_qr_code));
+
+        sheetView.findViewById(R.id.btn_positive_sheet).setOnClickListener(v -> {
+            context.finish();
+            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            intent.setData(Uri.parse("package:" + context.getPackageName()));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+            bottomSheetDialog.dismiss();
+        });
+
+        sheetView.findViewById(R.id.btn_negative_sheet).setOnClickListener(v -> bottomSheetDialog.dismiss());
+
+        bottomSheetDialog.setContentView(sheetView);
+        bottomSheetDialog.show();
+    }
+
+    public static void showWeHaveAProblem(Context context, String ERROR_CODE){
         Dialog = new Dialog(context);
 
-        CardView btnOk_WeHaveAProblem;
+        TextView btnOk_WeHaveAProblem;
         Dialog.setContentView(R.layout.adapter_wehaveaproblem);
         Dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         btnOk_WeHaveAProblem = Dialog.findViewById(R.id.btnOk_WeHaveAProblem);
-        btnOk_WeHaveAProblem.setElevation(10);
         Dialog.setCancelable(false);
+        ((TextView)Dialog.findViewById(R.id.error_title_problem_adapter)).setText(context.getString(R.string.error_code, ERROR_CODE));
 
-        btnOk_WeHaveAProblem.setOnClickListener(v -> Dialog.dismiss());
+        btnOk_WeHaveAProblem.setOnClickListener(v -> {
+            btnOk_WeHaveAProblem.startAnimation(AnimationUtils.loadAnimation(context,R.anim.click_anim));
+            Dialog.dismiss();
+        });
 
+        Dialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
+        Dialog.show();
+    }
+
+    public static void showAccountDisable(Context context){
+        Dialog = new Dialog(context);
+
+        TextView btnOk_WeHaveAProblem;
+        Dialog.setContentView(R.layout.adapter_wehaveaproblem);
+        Dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        btnOk_WeHaveAProblem = Dialog.findViewById(R.id.btnOk_WeHaveAProblem);
+        Dialog.setCancelable(false);
+        ((TextView)Dialog.findViewById(R.id.error_title_problem_adapter)).setText(context.getString(R.string.suspended_account));
+        ((TextView)Dialog.findViewById(R.id.txt_wehaveAProblemAlert)).setText(context.getString(R.string.your_account_has_been_suspended));
+
+        btnOk_WeHaveAProblem.setOnClickListener(v -> {
+            btnOk_WeHaveAProblem.startAnimation(AnimationUtils.loadAnimation(context,R.anim.click_anim));
+            Dialog.dismiss();
+        });
+
+        Dialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
         Dialog.show();
     }
 

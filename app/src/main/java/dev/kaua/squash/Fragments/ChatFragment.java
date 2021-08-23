@@ -1,6 +1,7 @@
 package dev.kaua.squash.Fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import com.squareup.picasso.Picasso;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -41,6 +43,8 @@ import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.Fragments.Chat.UsersFragment;
+import dev.kaua.squash.Fragments.Chat.UsersOutstandingFragment;
+import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -51,14 +55,16 @@ public class ChatFragment extends Fragment {
     DtoAccount account_info;
     private View view;
     private static ChatFragment instance;
+    private static Activity instance_activity;
     CircleImageView profile_image;
     TextView txt_username_chat;
     private TabLayout tab_layout_chat;
     private ViewPager view_paper_chat;
+    private static DaoChat chatDB;
 
     FirebaseUser firebaseUser;
     DatabaseReference reference;
-    ViewPaperAdapter viewPaperAdapter;
+    static ViewPaperAdapter viewPaperAdapter;
 
     @Nullable
     @Override
@@ -67,7 +73,7 @@ public class ChatFragment extends Fragment {
         Ids(view);
 
         firebaseUser = myFirebaseHelper.getFirebaseUser();
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(firebaseUser.getUid());
         viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
 
         return view;
@@ -88,17 +94,21 @@ public class ChatFragment extends Fragment {
         }
     }
 
-    private void loadViewAdapter() {
+    static int unread = 0;
+    static int Outstanding = 0;
+    static int Outstanding_base = 0;
+    static boolean base_load = true;
+    public void loadViewAdapter() {
 
         if(getContext() != null){
             if(ConnectionHelper.isOnline(getContext())){
-                reference = FirebaseDatabase.getInstance().getReference("Chats");
+                reference = myFirebaseHelper.getFirebaseDatabase().getReference("Chats");
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         if(getActivity() != null){
-                            viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
-                            int unread = 0;
+                            LoadLocalMessageOutstanding();
+
                             for (DataSnapshot snapshot1 : snapshot.getChildren()){
                                 DtoMessage message = snapshot1.getValue(DtoMessage.class);
                                 if(message != null)
@@ -106,15 +116,6 @@ public class ChatFragment extends Fragment {
                                         if(message.getReceiver().equals(firebaseUser.getUid()) && message.getIsSeen() == 0)
                                             unread++;
                             }
-
-                            if(unread == 0)
-                                viewPaperAdapter.addFragment(new ChatsFragment(), getString(R.string.chats));
-                            else
-                                viewPaperAdapter.addFragment(new ChatsFragment(), "(" + unread + ") " + getString(R.string.chats));
-
-                            viewPaperAdapter.addFragment(new UsersFragment(), getString(R.string.following));
-                            view_paper_chat.setAdapter(viewPaperAdapter);
-                            tab_layout_chat.setupWithViewPager(view_paper_chat);
                         }
                     }
                     @Override
@@ -128,8 +129,32 @@ public class ChatFragment extends Fragment {
                 tab_layout_chat.setupWithViewPager(view_paper_chat);
             }
         }
-
     }
+
+    public void LoadLocalMessageOutstanding() {
+        Outstanding = 0;
+        List<DtoAccount> mAccounts = chatDB.get_CHAT_LIST();
+        for(DtoAccount account: mAccounts){
+            if(account.getAccount_id_cry() == null)
+                Outstanding++;
+        }
+        if(Outstanding_base != Outstanding || base_load){
+            base_load = false;
+            viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
+            if(unread == 0)
+                viewPaperAdapter.addFragment(new ChatsFragment(), instance_activity.getString(R.string.chats));
+            else
+                viewPaperAdapter.addFragment(new ChatsFragment(), "(" + unread + ") " + instance_activity.getString(R.string.chats));
+
+            viewPaperAdapter.addFragment(new UsersFragment(), instance_activity.getString(R.string.following));
+
+            if(Outstanding > 0) viewPaperAdapter.addFragment(new UsersOutstandingFragment(), "(" + Outstanding + ") " + instance_activity.getString(R.string.outstanding));
+            view_paper_chat.setAdapter(viewPaperAdapter);
+            tab_layout_chat.setupWithViewPager(view_paper_chat);
+        }
+    }
+
+    public static ChatFragment getInstance(){ return instance; }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -165,6 +190,8 @@ public class ChatFragment extends Fragment {
     private void Ids(@NonNull View view) {
         account_info = MyPrefs.getUserInformation(requireContext());
         instance = this;
+        chatDB = new DaoChat(requireContext());
+        if(getActivity() != null) instance_activity = requireActivity();
         txt_username_chat = view.findViewById(R.id.txt_username_chat);
         profile_image = view.findViewById(R.id.profile_image_chat);
         tab_layout_chat = view.findViewById(R.id.tab_layout_chat);
@@ -175,6 +202,11 @@ public class ChatFragment extends Fragment {
             txt_username_chat.setText(MyPrefs.getUserInformation(getContext()).getName_user());
             Picasso.get().load(MyPrefs.getUserInformation(getContext()).getProfile_image()).into(profile_image);
         }
+        viewPaperAdapter = new ViewPaperAdapter(requireActivity().getSupportFragmentManager());
+        viewPaperAdapter.addFragment(new ChatsFragment(), getString(R.string.chats));
+        viewPaperAdapter.addFragment(new UsersFragment(), getString(R.string.following));
+        view_paper_chat.setAdapter(viewPaperAdapter);
+        tab_layout_chat.setupWithViewPager(view_paper_chat);
     }
 
     static class ViewPaperAdapter extends FragmentPageAdapter{

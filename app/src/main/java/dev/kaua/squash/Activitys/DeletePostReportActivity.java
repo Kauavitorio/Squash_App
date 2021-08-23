@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
@@ -15,7 +14,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -26,9 +24,9 @@ import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
-import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -92,16 +90,16 @@ public class DeletePostReportActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
                             loadingDialog.dismissDialog();
-                            if(response.code() == 200){
+                            if(response.code() == 200)
                                 finish();
-                            }else
-                                Warnings.showWeHaveAProblem(DeletePostReportActivity.this);
+                            else
+                                Warnings.showWeHaveAProblem(DeletePostReportActivity.this, ErrorHelper.DELETE_POST_REPORT_API);
                         }
 
                         @Override
                         public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                             loadingDialog.dismissDialog();
-                            Warnings.showWeHaveAProblem(DeletePostReportActivity.this);
+                            Warnings.showWeHaveAProblem(DeletePostReportActivity.this, ErrorHelper.DELETE_POST_REPORT_API);
                         }
                     });
                 }catch (Exception ex){

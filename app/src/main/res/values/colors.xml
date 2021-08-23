@@ -32,6 +32,7 @@
     <color name="text_version">#72FFFFFF</color>
     <color name="BarColor">#DDDADA</color>
     <color name="base_color">#FF6C26</color>
+    <color name="base_color_disable_btn">#CDFF6C26</color>
     <color name="color_hover">#46FF6C26</color>
     <color name="stroke_chat_left">#0562D0</color>
     <color name="setting_icons">#7A7A7A</color>
@@ -44,4 +45,11 @@
     <color name="tab_background_unselected">#10ace0</color>
     <color name="base_color_disable">#B248C5EF</color>
     <color name="base_color_click">#0F9CCC</color>
+
+    <!-- QRCODE READER -->
+    <color name="zxing_viewfinder_laser">#FF6C26</color>
+    <color name="zxing_result_view">#b0000000</color>
+    <color name="zxing_status_text">#ffffffff</color>
+    <color name="zxing_transparent">#00000000</color>
+    <color name="zxing_viewfinder_mask">#60000000</color>
 </resources>

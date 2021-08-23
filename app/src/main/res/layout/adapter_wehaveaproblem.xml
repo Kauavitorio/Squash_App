@@ -12,74 +12,75 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="30dp"
+        app:cardCornerRadius="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" >
 
         <!-- Container -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             android:padding="20dp">
 
             <!-- Animation -->
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/anim_doggyError"
-                android:layout_width="250dp"
-                android:layout_height="200dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true"
-                app:lottie_rawRes="@raw/error_boat" />
+            <TextView
+                android:id="@+id/error_title_problem_adapter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/error_code"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:layout_gravity="center"/>
 
             <!-- Text We Have A problem -->
             <TextView
                 android:id="@+id/txt_wehaveAProblemAlert"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
+                android:maxWidth="200dp"
                 android:text="@string/weHaveAProblem"
+                android:textColor="@color/hint"
+                android:textSize="16sp"
                 android:textAlignment="center"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/anim_doggyError" />
+                android:layout_gravity="center"/>
 
-            <!-- Btn OK -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnOk_WeHaveAProblem"
-                android:layout_width="wrap_content"
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:visibility="visible"
+                android:layout_gravity="center"
+                android:background="@color/transparent_black"/>
+
+            <LinearLayout
+                android:id="@+id/container_btn_dismiss_error"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="10dp"
-                android:minWidth="130dp"
-                android:minHeight="50dp"
-                app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="@color/base_color"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txt_wehaveAProblemAlert">
+                android:layout_marginTop="10dp">
 
                 <!-- Text Ok -->
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/btnOk_WeHaveAProblem"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:text="@string/ok"
+                    android:text="@string/dismiss"
                     android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:textSize="22sp" />
+                    android:textAlignment="center"
+                    android:textColor="@color/base_color"
+                    android:textSize="20sp" />
 
-            </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 

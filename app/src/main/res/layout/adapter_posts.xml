@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="9dp"
+    android:padding="8dp"
     android:layout_marginTop="5dp"
-    android:layout_marginBottom="5dp"
+    android:layout_marginBottom="3dp"
     android:layout_marginStart="10dp"
     android:layout_marginEnd="10dp"
     android:background="@drawable/background_post"
@@ -100,7 +100,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:maxLength="25"
-                            android:text="@string/app_name"
+                            tools:text="@string/app_name"
                             android:textColor="@color/black"
                             android:textSize="15sp"
                             android:textStyle="bold"
@@ -127,9 +127,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="2dp"
                             android:maxLength="23"
-                            android:text="@string/app_name"
+                            tools:text="@string/app_name"
                             android:textColor="@color/hint"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/ic_account_badge"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -145,7 +145,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/container_user_info_post"
                     android:layout_alignParentStart="true"
-                    android:text="@string/app_name"
+                    tools:text="@string/app_name"
                     android:textColor="@color/hint"
                     android:textSize="12sp" />
 
@@ -156,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txt_date_time_post"
                     android:layout_alignParentStart="true"
-                    android:text="@string/receive_email_terms"
+                    tools:text="@string/receive_email_terms"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
@@ -256,7 +256,7 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
-                            android:layout_marginTop="15dp">
+                            android:layout_marginTop="5dp">
 
                             <!-- Container Likes -->
                             <LinearLayout

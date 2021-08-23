@@ -11,26 +11,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
@@ -39,8 +37,6 @@ import com.yalantis.ucrop.UCrop;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Timer;
@@ -54,6 +50,7 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -66,10 +63,11 @@ import retrofit2.Retrofit;
 
 @SuppressLint("StaticFieldLeak")
 public class EditProfileActivity extends AppCompatActivity {
-    private static final String TAG = "EditProfile";
+    private static final String TAG = "EditProfileLOG";
     public static CircleImageView ic_edit_ProfileUser;
     TextInputEditText edit_name, edit_username, edit_bio;
     Button btn_edit_profile;
+    ImageView close_edit_profile;
     public static DtoAccount user;
     public static String new_image;
     public static StorageReference storageReference;
@@ -85,6 +83,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private LoadingDialog loadingDialog;
     private final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
     InputMethodManager imm;
+    private Animation myAnim;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
@@ -95,6 +94,7 @@ public class EditProfileActivity extends AppCompatActivity {
         Ids();
 
         btn_edit_profile.setOnClickListener(v -> {
+            btn_edit_profile.startAnimation(myAnim);
             if(!username_check) showError(edit_username, getString(R.string.username_is_already_in_use));
             else if(edit_username.getText() == null || edit_username.getText().toString().replace(" ", "").length() < 6)
                 showError(edit_username, getString(R.string.required_field));
@@ -134,7 +134,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             editor.apply();
 
                             //  Register new user on Firebase Database
-                            reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
+                            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
                             HashMap<String, Object> hashMap = new HashMap<>();
 
                             hashMap.put("username", edit_username.getText().toString().trim());
@@ -175,14 +175,14 @@ public class EditProfileActivity extends AppCompatActivity {
                         else if(response.code() == 400) showError(edit_username, getString(R.string.bad_username));
                         else if(response.code() == 405) showError(edit_name, getString(R.string.bad_username));
                         else if(response.code() == 401) showError(edit_username, getString(R.string.username_is_already_in_use));
-                        else Warnings.showWeHaveAProblem(EditProfileActivity.this);
+                        else Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT);
                     }
 
                     @Override
                     public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                         loadingDialog.dismissDialog();
                         btn_edit_profile.setEnabled(true);
-                        Warnings.showWeHaveAProblem(EditProfileActivity.this);
+                        Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT);
                     }
                 });
             }
@@ -212,7 +212,9 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onTextChanged(final CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(final Editable s) {
-                if (s.length() >= 6 && !base_username.equals(s.toString())) {
+                boolean test_username = MyPrefs.getUserInformation(EditProfileActivity.this)
+                        .getUsername().equalsIgnoreCase(s.toString().replace(" ", ""));
+                if (!test_username && s.length() >= 5) {
                     timer = new Timer();
                     timer.schedule(new TimerTask() {
                         @Override
@@ -235,14 +237,22 @@ public class EditProfileActivity extends AppCompatActivity {
                             });
                         }
                     }, DELAY);
+                }else {
+                    if(s.toString().length() < 5) edit_username.setError(getString(R.string.your_username_must_contain_at_least));
+                    else edit_username.setError(null);
                 }
             }
         });
     }
 
     private void DoUsernameValidation() {
-        if(!username_check)
-            edit_username.setError(getString(R.string.username_is_already_in_use));
+        if(edit_username.getText() != null){
+            boolean test_username = MyPrefs.getUserInformation(EditProfileActivity.this)
+                    .getUsername().equalsIgnoreCase(edit_username.getText().toString().replace(" ", ""));
+            if(!username_check && !test_username)
+                edit_username.setError(getString(R.string.username_is_already_in_use));
+            else username_check = true;
+        }
     }
 
     private void OpenGallery() {
@@ -307,7 +317,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
             }catch (Exception ex){
                 dialog.dismissDialog();
-                Warnings.showWeHaveAProblem(EditProfileActivity.this);
+                Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT_IMAGE_UPLOAD);
                 Log.d(TAG, ex.toString());
             }
         }
@@ -316,14 +326,14 @@ public class EditProfileActivity extends AppCompatActivity {
             if(data != null){
                 final Uri resultUri = UCrop.getOutput(data);
                 Profile_Image.SendToCrop(this, resultUri);
-            }else Warnings.showWeHaveAProblem(this);
+            }else Warnings.showWeHaveAProblem(this, ErrorHelper.PROFILE_EDIT_IMAGE_CROP);
         } else if (resultCode == UCrop.RESULT_ERROR) {
             if(data != null){
                 final Throwable cropError = UCrop.getError(data);
                 if(cropError != null)
                     Log.d(TAG, cropError.toString());
             }
-            Warnings.showWeHaveAProblem(this);
+            Warnings.showWeHaveAProblem(this, ErrorHelper.PROFILE_EDIT_IMAGE_CROP);
         }
     }
 
@@ -331,7 +341,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private void loadUserInfo() {
         user = MyPrefs.getUserInformation(this);
         new_image = user.getProfile_image();
-        Glide.with(this).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+        Glide.with(this).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(ic_edit_ProfileUser);
         edit_name.setText(user.getName_user());
         edit_username.setText(user.getUsername());
@@ -340,10 +350,13 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void Ids() {
+        myAnim = AnimationUtils.loadAnimation(this, R.anim.click_anim);
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         instance = this;
         loadingDialog = new LoadingDialog(this);
         ic_edit_ProfileUser = findViewById(R.id.ic_edit_ProfileUser);
+        close_edit_profile = findViewById(R.id.close_edit_profile);
+        close_edit_profile.setOnClickListener(v -> finish());
         edit_name = findViewById(R.id.edit_name);
         btn_edit_profile = findViewById(R.id.btn_edit_profile);
         edit_username = findViewById(R.id.edit_username);

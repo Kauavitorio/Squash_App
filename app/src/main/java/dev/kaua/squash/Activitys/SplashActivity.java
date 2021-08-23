@@ -15,8 +15,10 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
+import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 
@@ -31,6 +33,7 @@ public class SplashActivity extends AppCompatActivity {
     //  Create timer
     private final Handler timer = new Handler();
     public static final String TAG = "SplashActivity";
+    public static final String ACCOUNT_DISABLE = "account_active";
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -131,6 +134,22 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void verifyIfUsersLogged() {
+        DaoSystem daoSystem = new DaoSystem(this);
+        if(daoSystem.getNeedResetAccount()){
+            Bundle bundle = getIntent().getExtras();
+            if(bundle != null) {
+                if(bundle.getInt(ACCOUNT_DISABLE) == Login.DISABLE_ACCOUNT){
+                    Intent goto_intro = new Intent(this, SignInActivity.class);
+                    goto_intro.putExtra(ACCOUNT_DISABLE, Login.DISABLE_ACCOUNT);
+                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
+                    ActivityCompat.startActivity(this, goto_intro, activityOptionsCompat.toBundle());
+                    finishAffinity();
+                }else LoadBase();
+            }else LoadBase();
+        }else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
+    }
+
+    void LoadBase(){
         MyPrefs.setUpdateRequest_Show(this, 0);
         //  Verification of user preference information
         SharedPreferences sp_First = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);

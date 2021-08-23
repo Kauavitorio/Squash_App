@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="dev.kaua.squash">
     <!--
     *  Copyright (c) 2021 Kauã Vitório
@@ -15,6 +16,10 @@
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -28,9 +33,31 @@
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".Activitys.DeletePostReportActivity"
+            android:name=".Activitys.WarnTheUserActivity"
             android:exported="true" />
-        <!-- Image Crop Activity -->
+        <activity
+            android:name=".Activitys.Setting.AccountSettingActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.Background.BG_DemonstrationActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.Background.BackgroundActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.ProfileInfoActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Adapters.CaptureAct"
+            android:screenOrientation="fullSensor"
+            android:stateNotNeeded="true"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".Activitys.QrCodeActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.DeletePostReportActivity"
+            android:exported="true" /> <!-- Image Crop Activity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="fullSensor"
@@ -45,7 +72,7 @@
             android:name=".Activitys.ForgotPasswordActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.ConnectionUsageActivity"
+            android:name=".Activitys.Setting.ConnectionUsageActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />

@@ -18,7 +18,7 @@ public class DaoAccount extends SQLiteOpenHelper {
 
 
     public DaoAccount(@Nullable Context context) {
-        super(context, "DB_ACCOUNT", null, 2);
+        super(context, "DB_ACCOUNT", null, 6);
     }
 
     @Override
@@ -29,8 +29,6 @@ public class DaoAccount extends SQLiteOpenHelper {
     private void createTable(SQLiteDatabase db) {
         //  Create Table
         String command = "CREATE TABLE " + TABLE + "(" +
-                "id bigint primary key," +
-                "account_id bigint not null," +
                 "following bigint not null," +
                 "followers bigint not null)";
 
@@ -51,7 +49,6 @@ public class DaoAccount extends SQLiteOpenHelper {
     public long Register_Followers_Following(DtoAccount account){
         DropTable();
         ContentValues values = new ContentValues();
-        values.put("account_id", account.getAccount_id());
         values.put("following", Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getFollowing()))));
         values.put("followers", Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getFollowers()))));
 
@@ -59,15 +56,13 @@ public class DaoAccount extends SQLiteOpenHelper {
     }
 
     public DtoAccount get_followers_following(long account_id){
-        String command = "SELECT * FROM " + TABLE + " WHERE account_id = ?";
-        String[] params = {account_id + ""};
-        Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        String command = "SELECT * FROM " + TABLE;
+        Cursor cursor = getWritableDatabase().rawQuery(command, null);
         DtoAccount account = new DtoAccount();
 
         while (cursor.moveToNext()) {
-            account.setAccount_id_cry(cursor.getString(1));
-            account.setFollowing(cursor.getString(2) + "");
-            account.setFollowers(cursor.getString(3) + "");
+            account.setFollowing(String.valueOf(cursor.getString(0)));
+            account.setFollowers(String.valueOf(cursor.getString(1)));
         }
         return account;
     }
@@ -75,7 +70,6 @@ public class DaoAccount extends SQLiteOpenHelper {
     public void DropTable(){
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE,null,null);
-        //createTable(db);
     }
 
 }

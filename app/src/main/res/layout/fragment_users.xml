@@ -20,10 +20,29 @@
         android:hint="@string/search_with_dots"
         tools:ignore="Autofill" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_below="@id/search_users"
-        android:id="@+id/recycler_view_users"
+    <!-- No user found -->
+    <TextView
+        android:id="@+id/no_user_fount_user_chat"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"
+        android:text="@string/no_user_found"
+        android:textColor="@color/black"
+        android:textSize="17sp"
+        android:layout_below="@id/search_users"
+        android:textAlignment="center"/>
+
+    <!-- Swipe Recycler -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_following_chat_user"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/search_users">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_users"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

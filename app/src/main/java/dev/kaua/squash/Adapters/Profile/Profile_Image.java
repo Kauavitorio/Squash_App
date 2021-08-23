@@ -19,6 +19,7 @@ import dev.kaua.squash.Activitys.EditProfileActivity;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.CompressImage;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
@@ -73,7 +74,7 @@ public class Profile_Image extends EditProfileActivity {
             }
         } catch (Exception ex) {
             loadingDialog.dismissDialog();
-            Warnings.showWeHaveAProblem(context);
+            Warnings.showWeHaveAProblem(context, ErrorHelper.PROFILE_IMAGE_UPLOAD);
             Log.d("MediaUpload", ex.toString());
         }
     }

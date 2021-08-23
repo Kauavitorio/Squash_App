@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -31,7 +30,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Objects;
 
-import dev.kaua.squash.Activitys.EditProfileActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.SignInActivity;
 import dev.kaua.squash.Activitys.SplashActivity;
@@ -44,7 +42,9 @@ import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
+import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -54,7 +54,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -63,7 +62,7 @@ import static android.content.Context.MODE_PRIVATE;
  *  @author Kaua Vitorio
  **/
 
-public abstract class Login {
+public abstract class Login extends SignInActivity{
     @SuppressLint("StaticFieldLeak")
     private static LoadingDialog loadingDialog;
     private static FirebaseAuth mAuth;
@@ -102,64 +101,74 @@ public abstract class Login {
                     //  Clear all prefs before login user
                     mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
+                    
+                    if(response.body() != null && response.body().getActive() > DtoAccount.ACCOUNT_DISABLE){
+                        try {
+                            txt_login_title.setText(context.getString(R.string.welcome));
+                        }catch (Exception ex){
+                            Log.d(TAG, ex.toString());
+                        }
+                        //  Add User prefs
+                        SharedPreferences.Editor editor = mPrefs.edit();
+                        assert response.body() != null;
+                        editor.putString("pref_account_id", response.body().getAccount_id_cry());
+                        editor.putString("pref_uid", response.body().getUID());
+                        editor.putString("pref_name_user", response.body().getName_user());
+                        editor.putString("pref_username", response.body().getUsername());
+                        editor.putString("pref_email", response.body().getEmail());
+                        editor.putString("pref_phone_user", response.body().getPhone_user());
+                        editor.putString("pref_banner_user", response.body().getBanner_user());
+                        editor.putString("pref_profile_image", response.body().getProfile_image());
+                        editor.putString("pref_bio_user", response.body().getBio_user());
+                        editor.putString("pref_url_user", response.body().getUrl_user());
+                        editor.putString("pref_following", response.body().getFollowing());
+                        editor.putString("pref_followers", response.body().getFollowers());
+                        editor.putString("pref_born_date", response.body().getBorn_date());
+                        editor.putString("pref_joined_date", response.body().getJoined_date());
+                        editor.putString("pref_token", response.body().getToken());
+                        editor.putString("pref_password", EncryptHelper.encrypt(password));
+                        editor.putString("pref_verification_level", response.body().getVerification_level());
+                        editor.putLong("pref_active", response.body().getActive());
+                        editor.apply();
 
-                    //  Add User prefs
-                    SharedPreferences.Editor editor = mPrefs.edit();
-                    assert response.body() != null;
-                    editor.putString("pref_account_id", response.body().getAccount_id_cry());
-                    editor.putString("pref_uid", response.body().getUID());
-                    editor.putString("pref_name_user", response.body().getName_user());
-                    editor.putString("pref_username", response.body().getUsername());
-                    editor.putString("pref_email", response.body().getEmail());
-                    editor.putString("pref_phone_user", response.body().getPhone_user());
-                    editor.putString("pref_banner_user", response.body().getBanner_user());
-                    editor.putString("pref_profile_image", response.body().getProfile_image());
-                    editor.putString("pref_bio_user", response.body().getBio_user());
-                    editor.putString("pref_url_user", response.body().getUrl_user());
-                    editor.putString("pref_following", response.body().getFollowing());
-                    editor.putString("pref_followers", response.body().getFollowers());
-                    editor.putString("pref_born_date", response.body().getBorn_date());
-                    editor.putString("pref_joined_date", response.body().getJoined_date());
-                    editor.putString("pref_token", response.body().getToken());
-                    editor.putString("pref_password", EncryptHelper.encrypt(password));
-                    editor.putString("pref_verification_level", response.body().getVerification_level());
-                    editor.apply();
+                        AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getAccount_id_cry()))), AsyncLikes_Posts.NOT_NOTIFY);
+                        //noinspection unchecked
+                        async.execute();
 
-                    AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getAccount_id_cry()))), AsyncLikes_Posts.NOT_NOTIFY);
-                    //noinspection unchecked
-                    async.execute();
+                        //  Getting Followers and Followings
+                        Methods.LoadFollowersAndFollowing(context, 1);
 
-                    //  Getting Followers and Followings
-                    Methods.LoadFollowersAndFollowing(context, 1);
+                        //  Log in User On Firebase
+                        mAuth = myFirebaseHelper.getFirebaseAuth();
+                        mAuth.signOut();
 
-                    //  Log in User On Firebase
-                    mAuth = myFirebaseHelper.getFirebaseAuth();
-                    mAuth.signOut();
+                        //  Init Analytics
+                        mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(context);
 
-                    //  Init Analytics
-                    mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(context);
+                        //  Login user in firebase to get user instance
+                        mAuth.signInWithEmailAndPassword(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail())), Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
+                                .addOnCompleteListener(task -> {
+                                    loadingDialog.dismissDialog();
+                                    Log.d(TAG, "Login Ok");
+                                    Log.d(TAG, "User " + mAuth.getUid());
 
-                    //  Login user in firebase to get user instance
-                    mAuth.signInWithEmailAndPassword(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail())), Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
-                            .addOnCompleteListener(task -> {
-                                loadingDialog.dismissDialog();
-                                Log.d(TAG, "Login Ok");
-                                Log.d(TAG, "User " + mAuth.getUid());
+                                    //  Creating analytic for login event
+                                    Bundle bundle_Analytics = new Bundle();
+                                    bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, mAuth.getUid());
+                                    bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
+                                    bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+                                    mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle_Analytics);
 
-                                //  Creating analytic for login event
-                                Bundle bundle_Analytics = new Bundle();
-                                bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, mAuth.getUid());
-                                bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
-                                bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
-                                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle_Analytics);
+                                    //  Go To main
+                                    Intent i = new Intent(context, MainActivity.class);
+                                    i.putExtra("shared", 0);
+                                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_left_go, R.anim.move_to_right_go);
+                                    ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
+                                    ((Activity) context).finish();
+                                });
+                    }else LogOut(context, LOGOUT_STATUS_WITHOUT_FLAG, DISABLE_ACCOUNT);
 
-                                //  Go To main
-                                Intent i = new Intent(context, MainActivity.class);
-                                i.putExtra("shared", 0);
-                                ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_left_go, R.anim.move_to_right_go);
-                                ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
-                                ((Activity) context).finish();
-                            });
+
                 }else if(response.code() == 206){
                     Log.d(TAG, "Email not validated");
                     loadingDialog.dismissDialog();
@@ -168,7 +177,7 @@ public abstract class Login {
                     Intent i = new Intent(context, ValidateEmailActivity.class);
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context,R.anim.move_to_left_go, R.anim.move_to_right_go);
                     //noinspection ConstantConditions
-                    i.putExtra("account_id", EncryptHelper.decrypt(response.body().getMessage()));
+                    i.putExtra("account_id", EncryptHelper.decrypt(response.body().getAccount_id_cry()));
                     i.putExtra("email_user", login_method);
                     i.putExtra("password", password);
                     i.putExtra("type_validate", 1);
@@ -181,18 +190,18 @@ public abstract class Login {
                     try {
                         SignInActivity.getInstance().Invalid_email_or_password();
                     }catch (Exception ex){
-                        Warnings.showWeHaveAProblem(context);
+                        Warnings.showWeHaveAProblem(context, ErrorHelper.LOGIN_ACTION_PASSWORD_EMAIL_WARNING);
                     }
                 }
                 else {
                     loadingDialog.dismissDialog();
-                    Warnings.showWeHaveAProblem(context);
+                    Warnings.showWeHaveAProblem(context, ErrorHelper.LOGIN_ACTION);
                 }
             }
             @Override
             public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                 loadingDialog.dismissDialog();
-                Warnings.showWeHaveAProblem(context);
+                Warnings.showWeHaveAProblem(context, ErrorHelper.LOGIN_ACTION);
             }
         });
     }
@@ -224,61 +233,66 @@ public abstract class Login {
                         //  Clear all prefs before login user
                         mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
 
-                        if(MyPrefs.getUserInformation(context).getVerification_level() != null && !MyPrefs.getUserInformation(context).getVerification_level().equals(EncryptHelper.decrypt(response.body().getVerification_level()))){
-                            //  Register new user on Firebase Database
-                            reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
+                        if(response.body().getActive() > DtoAccount.ACCOUNT_DISABLE){
+
+                            //  Update active info
+                            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
                             HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("active", response.body().getActive());
                             hashMap.put("verification_level", response.body().getVerification_level());
 
                             reference.updateChildren(hashMap).addOnCompleteListener(task1 -> {
-                                if(task1.isSuccessful()) Log.d(TAG, "Register in Realtime database Successful");
+                                if(task1.isSuccessful()) Log.d(TAG, "Update in Realtime database Successful");
                             });
 
                             //  Update all user posts
                             DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-                            Query applesQuery = ref.child("Posts").child("Published").orderByChild("account_id")
-                                    .equalTo(EncryptHelper.encrypt(MyPrefs.getUserInformation(context).getAccount_id() + ""));
+                            Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("account_id")
+                                    .equalTo(EncryptHelper.encrypt(String.valueOf(MyPrefs.getUserInformation(context).getAccount_id())));
                             applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
                                     for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
                                         HashMap<String, Object> hashMap = new HashMap<>();
+                                        hashMap.put("active", response.body().getActive());
                                         hashMap.put("verification_level", response.body().getVerification_level());
                                         appleSnapshot.getRef().updateChildren(hashMap);
                                     }
                                 }
                                 @Override
                                 public void onCancelled(@NotNull DatabaseError databaseError) {
-                                    Log.e("EditProfile", "onCancelled", databaseError.toException());
+                                    Log.e(TAG, "onCancelled", databaseError.toException());
                                 }
                             });
-                        }
 
-                        mPrefs.edit().clear().apply();
-                        //  Add User prefs
-                        SharedPreferences.Editor editor = mPrefs.edit();
-                        //noinspection ConstantConditions
-                        editor.putString("pref_account_id", response.body().getAccount_id_cry());
-                        editor.putString("pref_uid", response.body().getUID());
-                        editor.putString("pref_name_user", response.body().getName_user());
-                        editor.putString("pref_username", response.body().getUsername());
-                        editor.putString("pref_email", response.body().getEmail());
-                        editor.putString("pref_phone_user", response.body().getPhone_user());
-                        editor.putString("pref_banner_user", response.body().getBanner_user());
-                        editor.putString("pref_profile_image", response.body().getProfile_image());
-                        editor.putString("pref_bio_user", response.body().getBio_user());
-                        editor.putString("pref_url_user", response.body().getUrl_user());
-                        editor.putString("pref_following", response.body().getFollowing());
-                        editor.putString("pref_followers", response.body().getFollowers());
-                        editor.putString("pref_born_date", response.body().getBorn_date());
-                        editor.putString("pref_joined_date", response.body().getJoined_date());
-                        editor.putString("pref_token", response.body().getToken());
-                        editor.putString("pref_password", EncryptHelper.encrypt(password));
-                        editor.putString("pref_verification_level", response.body().getVerification_level());
-                        editor.apply();
+                            if(response.body() != null){
+                                mPrefs.edit().clear().apply();
+                                //  Add User prefs
+                                SharedPreferences.Editor editor = mPrefs.edit();
+                                editor.putString("pref_account_id", response.body().getAccount_id_cry());
+                                editor.putString("pref_uid", response.body().getUID());
+                                editor.putString("pref_name_user", response.body().getName_user());
+                                editor.putString("pref_username", response.body().getUsername());
+                                editor.putString("pref_email", response.body().getEmail());
+                                editor.putString("pref_phone_user", response.body().getPhone_user());
+                                editor.putString("pref_banner_user", response.body().getBanner_user());
+                                editor.putString("pref_profile_image", response.body().getProfile_image());
+                                editor.putString("pref_bio_user", response.body().getBio_user());
+                                editor.putString("pref_url_user", response.body().getUrl_user());
+                                editor.putString("pref_following", response.body().getFollowing());
+                                editor.putString("pref_followers", response.body().getFollowers());
+                                editor.putString("pref_born_date", response.body().getBorn_date());
+                                editor.putString("pref_joined_date", response.body().getJoined_date());
+                                editor.putString("pref_token", response.body().getToken());
+                                editor.putString("pref_password", EncryptHelper.encrypt(password));
+                                editor.putString("pref_verification_level", response.body().getVerification_level());
+                                editor.putLong("pref_active", response.body().getActive());
+                                editor.apply();
 
-                        //  Getting Followers and Followings
-                        Methods.LoadFollowersAndFollowing(context, 1);
+                                //  Getting Followers and Followings
+                                Methods.LoadFollowersAndFollowing(context, 1);
+                            }
+                        }else LogOut(context, LOGOUT_STATUS_WITHOUT_FLAG, DISABLE_ACCOUNT);
                     }
                 }else if(response.code() == 206){
                     Log.d(TAG, "Email not validated");
@@ -296,7 +310,7 @@ public abstract class Login {
                 }else if(response.code() == 401) {
                     Log.d(TAG, "Login Method or Password is not valid");
                     loadingDialog.dismissDialog();
-                    LogOut(context, 1);
+                    LogOut(context, LOGOUT_STATUS_WITHOUT_FLAG, NOT_DISABLE_ACCOUNT);
                 }
             }
             @Override
@@ -305,7 +319,11 @@ public abstract class Login {
     }
 
     static Handler timer = new Handler();
-    public static void LogOut(Context context, int status){
+    public static final int LOGOUT_STATUS_FLAG = 0;
+    public static final int LOGOUT_STATUS_WITHOUT_FLAG = 1;
+    public static final int NOT_DISABLE_ACCOUNT = 1;
+    public static final int DISABLE_ACCOUNT = 333;
+    public static void LogOut(Context context, int status, int active){
         loadingDialog = null;
         loadingDialog = new LoadingDialog((Activity)context);
         loadingDialog.startLoading();
@@ -333,13 +351,16 @@ public abstract class Login {
             daoFollowing.DropTable();
 
             DaoPosts daoPosts = new DaoPosts(context);
-            daoPosts.DropTable(DaoPosts.DROP_ALL);
+            daoPosts.ClearTable(DaoPosts.DROP_ALL);
 
             timer.postDelayed(() -> {
                 ((Activity)context).finishAffinity();
+                DaoSystem daoSystem = new DaoSystem(context);
+                daoSystem.setNeedResetAccount(MyPrefs.OKAY_RESET);
                 final Intent i;
-                if(status == 0 ) i = new Intent(context, SplashActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                if(status == LOGOUT_STATUS_FLAG ) i = new Intent(context, SplashActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 else i = new Intent(context, SplashActivity.class);
+                i.putExtra(SplashActivity.ACCOUNT_DISABLE, active);
                 context.startActivity(i);
                 loadingDialog.dismissDialog();
             },1000);

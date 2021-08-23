@@ -37,6 +37,7 @@ import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.Warnings;
@@ -250,7 +251,7 @@ public class Comments_Adapters extends RecyclerView.Adapter<Comments_Adapters.My
                         async.execute();
                     }
                     @Override
-                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(mContext); }
+                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(mContext, ErrorHelper.COMMENT_LIKE_ACTION); }
                 });
             }
         }else Warnings.NeedLoginWithShortCutAlert((Activity) mContext, 0);

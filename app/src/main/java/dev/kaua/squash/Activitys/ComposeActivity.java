@@ -46,6 +46,7 @@ import dev.kaua.squash.Fragments.MainFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -102,7 +103,7 @@ public class ComposeActivity extends AppCompatActivity {
 
                 //  Set on DtoPost post information
                 DtoPost post = new DtoPost();
-                post.setAccount_id(EncryptHelper.encrypt(userAccount.getAccount_id() + ""));
+                post.setAccount_id(EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
                 post.setPost_time(EncryptHelper.encrypt(time));
                 post.setPost_date(EncryptHelper.encrypt(date));
                 post.setPost_content(EncryptHelper.encrypt(compose_text));
@@ -135,19 +136,20 @@ public class ComposeActivity extends AppCompatActivity {
                                 hashMap.put("profile_image", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getProfile_image()));
                                 hashMap.put("post_likes", EncryptHelper.encrypt(0 + ""));
                                 hashMap.put("post_comments_amount", EncryptHelper.encrypt(0 + ""));
+                                hashMap.put("active", MyPrefs.getUserInformation(ComposeActivity.this).getActive());
                                 reference.child("Posts").child("Published").push().setValue(hashMap);
 
                                 MainFragment.RefreshRecycler();
                                 ProfileFragment.getInstance().ReloadRecycler();
                                 finish();
                             }
-                        }else Warnings.showWeHaveAProblem(ComposeActivity.this);
+                        }else Warnings.showWeHaveAProblem(ComposeActivity.this, ErrorHelper.NEW_POST_COMPOSE);
                     }
 
                     @Override
                     public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                         loadingDialog.dismissDialog();
-                        Warnings.showWeHaveAProblem(ComposeActivity.this);
+                        Warnings.showWeHaveAProblem(ComposeActivity.this, ErrorHelper.NEW_POST_COMPOSE);
                     }
                 });
             }
@@ -198,7 +200,7 @@ public class ComposeActivity extends AppCompatActivity {
 
                         } else {
                             loadingDialog.dismissDialog();
-                            Warnings.showWeHaveAProblem(ComposeActivity.this);
+                            Warnings.showWeHaveAProblem(ComposeActivity.this, ErrorHelper.NEW_POST_COMPOSE_IMAGE_UPLOAD);
                             Log.d("MediaUpload", Objects.requireNonNull(task.getException()).toString());
                         }
                     });
@@ -209,7 +211,7 @@ public class ComposeActivity extends AppCompatActivity {
                 }
             } catch (Exception ex) {
                 loadingDialog.dismissDialog();
-                Warnings.showWeHaveAProblem(this);
+                Warnings.showWeHaveAProblem(this, ErrorHelper.NEW_POST_COMPOSE_IMAGE_UPLOAD);
                 Log.d("MediaUpload", ex.toString());
             }
         }
@@ -276,7 +278,7 @@ public class ComposeActivity extends AppCompatActivity {
     }
 
     private void RemoveImage(LoadingDialog loadingDialog, int position) {
-        firebaseStorage = FirebaseStorage.getInstance();
+        firebaseStorage = myFirebaseHelper.getFirebaseStorageInstance();
         StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(post_image.get(position))));
         photoRef.delete().addOnSuccessListener(aVoid -> {
             // File deleted successfully

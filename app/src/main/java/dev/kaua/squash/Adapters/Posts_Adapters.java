@@ -34,7 +34,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -67,6 +66,7 @@ import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
+import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -154,7 +154,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                                 @Override
                                 public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                                     loadingDialog.dismissDialog();
-                                    Warnings.showWeHaveAProblem(mContext);
+                                    Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_MENTION_CLICK);
                                 }
                             });
                         }).into(holder.txt_post_content);
@@ -412,13 +412,13 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                                                                 Log.d("POSTS_ADAPTER", ex.toString());
                                                             }
                                                         }else
-                                                            Warnings.showWeHaveAProblem(mContext);
+                                                            Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_DELETE_ACTION);
                                                     }
 
                                                     @Override
                                                     public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
                                                         loadingDialog.dismissDialog();
-                                                        Warnings.showWeHaveAProblem(mContext);
+                                                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_DELETE_ACTION);
                                                     }
                                                 });
                                             }catch (Exception ex){

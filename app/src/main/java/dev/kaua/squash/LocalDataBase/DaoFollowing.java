@@ -18,7 +18,7 @@ public class DaoFollowing extends SQLiteOpenHelper {
 
 
     public DaoFollowing(@Nullable Context context) {
-        super(context, "DB_FOLLOWING", null, 1);
+        super(context, "DB_FOLLOWING", null, 3);
     }
 
     @Override
