@@ -197,4 +197,5 @@
     <string name="reactivated">reativada</string>
     <string name="suspended_account">Conta suspensa</string>
     <string name="your_account_has_been_suspended">Sua conta foi suspensa devido à duas violações de regras da Squash. Para tentar recuperar sua conta, entre em contato conosco via email. contato@kauavitorio.com</string>
+    <string name="welcome">Bem-vindo(a)</string>
 </resources>

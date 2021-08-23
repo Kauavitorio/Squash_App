@@ -22,11 +22,11 @@
         <ImageView
             android:id="@+id/ic_logo_signin"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:src="@drawable/logo_with_name"
+            android:layout_height="55dp"
+            android:layout_above="@id/container_input_signIn"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_above="@id/container_input_signIn"
+            android:src="@drawable/logo_with_name"
             tools:ignore="ContentDescription" />
 
         <!-- Inputs Container -->
@@ -58,10 +58,10 @@
                 android:id="@+id/txt_login_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/login_to_squash"
-                android:layout_marginTop="10dp"
-                android:textAlignment="center"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:text="@string/login_to_squash"
+                android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -71,10 +71,10 @@
                 android:id="@+id/edit_ls_login_method_signIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_below="@id/txt_login_title"
+                android:layout_marginTop="12dp"
                 app:hintEnabled="true"
-                app:hintTextColor="@color/white"
-                android:layout_below="@id/txt_login_title">
+                app:hintTextColor="@color/white">
 
                 <!-- Edit Text -->
                 <com.google.android.material.textfield.TextInputEditText
@@ -82,11 +82,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/hint"
-                    android:textColorHint="@color/hint"
-                    android:textColor="@color/hint"
                     android:hint="@string/phone_email_or_username"
                     android:inputType="text"
                     android:minHeight="50dp"
+                    android:textColor="@color/hint"
+                    android:textColorHint="@color/hint"
                     android:textSize="18sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -96,7 +96,7 @@
                 android:id="@+id/edit_ls_password_signIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="13dp"
+                android:layout_marginTop="10dp"
                 android:maxWidth="320dp"
                 android:minWidth="320dp"
                 app:hintEnabled="true"
@@ -135,15 +135,15 @@
                 android:id="@+id/btn_next_signIn"
                 android:layout_width="175dp"
                 android:layout_height="45dp"
+                android:layout_below="@id/txt_forget_password"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="1dp"
+                android:background="@drawable/custom_button_disable_next"
+                android:enabled="false"
                 android:text="@string/next"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:enabled="false"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="1dp"
-                android:layout_centerHorizontal="true"
-                android:background="@drawable/custom_button_disable_next"
-                android:layout_below="@id/txt_forget_password"/>
+                android:textStyle="bold" />
 
         </RelativeLayout>
 

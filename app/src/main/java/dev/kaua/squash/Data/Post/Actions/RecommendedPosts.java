@@ -44,6 +44,7 @@ public class RecommendedPosts extends MainFragment {
 
     private static Parcelable recyclerViewState;
     private static DaoFollowing daoFollowing;
+    private static boolean loaded = false;
     private static DatabaseReference reference_posts;
     static ArrayList<DtoPost> arraylist_base = new ArrayList<>();
     public static final String BASE_POST_ID = "99999";
@@ -60,13 +61,12 @@ public class RecommendedPosts extends MainFragment {
         LoadPostsFromLocal(context, recyclerView, loadingPanel, daoPosts);
 
         //  Checking if user is connected to a network
-        if(ConnectionHelper.isOnline(context)){
+       if(ConnectionHelper.isOnline(context)){
             daoFollowing = new DaoFollowing(context);
             reference_posts = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD);
             reference_posts.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot datasnapshot) {
-                    daoPosts.DropTable(DaoPosts.DROP_POST_AND_IMAGE);
                     arraylist_base.clear();
                     for(DataSnapshot snapshot: datasnapshot.getChildren()){
                         DtoPost post = snapshot.getValue(DtoPost.class);
@@ -93,6 +93,7 @@ public class RecommendedPosts extends MainFragment {
                             }
                         }
                     }
+                    loaded = true;
                     if(recyclerView.getLayoutManager() != null) recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
                     daoPosts.Register_Home_Posts(arraylist_base);
                     LoadPostsFromLocal(context, recyclerView, loadingPanel, daoPosts);
@@ -107,16 +108,15 @@ public class RecommendedPosts extends MainFragment {
 
     private static void LoadPostsFromLocal(Context mContext, RecyclerView recyclerView, ConstraintLayout loadingPanel, @NonNull DaoPosts daoPosts) {
         try{
-            ArrayList<DtoPost> listPostDB = daoPosts.get_post(0);
+            ArrayList<DtoPost> listPostDB = daoPosts.get_post();
             if (listPostDB.size() > 0) {
                 Posts_Adapters posts_adapters;
-                if(ConnectionHelper.isOnline(mContext)){
+                if(ConnectionHelper.isOnline(mContext) && loaded){
                     if(listPostDB.size() == 100 && arraylist_base.size() > 100) posts_adapters = new Posts_Adapters(arraylist_base, mContext);
-                    else
-                    if(!arraylist_base.equals(listPostDB)) {
-                        daoPosts.DropTable(0);
+                    else if(!arraylist_base.equals(listPostDB)) {
                         daoPosts.Register_Home_Posts(arraylist_base);
-                        posts_adapters = new Posts_Adapters(daoPosts.get_post(0), mContext);
+                        ArrayList<DtoPost> listLocal = daoPosts.get_post();
+                        posts_adapters = new Posts_Adapters(listLocal, mContext);
                     }
                     else posts_adapters = new Posts_Adapters(listPostDB, mContext);
                 }else posts_adapters = new Posts_Adapters(listPostDB, mContext);

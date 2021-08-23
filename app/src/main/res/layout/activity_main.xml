@@ -18,7 +18,7 @@
         android:id="@+id/container_bottom_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="45dp"
+        android:minHeight="40dp"
         android:background="@drawable/background_bottom_main"
         android:layout_alignParentBottom="true"
         app:layout_constraintBottom_toBottomOf="parent"

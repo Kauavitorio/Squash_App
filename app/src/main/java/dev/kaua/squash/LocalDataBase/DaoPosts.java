@@ -89,9 +89,9 @@ public class DaoPosts extends SQLiteOpenHelper {
     }
 
     public void Register_Home_Posts(ArrayList<DtoPost> post){
-        //DropTable();
+        ClearTable(DROP_POST_AND_IMAGE);
         int size = Math.min(post.size(), 100);
-        for (int i = 0; i< size; i++){
+        for (int i = 0; i < size; i++){
             ContentValues values = new ContentValues();
             values.put("post_id", Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id())));
             values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
@@ -126,39 +126,41 @@ public class DaoPosts extends SQLiteOpenHelper {
     }
 
     public void Register_Likes(ArrayList<DtoPost> post){
-        DropTable(1);
+        ClearTable(DROP_LIKES);
         if(post != null && post.size() > 0)
         for (int i = 0; i< post.size(); i++){
-            ContentValues values = new ContentValues();
-            values.put("post_id", Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id())));
-            values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
-
-            getWritableDatabase().insert(TABLE_LIKES, null, values);
+            if(post.get(i) != null && post.get(i).getPost_id() != null && post.get(i).getAccount_id() != null){
+                ContentValues values = new ContentValues();
+                values.put("post_id", Long.parseLong(post.get(i).getPost_id()));
+                values.put("account_id", Long.parseLong(post.get(i).getAccount_id()));
+                getWritableDatabase().insert(TABLE_LIKES, null, values);
+            }
         }
     }
 
-    public ArrayList<DtoPost> get_post(long account_id){
-        String command = "SELECT * FROM " + TABLE_POSTS + " WHERE account_id > ? ORDER BY post_id DESC";
-        String[] params = {account_id + ""};
-        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+    public ArrayList<DtoPost> get_post(){
+        String command = "SELECT * FROM " + TABLE_POSTS + " ORDER BY post_id DESC";
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, null);
         ArrayList<DtoPost> dtoPosts = new ArrayList<>();
 
         while (cursor.moveToNext()) {
             DtoPost post = new DtoPost();
-            post.setPost_id(cursor.getString(0));
-            post.setAccount_id(cursor.getString(1));
-            post.setVerification_level(cursor.getString(2));
-            post.setName_user(cursor.getString(3));
-            post.setUsername(cursor.getString(4));
-            post.setProfile_image(cursor.getString(5));
-            post.setPost_date(cursor.getString(6));
-            post.setPost_time(cursor.getString(7));
-            post.setPost_content(cursor.getString(8));
-            post.setPost_likes(cursor.getString(9));
-            post.setPost_images(Collections.singletonList(cursor.getString(10)));
-            post.setPost_comments_amount(cursor.getString(11));
-            post.setPost_topic(cursor.getString(12));
-            dtoPosts.add(post);
+            if(cursor.getString(0) != null){
+                post.setPost_id(cursor.getString(0));
+                post.setAccount_id(cursor.getString(1));
+                post.setVerification_level(cursor.getString(2));
+                post.setName_user(cursor.getString(3));
+                post.setUsername(cursor.getString(4));
+                post.setProfile_image(cursor.getString(5));
+                post.setPost_date(cursor.getString(6));
+                post.setPost_time(cursor.getString(7));
+                post.setPost_content(cursor.getString(8));
+                post.setPost_likes(cursor.getString(9));
+                post.setPost_images(Collections.singletonList(cursor.getString(10)));
+                post.setPost_comments_amount(cursor.getString(11));
+                post.setPost_topic(cursor.getString(12));
+                dtoPosts.add(post);
+            }
         }
         return dtoPosts;
     }
@@ -168,7 +170,6 @@ public class DaoPosts extends SQLiteOpenHelper {
         String[] params = {post_id + ""};
         @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
         DtoPost post = new DtoPost();
-
         ArrayList<String> img_list = new ArrayList<>();
 
         while (cursor.moveToNext()) {
@@ -180,30 +181,31 @@ public class DaoPosts extends SQLiteOpenHelper {
         return post;
     }
 
+    @SuppressLint("Recycle")
     public boolean get_A_Like(long post_id, long account_id){
         String command = "SELECT * FROM " + TABLE_LIKES + " WHERE  post_id = ? and account_id = ?";
         String[] params = {String.valueOf(post_id), String.valueOf(account_id)};
-        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
-        return cursor.moveToFirst();
+        return getWritableDatabase().rawQuery(command, params).moveToFirst();
     }
 
     public void delete_like(long post_id, long account_id){
         String command = "SELECT * FROM " + TABLE_LIKES + " WHERE  post_id = ? and account_id = ?";
         String[] params = {String.valueOf(post_id), String.valueOf(account_id)};
         @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
-        if(cursor.moveToFirst()){
+        if(cursor.moveToFirst())
             getWritableDatabase().delete(TABLE_LIKES, "post_id = ? and account_id = ?", new String[]{String.valueOf(post_id), String.valueOf(account_id)});
-        }
     }
 
     public void Register_Likes_Comments(ArrayList<DtoPost> post){
-        DropTable(2);
+        ClearTable(2);
         if(post != null && post.size() > 0)
             for (int i = 0; i< post.size(); i++){
-                ContentValues values = new ContentValues();
-                values.put("comment_id", Long.parseLong(Objects.requireNonNull(post.get(i).getComment_id())));
-                values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
-                getWritableDatabase().insert(TABLE_LIKES_COMMENTS, null, values);
+                if(post.get(i) != null && post.get(i).getComment_id() != null && post.get(i).getAccount_id() != null){
+                    ContentValues values = new ContentValues();
+                    values.put("comment_id", Long.parseLong(post.get(i).getComment_id()));
+                    values.put("account_id", Long.parseLong(post.get(i).getAccount_id()));
+                    getWritableDatabase().insert(TABLE_LIKES_COMMENTS, null, values);
+                }
             }
     }
 
@@ -232,14 +234,14 @@ public class DaoPosts extends SQLiteOpenHelper {
         getWritableDatabase().insert(TABLE_LIKES_COMMENTS, null, values);
     }
 
+    @SuppressLint("Recycle")
     public boolean get_A_Like_comment(long comment_id, long account_id){
         String command = "SELECT * FROM " + TABLE_LIKES_COMMENTS + " WHERE  comment_id = ? and account_id = ?";
         String[] params = {String.valueOf(comment_id), String.valueOf(account_id)};
-        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
-        return cursor.moveToFirst();
+        return getWritableDatabase().rawQuery(command, params).moveToFirst();
     }
 
-    public void DropTable(int type){
+    public void ClearTable(int type){
         SQLiteDatabase db = this.getWritableDatabase();
         if(type == DROP_POST_AND_IMAGE){
             db.delete(TABLE_POSTS,null,null);
@@ -255,7 +257,7 @@ public class DaoPosts extends SQLiteOpenHelper {
         }
         else
             db.delete(TABLE_LIKES_COMMENTS,null,null);
-        Log.d("InsertPost", "Dropped");
+        Log.d("PostsDB", "Clear type -> " + type);
         //createTable(db);
     }
 

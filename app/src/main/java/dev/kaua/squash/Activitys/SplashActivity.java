@@ -15,6 +15,7 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
+import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.Login;
@@ -133,10 +134,11 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void verifyIfUsersLogged() {
-        if(MyPrefs.getNeedResetAccount(this) != null){
+        DaoSystem daoSystem = new DaoSystem(this);
+        if(daoSystem.getNeedResetAccount()){
             Bundle bundle = getIntent().getExtras();
-            if(bundle != null){
-                if(bundle.getInt("ACCOUNT_DISABLE") == Login.DISABLE_ACCOUNT){
+            if(bundle != null) {
+                if(bundle.getInt(ACCOUNT_DISABLE) == Login.DISABLE_ACCOUNT){
                     Intent goto_intro = new Intent(this, SignInActivity.class);
                     goto_intro.putExtra(ACCOUNT_DISABLE, Login.DISABLE_ACCOUNT);
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
@@ -144,10 +146,7 @@ public class SplashActivity extends AppCompatActivity {
                     finishAffinity();
                 }else LoadBase();
             }else LoadBase();
-        }else{
-            MyPrefs.setNeedResetAccount(this, MyPrefs.OKAY_RESET);
-            Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
-        }
+        }else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
     }
 
     void LoadBase(){

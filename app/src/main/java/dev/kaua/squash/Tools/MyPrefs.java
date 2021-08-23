@@ -52,14 +52,13 @@ public abstract class MyPrefs {
         account.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
         account.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
         account.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
-        account.setActive(sp.getLong("pref_active", 1));
+        account.setActive(sp.getLong("pref_active", DtoAccount.ACCOUNT_ACTIVE));
 
         return account;
     }
 
     public static void setUpdateRequest_Show(@NonNull Context context, int request){
         sp = context.getSharedPreferences(PREFS_UPDATES, MODE_PRIVATE);
-        sp.edit().clear().apply();
 
         //  Add Request prefs
         SharedPreferences.Editor editor = sp.edit();
@@ -97,17 +96,6 @@ public abstract class MyPrefs {
     }
 
     public static final String OKAY_RESET = "OKAY";
-    public static void setNeedResetAccount(@NonNull Context context, String type){
-        sp = context.getSharedPreferences(PREFS_BASE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString("pref_reset",  type);
-        editor.apply();
-    }
-
-    public static String getNeedResetAccount(@NonNull Context context){
-        sp = context.getSharedPreferences(PREFS_BASE, MODE_PRIVATE);
-        return sp.getString("pref_reset", null);
-    }
 
     public static void InsertNetworkStatisticsReset(@NonNull Context context, long rx, long tx){
         sp = context.getSharedPreferences(PREFS_NETWORK_USAGE, MODE_PRIVATE);

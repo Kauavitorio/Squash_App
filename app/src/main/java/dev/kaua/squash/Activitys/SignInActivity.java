@@ -32,6 +32,7 @@ import dev.kaua.squash.Tools.Warnings;
 
 public class SignInActivity extends AppCompatActivity {
     private static SignInActivity instance;
+    public static TextView txt_login_title;
     private Button btn_next;
     private ImageView btn_back;
     private TextView txt_forget_password;
@@ -54,14 +55,17 @@ public class SignInActivity extends AppCompatActivity {
 
         btn_next.setOnClickListener(v -> {
             btn_next.startAnimation(myAnim);
-            login_method = Objects.requireNonNull(edit_login_method.getText()).toString();
-            password = Objects.requireNonNull(edit_password.getText()).toString();
-            Login.DoLogin(this, login_method, password);
+            if(edit_login_method.getText() != null && edit_password.getText() != null){
+                login_method = edit_login_method.getText().toString();
+                password = edit_password.getText().toString();
+                Login.DoLogin(this, login_method, password);
+            }
         });
 
         btn_back.setOnClickListener(v -> goTo_intro());
 
         txt_forget_password.setOnClickListener(v -> {
+            txt_forget_password.startAnimation(myAnim);
             Intent i = new Intent(this, ForgotPasswordActivity.class);
             if(edit_login_method.getText() != null &&
                     Patterns.EMAIL_ADDRESS.matcher(edit_login_method.getText().toString().replace(" ", "")).matches())
@@ -93,12 +97,14 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void CheckInputs(){
-        if(Objects.requireNonNull(edit_login_method.getText()).toString().length() > 0 && Objects.requireNonNull(edit_password.getText()).toString().length() > 0){
-            btn_next.setEnabled(true);
-            btn_next.setBackgroundResource(R.drawable.custom_button_next);
-        }else{
-            btn_next.setEnabled(false);
-            btn_next.setBackgroundResource(R.drawable.custom_button_disable_next);
+        if(edit_login_method.getText() != null && edit_password.getText() != null){
+            if(edit_login_method.getText().toString().length() > 0 && edit_password.getText().toString().length() > 0){
+                btn_next.setEnabled(true);
+                btn_next.setBackgroundResource(R.drawable.custom_button_next);
+            }else{
+                btn_next.setEnabled(false);
+                btn_next.setBackgroundResource(R.drawable.custom_button_disable_next);
+            }
         }
     }
 
@@ -109,6 +115,7 @@ public class SignInActivity extends AppCompatActivity {
         edit_password = findViewById(R.id.edit_password_signIn);
         btn_next = findViewById(R.id.btn_next_signIn);
         txt_forget_password = findViewById(R.id.txt_forget_password);
+        txt_login_title = findViewById(R.id.txt_login_title);
         btn_back = findViewById(R.id.btn_back_signIn);
         getWindow().setStatusBarColor(getColor(R.color.base_color));
         getWindow().setNavigationBarColor(getColor(R.color.base_color));

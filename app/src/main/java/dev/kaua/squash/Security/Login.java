@@ -42,6 +42,7 @@ import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
+import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
@@ -53,7 +54,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -62,7 +62,7 @@ import static android.content.Context.MODE_PRIVATE;
  *  @author Kaua Vitorio
  **/
 
-public abstract class Login {
+public abstract class Login extends SignInActivity{
     @SuppressLint("StaticFieldLeak")
     private static LoadingDialog loadingDialog;
     private static FirebaseAuth mAuth;
@@ -103,6 +103,11 @@ public abstract class Login {
                     mPrefs.edit().clear().apply();
                     
                     if(response.body() != null && response.body().getActive() > DtoAccount.ACCOUNT_DISABLE){
+                        try {
+                            txt_login_title.setText(context.getString(R.string.welcome));
+                        }catch (Exception ex){
+                            Log.d(TAG, ex.toString());
+                        }
                         //  Add User prefs
                         SharedPreferences.Editor editor = mPrefs.edit();
                         assert response.body() != null;
@@ -172,7 +177,7 @@ public abstract class Login {
                     Intent i = new Intent(context, ValidateEmailActivity.class);
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context,R.anim.move_to_left_go, R.anim.move_to_right_go);
                     //noinspection ConstantConditions
-                    i.putExtra("account_id", EncryptHelper.decrypt(response.body().getMessage()));
+                    i.putExtra("account_id", EncryptHelper.decrypt(response.body().getAccount_id_cry()));
                     i.putExtra("email_user", login_method);
                     i.putExtra("password", password);
                     i.putExtra("type_validate", 1);
@@ -346,10 +351,12 @@ public abstract class Login {
             daoFollowing.DropTable();
 
             DaoPosts daoPosts = new DaoPosts(context);
-            daoPosts.DropTable(DaoPosts.DROP_ALL);
+            daoPosts.ClearTable(DaoPosts.DROP_ALL);
 
             timer.postDelayed(() -> {
                 ((Activity)context).finishAffinity();
+                DaoSystem daoSystem = new DaoSystem(context);
+                daoSystem.setNeedResetAccount(MyPrefs.OKAY_RESET);
                 final Intent i;
                 if(status == LOGOUT_STATUS_FLAG ) i = new Intent(context, SplashActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 else i = new Intent(context, SplashActivity.class);

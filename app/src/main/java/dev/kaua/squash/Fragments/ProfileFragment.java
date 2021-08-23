@@ -462,7 +462,6 @@ public class ProfileFragment extends Fragment {
                     BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.BottomSheetTheme);
                     //  Creating View for SheetMenu
 
-                    bottomSheetDialog.setCancelable(false);
                     View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_profile_actions ,
                             getActivity().findViewById(R.id.sheet_profile_action));
 
