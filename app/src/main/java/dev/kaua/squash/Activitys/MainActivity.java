@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
@@ -50,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String SHARED_TAG = "shared";
     public static final String SHARED_TYPE_TAG = "shared_type";
     public static final String SHARED_CONTENT_TAG = "shared_content";
-    private static ImageView btn_search_main, btn_home_main;
-    private RelativeLayout click_home;
+    private static ImageView btn_search_main, btn_home_main, btn_chat_main;
+    private RelativeLayout click_home, click_chat;
     private CircleImageView btn_profile_main;
     private RelativeLayout container_btn_profile_main;
     private static ViewPager viewPager;
@@ -103,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
         btn_search_main.setOnClickListener(v -> LoadSearchFragment());
         click_home.setOnClickListener(v -> LoadMainFragment());
+        click_chat.setOnClickListener(v -> CallChat());
 
         container_btn_profile_main.setOnClickListener(v -> CallProfile());
 
@@ -128,6 +130,9 @@ public class MainActivity extends AppCompatActivity {
     public static MainActivity getInstance(){ return instance; }
 
     Bundle bundle_profile;
+    public static final String ID_REQUEST_ACCOUNT_ID = "account_id";
+    public static final String ID_REQUEST_CONTROL = "control";
+    public static final int ID_REQUEST_CONTROL_BASE = 0;
     public void GetBundleProfile(Bundle bundle){
         bundle_profile = bundle;
     }
@@ -173,8 +178,10 @@ public class MainActivity extends AppCompatActivity {
     public void Check_Fragments(int position){
         btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search));
         btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home));
+        btn_chat_main.setImageDrawable(getDrawable(R.drawable.ic_chat_no_focus));
         btn_profile_main.setBorderWidth(0);
-        if(position == MAIN_POSITION) btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
+        if(position == CHAT_POSITION) btn_chat_main.setImageDrawable(getDrawable(R.drawable.ic_chat_focus));
+        else if(position == MAIN_POSITION) btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
         else if(position == SEARCH_POSITION) btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search_select));
         else if(position == PROFILE_POSITION) btn_profile_main.setBorderWidth(3);
     }
@@ -186,8 +193,10 @@ public class MainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.viewpager_main);
         btn_profile_main = findViewById(R.id.btn_profile_main);
         click_home = findViewById(R.id.click_home);
+        click_chat = findViewById(R.id.click_chat);
         btn_search_main = findViewById(R.id.btn_search_main);
         btn_home_main = findViewById(R.id.btn_home_main);
+        btn_chat_main = findViewById(R.id.ic_btn_chat_main);
         container_btn_profile_main = findViewById(R.id.container_btn_profile_main);
         mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(this);
         btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
@@ -200,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle_Analytics);
         getUserInformationAndLoadProfile();
         Login.ReloadUserinfo(this, MyPrefs.getUserInformation(this).getEmail(), MyPrefs.getUserInformation(this).getPassword());
+        NotificationManagerCompat.from(this).cancelAll();
     }
 
     @SuppressWarnings("unchecked")

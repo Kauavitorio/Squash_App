@@ -26,9 +26,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts_Comment;
 import dev.kaua.squash.Data.Post.DtoPost;
@@ -38,8 +40,11 @@ import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
+import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.PatternEditableBuilder;
+import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 import retrofit2.Call;
@@ -93,18 +98,8 @@ public class Comments_Adapters extends RecyclerView.Adapter<Comments_Adapters.My
         holder.txt_post_reply_to.setText( mContext.getString(R.string.reply_to) + " @" + list.get(position).getReply_to());
 
         //  Apply all url on Texts Views
-        Linkify.addLinks(holder.txt_comment_content, Linkify.ALL);
-
         //  URL CLICK'S listener
-        holder.txt_comment_content.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
-            if (Patterns.WEB_URL.matcher(url).matches()) {
-                //An web url is detected
-                Methods.browseTo(mContext, url);
-                return true;
-            }
-
-            return false;
-        }));
+        LoadUserMentions(holder.txt_comment_content);
 
         Check_Like(holder, position);
 
@@ -255,6 +250,55 @@ public class Comments_Adapters extends RecyclerView.Adapter<Comments_Adapters.My
                 });
             }
         }else Warnings.NeedLoginWithShortCutAlert((Activity) mContext, 0);
+    }
+
+    void LoadUserMentions(TextView text_comment){
+        if(mContext != null){
+            new PatternEditableBuilder().
+                    addPattern(Pattern.compile("@(\\w+)"), mContext.getColor(R.color.base_color),
+                            text -> {
+                                DtoAccount account = new DtoAccount();
+                                account.setUsername(text.replace("@", ""));
+                                AccountServices services = retrofit.create(AccountServices.class);
+                                Call<DtoPost> call = services.search_with_username(account);
+                                LoadingDialog loadingDialog = new LoadingDialog(((Activity)mContext));
+                                loadingDialog.startLoading();
+                                call.enqueue(new Callback<DtoPost>() {
+                                    @Override
+                                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                                        loadingDialog.dismissDialog();
+                                        if(response.code() == 200){
+                                            if(response.body() != null){
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString(MainActivity.ID_REQUEST_ACCOUNT_ID, response.body().getAccount_id());
+                                                bundle.putInt(MainActivity.ID_REQUEST_CONTROL, MainActivity.ID_REQUEST_CONTROL_BASE);
+                                                MainActivity.getInstance().GetBundleProfile(bundle);
+                                                MainActivity.getInstance().CallProfile();
+                                                ProfileFragment.getInstance().LoadAnotherUser();
+                                                ((Activity) mContext).finish();
+                                            }
+                                        }else ToastHelper.toast(((Activity) mContext), mContext.getString(R.string.user_not_found), 0);
+                                    }
+                                    @Override
+                                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                                        loadingDialog.dismissDialog();
+                                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.PROFILE_MENTION_CLICK);
+                                    }
+                                });
+                            }).into(text_comment);
+
+
+            text_comment.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
+                if (Patterns.WEB_URL.matcher(url).matches()) {
+                    //An web url is detected
+                    Methods.browseTo(mContext, url);
+                    return true;
+                }
+
+                return false;
+            }));
+            Linkify.addLinks(text_comment, Linkify.ALL);
+        }
     }
 
     @Override

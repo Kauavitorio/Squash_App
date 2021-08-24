@@ -14,22 +14,45 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <!-- Bottom Menu -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/container_bottom_main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="40dp"
+        android:layout_height="45dp"
+        android:orientation="horizontal"
         android:background="@drawable/background_bottom_main"
         android:layout_alignParentBottom="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:baselineAligned="false">
+
+        <!-- Btn Chat -->
+        <RelativeLayout
+            android:id="@+id/click_chat"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Image Home -->
+            <ImageView
+                android:id="@+id/ic_btn_chat_main"
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/ic_chat_no_focus"
+                tools:ignore="ContentDescription" />
+
+        </RelativeLayout>
 
         <!-- Btn Home -->
         <RelativeLayout
             android:id="@+id/click_home"
-            android:layout_width="60dp"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/relativeLayout"
             app:layout_constraintStart_toStartOf="parent"
@@ -49,8 +72,9 @@
         <!-- Btn Search -->
         <RelativeLayout
             android:id="@+id/relativeLayout"
-            android:layout_width="60dp"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -70,37 +94,28 @@
         <!-- Btn Profile -->
         <RelativeLayout
             android:id="@+id/container_btn_profile_main"
-            android:layout_width="60dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/relativeLayout"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <!-- Img User With Profile btn -->
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/btn_profile_main"
                 android:layout_width="30dp"
-                android:layout_height="match_parent"
+                android:layout_height="30dp"
                 android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
                 android:src="@drawable/ic_profile_default"
                 app:civ_border_color="@color/base_color"
                 app:civ_border_width="0dp" />
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="5dp"
-                android:layout_height="5dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/base_color"
-                app:cardCornerRadius="10dp" />
-
         </RelativeLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

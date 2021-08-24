@@ -25,7 +25,6 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Animation -->
             <TextView
                 android:id="@+id/error_title_problem_adapter"
                 android:layout_width="match_parent"

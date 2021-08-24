@@ -11,7 +11,7 @@
     <ImageView
         android:id="@+id/img_squash_logo_splash"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:src="@drawable/logo_with_name"
         android:layout_centerVertical="true"
         tools:ignore="ContentDescription" />

@@ -303,9 +303,9 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     date = new String(chars);
                 }
             }
-            return Methods.loadLastSeenUser(mContext, date);
+            return Methods.loadLastSeenUser(mContext, date).replace(mContext.getString(R.string.today) + " ", "");
         }catch (Exception ex){
-            return Methods.loadLastSeenUser(mContext, date);
+            return Methods.loadLastSeenUser(mContext, date).replace(mContext.getString(R.string.today) + " ", "");
         }
     }
 

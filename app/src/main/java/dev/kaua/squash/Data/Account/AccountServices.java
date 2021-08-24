@@ -42,4 +42,7 @@ public interface    AccountServices {
 
     @POST("user/action/check/validation-code")
     Call<DtoAccount> check_validation_code (@Body DtoAccount account);
+
+    @POST("user/report/user/")
+    Call<DtoAccount> report_an_user (@Body DtoAccount account);
 }

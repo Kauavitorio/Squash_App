@@ -58,7 +58,7 @@ public class MainFragment extends Fragment {
     //private static SwipeRefreshLayout swipe_main;
     private ConstraintLayout btn_create_new_story_main;
     private static RecyclerView recyclerView_Posts;
-    private ImageView btn_chat_main, btn_compose_main;
+    private ImageView btn_compose_main;
     private CircleImageView icon_ProfileUser_main;
     private CardView card_msg_notRead_main;
     private LinearLayout header_main;
@@ -80,7 +80,6 @@ public class MainFragment extends Fragment {
         Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(icon_ProfileUser_main);
         btn_create_new_story_main.setOnClickListener(v -> StoryClick());
-        btn_chat_main.setOnClickListener(v -> MainActivity.getInstance().CallChat());
         btn_compose_main.setOnClickListener(v -> MainActivity.getInstance().CallComposePost());
 
         //loadMsgNotRead();
@@ -174,7 +173,6 @@ public class MainFragment extends Fragment {
         btn_create_new_story_main = view.findViewById(R.id.btn_create_new_story_main);
         card_msg_notRead_main = view.findViewById(R.id.card_msg_notRead_main);
         btn_compose_main = view.findViewById(R.id.btn_compose_main);
-        btn_chat_main = view.findViewById(R.id.btn_chat_main);
         recyclerView_Posts = view.findViewById(R.id.recyclerView_Posts);
         header_main = view.findViewById(R.id.header_main);
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());

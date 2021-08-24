@@ -4,13 +4,14 @@ public class DtoAccount implements Comparable<DtoAccount>{
     public static final int ACCOUNT_ACTIVE = 2;
     public static final int ACCOUNT_RESTRICTION = 1;
     public static final int ACCOUNT_DISABLE = 0;
+    public static final int ACCOUNT_IS_ADM = 2;
     private long account_id, id_user, verify, status, active;
     private String account_id_cry, id_user_cry;
     private String name_user, username, email, phone_user, password, verify_id;
     private String banner_user, profile_image, bio_user, url_user, following, followers, born_date, joined_date;
     private String message, verification_level;
     private String login_method, token, login_info, trust, date_time_login, UID;
-    private String id_following, imageURL, id, typingTo, last_seen;
+    private String id_following, imageURL, id, typingTo, last_seen, report_to, report_from, report_reason;
     private String account_id_following, status_chat, search, last_chat, chat_id, reason_warn;
 
     public DtoAccount (){}
@@ -34,6 +35,30 @@ public class DtoAccount implements Comparable<DtoAccount>{
         this.last_seen = last_seen;
         this.verification_level = verification_level;
         this.active = active;
+    }
+
+    public String getReport_to() {
+        return report_to;
+    }
+
+    public void setReport_to(String report_to) {
+        this.report_to = report_to;
+    }
+
+    public String getReport_from() {
+        return report_from;
+    }
+
+    public void setReport_from(String report_from) {
+        this.report_from = report_from;
+    }
+
+    public String getReport_reason() {
+        return report_reason;
+    }
+
+    public void setReport_reason(String report_reason) {
+        this.report_reason = report_reason;
     }
 
     public String getReason_warn() {

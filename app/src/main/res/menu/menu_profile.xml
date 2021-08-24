@@ -3,8 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/report_user"
+        android:title="@string/report_user"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/block_user"
+        android:title="@string/block_user"
+        android:visible="false"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/more_user_profile"
+        android:title="@string/more"
+        android:visible="false"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/options_profile"
         android:title="@string/options"
+        android:visible="false"
         app:showAsAction="never"/>
 
 </menu>
