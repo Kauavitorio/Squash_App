@@ -25,7 +25,7 @@ public class DaoChat extends SQLiteOpenHelper {
     public static final int DROP_ALL = 999;
 
     public DaoChat(@Nullable Context context) {
-        super(context, "DB_CHAT", null, 43);
+        super(context, "DB_CHAT", null, 46);
     }
 
     @Override
@@ -53,7 +53,8 @@ public class DaoChat extends SQLiteOpenHelper {
                 "last_chat varchar(800)," +
                 "verification_level varchar(800)," +
                 "username varchar(800)," +
-                "chat_id varchar(1000))";
+                "chat_id varchar(1000)," +
+                "active int)";
 
         db.execSQL(command_chat_list);
 
@@ -127,6 +128,7 @@ public class DaoChat extends SQLiteOpenHelper {
                     values.put("verification_level", accounts.get(i).getVerification_level());
                     values.put("username", accounts.get(i).getUsername());
                     values.put("chat_id", accounts.get(i).getChat_id());
+                    values.put("active", accounts.get(i).getActive());
 
                     String where = "id=?";
 
@@ -144,6 +146,7 @@ public class DaoChat extends SQLiteOpenHelper {
                     values.put("verification_level", accounts.get(i).getVerification_level());
                     values.put("username", accounts.get(i).getUsername());
                     values.put("chat_id", accounts.get(i).getChat_id());
+                    values.put("active", accounts.get(i).getActive());
 
                     getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
                 }
@@ -298,9 +301,38 @@ public class DaoChat extends SQLiteOpenHelper {
             account.setVerification_level(cursor.getString(9));
             account.setUsername(cursor.getString(10));
             account.setChat_id(cursor.getString(11));
+            account.setActive(cursor.getInt(12));
             accounts.add(account);
         }
         return accounts;
+    }
+
+    public void Update_ChatList_Item(DtoAccount account){
+        if(account.getId() != null){
+            String command = "SELECT * FROM " + TABLE_CHAT_LIST + " WHERE  id = ?";
+            String[] params = {account.getId()};
+            @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+
+            if(cursor.moveToFirst()){
+                ContentValues values = new ContentValues();
+                values.put("account_id_cry", account.getAccount_id_cry());
+                values.put("id", account.getId());
+                values.put("imageURL", account.getImageURL());
+                values.put("last_seen", account.getLast_seen());
+                values.put("name_user", account.getName_user());
+                values.put("search", account.getSearch());
+                values.put("status_chat", account.getStatus_chat());
+                values.put("typingTo", account.getTypingTo());
+                values.put("verification_level", account.getVerification_level());
+                values.put("username", account.getUsername());
+                values.put("chat_id", account.getChat_id());
+                values.put("active", account.getActive());
+
+                String where = "id=?";
+
+                getWritableDatabase().update(TABLE_CHAT_LIST, values, where, params);
+            }
+        }
     }
 
     public DtoAccount get_Single_User(String user_id){

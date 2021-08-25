@@ -155,7 +155,7 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    private void Apply_ArrayList() {
+    void Apply_ArrayList() {
         swipe_post_feed.setRefreshing(true);
         if(size != arrayListDto.size()) Collections.shuffle(arrayListDto);
         posts_adapters = new Posts_Adapters(arrayListDto, getContext());
@@ -163,13 +163,14 @@ public class SearchFragment extends Fragment {
         if (arrayListDto.size() <= 0){
             swipe_post_feed.setVisibility(View.GONE);
             txt_empty_feed.setVisibility(View.VISIBLE);
+            swipe_post_feed.setRefreshing(false);
         }else{
             size = arrayListDto.size();
             recycler_post_feed.setAdapter(posts_adapters);
             recycler_post_feed.getRecycledViewPool().clear();
             swipe_post_feed.setVisibility(View.VISIBLE);
             txt_empty_feed.setVisibility(View.GONE);
-            new Handler().postDelayed(() -> swipe_post_feed.setRefreshing(false), 500);
+            new Handler().postDelayed(() -> swipe_post_feed.setRefreshing(false), 400);
         }
     }
 

@@ -125,6 +125,7 @@ public class DtoAccount implements Comparable<DtoAccount>{
         this.status_chat = status_chat;
     }
 
+    public static final String DEFAULT = "default";
     public String getImageURL() {
         return imageURL;
     }

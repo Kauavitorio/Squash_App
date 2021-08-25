@@ -2,7 +2,6 @@ package dev.kaua.squash.Adapters.Chat;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -24,7 +23,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -39,26 +37,29 @@ import dev.kaua.squash.Activitys.ShareContentActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 
 public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHolder> {
 
-    private Context mContext;
+    private Activity mContext;
     private List<DtoAccount> mAccounts;
-    private final boolean isChat;
+    private boolean isChat;
     private final boolean share;
+    DaoChat daoChat;
     String theLastMessage;
 
-    public UserChatAdapter(Context mContext, List<DtoAccount> mAccounts, boolean isChat, boolean share){
+    public UserChatAdapter(Activity mContext, List<DtoAccount> mAccounts, boolean share){
         this.mContext = mContext;
         this.mAccounts = mAccounts;
-        this.isChat = isChat;
         this.share = share;
+        this.daoChat = new DaoChat(mContext);
     }
 
     @NonNull
@@ -75,75 +76,128 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         DtoAccount account = mAccounts.get(position);
         if(account != null){
             try{
-                holder.user_name.setText(account.getName_user());
-                if(account.getImageURL() == null || account.getImageURL().equals("default")) holder.profile_image.setImageResource(R.drawable.pumpkin_default_image);
-                else Glide.with(mContext).load(EncryptHelper.decrypt(account.getImageURL())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                        .into(holder.profile_image);
 
                 /*if(isChat)
                     lastMessage(account.getId(), holder.card_no_read_ic);
                 else holder.last_seen.setVisibility(View.GONE);*/
 
-                holder.itemView.setOnClickListener(v -> {
-                    try {
-                        final Animation myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
-                        holder.itemView.startAnimation(myAnim);
-                        Intent intent = new Intent(mContext, MessageActivity.class);
-                        intent.putExtra("userId", account.getId());
-                        intent.putExtra("chat_id", account.getChat_id());
-                        if(share){
-                            int shareType = ShareContentActivity.getInstance().GetShareType();
-                            intent.putExtra("shared", MainActivity.SHARED_ID);
-                            intent.putExtra("shared_type", shareType);
-                            if(shareType == MainActivity.SHARED_PLAIN_TEXT)
-                                intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
-                            else if(shareType == MainActivity.SHARED_IMAGE)
-                                intent.putExtra("shared_content", (Uri) ShareContentActivity.getInstance().GetShareContent());
-                            ((Activity)mContext).finish();
-                        }else intent.putExtra("shared", 0);
-                        mContext.startActivity(intent);
-                    }catch (Exception exception){
-                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.USER_CHAT_ITEM_CLICK);
-                    }
-                });
+                LoadProfileImage(holder, account);
+                CheckVerification(account, holder);
+                CheckUserStatus(account, holder);
+                ChatClick(holder, account);
 
-                if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
-                    holder.verification_ic.setVisibility(View.VISIBLE);
-                    int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level())));
-                    if (verified == 2)
-                        holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
-                    else
-                        holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
-                }else holder.verification_ic.setVisibility(View.GONE);
-
-                if(isChat){
-                    if(ConnectionHelper.isOnline(mContext)){
-                        if (account.getStatus_chat() != null && account.getStatus_chat().equals("online")){
-                            holder.last_seen.setText(mContext.getString(R.string.online));
-                            holder.img_on.setVisibility(View.VISIBLE);
-                            holder.img_off.setVisibility(View.GONE);
-                        }else {
-                            if(account.getLast_chat() != null && account.getLast_chat().equals(mContext.getString(R.string.waiting_for_reply)))
-                                holder.last_seen.setText(mContext.getString(R.string.waiting_for_reply));
-                            else holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
-                            holder.last_seen.setVisibility(View.VISIBLE);
-                            holder.img_on.setVisibility(View.GONE);
-                            holder.img_off.setVisibility(View.VISIBLE);
+                if(ConnectionHelper.isOnline(mContext)){
+                    final DatabaseReference holder_DB = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(account.getId());
+                    holder_DB.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if(!mContext.isDestroyed() && !mContext.isFinishing()){
+                                if(ConnectionHelper.isOnline(mContext)){
+                                    DtoAccount DB_account = snapshot.getValue(DtoAccount.class);
+                                    if(DB_account != null && DB_account.getId() != null){
+                                        if(DB_account.getActive() == DtoAccount.ACCOUNT_DISABLE){
+                                            holder.itemView.setOnClickListener(v -> {
+                                                final Animation myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
+                                                holder.itemView.startAnimation(myAnim);
+                                                ToastHelper.toast(mContext, mContext.getString(R.string.this_account_has_been_disabled)
+                                                        , ToastHelper.SHORT_DURATION );
+                                            });
+                                        }else{
+                                            LoadProfileImage(holder, DB_account);
+                                            CheckVerification(DB_account, holder);
+                                            CheckUserStatus(DB_account, holder);
+                                            ChatClick(holder, account);
+                                        }
+                                        daoChat.Update_ChatList_Item(DB_account);
+                                    }
+                                }
+                            }
                         }
-                    }else {
-                        if(account.getLast_seen() != null)
-                        holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
-                        holder.img_on.setVisibility(View.GONE);
-                        holder.img_off.setVisibility(View.VISIBLE);
-                    }
-                }else{
-                    holder.img_on.setVisibility(View.GONE);
-                    holder.img_off.setVisibility(View.GONE);
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
                 }
+
             }catch (Exception ex){
                 Log.d("USER_ADAPTER", ex.toString());
             }
         }else holder.itemView.setVisibility(View.GONE);
+    }
+
+    private void ChatClick(@NonNull ViewHolder holder, DtoAccount account) {
+        holder.itemView.setOnClickListener(v -> {
+            try {
+                final Animation myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
+                holder.itemView.startAnimation(myAnim);
+                Intent intent = new Intent(mContext, MessageActivity.class);
+                intent.putExtra("userId", account.getId());
+                intent.putExtra("chat_id", account.getChat_id());
+                if(share){
+                    int shareType = ShareContentActivity.getInstance().GetShareType();
+                    intent.putExtra("shared", MainActivity.SHARED_ID);
+                    intent.putExtra("shared_type", shareType);
+                    if(shareType == MainActivity.SHARED_PLAIN_TEXT)
+                        intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
+                    else if(shareType == MainActivity.SHARED_IMAGE)
+                        intent.putExtra("shared_content", (Uri) ShareContentActivity.getInstance().GetShareContent());
+                    ((Activity)mContext).finish();
+                }else intent.putExtra("shared", 0);
+                mContext.startActivity(intent);
+            }catch (Exception exception){
+                Warnings.showWeHaveAProblem(mContext, ErrorHelper.USER_CHAT_ITEM_CLICK);
+            }
+        });
+    }
+
+    private void LoadProfileImage(@NonNull ViewHolder holder, DtoAccount account) {
+        holder.user_name.setText(account.getName_user().trim());
+        if(!mContext.isDestroyed()){
+            if(account.getImageURL() == null || account.getImageURL().equals(DtoAccount.DEFAULT)) holder.profile_image.setImageResource(R.drawable.pumpkin_default_image);
+            else Glide.with(mContext).load(EncryptHelper.decrypt(account.getImageURL())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                    .into(holder.profile_image);
+        }
+    }
+
+    private void CheckUserStatus(DtoAccount account, @NonNull ViewHolder holder) {
+        if(!mContext.isDestroyed()){
+            isChat = account.getStatus_chat() != null && account.getStatus_chat().equals("online");
+            holder.img_status.setVisibility(View.VISIBLE);
+
+            if(isChat){
+                if(ConnectionHelper.isOnline(mContext)){
+                    if (account.getStatus_chat() != null && account.getStatus_chat().equals("online")){
+                        holder.last_seen.setText(mContext.getString(R.string.online));
+                        holder.img_status.setBorderColor(mContext.getColor(R.color.status_on));
+                    }
+                }else {
+                    if(account.getLast_seen() != null)
+                        holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
+                    holder.img_status.setBorderColor(mContext.getColor(R.color.status_off));
+                }
+            }
+            else{
+                if(account.getLast_chat() != null && account.getLast_chat().equals(mContext.getString(R.string.waiting_for_reply))){
+                    holder.last_seen.setText(mContext.getString(R.string.waiting_for_reply));
+                    holder.last_seen.setVisibility(View.VISIBLE);
+                } else
+                    holder.last_seen.setText(Methods.loadLastSeenUser(mContext, account.getLast_seen()));
+                holder.img_status.setBorderColor(mContext.getColor(R.color.status_off));
+            }
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private void CheckVerification(DtoAccount account, @NonNull ViewHolder holder) {
+        if(!mContext.isDestroyed()){
+            if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
+                holder.verification_ic.setVisibility(View.VISIBLE);
+                int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level())));
+                if (verified == DtoAccount.ACCOUNT_IS_ADM)
+                    holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
+                else
+                    holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
+            }else holder.verification_ic.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -153,7 +207,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
 
         private final TextView user_name, last_seen;
         private final CircleImageView profile_image;
-        private final CircleImageView img_on, img_off;
+        private final CircleImageView img_status;
         private final CardView card_no_read_ic;
         private final ImageView ic_pinned_chat;
         private final ImageView verification_ic;
@@ -165,18 +219,17 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
             user_name = itemView.findViewById(R.id.user_name_users);
             verification_ic = itemView.findViewById(R.id.verification_ic_user_chat);
             profile_image = itemView.findViewById(R.id.profile_image_users);
-            img_on = itemView.findViewById(R.id.img_on);
             last_seen = itemView.findViewById(R.id.last_seen);
-            img_off = itemView.findViewById(R.id.img_off);
+            img_status = itemView.findViewById(R.id.img_status_user);
             card_no_read_ic = itemView.findViewById(R.id.card_no_read_ic);
         }
     }
 
     //  check for last message
     private void lastMessage(String userId, CardView ic_not_seen){
-        theLastMessage  = "default";
+        theLastMessage  = DtoAccount.DEFAULT;
         FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
+        DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHATS_REFERENCE);
         reference.addValueEventListener(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
             @Override

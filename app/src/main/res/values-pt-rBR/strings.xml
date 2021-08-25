@@ -207,4 +207,5 @@
     <string name="report_post_message_or_comment">Reportar Post, Mensagem ou Comentário</string>
     <string name="report_account">Denunciar conta</string>
     <string name="report_sent_successfully">Report enviado com sucesso</string>
+    <string name="this_account_has_been_disabled">Essa conta foi desativada.</string>
 </resources>

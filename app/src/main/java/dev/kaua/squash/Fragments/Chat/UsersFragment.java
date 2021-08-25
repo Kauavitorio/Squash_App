@@ -1,6 +1,7 @@
 package dev.kaua.squash.Fragments.Chat;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
@@ -33,11 +34,13 @@ import java.util.Objects;
 import dev.kaua.squash.Adapters.Chat.UserChatAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ToastHelper;
 
 @SuppressLint("StaticFieldLeak")
 public class UsersFragment extends Fragment {
@@ -47,7 +50,7 @@ public class UsersFragment extends Fragment {
     private EditText search_users;
     private static DaoFollowing daoFollowing;
     private static DtoAccount myAccount;
-    private static Context instance;
+    private static Activity instance;
     private static  FirebaseUser fUser;
 
     private static UserChatAdapter userChatAdapter;
@@ -78,7 +81,10 @@ public class UsersFragment extends Fragment {
 
     private void Ids(View view) {
         fUser = myFirebaseHelper.getFirebaseUser();
-        if(getContext() != null) instance = getContext();
+        if(getActivity() != null) {
+            instance = getActivity();
+            db = new DaoAccount(instance);
+        }
         daoFollowing = new DaoFollowing(requireContext());
         myAccount = MyPrefs.getUserInformation(requireContext());
         recycler_view_users = view.findViewById(R.id.recycler_view_users);
@@ -121,20 +127,24 @@ public class UsersFragment extends Fragment {
     }
 
     final static List<DtoAccount> finalList = new ArrayList<>();
+    static DaoAccount db;
     static void LoadAdapter(){
         if(mAccounts.size() > 0){
-            finalList.clear();
-            for (DtoAccount accounts : mAccounts){
-                if(accounts != null && accounts.getAccount_id_cry() != null && accounts.getActive() > DtoAccount.ACCOUNT_DISABLE)
-                if(!accounts.getId().equals(fUser.getUid())
-                        && daoFollowing.check_if_follow(myAccount.getAccount_id(),
-                        Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(accounts.getAccount_id_cry()))))
-                && accounts.getActive() > DtoAccount.ACCOUNT_DISABLE){
-                    finalList.add(accounts);
+            DtoAccount account_follow = db.get_followers_following(MyPrefs.getUserInformation(instance).getAccount_id());
+            if(Long.parseLong(account_follow.getFollowing()) != finalList.size()){
+                finalList.clear();
+                for (DtoAccount accounts : mAccounts){
+                    if(accounts != null && accounts.getAccount_id_cry() != null && accounts.getActive() > DtoAccount.ACCOUNT_DISABLE)
+                        if(!accounts.getId().equals(fUser.getUid())
+                                && daoFollowing.check_if_follow(myAccount.getAccount_id(),
+                                Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(accounts.getAccount_id_cry()))))
+                                && accounts.getActive() > DtoAccount.ACCOUNT_DISABLE){
+                            finalList.add(accounts);
+                        }
                 }
+                userChatAdapter = new UserChatAdapter(instance, finalList, false);
+                recycler_view_users.setAdapter(userChatAdapter);
             }
-            userChatAdapter = new UserChatAdapter(instance, finalList, true, false);
-            recycler_view_users.setAdapter(userChatAdapter);
             if(finalList.size() > 0)
                 no_user_fount_user_chat.setVisibility(View.GONE);
             else no_user_fount_user_chat.setVisibility(View.VISIBLE);
@@ -159,13 +169,12 @@ public class UsersFragment extends Fragment {
                 query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                        if(search_users.getText().toString().equals("")){
+                        if(search_users.getText().toString().equals("") && !instance.isFinishing()){
                             mAccounts.clear();
                             for(DataSnapshot snapshot: datasnapshot.getChildren()){
                                 DtoAccount account = snapshot.getValue(DtoAccount.class);
                                 if(account != null && fUser != null){
-                                    if(account.getId() != null && !account.getId().equals(fUser.getUid())
-                                            && daoFollowing.check_if_follow(myAccount.getAccount_id(), Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getAccount_id_cry())))))
+                                    if(account.getId() != null && !account.getId().equals(fUser.getUid()))
                                         mAccounts.add(account);
                                 }
                             }

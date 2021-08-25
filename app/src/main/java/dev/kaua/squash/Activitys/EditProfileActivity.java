@@ -107,7 +107,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 DtoAccount newInfo = new DtoAccount();
                 newInfo.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
                 newInfo.setName_user(EncryptHelper.encrypt(edit_name.getText().toString()));
-                newInfo.setUsername(EncryptHelper.encrypt(edit_username.getText().toString()));
+                newInfo.setUsername(EncryptHelper.encrypt(edit_username.getText().toString().replace(" ", "")));
                 if(edit_bio.getText() == null) newInfo.setBio_user(EncryptHelper.encrypt(""));
                 else newInfo.setBio_user(EncryptHelper.encrypt(edit_bio.getText().toString()));
                 newInfo.setProfile_image(EncryptHelper.encrypt(new_image));
@@ -212,34 +212,41 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onTextChanged(final CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(final Editable s) {
-                boolean test_username = MyPrefs.getUserInformation(EditProfileActivity.this)
-                        .getUsername().equalsIgnoreCase(s.toString().replace(" ", ""));
-                if (!test_username && s.length() >= 5) {
-                    timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            runOnUiThread(() -> {
-                                DtoAccount account = new DtoAccount();
-                                account.setUsername(EncryptHelper.encrypt(s.toString().replace(" ", "")));
-                                AccountServices services = retrofit.create(AccountServices.class);
-                                Call<DtoAccount> call = services.check_username(account);
-                                call.enqueue(new Callback<DtoAccount>() {
-                                    @Override
-                                    public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                                        if(response.code() == 401) username_check = false;
-                                        else if (response.code() == 200) username_check = true;
-                                        DoUsernameValidation();
-                                    }
-                                    @Override
-                                    public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+                if (edit_username != null && edit_username.getText() != null && s != null && s.toString().contains(" ")) {
+                    edit_username.setText(edit_username.getText().toString().replace(" ", ""));
+                    edit_username.setSelection(edit_username.getText().length());
+                }
+                if(s != null){
+
+                    boolean test_username = MyPrefs.getUserInformation(EditProfileActivity.this)
+                            .getUsername().equalsIgnoreCase(s.toString().replace(" ", ""));
+                    if (!test_username && s.length() >= 5) {
+                        timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                runOnUiThread(() -> {
+                                    DtoAccount account = new DtoAccount();
+                                    account.setUsername(EncryptHelper.encrypt(s.toString().replace(" ", "")));
+                                    AccountServices services = retrofit.create(AccountServices.class);
+                                    Call<DtoAccount> call = services.check_username(account);
+                                    call.enqueue(new Callback<DtoAccount>() {
+                                        @Override
+                                        public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                                            if(response.code() == 401) username_check = false;
+                                            else if (response.code() == 200) username_check = true;
+                                            DoUsernameValidation();
+                                        }
+                                        @Override
+                                        public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+                                    });
                                 });
-                            });
-                        }
-                    }, DELAY);
-                }else {
-                    if(s.toString().length() < 5) edit_username.setError(getString(R.string.your_username_must_contain_at_least));
-                    else edit_username.setError(null);
+                            }
+                        }, DELAY);
+                    }else {
+                        if(s.toString().length() < 5) edit_username.setError(getString(R.string.your_username_must_contain_at_least));
+                        else edit_username.setError(null);
+                    }
                 }
             }
         });
@@ -336,7 +343,6 @@ public class EditProfileActivity extends AppCompatActivity {
             Warnings.showWeHaveAProblem(this, ErrorHelper.PROFILE_EDIT_IMAGE_CROP);
         }
     }
-
 
     private void loadUserInfo() {
         user = MyPrefs.getUserInformation(this);

@@ -77,7 +77,7 @@ public class UsersOutstandingFragment extends Fragment {
 
     final static List<DtoAccount> finalList = new ArrayList<>();
     void LoadAdapter(){
-        if(getContext() != null){
+        if(getContext() != null && getActivity() != null){
             if(chatDB != null && mAccounts != null && recycler_view_users != null){
                 mAccounts.clear();
                 finalList.clear();
@@ -87,7 +87,7 @@ public class UsersOutstandingFragment extends Fragment {
                         finalList.add(account);
                     }
                 }
-                userChatAdapter = new UserChatAdapter(getContext(), finalList, true, false);
+                userChatAdapter = new UserChatAdapter(getActivity(), finalList, false);
                 ((SimpleItemAnimator) Objects.requireNonNull(recycler_view_users.getItemAnimator())).setSupportsChangeAnimations(false);
                 recycler_view_users.setAdapter(userChatAdapter);
             }

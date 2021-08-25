@@ -241,7 +241,7 @@ public class ProfileFragment extends Fragment {
 
     public static ProfileFragment getInstance(){ return instance;}
 
-    public void ReloadRecycler(){ RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile
+    public void ReloadRecycler(){ RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile
             , posts_size, account);}
 
     public void LoadAnotherUser(){
@@ -267,7 +267,7 @@ public class ProfileFragment extends Fragment {
                             account.setAccount_id_cry(EncryptHelper.encrypt(bundle.getString("account_id")));
                             DtoAccount search_account = new DtoAccount();
                             search_account.setAccount_id(account_another_user);
-                            RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile,
+                            RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile,
                                     posts_size, search_account);
                             AccountServices services = retrofitUser.create(AccountServices.class);
                             Call<DtoAccount> call = services.getUserInfo(account);
@@ -306,7 +306,7 @@ public class ProfileFragment extends Fragment {
                                                     ic_account_badge_profile.setVisibility(View.VISIBLE);
                                                     BangedAnimation();
                                                 }
-                                                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile
+                                                RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile
                                                         , posts_size, search_account);
 
                                                 DaoFollowing daoFollowing = new DaoFollowing(getContext());
@@ -379,7 +379,7 @@ public class ProfileFragment extends Fragment {
         account_id = user.getAccount_id();
         account.setAccount_id(account_id);
         account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
-        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, posts_size, account);
+        RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile, posts_size, account);
 
         DaoAccount db = new DaoAccount(activity);
         DtoAccount account_follow = db.get_followers_following(account_id);

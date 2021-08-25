@@ -1,6 +1,7 @@
 package dev.kaua.squash.Fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -62,7 +63,7 @@ public class MainFragment extends Fragment {
     private CircleImageView icon_ProfileUser_main;
     private CardView card_msg_notRead_main;
     private LinearLayout header_main;
-    private static Context instance;
+    private static Activity instance;
     private static ConstraintLayout loadingPanel;
     private final Handler timer = new Handler();
     DatabaseReference reference;

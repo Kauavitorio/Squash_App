@@ -3,8 +3,6 @@ package dev.kaua.squash.Adapters;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,17 +33,13 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Activitys.MessageActivity;
-import dev.kaua.squash.Activitys.ShareContentActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
-import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
-import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.Warnings;
 
 public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_FollowingAdapter.ViewHolder> {
@@ -75,7 +69,7 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
             try{
                 holder.user_name.setText(EncryptHelper.decrypt(account.getUsername()));
                 holder.last_seen.setText(EncryptHelper.decrypt(account.getName_user()));
-                if(account.getProfile_image() == null || account.getProfile_image().equals("default")) holder.profile_image.setImageResource(R.drawable.pumpkin_default_image);
+                if(account.getProfile_image() == null || account.getProfile_image().equals(DtoAccount.DEFAULT)) holder.profile_image.setImageResource(R.drawable.pumpkin_default_image);
                 else Glide.with(mContext).load(EncryptHelper.decrypt(account.getProfile_image())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                         .into(holder.profile_image);
 
@@ -104,8 +98,7 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
                         holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
                 }else holder.verification_ic.setVisibility(View.GONE);
 
-                holder.img_on.setVisibility(View.GONE);
-                holder.img_off.setVisibility(View.GONE);
+                holder.img_status.setVisibility(View.GONE);
             }catch (Exception ex){
                 Log.d("USER_ADAPTER", ex.toString());
             }
@@ -119,7 +112,7 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
 
         private final TextView user_name, last_seen;
         private final CircleImageView profile_image;
-        private final CircleImageView img_on, img_off;
+        private final CircleImageView img_status;
         private final CardView card_no_read_ic;
         private final ImageView ic_pinned_chat;
         private final ImageView verification_ic;
@@ -131,9 +124,8 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
             user_name = itemView.findViewById(R.id.user_name_users);
             verification_ic = itemView.findViewById(R.id.verification_ic_user_chat);
             profile_image = itemView.findViewById(R.id.profile_image_users);
-            img_on = itemView.findViewById(R.id.img_on);
             last_seen = itemView.findViewById(R.id.last_seen);
-            img_off = itemView.findViewById(R.id.img_off);
+            img_status = itemView.findViewById(R.id.img_status_user);
             card_no_read_ic = itemView.findViewById(R.id.card_no_read_ic);
         }
     }

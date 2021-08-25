@@ -217,4 +217,5 @@
     <string name="report_post_message_or_comment">Report Post, Message or Comment</string>
     <string name="report_account">Report Account</string>
     <string name="report_sent_successfully">Report sent successfully</string>
+    <string name="this_account_has_been_disabled">This account has been disabled.</string>
 </resources>
