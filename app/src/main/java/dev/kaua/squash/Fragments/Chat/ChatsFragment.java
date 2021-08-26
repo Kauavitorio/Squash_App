@@ -1,5 +1,6 @@
 package dev.kaua.squash.Fragments.Chat;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -47,6 +48,7 @@ public class ChatsFragment extends Fragment {
     private EditText search_users;
     private DaoChat chatDB;
     private static ChatsFragment instance;
+    private static Activity activity;
 
     FirebaseUser fUser;
     DatabaseReference reference;
@@ -65,13 +67,15 @@ public class ChatsFragment extends Fragment {
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                    ChatList_List.clear();
-                    for(DataSnapshot snapshot : datasnapshot.getChildren()){
-                        Chatslist chatList = snapshot.getValue(Chatslist.class);
-                        if(chatList != null && chatList.getChat_id() != null && chatList.getChat_id().length() > 5)
-                            ChatList_List.add(chatList);
+                    if(activity != null && !activity.isFinishing() && !activity.isDestroyed()){
+                        ChatList_List.clear();
+                        for(DataSnapshot snapshot : datasnapshot.getChildren()){
+                            Chatslist chatList = snapshot.getValue(Chatslist.class);
+                            if(chatList != null && chatList.getChat_id() != null && chatList.getChat_id().length() > 5)
+                                ChatList_List.add(chatList);
+                        }
+                        chatList();
                     }
-                    chatList();
                 }
 
                 @Override
@@ -107,27 +111,29 @@ public class ChatsFragment extends Fragment {
 
     private void searchUsers(String str) {
         FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
-        Query query = myFirebaseHelper.getFirebaseDatabase().getReference("Users").orderByChild("search")
+        Query query = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).orderByChild("search")
                 .startAt(str)
                 .endAt(str + "\uf8ff");
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                First_List_Accounts.clear();
-                for (DataSnapshot snapshot : datasnapshot.getChildren()){
-                    DtoAccount account = snapshot.getValue(DtoAccount.class);
-                    assert account != null;
-                    if(!account.getId().equals(fUser.getUid())){
-                        for (int i = 0; i < ChatList_List.size(); i++){
-                            if(ChatList_List.get(i).getId().equals(account.getId())){
-                                account.setChat_id(ChatList_List.get(i).getChat_id());
-                                First_List_Accounts.add(account);
+                if(activity != null && !activity.isFinishing() && !activity.isDestroyed()){
+                    First_List_Accounts.clear();
+                    for (DataSnapshot snapshot : datasnapshot.getChildren()){
+                        DtoAccount account = snapshot.getValue(DtoAccount.class);
+                        assert account != null;
+                        if(!account.getId().equals(fUser.getUid())){
+                            for (int i = 0; i < ChatList_List.size(); i++){
+                                if(ChatList_List.get(i).getId().equals(account.getId())){
+                                    account.setChat_id(ChatList_List.get(i).getChat_id());
+                                    First_List_Accounts.add(account);
+                                }
                             }
                         }
                     }
+                    LoadChatRecycler();
                 }
-                LoadChatRecycler();
             }
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
@@ -136,6 +142,7 @@ public class ChatsFragment extends Fragment {
 
     private void Ids(View view) {
         instance = this;
+        if(getActivity() != null) activity = getActivity();
         chatDB = new DaoChat(requireContext());
         recycler_myMsg = view.findViewById(R.id.recycler_myMsg);
         search_users = view.findViewById(R.id.search_users);
@@ -171,26 +178,28 @@ public class ChatsFragment extends Fragment {
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                        First_List_Accounts.clear();
-                        can_load = false;
-                        for(DataSnapshot snapshot : datasnapshot.getChildren()){
-                            DtoAccount account = snapshot.getValue(DtoAccount.class);
-                            if(account != null && account.getId() != null && account.getName_user() != null && account.getName_user().length() > 0){
-                                for(Chatslist chatList : ChatList_List){
-                                    if(account.getId().equals(chatList.getId()) && chatList.getChat_id() != null){
-                                        account.setChat_id(chatList.getChat_id());
-                                        First_List_Accounts.add(account);
+                        if(activity != null && !activity.isFinishing() && !activity.isDestroyed()){
+                            First_List_Accounts.clear();
+                            can_load = false;
+                            for(DataSnapshot snapshot : datasnapshot.getChildren()){
+                                DtoAccount account = snapshot.getValue(DtoAccount.class);
+                                if(account != null && account.getId() != null && account.getName_user() != null && account.getName_user().length() > 0){
+                                    for(Chatslist chatList : ChatList_List){
+                                        if(account.getId().equals(chatList.getId()) && chatList.getChat_id() != null){
+                                            account.setChat_id(chatList.getChat_id());
+                                            First_List_Accounts.add(account);
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if(mAccountsBase.size() != First_List_Accounts.size()) {
-                            mAccountsBase = new ArrayList<>();
-                            mAccountsBase.addAll(First_List_Accounts);
+                            if(mAccountsBase.size() != First_List_Accounts.size()) {
+                                mAccountsBase = new ArrayList<>();
+                                mAccountsBase.addAll(First_List_Accounts);
 
-                            chatDB.REGISTER_CHAT_LIST(mAccountsBase);
-                            new Handler().postDelayed(() -> LoadChatRecycler(), 200);
+                                chatDB.REGISTER_CHAT_LIST(mAccountsBase);
+                                new Handler().postDelayed(() -> LoadChatRecycler(), 200);
+                            }
                         }
                     }
 

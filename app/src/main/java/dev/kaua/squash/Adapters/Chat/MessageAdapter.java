@@ -312,11 +312,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     seen_last.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
-                                DtoMessage finalMessage = appleSnapshot.getValue(DtoMessage.class);
-                                if(finalMessage != null && finalMessage.getId_msg() != null){
-                                    if (finalMessage.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_seen));
-                                    else viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_delivered));
+                            if(!mContext.isDestroyed() && !mContext.isFinishing()){
+                                for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
+                                    DtoMessage finalMessage = appleSnapshot.getValue(DtoMessage.class);
+                                    if(finalMessage != null && finalMessage.getId_msg() != null){
+                                        if (finalMessage.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_seen));
+                                        else viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_delivered));
+                                    }
                                 }
                             }
                         }

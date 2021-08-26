@@ -220,10 +220,12 @@ public class MessageActivity extends AppCompatActivity {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                    DtoAccount account = snapshot.getValue(DtoAccount.class);
-                    if(account != null){
-                        user_im_chat = account;
-                        LoadAnotherUserInfo();
+                    if(instance != null && !instance.isDestroyed() && !instance.isFinishing()){
+                        DtoAccount account = snapshot.getValue(DtoAccount.class);
+                        if(account != null){
+                            user_im_chat = account;
+                            LoadAnotherUserInfo();
+                        }
                     }
                 }
                 @Override
@@ -563,7 +565,8 @@ public class MessageActivity extends AppCompatActivity {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                for(DataSnapshot snapshot : datasnapshot.getChildren()){
+                if(instance != null && !instance.isFinishing() && !instance.isDestroyed()){
+                    for(DataSnapshot snapshot : datasnapshot.getChildren()){
                     Chatslist chatList = snapshot.getValue(Chatslist.class);
                     if(chatList != null)
                     if(chatList.getId().equals(userId)){
@@ -573,6 +576,7 @@ public class MessageActivity extends AppCompatActivity {
                                 UpdateChat_Id(chatList.getChat_id());
                             }
                     }
+                }
                 }
             }
             @Override
@@ -674,7 +678,8 @@ public class MessageActivity extends AppCompatActivity {
             seenListener = reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                    for(DataSnapshot snapshot : datasnapshot.getChildren()){
+                    if(instance != null && !instance.isDestroyed() && !instance.isFinishing()){
+                        for(DataSnapshot snapshot : datasnapshot.getChildren()){
                         DtoMessage message = snapshot.getValue(DtoMessage.class);
                         if(message != null)
                             if(message.getReceiver() != null)
@@ -684,7 +689,7 @@ public class MessageActivity extends AppCompatActivity {
                                     snapshot.getRef().updateChildren(hashMap);
                                 }
                     }
-
+                    }
                 }
 
                 @Override
@@ -816,11 +821,12 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void sendNotification(String receiver, String username, String message, String chat_id){
-        DatabaseReference tokens = myFirebaseHelper.getFirebaseDatabase().getReference("Tokens");
+        DatabaseReference tokens = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.TOKENS_REFERENCE);
         Query query = tokens.orderByKey().equalTo(receiver);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                if(instance != null && !instance.isDestroyed() && !instance.isFinishing()){
                 for (DataSnapshot snapshot : datasnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
                     Data data = new Data(fUser.getUid(), R.drawable.pumpkin_default_image, username+": "+ message, getString(R.string.new_message), userId, EncryptHelper.encrypt(chat_id));
@@ -840,6 +846,7 @@ public class MessageActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(@NotNull Call<MyResponse> call, @NotNull Throwable t) {}
                     });
+                }
                 }
             }
             @Override

@@ -102,19 +102,21 @@ public class ChatFragment extends Fragment {
 
         if(getContext() != null){
             if(ConnectionHelper.isOnline(getContext())){
-                reference = myFirebaseHelper.getFirebaseDatabase().getReference("Chats");
+                reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHATS_REFERENCE);
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         if(getActivity() != null){
-                            LoadLocalMessageOutstanding();
+                            if(!getActivity().isFinishing() && !getActivity().isDestroyed()){
+                                LoadLocalMessageOutstanding();
 
-                            for (DataSnapshot snapshot1 : snapshot.getChildren()){
-                                DtoMessage message = snapshot1.getValue(DtoMessage.class);
-                                if(message != null)
-                                    if(message.getReceiver() != null)
-                                        if(message.getReceiver().equals(firebaseUser.getUid()) && message.getIsSeen() == 0)
-                                            unread++;
+                                for (DataSnapshot snapshot1 : snapshot.getChildren()){
+                                    DtoMessage message = snapshot1.getValue(DtoMessage.class);
+                                    if(message != null)
+                                        if(message.getReceiver() != null)
+                                            if(message.getReceiver().equals(firebaseUser.getUid()) && message.getIsSeen() == 0)
+                                                unread++;
+                                }
                             }
                         }
                     }

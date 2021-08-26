@@ -138,19 +138,21 @@ public class MainFragment extends Fragment {
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                    if(getContext() != null)
-                    if(ConnectionHelper.isOnline(getContext())){
-                        DtoSystem system = snapshot.getValue(DtoSystem.class);
-                        if(system != null){
-                            if(currentVersionCode < system.getVersionCode()){
-                                if(getContext() != null)
-                                    if(MyPrefs.getUpdateRequest_Show(getContext()) == 0 || system.getNeedUpdate() == 1)
-                                        Warnings.showNeedUpdate(requireContext(), system.getVersionName(), system.getVersionCode(), (int) system.getNeedUpdate());
+                    if(getContext() != null && getActivity() != null)
+                        if(!getActivity().isFinishing() && !getActivity().isDestroyed()){
+                            if(ConnectionHelper.isOnline(getContext())){
+                                DtoSystem system = snapshot.getValue(DtoSystem.class);
+                                if(system != null && system.getVersionName() != null){
+                                    if(currentVersionCode < system.getVersionCode())
+                                        if(getContext() != null)
+                                            if(MyPrefs.getUpdateRequest_Show(getContext()) == 0 || system.getNeedUpdate() == 1)
+                                                Warnings.showNeedUpdate(requireContext(), system.getVersionName(), system.getVersionCode(), (int) system.getNeedUpdate());
+
+                                    if(daoSystem.getPrivacyPolicy() < system.getPrivacy_policy())
+                                        Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
+                                }
                             }
-                            if(daoSystem.getPrivacyPolicy() < system.getPrivacy_policy())
-                                Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
                         }
-                    }
                 }
                 @Override
                 public void onCancelled(@NonNull @NotNull DatabaseError error) {}

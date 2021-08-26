@@ -25,7 +25,7 @@ public class DaoChat extends SQLiteOpenHelper {
     public static final int DROP_ALL = 999;
 
     public DaoChat(@Nullable Context context) {
-        super(context, "DB_CHAT", null, 62);
+        super(context, "DB_CHAT", null, 63);
     }
 
     @Override

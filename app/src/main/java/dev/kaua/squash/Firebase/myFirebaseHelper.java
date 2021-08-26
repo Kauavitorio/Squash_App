@@ -15,6 +15,7 @@ public class myFirebaseHelper {
     public static final String USERS_REFERENCE = "Users";
     public static final String PUBLISHED_CHILD = "Published";
     public static final String CHATS_REFERENCE = "Chats";
+    public static final String TOKENS_REFERENCE = "Tokens";
     public static final String CHAT_LIST_REFERENCE = "Chatslist";
     private static FirebaseAnalytics firebaseAnalytics;
     private static FirebaseAuth firebaseAuth;
