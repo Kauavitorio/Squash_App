@@ -40,6 +40,7 @@ import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
 import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
+import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -68,6 +69,7 @@ public class MainFragment extends Fragment {
     private final Handler timer = new Handler();
     DatabaseReference reference;
     FirebaseUser firebaseUser;
+    private static DaoSystem daoSystem;
 
     private View view;
     private static DtoAccount account;
@@ -145,8 +147,7 @@ public class MainFragment extends Fragment {
                                     if(MyPrefs.getUpdateRequest_Show(getContext()) == 0 || system.getNeedUpdate() == 1)
                                         Warnings.showNeedUpdate(requireContext(), system.getVersionName(), system.getVersionCode(), (int) system.getNeedUpdate());
                             }
-
-                            if(MyPrefs.Privacy_Policy_Version(getContext()) < system.getPrivacy_policy())
+                            if(daoSystem.getPrivacyPolicy() < system.getPrivacy_policy())
                                 Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
                         }
                     }
@@ -165,6 +166,7 @@ public class MainFragment extends Fragment {
 
     private void Ids(View view) {
         instance = requireActivity();
+        daoSystem = new DaoSystem(instance);
         requireActivity().getWindow().setStatusBarColor(requireActivity().getColor(R.color.background_menu_sheet));
         requireActivity().getWindow().setNavigationBarColor(requireActivity().getColor(R.color.base_color));
         firebaseUser = myFirebaseHelper.getFirebaseUser();

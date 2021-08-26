@@ -25,7 +25,7 @@ public class DaoChat extends SQLiteOpenHelper {
     public static final int DROP_ALL = 999;
 
     public DaoChat(@Nullable Context context) {
-        super(context, "DB_CHAT", null, 46);
+        super(context, "DB_CHAT", null, 62);
     }
 
     @Override
@@ -111,44 +111,46 @@ public class DaoChat extends SQLiteOpenHelper {
     public void REGISTER_CHAT_LIST(List<DtoAccount> accounts){
         if(accounts != null && accounts.size() > 0){
             for(int i = 0; i < accounts.size(); i++){
-                String command = "SELECT * FROM " + TABLE_CHAT_LIST + " WHERE  id = ?";
-                String[] params = {accounts.get(i).getId()};
-                @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+                if(accounts.get(i).getChat_id() != null){
+                    String command = "SELECT * FROM " + TABLE_CHAT_LIST + " WHERE  id = ?";
+                    String[] params = {accounts.get(i).getId()};
+                    @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
 
-                if(cursor.moveToFirst()){
-                    ContentValues values = new ContentValues();
-                    values.put("account_id_cry", accounts.get(i).getAccount_id_cry());
-                    values.put("id", accounts.get(i).getId());
-                    values.put("imageURL", accounts.get(i).getImageURL());
-                    values.put("last_seen", accounts.get(i).getLast_seen());
-                    values.put("name_user", accounts.get(i).getName_user());
-                    values.put("search", accounts.get(i).getSearch());
-                    values.put("status_chat", accounts.get(i).getStatus_chat());
-                    values.put("typingTo", accounts.get(i).getTypingTo());
-                    values.put("verification_level", accounts.get(i).getVerification_level());
-                    values.put("username", accounts.get(i).getUsername());
-                    values.put("chat_id", accounts.get(i).getChat_id());
-                    values.put("active", accounts.get(i).getActive());
+                    if(cursor.moveToFirst()){
+                        ContentValues values = new ContentValues();
+                        values.put("account_id_cry", accounts.get(i).getAccount_id_cry());
+                        values.put("id", accounts.get(i).getId());
+                        values.put("imageURL", accounts.get(i).getImageURL());
+                        values.put("last_seen", accounts.get(i).getLast_seen());
+                        values.put("name_user", accounts.get(i).getName_user());
+                        values.put("search", accounts.get(i).getSearch());
+                        values.put("status_chat", accounts.get(i).getStatus_chat());
+                        values.put("typingTo", accounts.get(i).getTypingTo());
+                        values.put("verification_level", accounts.get(i).getVerification_level());
+                        values.put("username", accounts.get(i).getUsername());
+                        values.put("chat_id", accounts.get(i).getChat_id());
+                        values.put("active", accounts.get(i).getActive());
 
-                    String where = "id=?";
+                        String where = "id=?";
 
-                    getWritableDatabase().update(TABLE_CHAT_LIST, values, where, params);
-                }else{
-                    ContentValues values = new ContentValues();
-                    values.put("account_id_cry", accounts.get(i).getAccount_id_cry());
-                    values.put("id", accounts.get(i).getId());
-                    values.put("imageURL", accounts.get(i).getImageURL());
-                    values.put("last_seen", accounts.get(i).getLast_seen());
-                    values.put("name_user", accounts.get(i).getName_user());
-                    values.put("search", accounts.get(i).getSearch());
-                    values.put("status_chat", accounts.get(i).getStatus_chat());
-                    values.put("typingTo", accounts.get(i).getTypingTo());
-                    values.put("verification_level", accounts.get(i).getVerification_level());
-                    values.put("username", accounts.get(i).getUsername());
-                    values.put("chat_id", accounts.get(i).getChat_id());
-                    values.put("active", accounts.get(i).getActive());
+                        getWritableDatabase().update(TABLE_CHAT_LIST, values, where, params);
+                    }else{
+                        ContentValues values = new ContentValues();
+                        values.put("account_id_cry", accounts.get(i).getAccount_id_cry());
+                        values.put("id", accounts.get(i).getId());
+                        values.put("imageURL", accounts.get(i).getImageURL());
+                        values.put("last_seen", accounts.get(i).getLast_seen());
+                        values.put("name_user", accounts.get(i).getName_user());
+                        values.put("search", accounts.get(i).getSearch());
+                        values.put("status_chat", accounts.get(i).getStatus_chat());
+                        values.put("typingTo", accounts.get(i).getTypingTo());
+                        values.put("verification_level", accounts.get(i).getVerification_level());
+                        values.put("username", accounts.get(i).getUsername());
+                        values.put("chat_id", accounts.get(i).getChat_id());
+                        values.put("active", accounts.get(i).getActive());
 
-                    getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
+                        getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
+                    }
                 }
             }
         }
@@ -159,21 +161,23 @@ public class DaoChat extends SQLiteOpenHelper {
         if(messages != null && messages.size() > 0){
             getWritableDatabase().delete(TABLE_CHAT,"chat_id=?",new String[]{chat_id});
             for(int i = 1; i < messages.size(); i++){
-                ContentValues values = new ContentValues();
-                values.put("id_msg", messages.get(i).getId_msg());
-                values.put("isSeen", messages.get(i).getIsSeen());
-                values.put("message", messages.get(i).getMessage());
-                values.put("receiver", messages.get(i).getReceiver());
-                values.put("reply_content", messages.get(i).getReply_content());
-                values.put("reply_from", messages.get(i).getReply_from());
-                values.put("sender", messages.get(i).getSender());
-                values.put("time", messages.get(i).getTime());
-                if(messages.get(i) != null && messages.get(i).getMedia() != null && messages.get(i).getMedia().get(0) != null)
-                    values.put("media", messages.get(i).getMedia().get(0));
-                else values.put("media", "");
-                values.put("chat_id", chat_id);
+                if(messages.get(i).getId_msg() != null){
+                    ContentValues values = new ContentValues();
+                    values.put("id_msg", messages.get(i).getId_msg());
+                    values.put("isSeen", messages.get(i).getIsSeen());
+                    values.put("message", messages.get(i).getMessage());
+                    values.put("receiver", messages.get(i).getReceiver());
+                    values.put("reply_content", messages.get(i).getReply_content());
+                    values.put("reply_from", messages.get(i).getReply_from());
+                    values.put("sender", messages.get(i).getSender());
+                    values.put("time", messages.get(i).getTime());
+                    if(messages.get(i) != null && messages.get(i).getMedia() != null && messages.get(i).getMedia().get(0) != null)
+                        values.put("media", messages.get(i).getMedia().get(0));
+                    else values.put("media", "");
+                    values.put("chat_id", chat_id);
 
-                getWritableDatabase().insert(TABLE_CHAT, null, values);
+                    getWritableDatabase().insert(TABLE_CHAT, null, values);
+                }
             }
         }
 
@@ -314,23 +318,24 @@ public class DaoChat extends SQLiteOpenHelper {
             @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
 
             if(cursor.moveToFirst()){
-                ContentValues values = new ContentValues();
-                values.put("account_id_cry", account.getAccount_id_cry());
-                values.put("id", account.getId());
-                values.put("imageURL", account.getImageURL());
-                values.put("last_seen", account.getLast_seen());
-                values.put("name_user", account.getName_user());
-                values.put("search", account.getSearch());
-                values.put("status_chat", account.getStatus_chat());
-                values.put("typingTo", account.getTypingTo());
-                values.put("verification_level", account.getVerification_level());
-                values.put("username", account.getUsername());
-                values.put("chat_id", account.getChat_id());
-                values.put("active", account.getActive());
+                if(account.getAccount_id_cry() != null && account.getId() != null){
+                    ContentValues values = new ContentValues();
+                    values.put("account_id_cry", account.getAccount_id_cry());
+                    values.put("id", account.getId());
+                    values.put("imageURL", account.getImageURL());
+                    values.put("last_seen", account.getLast_seen());
+                    values.put("name_user", account.getName_user());
+                    values.put("search", account.getSearch());
+                    values.put("status_chat", account.getStatus_chat());
+                    values.put("typingTo", account.getTypingTo());
+                    values.put("verification_level", account.getVerification_level());
+                    values.put("username", account.getUsername());
+                    values.put("active", account.getActive());
 
-                String where = "id=?";
+                    String where = "id=?";
 
-                getWritableDatabase().update(TABLE_CHAT_LIST, values, where, params);
+                    getWritableDatabase().update(TABLE_CHAT_LIST, values, where, params);
+                }
             }
         }
     }

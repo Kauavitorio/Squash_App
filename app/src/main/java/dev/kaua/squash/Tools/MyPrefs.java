@@ -3,7 +3,6 @@ package dev.kaua.squash.Tools;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -23,7 +22,6 @@ public abstract class MyPrefs {
     public static final String PREFS_CONFIG = "myPrefsConfiguration";
     public static final String PREFS_BASE = "myPrefsBASE01";
     public static final String PREFS_UPDATES = "myPrefsUpdates";
-    public static final String PREFS_PRIVACY_POLICY = "myPrefsPrivacyPolicy";
     public static final String PREFS_NOTIFICATION = "myPrefsNotify";
     public static final String PREFS_TERMS = "myPrefsTerms_Experience";
     public static final String TAG = "MyPrefs";
@@ -69,20 +67,6 @@ public abstract class MyPrefs {
     public static int getUpdateRequest_Show(@NonNull Context context){
         sp = context.getSharedPreferences(PREFS_UPDATES, MODE_PRIVATE);
         return sp.getInt("pref_request", 0);
-    }
-
-    public static long Privacy_Policy_Version(@NonNull Context context){
-        sp = context.getSharedPreferences(PREFS_PRIVACY_POLICY, MODE_PRIVATE);
-        Log.d(TAG, "Current version -> " + sp.getLong("pref_version", 0));
-        return sp.getLong("pref_version", 0);
-    }
-
-    public static void setPrivacy_Policy(@NonNull Context context, long version){
-        sp = context.getSharedPreferences(PREFS_PRIVACY_POLICY, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putLong("pref_version", version);
-        editor.apply();
-        Log.d(TAG, version + " <- New Version");
     }
 
     public static void InsertNetworkCount(@NonNull Context context){

@@ -140,7 +140,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                         intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
                     else if(shareType == MainActivity.SHARED_IMAGE)
                         intent.putExtra("shared_content", (Uri) ShareContentActivity.getInstance().GetShareContent());
-                    ((Activity)mContext).finish();
+                    mContext.finish();
                 }else intent.putExtra("shared", 0);
                 mContext.startActivity(intent);
             }catch (Exception exception){

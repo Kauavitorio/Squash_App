@@ -104,7 +104,7 @@ public class SearchFragment extends Fragment {
                         arrayListDto.clear();
                         for(DataSnapshot snapshot: datasnapshot.getChildren()){
                             DtoPost post = snapshot.getValue(DtoPost.class);
-                            if(post != null && getContext() != null){
+                            if(post != null && getContext() != null && post.getAccount_id() != null){
                                 if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))) != MyPrefs.getUserInformation(getContext()).getAccount_id()
                                         && !daoFollowing.check_if_follow(MyPrefs.getUserInformation(getContext()).getAccount_id(),
                                         Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))))){

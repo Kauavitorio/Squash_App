@@ -68,7 +68,7 @@ public class ChatsFragment extends Fragment {
                     ChatList_List.clear();
                     for(DataSnapshot snapshot : datasnapshot.getChildren()){
                         Chatslist chatList = snapshot.getValue(Chatslist.class);
-                        if(chatList != null && chatList.getChat_id() != null)
+                        if(chatList != null && chatList.getChat_id() != null && chatList.getChat_id().length() > 5)
                             ChatList_List.add(chatList);
                     }
                     chatList();
@@ -177,7 +177,7 @@ public class ChatsFragment extends Fragment {
                             DtoAccount account = snapshot.getValue(DtoAccount.class);
                             if(account != null && account.getId() != null && account.getName_user() != null && account.getName_user().length() > 0){
                                 for(Chatslist chatList : ChatList_List){
-                                    if(account.getId().equals(chatList.getId())){
+                                    if(account.getId().equals(chatList.getId()) && chatList.getChat_id() != null){
                                         account.setChat_id(chatList.getChat_id());
                                         First_List_Accounts.add(account);
                                     }
@@ -186,7 +186,7 @@ public class ChatsFragment extends Fragment {
                         }
 
                         if(mAccountsBase.size() != First_List_Accounts.size()) {
-                            mAccountsBase.clear();
+                            mAccountsBase = new ArrayList<>();
                             mAccountsBase.addAll(First_List_Accounts);
 
                             chatDB.REGISTER_CHAT_LIST(mAccountsBase);

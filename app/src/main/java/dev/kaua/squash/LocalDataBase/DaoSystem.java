@@ -17,7 +17,7 @@ public class DaoSystem extends SQLiteOpenHelper {
     private final String TABLE = "TBL_SYSTEM_INFO";
 
     public DaoSystem(@Nullable Context context) {
-        super(context, "DB_SYSTEM_INFO", null, 9);
+        super(context, "DB_SYSTEM_INFO", null, 16);
     }
 
     @Override
@@ -28,6 +28,8 @@ public class DaoSystem extends SQLiteOpenHelper {
     private void createTable(SQLiteDatabase db) {
         //  Create Table
         String command = "CREATE TABLE " + TABLE + "(" +
+                "id_system bigint," +
+                "PrivacyPolicy bigint," +
                 "need_reset String not null)";
 
         db.execSQL(command);
@@ -45,15 +47,49 @@ public class DaoSystem extends SQLiteOpenHelper {
     }
 
     public boolean getNeedResetAccount(){
-        String command = "SELECT * FROM " + TABLE;
+        String command = "SELECT * FROM " + TABLE + " WHERE id_system = 1";
         @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, null);
         return cursor.moveToNext();
     }
 
+    public long getPrivacyPolicy(){
+        String command = "SELECT * FROM " + TABLE + " WHERE id_system = 1";
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, null);
+        if(cursor.moveToNext()){
+            return cursor.getLong(1);
+        }else return 0;
+    }
+
     public void setNeedResetAccount(String info){
-        ContentValues values = new ContentValues();
-        values.put("need_reset", info);
-        getWritableDatabase().insert(TABLE, null, values);
+        String command = "SELECT * FROM " + TABLE + " WHERE id_system = 1";
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, null);
+        if(cursor.moveToNext()){
+            ContentValues values = new ContentValues();
+            values.put("PrivacyPolicy", cursor.getLong(1));
+            getWritableDatabase().update(TABLE, values, "id_system=?", new String[]{"1"});
+        }else{
+            ContentValues values = new ContentValues();
+            values.put("id_system", 1);
+            values.put("PrivacyPolicy", 0);
+            values.put("need_reset", info);
+            getWritableDatabase().insert(TABLE, null, values);
+        }
+    }
+
+    public void setPrivacyPolicy(long version){
+        String command = "SELECT * FROM " + TABLE;
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, null);
+        if(cursor.moveToNext()){
+
+            ContentValues values = new ContentValues();
+            values.put("PrivacyPolicy", version);
+            getWritableDatabase().update(TABLE, values, "id_system=?", new String[]{"1"});
+        }else{
+            ContentValues values = new ContentValues();
+            values.put("id_system", 1);
+            values.put("PrivacyPolicy", version);
+            getWritableDatabase().insert(TABLE, null, values);
+        }
     }
 
     public void DropTable(){
