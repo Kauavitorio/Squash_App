@@ -36,4 +36,5 @@ public abstract class ErrorHelper {
     public static final String LOAD_FEED_POSTS = "33";
     public static final String WARN_USER_WITHOUT_ID = "34";
     public static final String WARN_USER_SERVER_ERROR = "35";
+    public static final String REPORT_AN_USER = "36";
 }

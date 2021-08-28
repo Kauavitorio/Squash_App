@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp"
-    android:layout_marginTop="10dp"
+    android:padding="8dp"
+    android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp"
-    android:layout_marginStart="10dp"
-    android:layout_marginEnd="10dp"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
     android:background="@drawable/background_post"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:minHeight="80dp"
         android:orientation="vertical"
-        android:padding="7dp">
+        android:padding="3dp">
 
         <!-- Image User Profile -->
         <de.hdodenhof.circleimageview.CircleImageView
@@ -26,8 +26,8 @@
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:src="@drawable/img_opss"
-            app:civ_border_color="@color/base_color"
-            app:civ_border_width="1dp"/>
+            app:civ_border_color="@color/transparent"
+            app:civ_border_width="1dp" />
 
         <!-- Container User Profile Image -->
         <LinearLayout
@@ -127,7 +127,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="2dp"
                 android:orientation="vertical"
                 tools:ignore="UselessParent">
 

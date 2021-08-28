@@ -35,8 +35,8 @@ import dev.kaua.squash.Activitys.SignInActivity;
 import dev.kaua.squash.Activitys.SplashActivity;
 import dev.kaua.squash.Activitys.ValidateEmailActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
+import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoChat;
@@ -98,6 +98,8 @@ public abstract class Login extends SignInActivity{
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                 //  Checking api return code
                 if(response.code() == 200){
+                    loadingDialog.dismissDialog();
+                    new Handler().postDelayed(() -> loadingDialog.startLoading(), 100);
                     //  Clear all prefs before login user
                     mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
@@ -131,12 +133,11 @@ public abstract class Login extends SignInActivity{
                         editor.putLong("pref_active", response.body().getActive());
                         editor.apply();
 
-                        AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getAccount_id_cry()))), AsyncLikes_Posts.NOT_NOTIFY);
-                        //noinspection unchecked
-                        async.execute();
-
                         //  Getting Followers and Followings
-                        Methods.LoadFollowersAndFollowing(context, 1);
+                        Methods.LoadFollowersAndFollowing(context, 0);
+                        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow((Activity) context, account.getAccount_id());
+                        //noinspection unchecked
+                        asyncUser_follow.execute();
 
                         //  Log in User On Firebase
                         mAuth = myFirebaseHelper.getFirebaseAuth();
@@ -148,7 +149,6 @@ public abstract class Login extends SignInActivity{
                         //  Login user in firebase to get user instance
                         mAuth.signInWithEmailAndPassword(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail())), Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
                                 .addOnCompleteListener(task -> {
-                                    loadingDialog.dismissDialog();
                                     Log.d(TAG, "Login Ok");
                                     Log.d(TAG, "User " + mAuth.getUid());
 
@@ -160,11 +160,18 @@ public abstract class Login extends SignInActivity{
                                     mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle_Analytics);
 
                                     //  Go To main
-                                    Intent i = new Intent(context, MainActivity.class);
-                                    i.putExtra("shared", 0);
-                                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_left_go, R.anim.move_to_right_go);
-                                    ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
-                                    ((Activity) context).finish();
+                                    new Handler().postDelayed(() -> {
+                                        Intent i = new Intent(context, MainActivity.class);
+                                        i.putExtra("shared", 0);
+                                        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_left_go, R.anim.move_to_right_go);
+                                        ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
+                                        ((Activity) context).finish();
+                                        try {
+                                            new Handler().postDelayed(() -> loadingDialog.dismissDialog(), 300);
+                                        }catch (Exception ex){
+                                            Log.d(TAG, ex.toString());
+                                        }
+                                    }, 1000);
                                 });
                     }else LogOut(context, LOGOUT_STATUS_WITHOUT_FLAG, DISABLE_ACCOUNT);
 
@@ -177,10 +184,10 @@ public abstract class Login extends SignInActivity{
                     Intent i = new Intent(context, ValidateEmailActivity.class);
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context,R.anim.move_to_left_go, R.anim.move_to_right_go);
                     //noinspection ConstantConditions
-                    i.putExtra("account_id", EncryptHelper.decrypt(response.body().getAccount_id_cry()));
-                    i.putExtra("email_user", login_method);
-                    i.putExtra("password", password);
-                    i.putExtra("type_validate", 1);
+                    i.putExtra(ValidateEmailActivity.ACCOUNT_ID_ID, EncryptHelper.decrypt(response.body().getAccount_id_cry()));
+                    i.putExtra(ValidateEmailActivity.LOGIN_METHOD_ID, login_method);
+                    i.putExtra(ValidateEmailActivity.PASSWORD_ID, password);
+                    i.putExtra(ValidateEmailActivity.TYPE_VALIDATE_ID, 1);
                     ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
                     ((Activity) context).finish();
                 }else if(response.code() == 401) {

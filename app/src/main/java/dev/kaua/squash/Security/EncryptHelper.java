@@ -54,10 +54,17 @@ public class EncryptHelper {
 
     public static String decrypt(String str) {
         try {
-            if (str == null || str.equals("") || str.equals(" ")) return null;
-            else
-                // base64(ascii) -> bytes --> decrypt -> bytes -> str(utf8)
-                return new String(decrypt(Base64.getDecoder().decode(str.getBytes("ISO-8859-1"))), "UTF-8");
+            if(str == null) return null;
+            else{
+                if(!str.matches("^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$")) return str;
+                else{
+                    if (str.equals("") || str.equals(" ")) return null;
+                    else
+                        // base64(ascii) -> bytes --> decrypt -> bytes -> str(utf8)
+                        return new String(decrypt(Base64.getDecoder()
+                                .decode(str.getBytes(StandardCharsets.ISO_8859_1))), StandardCharsets.UTF_8);
+                }
+            }
         } catch (Exception e) {
             //UnsupportedEncodingException...
             if (L.isWarnEnabled()) {

@@ -1,6 +1,7 @@
 package dev.kaua.squash.Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,12 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Security.EncryptHelper;
 
 @SuppressWarnings("unchecked")
 public class SearchItemArrayAdapter extends ArrayAdapter<DtoAccount> {
@@ -47,7 +50,8 @@ public class SearchItemArrayAdapter extends ArrayAdapter<DtoAccount> {
             TextView lblName = (TextView) view.findViewById(R.id.txt_user_name_search);
             CircleImageView circleImageView = view.findViewById(R.id.ic_user_image);
             if (lblName != null){
-                Glide.with(context).load(people.getProfile_image()).into(circleImageView);
+                if(people.getImageURL() == null || people.getImageURL().equals("default")) circleImageView.setImageResource(R.drawable.pumpkin_default_image);
+                else Glide.with(context).load(people.getImageURL()).into(circleImageView);
                 lblName.setText(people.getName_user());
             }
         }
@@ -65,7 +69,7 @@ public class SearchItemArrayAdapter extends ArrayAdapter<DtoAccount> {
     Filter nameFilter = new Filter() {
         @Override
         public CharSequence convertResultToString(Object resultValue) {
-            return ((DtoAccount) resultValue).getName_user();
+            return EncryptHelper.decrypt(((DtoAccount) resultValue).getName_user());
         }
 
         @Override
@@ -76,7 +80,6 @@ public class SearchItemArrayAdapter extends ArrayAdapter<DtoAccount> {
                 for (DtoAccount people : tempItems) {
                     if (people.getName_user().toLowerCase().contains(constraint.toString().toLowerCase())) suggestions.add(people);
                     else if (people.getUsername().toLowerCase().contains(constraint.toString().toLowerCase())) suggestions.add(people);
-                    else if (people.getJoined_date().toLowerCase().contains(constraint.toString().toLowerCase())) suggestions.add(people);
                 }
                 filterResults.values = suggestions;
                 filterResults.count = suggestions.size();

@@ -211,15 +211,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     });
                 }else if(viewHolder.container_media_img_chat != null) viewHolder.container_media_img_chat.setVisibility(View.GONE);
 
-                if(can_animate){
-                    if(viewHolder.container_msg != null){
-                        if(position == mMessages.size() - 1){
-                            Animation CartAnim = AnimationUtils.loadAnimation(context, R.anim.slide_up);
-                            viewHolder.itemView.startAnimation(CartAnim);
-                        }
-                    }
-                }
-
             }else if(LayoutType == MSG_TYPE_RIGHT_AUDIO || LayoutType == MSG_TYPE_LEFT_AUDIO){
                 if(viewHolder.voicePlayerView != null && viewHolder.audio_timer != null
                         && viewHolder.play_button != null && viewHolder.pause_button != null && viewHolder.audio_seek_bar != null){
@@ -306,15 +297,35 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 }
             }
 
+            if(viewHolder.container_msg != null){
+                if(position == mMessages.size() - 1)
+                    viewHolder.itemView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_up));
+            }
 
             //  Default Action
             //  This action and items contain in all adapters
             if(message.getSender().equals(fUser.getUid())){
                 viewHolder.message_container.setPadding(2, 2, 20, 2);
                 if(position == mMessages.size() - 1){
-                    if (message.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_seen));
-                    else viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_delivered));
-                }else viewHolder.img_seen.setVisibility(View.GONE);
+                    DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                    Query seen_last = ref.child(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(message.getId_msg());
+                    seen_last.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if(!mContext.isDestroyed() && !mContext.isFinishing()){
+                                for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
+                                    DtoMessage finalMessage = appleSnapshot.getValue(DtoMessage.class);
+                                    if(finalMessage != null && finalMessage.getId_msg() != null){
+                                        if (finalMessage.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_seen));
+                                        else viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_delivered));
+                                    }
+                                }
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+                }
             }else if(viewHolder.img_seen != null) viewHolder.img_seen.setVisibility(View.GONE);
             if(message.getTime() != null){
                 String[] time = EncryptHelper.decrypt(message.getTime()).replace("-", "/").split("/");

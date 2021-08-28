@@ -1,6 +1,7 @@
 package dev.kaua.squash.Fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,6 +40,7 @@ import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
 import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
+import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -58,15 +60,16 @@ public class MainFragment extends Fragment {
     //private static SwipeRefreshLayout swipe_main;
     private ConstraintLayout btn_create_new_story_main;
     private static RecyclerView recyclerView_Posts;
-    private ImageView btn_chat_main, btn_compose_main;
+    private ImageView btn_compose_main;
     private CircleImageView icon_ProfileUser_main;
     private CardView card_msg_notRead_main;
     private LinearLayout header_main;
-    private static Context instance;
+    private static Activity instance;
     private static ConstraintLayout loadingPanel;
     private final Handler timer = new Handler();
     DatabaseReference reference;
     FirebaseUser firebaseUser;
+    private static DaoSystem daoSystem;
 
     private View view;
     private static DtoAccount account;
@@ -80,7 +83,6 @@ public class MainFragment extends Fragment {
         Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(icon_ProfileUser_main);
         btn_create_new_story_main.setOnClickListener(v -> StoryClick());
-        btn_chat_main.setOnClickListener(v -> MainActivity.getInstance().CallChat());
         btn_compose_main.setOnClickListener(v -> MainActivity.getInstance().CallComposePost());
 
         //loadMsgNotRead();
@@ -136,20 +138,21 @@ public class MainFragment extends Fragment {
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                    if(getContext() != null)
-                    if(ConnectionHelper.isOnline(getContext())){
-                        DtoSystem system = snapshot.getValue(DtoSystem.class);
-                        if(system != null){
-                            if(currentVersionCode < system.getVersionCode()){
-                                if(getContext() != null)
-                                    if(MyPrefs.getUpdateRequest_Show(getContext()) == 0 || system.getNeedUpdate() == 1)
-                                        Warnings.showNeedUpdate(requireContext(), system.getVersionName(), system.getVersionCode(), (int) system.getNeedUpdate());
-                            }
+                    if(getContext() != null && getActivity() != null)
+                        if(!getActivity().isFinishing() && !getActivity().isDestroyed()){
+                            if(ConnectionHelper.isOnline(getContext())){
+                                DtoSystem system = snapshot.getValue(DtoSystem.class);
+                                if(system != null && system.getVersionName() != null){
+                                    if(currentVersionCode < system.getVersionCode())
+                                        if(getContext() != null)
+                                            if(MyPrefs.getUpdateRequest_Show(getContext()) == 0 || system.getNeedUpdate() == 1)
+                                                Warnings.showNeedUpdate(requireContext(), system.getVersionName(), system.getVersionCode(), (int) system.getNeedUpdate());
 
-                            if(MyPrefs.Privacy_Policy_Version(getContext()) < system.getPrivacy_policy())
-                                Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
+                                    if(daoSystem.getPrivacyPolicy() < system.getPrivacy_policy())
+                                        Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
+                                }
+                            }
                         }
-                    }
                 }
                 @Override
                 public void onCancelled(@NonNull @NotNull DatabaseError error) {}
@@ -161,10 +164,16 @@ public class MainFragment extends Fragment {
         ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     public static void RefreshRecycler(){ RecommendedPosts.getFeedPosts(instance, recyclerView_Posts, loadingPanel); }
 
     private void Ids(View view) {
         instance = requireActivity();
+        daoSystem = new DaoSystem(instance);
         requireActivity().getWindow().setStatusBarColor(requireActivity().getColor(R.color.background_menu_sheet));
         requireActivity().getWindow().setNavigationBarColor(requireActivity().getColor(R.color.base_color));
         firebaseUser = myFirebaseHelper.getFirebaseUser();
@@ -174,7 +183,6 @@ public class MainFragment extends Fragment {
         btn_create_new_story_main = view.findViewById(R.id.btn_create_new_story_main);
         card_msg_notRead_main = view.findViewById(R.id.card_msg_notRead_main);
         btn_compose_main = view.findViewById(R.id.btn_compose_main);
-        btn_chat_main = view.findViewById(R.id.btn_chat_main);
         recyclerView_Posts = view.findViewById(R.id.recyclerView_Posts);
         header_main = view.findViewById(R.id.header_main);
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());

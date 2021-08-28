@@ -147,7 +147,6 @@ public class ProfileFragment extends Fragment {
                     public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                         if(response.code() == 201){
                             btn_go_chat_profile.setVisibility(View.VISIBLE);
-                            SearchFragment.getInstance().LoadSearch();
                             Methods.LoadFollowersAndFollowing(requireActivity(), 1);
                             MainFragment.RefreshRecycler();
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
@@ -175,7 +174,6 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                         if(response.code() == 201){
-                            SearchFragment.getInstance().LoadSearch();
                             Methods.LoadFollowersAndFollowing(requireActivity(), 1);
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
                             asyncUser_follow.execute();
@@ -241,7 +239,7 @@ public class ProfileFragment extends Fragment {
 
     public static ProfileFragment getInstance(){ return instance;}
 
-    public void ReloadRecycler(){ RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile
+    public void ReloadRecycler(){ RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile
             , posts_size, account);}
 
     public void LoadAnotherUser(){
@@ -267,7 +265,7 @@ public class ProfileFragment extends Fragment {
                             account.setAccount_id_cry(EncryptHelper.encrypt(bundle.getString("account_id")));
                             DtoAccount search_account = new DtoAccount();
                             search_account.setAccount_id(account_another_user);
-                            RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile,
+                            RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile,
                                     posts_size, search_account);
                             AccountServices services = retrofitUser.create(AccountServices.class);
                             Call<DtoAccount> call = services.getUserInfo(account);
@@ -306,7 +304,7 @@ public class ProfileFragment extends Fragment {
                                                     ic_account_badge_profile.setVisibility(View.VISIBLE);
                                                     BangedAnimation();
                                                 }
-                                                RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile
+                                                RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile
                                                         , posts_size, search_account);
 
                                                 DaoFollowing daoFollowing = new DaoFollowing(getContext());
@@ -379,7 +377,7 @@ public class ProfileFragment extends Fragment {
         account_id = user.getAccount_id();
         account.setAccount_id(account_id);
         account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
-        RecommendedPosts.getUsersPosts(requireContext(), recyclerView_Posts_profile, noPost_profile, posts_size, account);
+        RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile, posts_size, account);
 
         DaoAccount db = new DaoAccount(activity);
         DtoAccount account_follow = db.get_followers_following(account_id);
@@ -445,8 +443,7 @@ public class ProfileFragment extends Fragment {
     void EnableOptions(long id){
         warn_id = id;
         if(getContext() != null){
-            setHasOptionsMenu(id != MyPrefs.getUserInformation(requireContext()).getAccount_id()
-                    && Integer.parseInt(MyPrefs.getUserInformation(requireContext()).getVerification_level()) == 2);
+            setHasOptionsMenu(id != MyPrefs.getUserInformation(requireContext()).getAccount_id());
         }else
             setHasOptionsMenu(false);
 
@@ -455,7 +452,7 @@ public class ProfileFragment extends Fragment {
     String UID_USER_WARN = null;
     @SuppressLint("NonConstantResourceId")
     @Override
-    public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.options_profile:
                 if(getContext() != null && getActivity() != null){
@@ -513,9 +510,60 @@ public class ProfileFragment extends Fragment {
                     bottomSheetDialog.setContentView(sheetView);
                     bottomSheetDialog.show();
                 }
+            case R.id.report_user:
+                if(getContext() != null && getActivity() != null) {
+                    BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.BottomSheetTheme);
+                    //  Creating View for SheetMenu
+                    View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_user_report ,
+                            getActivity().findViewById(R.id.sheet_report_user));
+
+                    sheetView.findViewById(R.id.txt_report_post_message_or_comment).setOnClickListener(v -> {
+                        ReportUser(EncryptHelper.encrypt(getString(R.string.report_post_message_or_comment)));
+                        bottomSheetDialog.dismiss();
+                    });
+
+
+                    sheetView.findViewById(R.id.txt_report_account).setOnClickListener(v -> {
+                        ReportUser(EncryptHelper.encrypt(getString(R.string.report_account)));
+                        bottomSheetDialog.dismiss();
+                    });
+
+                    bottomSheetDialog.setContentView(sheetView);
+                    bottomSheetDialog.show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    void ReportUser(String reason){
+        if(getContext() != null && getActivity() != null){
+            LoadingDialog loadingDialog = new LoadingDialog(getActivity());
+            loadingDialog.startLoading();
+
+            DtoAccount dtoAccount = new DtoAccount();
+            dtoAccount.setReport_from(EncryptHelper.encrypt(String.valueOf(MyPrefs.getUserInformation(getContext()).getAccount_id())));
+            dtoAccount.setReport_to(EncryptHelper.encrypt(String.valueOf(warn_id)));
+            dtoAccount.setReport_reason(reason);
+            AccountServices services = retrofit.create(AccountServices.class);
+            Call<DtoAccount> call = services.report_an_user(dtoAccount);
+            call.enqueue(new Callback<DtoAccount>() {
+                @Override
+                public void onResponse(@NonNull Call<DtoAccount> call, @NonNull Response<DtoAccount> response) {
+                    loadingDialog.dismissDialog();
+                    if(response.code() == 200){
+                        ToastHelper.toast(requireActivity(), getString(R.string.report_sent_successfully), ToastHelper.SHORT_DURATION);
+                    }else
+                        Warnings.showWeHaveAProblem(getContext(), ErrorHelper.REPORT_AN_USER);
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<DtoAccount> call, @NonNull Throwable t) {
+                    loadingDialog.dismissDialog();
+                    Warnings.showWeHaveAProblem(getContext(), ErrorHelper.REPORT_AN_USER);
+                }
+            });
         }
     }
 
@@ -524,6 +572,11 @@ public class ProfileFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         requireActivity().getMenuInflater().inflate(R.menu.menu_profile, menu);
         super.onCreateOptionsMenu(menu,inflater);
+
+        if(menu.findItem(R.id.options_profile) != null &&
+                Integer.parseInt(MyPrefs.getUserInformation(requireContext()).getVerification_level()) == DtoAccount.ACCOUNT_IS_ADM){
+            menu.findItem(R.id.options_profile).setVisible(true);
+        }
     }
 
     private Animation myAnim;

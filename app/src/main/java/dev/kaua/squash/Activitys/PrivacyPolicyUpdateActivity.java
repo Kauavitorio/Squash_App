@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
+import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -29,13 +30,14 @@ public class PrivacyPolicyUpdateActivity extends AppCompatActivity {
 
         btn_accept.setOnClickListener(v -> {
             accept = true;
-            MyPrefs.setPrivacy_Policy(this, version);
+            DaoSystem daoSystem = new DaoSystem(this);
+            daoSystem.setPrivacyPolicy(version);
             LoadingDialog loadingDialog = new LoadingDialog(this);
             loadingDialog.startLoading();
             new Handler().postDelayed(() -> {
                 loadingDialog.dismissDialog();
                 finish();
-            }, 1500);
+            }, 1000);
         });
 
     }

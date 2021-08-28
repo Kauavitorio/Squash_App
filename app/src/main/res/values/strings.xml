@@ -93,6 +93,7 @@
     <string name="loading">Loading…</string>
     <string name="msg_background_chat_under_development">The following process is under development, however, it may fail to be used.\nAre you sure you want to proceed?</string>
     <string name="report_website"><font color='#FD0000'>Report Website</font></string>
+    <string name="report_user"><font color='#FD0000'>Report User</font></string>
     <string name="refresh">Refresh</string>
     <string name="open_with">Open with …</string>
     <string name="copy_link">Copy Link</string>
@@ -202,10 +203,19 @@
     <string name="options">Options</string>
     <string name="warn_user">Warn user</string>
     <string name="warn_reason">This user will have his account %1$s after this warning, justify below the reason.</string>
-    <string name="restricted_and_alerted" >restricted and alerted</string>
+    <string name="restricted_and_alerted">restricted and alerted</string>
     <string name="suspended">suspended</string>
     <string name="reactivated">reactivated</string>
     <string name="suspended_account">Suspended account</string>
     <string name="your_account_has_been_suspended">Your account has been suspended due to two Squash rules violations. To try to recover your account, please contact us via email. contato@kauavitorio.com</string>
     <string name="welcome">Welcome</string>
+    <string name="block_user">Block user</string>
+    <string name="more">More</string>
+    <string name="reason_for_report">Reason for report</string>
+    <string name="report_desc">Your report is anonymous, except if you`re reporting and intellectual property infringement. If someone is immediate danger, call the local emergency services - don\'t wait.</string>
+    <string name="why_are_you_reporting_this_account">Why are you reporting this account?</string>
+    <string name="report_post_message_or_comment">Report Post, Message or Comment</string>
+    <string name="report_account">Report Account</string>
+    <string name="report_sent_successfully">Report sent successfully</string>
+    <string name="this_account_has_been_disabled">This account has been disabled.</string>
 </resources>

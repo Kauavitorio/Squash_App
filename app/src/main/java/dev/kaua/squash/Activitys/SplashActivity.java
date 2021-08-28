@@ -1,5 +1,7 @@
 package dev.kaua.squash.Activitys;
 
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,7 +35,7 @@ import dev.kaua.squash.Tools.MyPrefs;
 public class SplashActivity extends AppCompatActivity {
     //  Create timer
     private final Handler timer = new Handler();
-    public static final String TAG = "SplashActivity";
+    public static final String TAG = "SplashActivity_LOG";
     public static final String ACCOUNT_DISABLE = "account_active";
 
     @SuppressLint("SetTextI18n")
@@ -42,6 +45,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         getWindow().setStatusBarColor(getColor(R.color.base_color));
         getWindow().setNavigationBarColor(getColor(R.color.base_color));
+        AnimateLogo();
 
         SharedPreferences sp_network = getSharedPreferences(MyPrefs.PREFS_NETWORK_USAGE, MODE_PRIVATE);
         if (!sp_network.contains("pref_start_time")) MyPrefs.InsertNetworkCount(this);
@@ -124,11 +128,11 @@ public class SplashActivity extends AppCompatActivity {
     private void DoValidation(String value) {
         SharedPreferences sp_First = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         Intent i = new Intent(this, ValidateEmailActivity.class);
-        i.putExtra("account_id", EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)));
-        i.putExtra("password", EncryptHelper.decrypt(sp_First.getString("pref_password", null)));
-        i.putExtra("email_user", EncryptHelper.decrypt(sp_First.getString("pref_email", null)));
+        i.putExtra(ValidateEmailActivity.ACCOUNT_ID_ID, EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)));
+        i.putExtra(ValidateEmailActivity.PASSWORD_ID, EncryptHelper.decrypt(sp_First.getString("pref_password", null)));
+        i.putExtra(ValidateEmailActivity.LOGIN_METHOD_ID, EncryptHelper.decrypt(sp_First.getString("pref_email", null)));
         i.putExtra("verify_id", value);
-        i.putExtra("type_validate", 2);
+        i.putExtra(ValidateEmailActivity.TYPE_VALIDATE_ID, 2);
         startActivity(i);
         finish();
     }
@@ -147,6 +151,20 @@ public class SplashActivity extends AppCompatActivity {
                 }else LoadBase();
             }else LoadBase();
         }else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
+    }
+
+    void AnimateLogo(){
+        ImageView iv = (ImageView) findViewById(R.id.img_squash_logo_splash);
+        ObjectAnimator scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+                iv,
+                PropertyValuesHolder.ofFloat("scaleX", 1.2f),
+                PropertyValuesHolder.ofFloat("scaleY", 1.2f));
+        scaleDown.setDuration(1500);
+
+        scaleDown.setRepeatCount(ObjectAnimator.INFINITE);
+        scaleDown.setRepeatMode(ObjectAnimator.REVERSE);
+
+        scaleDown.start();
     }
 
     void LoadBase(){

@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -49,9 +50,14 @@ public class ValidateEmailActivity extends AppCompatActivity {
     private ImageView btn_back;
     private TextView txt_didNot_receive_email_validate;
 
-    private static String account_id, password, email_user;
+    private static String account_id, password, login_method_user;
 
     final Retrofit retrofitUser = Methods.GetRetrofitBuilder();
+
+    public static final String LOGIN_METHOD_ID = "email_user";
+    public static final String PASSWORD_ID = "password";
+    public static final String TYPE_VALIDATE_ID = "type_validate";
+    public static final String ACCOUNT_ID_ID = "account_id";
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -70,16 +76,17 @@ public class ValidateEmailActivity extends AppCompatActivity {
 
         //  Get User Information form SignUp
         Bundle bundle = getIntent().getExtras();
-        account_id = bundle.getString("account_id");
-        password = bundle.getString("password");
-        email_user = bundle.getString("email_user");
-        int type_validate = bundle.getInt("type_validate");
+        account_id = bundle.getString(ACCOUNT_ID_ID);
+        password = bundle.getString(PASSWORD_ID);
+        login_method_user = bundle.getString(LOGIN_METHOD_ID);
+        int type_validate = bundle.getInt(TYPE_VALIDATE_ID);
         if(type_validate == 0){
             //  Show Account Created Alert
             Warnings.Base_Sheet_Alert(this, getString(R.string.account_was_created), false);
-            txt_who_is_sent.setText(getString(R.string.the_code_has_been_sent, email_user.replace(" ", "")));
+            txt_who_is_sent.setText(getString(R.string.the_code_has_been_sent, login_method_user.replace(" ", "")));
         }
         else if(type_validate == 2){
+            txt_who_is_sent.setVisibility(View.GONE);
             edit_verification_code.setText(bundle.getString("verify_id"));
             TryValidate();
         }
@@ -122,7 +129,7 @@ public class ValidateEmailActivity extends AppCompatActivity {
         LoadingDialog loadingDialog = new LoadingDialog(ValidateEmailActivity.this);
         loadingDialog.startLoading();
         DtoAccount account = new DtoAccount();
-        account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
+        account.setAccount_id_cry(EncryptHelper.encrypt(account_id));
         account.setVerify_id(EncryptHelper.encrypt(Objects.requireNonNull(edit_verification_code.getText()).toString()));
         ValidationServices services = retrofitUser.create(ValidationServices.class);
         Call<DtoAccount> call = services.validate_email(account);
@@ -131,7 +138,7 @@ public class ValidateEmailActivity extends AppCompatActivity {
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                 loadingDialog.dismissDialog();
                 //  User's email has been successfully confirmed, now login will be performed
-                if(response.code() == 200) Login.DoLogin(ValidateEmailActivity.this, email_user, password);
+                if(response.code() == 200) Login.DoLogin(ValidateEmailActivity.this, login_method_user, password);
 
                 //  Validation Code is Invalid
                 else if(response.code() == 203) Warnings.Base_Sheet_Alert(ValidateEmailActivity.this, getString(R.string.the_validation_code_is_invalid), true);

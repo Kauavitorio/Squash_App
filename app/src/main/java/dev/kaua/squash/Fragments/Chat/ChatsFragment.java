@@ -1,11 +1,11 @@
 package dev.kaua.squash.Fragments.Chat;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +24,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +35,6 @@ import dev.kaua.squash.Adapters.Chat.UserChatAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
-import dev.kaua.squash.Fragments.ChatFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
@@ -46,46 +44,51 @@ public class ChatsFragment extends Fragment {
     private RecyclerView recycler_myMsg;
     private TextView txt_not_start_conversation;
     private UserChatAdapter userChatAdapter;
-    private List<DtoAccount> mAccounts;
+    private List<DtoAccount> First_List_Accounts;
     private EditText search_users;
     private DaoChat chatDB;
     private static ChatsFragment instance;
+    private static Activity activity;
 
     FirebaseUser fUser;
     DatabaseReference reference;
 
-    private final List<Chatslist> usersList = new ArrayList<>();
+    private final List<Chatslist> ChatList_List = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
         Ids(view);
-
         fUser = myFirebaseHelper.getFirebaseUser();
 
         chatList();
-        reference = myFirebaseHelper.getFirebaseDatabase().getReference("Chatslist").child(fUser.getUid());
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                usersList.clear();
-                for(DataSnapshot snapshot : datasnapshot.getChildren()){
-                    Chatslist chatList = snapshot.getValue(Chatslist.class);
-                    usersList.add(chatList);
+        if(ConnectionHelper.isOnline(requireContext())){
+            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE).child(fUser.getUid());
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                    if(activity != null && !activity.isFinishing() && !activity.isDestroyed()){
+                        ChatList_List.clear();
+                        for(DataSnapshot snapshot : datasnapshot.getChildren()){
+                            Chatslist chatList = snapshot.getValue(Chatslist.class);
+                            if(chatList != null && chatList.getChat_id() != null && chatList.getChat_id().length() > 5)
+                                ChatList_List.add(chatList);
+                        }
+                        chatList();
+                    }
                 }
-                chatList();
-            }
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            });
 
-        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                String token = task.getResult();
-                updateToken(token);
-            }
-        });
+            myFirebaseHelper.getFirebaseMessaging().getToken().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    String token = task.getResult();
+                    updateToken(token);
+                }
+            });
+        }
 
         search_users.addTextChangedListener(new TextWatcher() {
             @Override
@@ -108,27 +111,29 @@ public class ChatsFragment extends Fragment {
 
     private void searchUsers(String str) {
         FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
-        Query query = myFirebaseHelper.getFirebaseDatabase().getReference("Users").orderByChild("search")
+        Query query = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).orderByChild("search")
                 .startAt(str)
                 .endAt(str + "\uf8ff");
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                mAccounts.clear();
-                for (DataSnapshot snapshot : datasnapshot.getChildren()){
-                    DtoAccount account = snapshot.getValue(DtoAccount.class);
-                    assert account != null;
-                    if(!account.getId().equals(fUser.getUid())){
-                        for (int i = 0; i < usersList.size(); i++){
-                            if(usersList.get(i).getId().equals(account.getId())){
-                                account.setChat_id(usersList.get(i).getChat_id());
-                                mAccounts.add(account);
+                if(activity != null && !activity.isFinishing() && !activity.isDestroyed()){
+                    First_List_Accounts.clear();
+                    for (DataSnapshot snapshot : datasnapshot.getChildren()){
+                        DtoAccount account = snapshot.getValue(DtoAccount.class);
+                        assert account != null;
+                        if(!account.getId().equals(fUser.getUid())){
+                            for (int i = 0; i < ChatList_List.size(); i++){
+                                if(ChatList_List.get(i).getId().equals(account.getId())){
+                                    account.setChat_id(ChatList_List.get(i).getChat_id());
+                                    First_List_Accounts.add(account);
+                                }
                             }
                         }
                     }
+                    LoadChatRecycler();
                 }
-                LoadChatRecycler();
             }
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {}
@@ -137,6 +142,7 @@ public class ChatsFragment extends Fragment {
 
     private void Ids(View view) {
         instance = this;
+        if(getActivity() != null) activity = getActivity();
         chatDB = new DaoChat(requireContext());
         recycler_myMsg = view.findViewById(R.id.recycler_myMsg);
         search_users = view.findViewById(R.id.search_users);
@@ -156,8 +162,6 @@ public class ChatsFragment extends Fragment {
     @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
-        if(visible)
-            LoadChatRecycler();
     }
 
     public static ChatsFragment getInstance(){ return instance; }
@@ -169,64 +173,39 @@ public class ChatsFragment extends Fragment {
 
         if(getContext() != null)
             if(ConnectionHelper.isOnline(getContext())){
-                mAccounts = new ArrayList<>();
-                reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users");
+                First_List_Accounts = new ArrayList<>();
+                reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE);
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                        mAccounts.clear();
-                        can_load = false;
-                        for(DataSnapshot snapshot : datasnapshot.getChildren()){
-                            DtoAccount account = snapshot.getValue(DtoAccount.class);
-                            if(account != null){
-                                for(Chatslist chatList : usersList){
-                                    if(account.getId() != null && account.getId().equals(chatList.getId()) &&
-                                            chatDB.test_has_chat(account.getId())){
-                                        account.setChat_id(chatList.getChat_id());
-                                        mAccounts.add(account);
+                        if(activity != null && !activity.isFinishing() && !activity.isDestroyed()){
+                            First_List_Accounts.clear();
+                            can_load = false;
+                            for(DataSnapshot snapshot : datasnapshot.getChildren()){
+                                DtoAccount account = snapshot.getValue(DtoAccount.class);
+                                if(account != null && account.getId() != null && account.getName_user() != null && account.getName_user().length() > 0){
+                                    for(Chatslist chatList : ChatList_List){
+                                        if(account.getId().equals(chatList.getId()) && chatList.getChat_id() != null){
+                                            account.setChat_id(chatList.getChat_id());
+                                            First_List_Accounts.add(account);
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if(mAccountsBase.size() != mAccounts.size()) mAccountsBase.addAll(mAccounts);
+                            if(mAccountsBase.size() != First_List_Accounts.size()) {
+                                mAccountsBase = new ArrayList<>();
+                                mAccountsBase.addAll(First_List_Accounts);
 
-                        //  Check if recyclerView need to be updated
-                        try {
-                            for (int i = 0; i < mAccounts.size(); i++){
-                                if(mAccountsBase != null && mAccountsBase.get(i) != null)
-                                    if(!mAccountsBase.get(i).getStatus_chat().equals(mAccounts.get(i).getStatus_chat()) ||
-                                            !mAccountsBase.get(i).getName_user().equals(mAccounts.get(i).getName_user()) ||
-                                            !mAccountsBase.get(i).getSearch().equals(mAccounts.get(i).getSearch()) ||
-                                            !mAccountsBase.get(i).getImageURL().equals(mAccounts.get(i).getImageURL()) ||
-                                            mAccountsBase.get(i).getVerification_level() != null && !mAccountsBase.get(i).getVerification_level().equals(mAccounts.get(i).getVerification_level())){
-                                        reload = true;
-                                        chatDB.REGISTER_CHAT_LIST(mAccounts);
-                                        LoadChatRecycler();
-                                    }
+                                chatDB.REGISTER_CHAT_LIST(mAccountsBase);
+                                new Handler().postDelayed(() -> LoadChatRecycler(), 200);
                             }
-                        }catch (Exception ex){
-                            Log.d("CHAT", ex.toString());
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull @NotNull DatabaseError error) {}
                 });
-
-                if(reload){
-                    chatDB.REGISTER_CHAT_LIST(mAccounts);
-                    new Handler().postDelayed(() -> {
-                        if(ChatFragment.getInstance() != null) ChatFragment.getInstance().loadViewAdapter();
-                    }, 1000);
-                    LoadChatRecycler();
-                }
-
-                if(base_reload){
-                    chatDB.REGISTER_CHAT_LIST(mAccounts);
-                    LoadChatRecycler();
-                    base_reload = false;
-                }
             }
     }
 
@@ -234,14 +213,14 @@ public class ChatsFragment extends Fragment {
     public static int Outstanding;
     private static Parcelable recyclerViewState;
     public void LoadChatRecycler() {
-        if(chatDB != null && mAccounts != null && recycler_myMsg != null){
+        if(chatDB != null && First_List_Accounts != null && recycler_myMsg != null){
             if(recycler_myMsg.getLayoutManager() != null) recyclerViewState = recycler_myMsg.getLayoutManager().onSaveInstanceState();
-            mAccounts.clear();
+            First_List_Accounts.clear();
             finalList.clear();
             Outstanding = 0;
-            mAccounts = chatDB.get_CHAT_LIST();
-            for(DtoAccount account: mAccounts){
-                if(account.getAccount_id_cry() != null && account.getActive() > DtoAccount.ACCOUNT_DISABLE){
+            First_List_Accounts = chatDB.get_CHAT_LIST();
+            for(DtoAccount account: First_List_Accounts){
+                if(account.getId() != null && account.getActive() > DtoAccount.ACCOUNT_DISABLE){
                     finalList.add(account);
                 }else Outstanding++;
             }
@@ -252,11 +231,11 @@ public class ChatsFragment extends Fragment {
                 recycler_myMsg.setVisibility(View.GONE);
                 txt_not_start_conversation.setVisibility(View.VISIBLE);
             }
-            userChatAdapter = new UserChatAdapter(getContext(), finalList, true, false);
-            ((SimpleItemAnimator) Objects.requireNonNull(recycler_myMsg.getItemAnimator())).setSupportsChangeAnimations(false);
+            userChatAdapter = new UserChatAdapter(getActivity(), finalList, false);
+            if(recycler_myMsg.getItemAnimator() != null) ((SimpleItemAnimator) recycler_myMsg.getItemAnimator()).setSupportsChangeAnimations(false);
             recycler_myMsg.setAdapter(userChatAdapter);
             mAccountsBase.clear();
-            mAccountsBase.addAll(mAccounts);
+            mAccountsBase.addAll(First_List_Accounts);
             reload = false;
             if(recyclerViewState != null && recycler_myMsg.getLayoutManager() != null) recycler_myMsg.getLayoutManager().onRestoreInstanceState(recyclerViewState);
         }

@@ -50,6 +50,7 @@ import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
@@ -330,7 +331,10 @@ public class SignUpActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(ConnectionHelper.isOnline(SignUpActivity.this)){
                         DtoSystem system = snapshot.getValue(DtoSystem.class);
-                        if(system != null) MyPrefs.setPrivacy_Policy(SignUpActivity.this, system.getPrivacy_policy());
+                        if(system != null) {
+                            DaoSystem daoSystem = new DaoSystem(SignUpActivity.this);
+                            daoSystem.setPrivacyPolicy(system.getPrivacy_policy());
+                        }
                     }
                 }
                 @Override

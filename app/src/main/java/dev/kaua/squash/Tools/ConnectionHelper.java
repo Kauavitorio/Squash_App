@@ -6,6 +6,8 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.TrafficStats;
+import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -94,5 +96,10 @@ public class ConnectionHelper {
             ci.next();
         }
         return String.format("%.1f %cB", bytes / 1000.0, ci.current());
+    }
+
+    public static String getIp(Context context){
+        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        return Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
     }
 }

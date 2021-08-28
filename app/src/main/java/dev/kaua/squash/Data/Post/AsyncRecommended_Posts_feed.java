@@ -1,6 +1,7 @@
 package dev.kaua.squash.Data.Post;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -27,14 +28,14 @@ import dev.kaua.squash.Tools.MyPrefs;
 @SuppressLint("StaticFieldLeak")
 public class AsyncRecommended_Posts_feed extends AsyncTask {
     ArrayList<DtoPost> arrayListDto = new ArrayList<>();
-    Context context;
+    Activity context;
     RecyclerView recyclerView;
     TextView txt_empty_feed;
     private DaoFollowing daoFollowing;
     SwipeRefreshLayout swipeRefreshLayout;
     int size;
 
-    public AsyncRecommended_Posts_feed(Context context, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout, TextView txt_empty_feed) {
+    public AsyncRecommended_Posts_feed(Activity context, RecyclerView recyclerView, SwipeRefreshLayout swipeRefreshLayout, TextView txt_empty_feed) {
         this.context = context;
         this.recyclerView = recyclerView;
         this.txt_empty_feed = txt_empty_feed;
@@ -79,7 +80,7 @@ public class AsyncRecommended_Posts_feed extends AsyncTask {
                 }
             }
             size = arrayListDto.size();
-            posts_adapters = new Posts_Adapters(arrayListDto, context);
+            posts_adapters = new Posts_Adapters(arrayListDto, context, Posts_Adapters.CAN_ANIME);
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("ErrorNetWork", e.toString());

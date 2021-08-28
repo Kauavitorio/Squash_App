@@ -165,7 +165,7 @@ public abstract class Methods extends MainActivity {
     }
 
     public static void LoadFollowersAndFollowing(@NonNull Context context, final int base){
-        SharedPreferences sp_First = context.getSharedPreferences("myPrefs", MODE_PRIVATE);
+        SharedPreferences sp_First = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         if(base == 0){
             AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))), AsyncLikes_Posts.NOT_NOTIFY);
             //noinspection unchecked

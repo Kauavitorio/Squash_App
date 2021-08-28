@@ -130,7 +130,7 @@
         android:layout_height="15dp"
         android:layout_below="@id/voicePlayerView"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/ic_seen"
+        android:src="@drawable/ic_delivered"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="ContentDescription" />

@@ -86,6 +86,7 @@
     <string name="loading" >Carregando…</string>
     <string name="msg_background_chat_under_development">O processo a seguir está em desenvolvimento, no entanto o mesmo pode apresentar falhas ao ser utilizado.\nVocê tem certeza que deseja prosseguir?</string>
     <string name="report_website"><font color='#FD0000'>Reportar Site</font></string>
+    <string name="report_user"><font color='#FD0000'>Reportar Usuário</font></string>
     <string name="refresh">Atualizar</string>
     <string name="open_with">Abrir com …</string>
     <string name="update_later">Atualizar Depois</string>
@@ -198,4 +199,13 @@
     <string name="suspended_account">Conta suspensa</string>
     <string name="your_account_has_been_suspended">Sua conta foi suspensa devido à duas violações de regras da Squash. Para tentar recuperar sua conta, entre em contato conosco via email. contato@kauavitorio.com</string>
     <string name="welcome">Bem-vindo(a)</string>
+    <string name="block_user">Bloquear usuário</string>
+    <string name="more">Mais</string>
+    <string name="reason_for_report">Razão para relatar</string>
+    <string name="report_desc">Sua denúncia é anônima, exceto se você estiver denunciando e infringindo propriedade intelectual. Se alguém estiver em perigo imediato, ligue para os serviços de emergência locais - não espere.</string>
+    <string name="why_are_you_reporting_this_account">Por que você está denunciando esta conta?</string>
+    <string name="report_post_message_or_comment">Reportar Post, Mensagem ou Comentário</string>
+    <string name="report_account">Denunciar conta</string>
+    <string name="report_sent_successfully">Report enviado com sucesso</string>
+    <string name="this_account_has_been_disabled">Essa conta foi desativada.</string>
 </resources>

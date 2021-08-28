@@ -3,7 +3,6 @@ package dev.kaua.squash.Adapters;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.util.Linkify;
 import android.util.Patterns;
@@ -26,9 +25,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts_Comment;
 import dev.kaua.squash.Data.Post.DtoPost;
@@ -38,8 +39,11 @@ import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
+import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.PatternEditableBuilder;
+import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 import retrofit2.Call;
@@ -47,7 +51,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-import static android.content.Context.MODE_PRIVATE;
 
 @SuppressLint({"UseCompatLoadingForDrawables", "StaticFieldLeak"})
 public class Comments_Adapters extends RecyclerView.Adapter<Comments_Adapters.MyHolderComments> {
@@ -93,18 +96,8 @@ public class Comments_Adapters extends RecyclerView.Adapter<Comments_Adapters.My
         holder.txt_post_reply_to.setText( mContext.getString(R.string.reply_to) + " @" + list.get(position).getReply_to());
 
         //  Apply all url on Texts Views
-        Linkify.addLinks(holder.txt_comment_content, Linkify.ALL);
-
         //  URL CLICK'S listener
-        holder.txt_comment_content.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
-            if (Patterns.WEB_URL.matcher(url).matches()) {
-                //An web url is detected
-                Methods.browseTo(mContext, url);
-                return true;
-            }
-
-            return false;
-        }));
+        LoadUserMentions(holder.txt_comment_content);
 
         Check_Like(holder, position);
 
@@ -203,58 +196,99 @@ public class Comments_Adapters extends RecyclerView.Adapter<Comments_Adapters.My
     }
 
     private void Check_Like(@NotNull Comments_Adapters.MyHolderComments holder, int position) {
-        SharedPreferences sp_First = mContext.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        account.setAccount_id_cry(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)));
-        if(account.getAccount_id_cry() != null){
-            DtoAccount user = MyPrefs.getUserInformation(mContext);
-            boolean result_like = daoPosts.get_A_Like_comment(Long.parseLong(list.get(position).getComment_id()), Long.parseLong(user.getAccount_id() + ""));
-            if(result_like) holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
-            else holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
-        }else holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
+        final long comment_id = Long.parseLong(list.get(position).getComment_id());
+        boolean result_like = daoPosts.get_A_Like_comment(comment_id, MyPrefs.getUserInformation(mContext).getAccount_id());
+        if(result_like) holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
+        else holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
     }
 
     private void Like_Un_Like_A_Post(@NotNull Comments_Adapters.MyHolderComments holder, long position, String comment_id) {
-        SharedPreferences sp_First = mContext.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        account.setAccount_id_cry(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)));
-        if(account.getAccount_id_cry() != null){
-            //  Get User info
-            DtoAccount user = MyPrefs.getUserInformation(mContext);
+        //  Get User info
+        DtoAccount user = MyPrefs.getUserInformation(mContext);
 
-            boolean result_like = daoPosts.get_A_Like_comment(Long.parseLong(comment_id), Long.parseLong(user.getAccount_id() + ""));
-            long like_now = Long.parseLong(list.get((int) position).getLikes());
-            if(result_like) {
-                holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
-                like_now = like_now - 1;
-                daoPosts.delete_like_comment(Long.parseLong(comment_id), Long.parseLong(user.getAccount_id() + ""));
-            }else{
-                holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
-                like_now = like_now + 1;
-                daoPosts.Register_A_Like_Comment(Long.parseLong(comment_id), Long.parseLong(user.getAccount_id() + ""));
-            }
+        boolean result_like = daoPosts.get_A_Like_comment(Long.parseLong(comment_id), user.getAccount_id());
+        long like_now = Long.parseLong(list.get((int) position).getLikes());
+        if(result_like) {
+            holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
+            like_now = like_now - 1;
+            daoPosts.delete_like_comment(Long.parseLong(comment_id), user.getAccount_id());
+        }else{
+            holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
+            like_now = like_now + 1;
+            daoPosts.Register_A_Like_Comment(Long.parseLong(comment_id), user.getAccount_id());
+        }
 
-            if(like_now >= 0){
-                list.get((int) position).setLikes(like_now + "");
-                holder.txt_likes_comment.setText(Methods.NumberTrick(like_now));
+        if(like_now >= 0){
+            list.get((int) position).setLikes(like_now + "");
+            holder.txt_likes_comment.setText(Methods.NumberTrick(like_now));
 
-                //  Do Like or Un Like
-                DtoPost dtoPost = new DtoPost();
-                dtoPost.setComment_id(EncryptHelper.encrypt(comment_id));
-                dtoPost.setPost_id(EncryptHelper.encrypt(list.get((int) position).getPost_id()));
-                dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
-                PostServices services = retrofit.create(PostServices.class);
-                Call<DtoPost> call = services.like_Un_Like_A_Post_Comment(dtoPost);
-                call.enqueue(new Callback<DtoPost>() {
-                    @Override
-                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                        AsyncLikes_Posts_Comment async = new AsyncLikes_Posts_Comment((Activity) mContext , Long.parseLong(user.getAccount_id() + ""));
-                        //noinspection unchecked
-                        async.execute();
-                    }
-                    @Override
-                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(mContext, ErrorHelper.COMMENT_LIKE_ACTION); }
-                });
-            }
-        }else Warnings.NeedLoginWithShortCutAlert((Activity) mContext, 0);
+            //  Do Like or Un Like
+            DtoPost dtoPost = new DtoPost();
+            dtoPost.setComment_id(EncryptHelper.encrypt(comment_id));
+            dtoPost.setPost_id(EncryptHelper.encrypt(list.get((int) position).getPost_id()));
+            dtoPost.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(user.getAccount_id())));
+            PostServices services = retrofit.create(PostServices.class);
+            Call<DtoPost> call = services.like_Un_Like_A_Post_Comment(dtoPost);
+            call.enqueue(new Callback<DtoPost>() {
+                @Override
+                public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                    AsyncLikes_Posts_Comment async = new AsyncLikes_Posts_Comment((Activity) mContext , Long.parseLong(user.getAccount_id() + ""));
+                    //noinspection unchecked
+                    async.execute();
+                }
+                @Override
+                public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) { Warnings.showWeHaveAProblem(mContext, ErrorHelper.COMMENT_LIKE_ACTION); }
+            });
+        }
+    }
+
+    void LoadUserMentions(TextView text_comment){
+        if(mContext != null){
+            new PatternEditableBuilder().
+                    addPattern(Pattern.compile("@(\\w+)"), mContext.getColor(R.color.base_color),
+                            text -> {
+                                DtoAccount account = new DtoAccount();
+                                account.setUsername(text.replace("@", ""));
+                                AccountServices services = retrofit.create(AccountServices.class);
+                                Call<DtoPost> call = services.search_with_username(account);
+                                LoadingDialog loadingDialog = new LoadingDialog(((Activity)mContext));
+                                loadingDialog.startLoading();
+                                call.enqueue(new Callback<DtoPost>() {
+                                    @Override
+                                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                                        loadingDialog.dismissDialog();
+                                        if(response.code() == 200){
+                                            if(response.body() != null){
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString(MainActivity.ID_REQUEST_ACCOUNT_ID, response.body().getAccount_id());
+                                                bundle.putInt(MainActivity.ID_REQUEST_CONTROL, MainActivity.ID_REQUEST_CONTROL_BASE);
+                                                MainActivity.getInstance().GetBundleProfile(bundle);
+                                                MainActivity.getInstance().CallProfile();
+                                                ProfileFragment.getInstance().LoadAnotherUser();
+                                                ((Activity) mContext).finish();
+                                            }
+                                        }else ToastHelper.toast(((Activity) mContext), mContext.getString(R.string.user_not_found), 0);
+                                    }
+                                    @Override
+                                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                                        loadingDialog.dismissDialog();
+                                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.PROFILE_MENTION_CLICK);
+                                    }
+                                });
+                            }).into(text_comment);
+
+
+            text_comment.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
+                if (Patterns.WEB_URL.matcher(url).matches()) {
+                    //An web url is detected
+                    Methods.browseTo(mContext, url);
+                    return true;
+                }
+
+                return false;
+            }));
+            Linkify.addLinks(text_comment, Linkify.ALL);
+        }
     }
 
     @Override

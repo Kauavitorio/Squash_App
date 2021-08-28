@@ -2,7 +2,7 @@ package dev.kaua.squash.Fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,18 +19,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Adapters.Posts_Adapters;
-import dev.kaua.squash.Data.Account.AsyncUser_Search;
+import dev.kaua.squash.Adapters.SearchItemArrayAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
@@ -55,6 +56,7 @@ public class SearchFragment extends Fragment {
     private static SearchFragment instance;
     private static DaoFollowing daoFollowing;
     private DtoAccount account;
+    private FirebaseUser fUser;
 
     @Nullable
     @Override
@@ -69,7 +71,7 @@ public class SearchFragment extends Fragment {
             imm.hideSoftInputFromWindow(edit_search.getWindowToken(), 0);
             DtoAccount info = (DtoAccount) parent.getItemAtPosition(position);
             Bundle bundle = new Bundle();
-            bundle.putString("account_id", info.getAccount_id_cry());
+            bundle.putString("account_id", EncryptHelper.decrypt(info.getAccount_id_cry()));
             bundle.putInt("control", 0);
             MainActivity.getInstance().GetBundleProfile(bundle);
             MainActivity.getInstance().CallProfile();
@@ -84,10 +86,49 @@ public class SearchFragment extends Fragment {
 
     public static SearchFragment getInstance(){ return instance;}
 
+    final List<DtoAccount> mAccounts = new ArrayList<>();
     public void LoadSearch() {
-        AsyncUser_Search asyncProductsSearchMain = new AsyncUser_Search(edit_search, getActivity());
-        //noinspection unchecked
-        asyncProductsSearchMain.execute();
+        DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference().child(myFirebaseHelper.USERS_REFERENCE);
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot datasnapshot) {
+                mAccounts.clear();
+                for(DataSnapshot snapshot: datasnapshot.getChildren()){
+                    DtoAccount account = snapshot.getValue(DtoAccount.class);
+                    if(account != null && fUser != null)
+                        if(account.getId() != null && !account.getId().equals(fUser.getUid())
+                                && account.getActive() > DtoAccount.ACCOUNT_DISABLE && account.getAccount_id_cry() != null)
+                            mAccounts.add(account);
+                }
+                Apply_ArrayListUsers();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    final List<DtoAccount> FinalAccounts = new ArrayList<>();
+    @SuppressLint("ClickableViewAccessibility")
+    private void Apply_ArrayListUsers() {
+        if(mAccounts.size() > 0){
+            Log.d("SearchUser", "Request To Load");
+            if(FinalAccounts.size() != mAccounts.size()){
+                if(getActivity() != null && !getActivity().isDestroyed() && !getActivity().isFinishing()){
+                    Log.d("SearchUser", "Loaded");
+                    FinalAccounts.clear();
+                    FinalAccounts.addAll(mAccounts);
+                    SearchItemArrayAdapter adapter = new SearchItemArrayAdapter(getContext(), R.layout.adapter_search_layout, R.id.txt_user_name_search, FinalAccounts);
+
+                    //edit_search.setDropDownBackgroundDrawable(context.getDrawable(R.drawable.custom_edit_register_new));
+                    edit_search.setAdapter(adapter);
+                    edit_search.setOnTouchListener((v, event) -> {
+                        edit_search.showDropDown();
+                        edit_search.requestFocus();
+                        return false;
+                    });
+                }
+            }
+        }
     }
 
     final ArrayList<DtoPost> arrayListDto = new ArrayList<>();
@@ -97,17 +138,16 @@ public class SearchFragment extends Fragment {
         if(getContext() != null){
             daoFollowing = new DaoFollowing(getContext());
             if(ConnectionHelper.isOnline(getContext())){
-                reference_posts = myFirebaseHelper.getFirebaseDatabase().getReference("Posts").child("Published");
+                reference_posts = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD);
                 reference_posts.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot datasnapshot) {
                         arrayListDto.clear();
                         for(DataSnapshot snapshot: datasnapshot.getChildren()){
                             DtoPost post = snapshot.getValue(DtoPost.class);
-                            if(post != null && getContext() != null){
-                                if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))) != MyPrefs.getUserInformation(getContext()).getAccount_id()
-                                        && !daoFollowing.check_if_follow(MyPrefs.getUserInformation(getContext()).getAccount_id(),
-                                        Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))))){
+                            if(post != null && getContext() != null && post.getAccount_id() != null){
+                                if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id())))
+                                        != MyPrefs.getUserInformation(getContext()).getAccount_id()){
                                     post.setPost_id(EncryptHelper.decrypt(post.getPost_id()));
                                     post.setAccount_id(EncryptHelper.decrypt(post.getAccount_id()));
                                     post.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
@@ -151,30 +191,45 @@ public class SearchFragment extends Fragment {
                 toolbar.setNavigationOnClickListener(v -> MainActivity.getInstance().LoadMainFragment());
 
                 Apply_ArrayList();
+                Apply_ArrayListUsers();
             }
         }
     }
 
-    private void Apply_ArrayList() {
-        swipe_post_feed.setRefreshing(true);
-        if(size != arrayListDto.size()) Collections.shuffle(arrayListDto);
-        posts_adapters = new Posts_Adapters(arrayListDto, getContext());
-        if(arrayListDto.size() > 0) posts_adapters.notifyItemRangeChanged(0, arrayListDto.size()-1);
-        if (arrayListDto.size() <= 0){
-            swipe_post_feed.setVisibility(View.GONE);
-            txt_empty_feed.setVisibility(View.VISIBLE);
-        }else{
-            size = arrayListDto.size();
-            recycler_post_feed.setAdapter(posts_adapters);
-            recycler_post_feed.getRecycledViewPool().clear();
-            swipe_post_feed.setVisibility(View.VISIBLE);
-            txt_empty_feed.setVisibility(View.GONE);
-            new Handler().postDelayed(() -> swipe_post_feed.setRefreshing(false), 500);
+    final List<DtoPost> finalFeedList = new ArrayList<>();
+    int currentSize = 0;
+    void Apply_ArrayList() {
+        Log.d("FeedNotFollow", "Request -> " + arrayListDto.size());
+        if(arrayListDto.size() != finalFeedList.size() && getContext() != null && getActivity() != null){
+            finalFeedList.clear();
+            for (DtoPost post: arrayListDto){
+                if(!daoFollowing.check_if_follow(MyPrefs.getUserInformation(getContext()).getAccount_id(),
+                        Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id())))))
+                    finalFeedList.add(post);
+            }
+            if(currentSize != finalFeedList.size() && !getActivity().isFinishing() && !getActivity().isDestroyed()){
+                currentSize = finalFeedList.size();
+                Log.d("FeedNotFollow", "Loaded -> " + currentSize);
+                posts_adapters = new Posts_Adapters((ArrayList<DtoPost>) finalFeedList, getActivity(), Posts_Adapters.CAN_NOT_ANIME);
+                if(finalFeedList.size() > 0) posts_adapters.notifyItemRangeChanged(0, finalFeedList.size()-1);
+                if (finalFeedList.size() <= 0){
+                    swipe_post_feed.setVisibility(View.GONE);
+                    txt_empty_feed.setVisibility(View.VISIBLE);
+                }else{
+                    size = finalFeedList.size();
+                    recycler_post_feed.setAdapter(posts_adapters);
+                    recycler_post_feed.getRecycledViewPool().clear();
+                    swipe_post_feed.setVisibility(View.VISIBLE);
+                    txt_empty_feed.setVisibility(View.GONE);
+                }
+            }
+            swipe_post_feed.setRefreshing(false);
         }
     }
 
     private void Ids(@NonNull View view) {
         instance = this;
+        fUser = myFirebaseHelper.getFirebaseUser();
         account = MyPrefs.getUserInformation(requireContext());
         edit_search = view.findViewById(R.id.edit_Search_Main);
         swipe_post_feed = view.findViewById(R.id.swipe_post_feed);
