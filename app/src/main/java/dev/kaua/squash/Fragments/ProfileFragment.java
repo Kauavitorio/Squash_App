@@ -147,7 +147,6 @@ public class ProfileFragment extends Fragment {
                     public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                         if(response.code() == 201){
                             btn_go_chat_profile.setVisibility(View.VISIBLE);
-                            SearchFragment.getInstance().LoadSearch();
                             Methods.LoadFollowersAndFollowing(requireActivity(), 1);
                             MainFragment.RefreshRecycler();
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
@@ -175,7 +174,6 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                         if(response.code() == 201){
-                            SearchFragment.getInstance().LoadSearch();
                             Methods.LoadFollowersAndFollowing(requireActivity(), 1);
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
                             asyncUser_follow.execute();

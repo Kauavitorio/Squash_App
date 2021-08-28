@@ -164,6 +164,11 @@ public class MainFragment extends Fragment {
         ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     public static void RefreshRecycler(){ RecommendedPosts.getFeedPosts(instance, recyclerView_Posts, loadingPanel); }
 
     private void Ids(View view) {

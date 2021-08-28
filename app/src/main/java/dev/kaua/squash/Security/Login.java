@@ -184,10 +184,10 @@ public abstract class Login extends SignInActivity{
                     Intent i = new Intent(context, ValidateEmailActivity.class);
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context,R.anim.move_to_left_go, R.anim.move_to_right_go);
                     //noinspection ConstantConditions
-                    i.putExtra("account_id", EncryptHelper.decrypt(response.body().getAccount_id_cry()));
-                    i.putExtra("email_user", login_method);
-                    i.putExtra("password", password);
-                    i.putExtra("type_validate", 1);
+                    i.putExtra(ValidateEmailActivity.ACCOUNT_ID_ID, EncryptHelper.decrypt(response.body().getAccount_id_cry()));
+                    i.putExtra(ValidateEmailActivity.LOGIN_METHOD_ID, login_method);
+                    i.putExtra(ValidateEmailActivity.PASSWORD_ID, password);
+                    i.putExtra(ValidateEmailActivity.TYPE_VALIDATE_ID, 1);
                     ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
                     ((Activity) context).finish();
                 }else if(response.code() == 401) {

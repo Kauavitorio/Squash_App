@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseUser;
@@ -397,7 +398,7 @@ public class MessageActivity extends AppCompatActivity {
             if(another_user_image != null && !another_user_image.equals(user_im_chat.getImageURL())){
                 another_user_image = user_im_chat.getImageURL();
                 if(user_im_chat.getImageURL() == null || user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
-                else Picasso.get().load(EncryptHelper.decrypt(another_user_image)).into(profile_image);
+                else Glide.with(this).load(EncryptHelper.decrypt(another_user_image)).into(profile_image);
             }
             //readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
             checkChatList(userId);
@@ -1217,7 +1218,11 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        reference.removeEventListener(seenListener);
+        try {
+            if(seenListener != null && reference != null) reference.removeEventListener(seenListener);
+        }catch (Exception ex){
+            Log.d(TAG, ex.toString());
+        }
         try {
             MainActivity instance = MainActivity.getInstance();
             if(instance == null) Methods.status_chat(Methods.OFFLINE, this);

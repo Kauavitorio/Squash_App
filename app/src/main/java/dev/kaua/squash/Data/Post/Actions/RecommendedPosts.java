@@ -58,7 +58,10 @@ public class RecommendedPosts extends MainFragment {
         if(recyclerView.getLayoutManager() != null) recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
         DaoPosts daoPosts = new DaoPosts(context);
 
-        LoadPostsFromLocal(context, recyclerView, loadingPanel, daoPosts);
+        Posts_Adapters posts_adapters;
+        ArrayList<DtoPost> listPostDB = daoPosts.get_post();
+        posts_adapters = new Posts_Adapters(listPostDB, context, Posts_Adapters.CAN_ANIME);
+        SetInRecycler(posts_adapters, recyclerView);
 
         //  Checking if user is connected to a network
        if(ConnectionHelper.isOnline(context)){
@@ -105,26 +108,39 @@ public class RecommendedPosts extends MainFragment {
             });
             LoadPostsFromLocal(context, recyclerView, loadingPanel, daoPosts);
 
-        }else ToastHelper.toast((Activity)context , context.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
+        }else ToastHelper.toast(context, context.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
     }
 
-    private static void LoadPostsFromLocal(Context mContext, RecyclerView recyclerView, ConstraintLayout loadingPanel, @NonNull DaoPosts daoPosts) {
+    static final ArrayList<DtoPost> SaveList = new ArrayList<>();
+    static int normal = 0;
+    static int load = 0;
+    private static void LoadPostsFromLocal(Activity mContext, RecyclerView recyclerView, ConstraintLayout loadingPanel, @NonNull DaoPosts daoPosts) {
         try{
+            normal++;
+            Log.d(TAG, "Normal -> " + normal);
+            Posts_Adapters posts_adapters;
             ArrayList<DtoPost> listPostDB = daoPosts.get_post();
             if (listPostDB.size() > 0) {
-                Posts_Adapters posts_adapters;
                 if(ConnectionHelper.isOnline(mContext) && loaded){
-                    if(listPostDB.size() == 100 && arraylist_base.size() > 100) posts_adapters = new Posts_Adapters(arraylist_base, mContext);
-                    else if(!arraylist_base.equals(listPostDB)) {
-                        daoPosts.Register_Home_Posts(arraylist_base);
-                        ArrayList<DtoPost> listLocal = daoPosts.get_post();
-                        posts_adapters = new Posts_Adapters(listLocal, mContext);
+                    if(arraylist_base.size() != SaveList.size()){
+                        SaveList.clear();
+                        SaveList.addAll(arraylist_base);
+                        load++;
+                        Log.d(TAG, "Load -> " + load);
+                        if(listPostDB.size() == 100 && arraylist_base.size() > 100) posts_adapters = new Posts_Adapters(arraylist_base, mContext, Posts_Adapters.CAN_ANIME);
+                        else if(!arraylist_base.equals(listPostDB)) {
+                            daoPosts.Register_Home_Posts(arraylist_base);
+                            ArrayList<DtoPost> listLocal = daoPosts.get_post();
+                            posts_adapters = new Posts_Adapters(listLocal, mContext, Posts_Adapters.CAN_ANIME);
+                        }
+                        else posts_adapters = new Posts_Adapters(listPostDB, mContext, Posts_Adapters.CAN_ANIME);
+
+                        SetInRecycler(posts_adapters, recyclerView);
                     }
-                    else posts_adapters = new Posts_Adapters(listPostDB, mContext);
-                }else posts_adapters = new Posts_Adapters(listPostDB, mContext);
-                recyclerView.setAdapter(posts_adapters);
-                recyclerView.getRecycledViewPool().clear();
-                if(recyclerViewState != null && recyclerView.getLayoutManager() != null) recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                }else {
+                    posts_adapters = new Posts_Adapters(listPostDB, mContext, Posts_Adapters.CAN_ANIME);
+                    SetInRecycler(posts_adapters, recyclerView);
+                }
                 loadingPanel.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
             } else {
@@ -135,6 +151,12 @@ public class RecommendedPosts extends MainFragment {
             Log.d(TAG, "Load Feed -> " + ex.toString());
             Warnings.showWeHaveAProblem(mContext, ErrorHelper.LOAD_FEED_POSTS);
         }
+    }
+
+    private static void SetInRecycler(Posts_Adapters posts_adapters, RecyclerView recyclerView) {
+        recyclerView.setAdapter(posts_adapters);
+        recyclerView.getRecycledViewPool().clear();
+        if(recyclerViewState != null && recyclerView.getLayoutManager() != null) recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
     }
 
     //  Method to get User Posts
@@ -187,7 +209,7 @@ public class RecommendedPosts extends MainFragment {
                             recyclerView.setVisibility(View.GONE);
                         }
                         else{
-                            Posts_Adapters posts_adapters = new Posts_Adapters(arraylist, context);
+                            Posts_Adapters posts_adapters = new Posts_Adapters(arraylist, context, Posts_Adapters.CAN_ANIME);
                             recyclerView.setAdapter(posts_adapters);
                             recyclerView.getRecycledViewPool().clear();
                             recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);

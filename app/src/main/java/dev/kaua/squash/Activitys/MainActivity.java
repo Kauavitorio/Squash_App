@@ -230,6 +230,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public void onBackPressed() {
         int currentItem = viewPager.getCurrentItem();
         if (currentItem != MAIN_POSITION){
