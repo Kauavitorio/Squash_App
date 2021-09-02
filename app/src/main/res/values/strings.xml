@@ -218,4 +218,9 @@
     <string name="report_account">Report Account</string>
     <string name="report_sent_successfully">Report sent successfully</string>
     <string name="this_account_has_been_disabled">This account has been disabled.</string>
+    <string name="new_follow">New follower</string>
+    <string name="started_following_you">started following you.</string>
+    <string name="just_now">Just now</string>
+    <string name="no_notifications_yet">No notifications yet</string>
+    <string name="notifications">Notifications</string>
 </resources>

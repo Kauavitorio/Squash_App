@@ -65,6 +65,7 @@ import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
+import dev.kaua.squash.Notifications.SenderHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
@@ -151,6 +152,27 @@ public class ProfileFragment extends Fragment {
                             MainFragment.RefreshRecycler();
                             AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
                             asyncUser_follow.execute();
+
+                            DtoAccount account_chat = new DtoAccount();
+                            DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE);
+                            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull @NotNull DataSnapshot fullSnapshot) {
+                                    for(DataSnapshot snapshot: fullSnapshot.getChildren()){
+                                        DtoAccount account = snapshot.getValue(DtoAccount.class);
+                                        if(account != null){
+                                            if(account.getUsername().equals(username)){
+                                                if(account_chat.getAccount_id_cry() == null && getContext() != null){
+                                                    SenderHelper.sendFollow(account.getId(),
+                                                            MyPrefs.getUserInformation(getContext()).getUsername());
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+                            });
                         }
                     }
                     @Override

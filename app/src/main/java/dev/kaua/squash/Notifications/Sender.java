@@ -8,6 +8,4 @@ public class Sender {
         this.data = data;
         this.to = to;
     }
-
-
 }

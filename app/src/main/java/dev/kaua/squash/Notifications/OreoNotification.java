@@ -11,6 +11,7 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.R;
 
 /**
@@ -22,16 +23,20 @@ import dev.kaua.squash.R;
 
 public class OreoNotification extends ContextWrapper {
 
-    private static final String CHANNEL_ID = "dev.kaua.river";
-    private static final String CHANNEL_NAME = "river_app";
+    private static String CHANNEL_ID = BuildConfig.APPLICATION_ID;
+    private static final String CHANNEL_NAME = "squash_social_app";
+    public static NotificationManager notificationManager;
 
-    public NotificationManager notificationManager;
-
-    public OreoNotification(Context base) {
+    public OreoNotification(Context base, String receiver, int type) {
         super(base);
+        //  Set Default Channel ID
+        CHANNEL_ID = BuildConfig.APPLICATION_ID;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            createChannel();
+        //  Generate channel id with different types
+        if(type == Data.TYPE_MESSAGE) CHANNEL_ID = receiver + "_" + type;
+        else CHANNEL_ID = CHANNEL_ID + "_" + type;
+
+        createChannel();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -53,14 +58,14 @@ public class OreoNotification extends ContextWrapper {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public Notification.Builder getOreoNotification(String title, String body, PendingIntent pendingIntent, Uri uri, String icon) {
+    public Notification.Builder getOreoNotification(String title, String body, PendingIntent pendingIntent, Uri uri, int type) {
         return new Notification.Builder(getApplicationContext(), CHANNEL_ID)
                 .setContentIntent(pendingIntent)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setSmallIcon(R.drawable.pumpkin_default_image)
                 .setSound(uri)
-                .setCategory("message")
+                .setCategory(String.valueOf(type))
                 .setGroupSummary(true)
                 .setAutoCancel(true);
 

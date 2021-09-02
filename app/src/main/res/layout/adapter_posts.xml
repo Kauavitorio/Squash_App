@@ -5,10 +5,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="8dp"
-    android:layout_marginTop="5dp"
+    android:layout_marginTop="2dp"
     android:layout_marginBottom="3dp"
-    android:layout_marginStart="10dp"
-    android:layout_marginEnd="10dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
     android:background="@drawable/background_post"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -40,7 +40,6 @@
             android:text="@string/maybe_you_like_it"/>
 
     </LinearLayout>
-
 
     <!-- Body -->
     <LinearLayout
@@ -127,12 +126,15 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="2dp"
                             android:maxLength="23"
-                            tools:text="@string/app_name"
                             android:textColor="@color/hint"
                             android:textSize="14sp"
+                            android:layout_marginEnd="2dp"
                             app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.0"
                             app:layout_constraintStart_toEndOf="@+id/ic_account_badge"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="@string/app_name" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

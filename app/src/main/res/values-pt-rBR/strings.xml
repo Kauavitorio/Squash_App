@@ -208,4 +208,9 @@
     <string name="report_account">Denunciar conta</string>
     <string name="report_sent_successfully">Report enviado com sucesso</string>
     <string name="this_account_has_been_disabled">Essa conta foi desativada.</string>
+    <string name="new_follow">Novo seguidor</string>
+    <string name="started_following_you">começou a seguir você.</string>
+    <string name="just_now">Agora mesmo</string>
+    <string name="no_notifications_yet">Ainda sem notificações</string>
+    <string name="notifications">Notificações</string>
 </resources>

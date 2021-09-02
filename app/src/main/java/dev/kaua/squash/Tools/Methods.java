@@ -313,7 +313,8 @@ public abstract class Methods extends MainActivity {
                 String time_GET = splitDateGet[2].substring(4, 10);
                 myTimeHelper now = myTimeHelper.now();
                 myTimeHelper now_GET = myTimeHelper.parse(time_GET.replace(" ", ""));
-                return context.getString(R.string.today) + " "  + showTimeAgo(now_GET, now + "", context);
+                if(showTimeAgo(now_GET, now + "", context).contains("00")) return context.getString(R.string.just_now);
+                else return showTimeAgo(now_GET, now + "", context);
             }
             else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET))
                 return context.getString(R.string.yesterday) + " " + splitTime[1];

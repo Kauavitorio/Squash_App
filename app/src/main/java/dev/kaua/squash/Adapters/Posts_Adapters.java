@@ -93,6 +93,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     private static boolean LIKE_ANIMATION;
     public static final boolean CAN_ANIME = true;
     public static final boolean CAN_NOT_ANIME = false;
+    public static boolean ANIME = false;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
@@ -214,6 +215,8 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                                 Check_Like(holder, PostPosition);
 
                                 LoadImages(holder, finalPost);
+
+                                if(PostPosition == mPostList.size() - 1) ANIME = true;
                             }
                         }
                     }
@@ -317,7 +320,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         holder.txt_post_content.setText(postInfo.getPost_content());
 
         holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_likes())));
-        if(LIKE_ANIMATION)  holder.txt_likes_post.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.slide_up));
+        if(LIKE_ANIMATION && ANIME)  holder.txt_likes_post.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.slide_up));
         holder.txt_date_time_post.setText(LastSeenRefactor(position));
         holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_comments_amount())));
     }
