@@ -24,6 +24,7 @@ import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ShortCutsHelper;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -100,7 +101,7 @@ public class SplashActivity extends AppCompatActivity {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
             Intent goto_main = new Intent(this, MainActivity.class);
-            goto_main.putExtra(MainActivity.SHORTCUT_TAG, 0);
+            goto_main.putExtra(ShortCutsHelper.SHORTCUT_TAG, ShortCutsHelper.NONE_SHORT);
             goto_main.putExtra(MainActivity.SHARED_TAG, MainActivity.SHARED_ID);
             goto_main.putExtra(MainActivity.SHARED_TYPE_TAG, MainActivity.SHARED_PLAIN_TEXT);
             goto_main.putExtra(MainActivity.SHARED_CONTENT_TAG, sharedText);
@@ -114,7 +115,7 @@ public class SplashActivity extends AppCompatActivity {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
             Intent goto_main = new Intent(this, MainActivity.class);
-            goto_main.putExtra(MainActivity.SHORTCUT_TAG, 0);
+            goto_main.putExtra(ShortCutsHelper.SHORTCUT_TAG, ShortCutsHelper.NONE_SHORT);
             goto_main.putExtra(MainActivity.SHARED_TAG, MainActivity.SHARED_ID);
             goto_main.putExtra(MainActivity.SHARED_TYPE_TAG, MainActivity.SHARED_IMAGE);
             goto_main.putExtra(MainActivity.SHARED_CONTENT_TAG, imageUri);
@@ -154,7 +155,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     void AnimateLogo(){
-        ImageView iv = (ImageView) findViewById(R.id.img_squash_logo_splash);
+        ImageView iv = findViewById(R.id.img_squash_logo_splash);
         ObjectAnimator scaleDown = ObjectAnimator.ofPropertyValuesHolder(
                 iv,
                 PropertyValuesHolder.ofFloat("scaleX", 1.2f),
@@ -182,7 +183,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void GoToMain(){
         Intent goto_main = new Intent(this, MainActivity.class);
-        goto_main.putExtra(MainActivity.SHORTCUT_TAG, 0);
+        goto_main.putExtra(ShortCutsHelper.SHORTCUT_TAG, ShortCutsHelper.NONE_SHORT);
         goto_main.putExtra(MainActivity.SHARED_TAG, 0);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
@@ -191,7 +192,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void GoToIntro(){
         Intent goto_intro = new Intent(this, IntroActivity.class);
-        goto_intro.putExtra(MainActivity.SHORTCUT_TAG, 0);
+        goto_intro.putExtra(ShortCutsHelper.SHORTCUT_TAG, ShortCutsHelper.NONE_SHORT);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goto_intro, activityOptionsCompat.toBundle());
         finishAffinity();

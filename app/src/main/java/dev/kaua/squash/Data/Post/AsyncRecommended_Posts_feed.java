@@ -80,7 +80,7 @@ public class AsyncRecommended_Posts_feed extends AsyncTask {
                 }
             }
             size = arrayListDto.size();
-            posts_adapters = new Posts_Adapters(arrayListDto, context, Posts_Adapters.CAN_ANIME);
+            posts_adapters = new Posts_Adapters(arrayListDto, context);
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("ErrorNetWork", e.toString());

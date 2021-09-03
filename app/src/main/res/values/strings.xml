@@ -223,4 +223,6 @@
     <string name="just_now">Just now</string>
     <string name="no_notifications_yet">No notifications yet</string>
     <string name="notifications">Notifications</string>
+    <string name="search">Search</string>
+    <string name="new_post">New Post</string>
 </resources>

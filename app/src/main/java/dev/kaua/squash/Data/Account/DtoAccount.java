@@ -5,6 +5,8 @@ public class DtoAccount implements Comparable<DtoAccount>{
     public static final int ACCOUNT_RESTRICTION = 1;
     public static final int ACCOUNT_DISABLE = 0;
     public static final int ACCOUNT_IS_ADM = 2;
+    public static final int NORMAL_ACCOUNT = 0;
+    public static final int VERIFY_ACCOUNT = 1;
     private long account_id, id_user, verify, status, active;
     private String account_id_cry, id_user_cry;
     private String name_user, username, email, phone_user, password, verify_id;

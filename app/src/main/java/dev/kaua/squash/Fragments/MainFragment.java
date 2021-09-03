@@ -52,6 +52,7 @@ import dev.kaua.squash.Notifications.NotificationActivity;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ShortCutsHelper;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 
@@ -68,6 +69,7 @@ public class MainFragment extends Fragment {
     //private static SwipeRefreshLayout swipe_main;
     private ConstraintLayout btn_create_new_story_main, btn_notifications_click;
     private static RecyclerView recyclerView_Posts;
+    private static ShortCutsHelper shortCutsHelper;
     private ImageView btn_compose_main;
     private CircleImageView icon_ProfileUser_main;
     private static CardView card_msg_notRead_main, have_notification;
@@ -89,8 +91,10 @@ public class MainFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_activity_main, container, false);
         Ids(view);
 
-        Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+        if(account.getProfile_image() != null)
+            Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(icon_ProfileUser_main);
+
         btn_create_new_story_main.setOnClickListener(v -> StoryClick());
         btn_compose_main.setOnClickListener(v -> MainActivity.getInstance().CallComposePost());
 
@@ -213,6 +217,7 @@ public class MainFragment extends Fragment {
         instance = requireActivity();
         daoNotification = new DaoNotification(instance);
         daoSystem = new DaoSystem(instance);
+        shortCutsHelper = new ShortCutsHelper(instance);
         requireActivity().getWindow().setStatusBarColor(requireActivity().getColor(R.color.background_menu_sheet));
         requireActivity().getWindow().setNavigationBarColor(requireActivity().getColor(R.color.base_color));
         firebaseUser = myFirebaseHelper.getFirebaseUser();
@@ -224,12 +229,11 @@ public class MainFragment extends Fragment {
         btn_create_new_story_main = view.findViewById(R.id.btn_create_new_story_main);
         card_msg_notRead_main = view.findViewById(R.id.card_msg_notRead_main);
         btn_compose_main = view.findViewById(R.id.btn_compose_main);
-        recyclerView_Posts = view.findViewById(R.id.recyclerView_Posts);
         header_main = view.findViewById(R.id.header_main);
-        LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
-        recyclerView_Posts.setLayoutManager(linearLayout);
+        recyclerView_Posts = view.findViewById(R.id.recyclerView_Posts);
+        recyclerView_Posts.setLayoutManager(new LinearLayoutManager(getActivity()));
         RefreshRecycler();
-
         Check_Notification();
+        shortCutsHelper.launchShortcuts();
     }
 }

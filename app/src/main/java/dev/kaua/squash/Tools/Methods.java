@@ -129,8 +129,8 @@ public abstract class Methods extends MainActivity {
 
     //  Method to return Default Retrofit Builder
     static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
-            .connectTimeout(20, TimeUnit.SECONDS)
-            .writeTimeout(20, TimeUnit.SECONDS)
+            .connectTimeout(25, TimeUnit.SECONDS)
+            .writeTimeout(25, TimeUnit.SECONDS)
             .readTimeout(35, TimeUnit.SECONDS).build();
 
     @NonNull
@@ -290,7 +290,7 @@ public abstract class Methods extends MainActivity {
         firebaseUser = null;
         reference = null;
         firebaseUser = myFirebaseHelper.getFirebaseUser();
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(firebaseUser.getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("typingTo", typing);
 

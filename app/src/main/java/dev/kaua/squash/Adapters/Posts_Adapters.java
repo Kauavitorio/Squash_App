@@ -90,16 +90,13 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     private static FirebaseAnalytics mFirebaseAnalytics;
     private static Posts_Adapters instance;
     private static DtoAccount user;
-    private static boolean LIKE_ANIMATION;
     public static final boolean CAN_ANIME = true;
     public static final boolean CAN_NOT_ANIME = false;
-    public static boolean ANIME = false;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
-    public Posts_Adapters(ArrayList<DtoPost> ArrayList, Activity mContext, boolean LIKE_ANIMATION) {
+    public Posts_Adapters(ArrayList<DtoPost> ArrayList, Activity mContext) {
         this.mPostList = ArrayList;
-        Posts_Adapters.LIKE_ANIMATION = LIKE_ANIMATION;
         instance = this;
         Posts_Adapters.mContext = mContext;
         daoPosts = new DaoPosts(mContext);
@@ -121,7 +118,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     public void onBindViewHolder(@NonNull MyHolderPosts holder, int position) {
         final DtoPost postInfo = mPostList.get(position);
 
-        LoadBaseInformation(holder, postInfo, position);
+        LoadBaseInformation(holder, postInfo, position, CAN_NOT_ANIME);
         LoadMentions(holder);
 
         SetInfoClickable(holder);
@@ -148,16 +145,21 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                 i.putExtra("post_id", Long.parseLong(postInfo.getPost_id()));
                 i.putExtra("comment", 1);
                 mContext.startActivity(i);
-            }else ToastHelper.toast((Activity)mContext , mContext.getString(R.string.you_are_without_internet), 0);
+            }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
         });
 
         holder.btn_share_post.setOnClickListener(v -> {
             holder.btn_share_post.startAnimation(myAnim);
             Intent myIntent = new Intent(Intent.ACTION_SEND);
             myIntent.setType("text/plain");
+            final String search_from;
+            final String verify = MyPrefs.getUserInformation(mContext).getVerification_level();
+            if(verify != null && Integer.parseInt(verify) == DtoAccount.ACCOUNT_IS_ADM) search_from = "STAFF";
+            else search_from = Methods.RandomCharactersWithoutSpecials(3);
             String body = Methods.BASE_URL_HTTPS + "share/" + postInfo.getUsername().replace(" ", "")
                     + "/post/" +  postInfo.getPost_id()
-                    + "?s=" + Methods.RandomCharactersWithoutSpecials(3);
+                    + "?s=" + search_from;
+            body = body.replace(" ", "");
             myIntent.putExtra(Intent.EXTRA_TEXT, body);
             mContext.startActivity(Intent.createChooser(myIntent, mContext.getString(R.string.share_using)));
 
@@ -200,14 +202,18 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                                 finalPost.setPost_content(EncryptHelper.decrypt(post.getPost_content()));
                                 finalPost.setPost_date(EncryptHelper.decrypt(post.getPost_date()));
                                 finalPost.setPost_likes(EncryptHelper.decrypt(post.getPost_likes()));
-                                mPostList.get(PostPosition).setPost_likes(EncryptHelper.decrypt(post.getPost_likes()));
                                 finalPost.setPost_time(EncryptHelper.decrypt(post.getPost_time()));
                                 finalPost.setPost_topic(EncryptHelper.decrypt(post.getPost_topic()));
                                 finalPost.setProfile_image(EncryptHelper.decrypt(post.getProfile_image()));
                                 finalPost.setUsername(EncryptHelper.decrypt(post.getUsername()));
                                 finalPost.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
 
-                                LoadBaseInformation(holder, finalPost, PostPosition);
+                                if(Long.parseLong(finalPost.getPost_likes()) != Long.parseLong(mPostList.get(PostPosition).getPost_likes()))
+                                    LoadBaseInformation(holder, finalPost, PostPosition, CAN_ANIME);
+                                else LoadBaseInformation(holder, finalPost, PostPosition, CAN_NOT_ANIME);
+
+                                mPostList.get(PostPosition).setPost_likes(finalPost.getPost_likes());
+
                                 LoadMentions(holder);
 
                                 SetInfoClickable(holder);
@@ -216,7 +222,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
                                 LoadImages(holder, finalPost);
 
-                                if(PostPosition == mPostList.size() - 1) ANIME = true;
                             }
                         }
                     }
@@ -302,27 +307,30 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         }));
     }
 
-    private void LoadBaseInformation(@NonNull MyHolderPosts holder, DtoPost postInfo, int position) {
-        if(Integer.parseInt(Objects.requireNonNull(postInfo.getVerification_level())) != 0){
-            holder.ic_account_badge.setVisibility(View.VISIBLE);
-            if (Integer.parseInt(Objects.requireNonNull(postInfo.getVerification_level())) == 1)
-                holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
-            else
-                holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
+    private void LoadBaseInformation(@NonNull MyHolderPosts holder, DtoPost postInfo, int position, boolean CAN_ANIMATE) {
+        Log.d("POSTS_ADAPTER", "ANIME -> " + CAN_ANIMATE);
+        if(postInfo.getVerification_level() != null){
+            if(Integer.parseInt(postInfo.getVerification_level()) != DtoAccount.NORMAL_ACCOUNT){
+                holder.ic_account_badge.setVisibility(View.VISIBLE);
+                if (Integer.parseInt(postInfo.getVerification_level()) == DtoAccount.VERIFY_ACCOUNT)
+                    holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
+                else
+                    holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
 
-        }else holder.ic_account_badge.setVisibility(View.GONE);
-        holder.img_secondImage_post.setVisibility(View.GONE);
-        holder.container_third_img.setVisibility(View.GONE);
-        Glide.with(mContext).load(postInfo.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .into(holder.icon_user_profile_post);
-        holder.txt_name_user_post.setText(postInfo.getName_user());
-        holder.txt_username_post.setText( "| @" + postInfo.getUsername());
-        holder.txt_post_content.setText(postInfo.getPost_content());
+            }else holder.ic_account_badge.setVisibility(View.GONE);
+            holder.img_secondImage_post.setVisibility(View.GONE);
+            holder.container_third_img.setVisibility(View.GONE);
+            Glide.with(mContext).load(postInfo.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                    .into(holder.icon_user_profile_post);
+            holder.txt_name_user_post.setText(postInfo.getName_user());
+            holder.txt_username_post.setText( "| @" + postInfo.getUsername());
+            holder.txt_post_content.setText(postInfo.getPost_content());
 
-        holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_likes())));
-        if(LIKE_ANIMATION && ANIME)  holder.txt_likes_post.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.slide_up));
-        holder.txt_date_time_post.setText(LastSeenRefactor(position));
-        holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_comments_amount())));
+            holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_likes())));
+            if(CAN_ANIMATE) holder.txt_likes_post.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.slide_up));
+            holder.txt_date_time_post.setText(LastSeenRefactor(position));
+            holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_comments_amount())));
+        }
     }
 
     private void LoadMentions(@NonNull MyHolderPosts holder) {
@@ -585,7 +593,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     }
                 });*/
             }
-        }else ToastHelper.toast((Activity)mContext , mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
+        }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
     }
 
     public static Posts_Adapters getInstance(){ return instance; }

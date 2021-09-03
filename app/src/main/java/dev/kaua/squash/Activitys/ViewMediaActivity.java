@@ -81,7 +81,7 @@ public class ViewMediaActivity extends AppCompatActivity {
                 Methods.SaveImage(this, image_bitmap, chat_id, receive_time[0] + receive_time[1] +
                         receive_time[2].replace(" ", "").replace(":", "").substring(0, 8));
 
-                new Handler().postDelayed(() -> ToastHelper.toast(this, getString(R.string.image_downloaded_successfully), 0), 3800);
+                new Handler().postDelayed(() -> ToastHelper.toast(this, getString(R.string.image_downloaded_successfully), 0), 3500);
             }
             else {
                 download_btn.setAnimation(R.raw.error);
