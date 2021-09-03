@@ -10,8 +10,8 @@ android {
         applicationId "dev.kaua.squash"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 38
-        versionName "1.11.9"
+        versionCode 40
+        versionName "1.12.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -384,8 +384,8 @@ public class PostDetailsActivity extends AppCompatActivity {
     private void StartSendNotify(String comment) {
         if(post_info.getUsername() != null && Objects.requireNonNull(EncryptHelper.decrypt(post_info.getUsername())).length() > 2){
             DtoAccount account_chat = new DtoAccount();
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-            reference.addValueEventListener(new ValueEventListener() {
+            DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE);
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot fullSnapshot) {
                     for(DataSnapshot snapshot: fullSnapshot.getChildren()){
@@ -422,14 +422,14 @@ public class PostDetailsActivity extends AppCompatActivity {
 
     private void sendNotification(String receiver, String username, String comment){
 
-        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        DatabaseReference tokens = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.TOKENS_REFERENCE);
         Query query = tokens.orderByKey().equalTo(receiver);
-        query.addValueEventListener(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
                 for (DataSnapshot snapshot : datasnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fUser.getUid(), R.drawable.pumpkin_default_image, username+": "+ comment, getString(R.string.new_comment), receiver, "comment_id");
+                    Data data = new Data(fUser.getUid(), String.valueOf(Data.TYPE_COMMENT), username+": "+ comment, getString(R.string.new_comment), receiver);
 
                     assert token != null;
                     Sender sender = new Sender(data, token.getToken());

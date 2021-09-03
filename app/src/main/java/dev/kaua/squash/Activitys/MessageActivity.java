@@ -830,7 +830,7 @@ public class MessageActivity extends AppCompatActivity {
                 if(instance != null && !instance.isDestroyed() && !instance.isFinishing()){
                 for (DataSnapshot snapshot : datasnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fUser.getUid(), R.drawable.pumpkin_default_image, username+": "+ message, getString(R.string.new_message), userId, EncryptHelper.encrypt(chat_id));
+                    Data data = new Data(fUser.getUid(), String.valueOf(Data.TYPE_MESSAGE), username+": "+ message, getString(R.string.new_message), userId, EncryptHelper.encrypt(chat_id));
 
                     assert token != null;
                     Sender sender = new Sender(data, token.getToken());

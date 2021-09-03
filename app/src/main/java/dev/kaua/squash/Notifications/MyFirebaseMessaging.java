@@ -14,10 +14,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -30,6 +28,7 @@ import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
+import dev.kaua.squash.LocalDataBase.Notification.DaoNotification;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.MyPrefs;
 
@@ -45,14 +44,13 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
-        FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
-        if (firebaseUser != null) updateToken(s);
+        if (myFirebaseHelper.getFirebaseUser() != null) updateToken(s);
     }
 
     private void updateToken(String newToken) {
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
         if(firebaseUser != null){
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
+            DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference("Tokens");
             Token token = new Token(newToken);
             reference.child(firebaseUser.getUid()).setValue(token);
         }
@@ -64,13 +62,13 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         Map<String, String> data_notify = remoteMessage.getData();
 
-        String user = remoteMessage.getData().get("user");
+        String user = remoteMessage.getData().get(Data.TAG_USER);
 
         SharedPreferences preferences  = getSharedPreferences(MyPrefs.PREFS_NOTIFICATION, MODE_PRIVATE);
         String currentUser = preferences.getString("currentUser", "none");
         Log.d("Current", currentUser);
 
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
 
         if (firebaseUser != null && data_notify.size() > 0) {
             if (!currentUser.equals(user)) {
@@ -82,49 +80,86 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void sendOreoNotification(@NonNull RemoteMessage remoteMessage) {
+        int type = 0;
+        final Data data = new Data();
+        final DaoNotification daoNotification = new DaoNotification(this);
+        final Calendar c = Calendar.getInstance();
+        final @SuppressLint("SimpleDateFormat") SimpleDateFormat format_notification = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
+        String time_notification = format_notification.format(c.getTime());
 
-        String user = remoteMessage.getData().get("user");
-        String icon = remoteMessage.getData().get("icon");
-        //String icon = remoteMessage.getData().get("icon");
-        String title = remoteMessage.getData().get("title");
-        String chat_id = remoteMessage.getData().get("chat_id");
-        String body = remoteMessage.getData().get("body");
+        String user = remoteMessage.getData().get(Data.TAG_USER);
+        String type_str = remoteMessage.getData().get(Data.TAG_TYPE);
+        String title = remoteMessage.getData().get(Data.TAG_TITLE);
+        String chat_id = remoteMessage.getData().get(Data.TAG_CHAT_ID);
+        String body = remoteMessage.getData().get(Data.TAG_BODY);
 
-        RemoteMessage.Notification notification  = remoteMessage.getNotification();
+        if(type_str != null)
+            type = Integer.parseInt(type_str);
 
-        assert user != null;
-        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
+        if(user != null && type != Data.NO_TYPE){
+            boolean can_show = false;
+            data.setUser(user);
+            data.setType(String.valueOf(type));
+            data.setChat_id(chat_id);
+            data.setBody(body);
+            data.setDate_time(time_notification);
 
-        final Intent intent;
-        if(chat_id != null && chat_id.equals("comment_id")){
-            intent = new Intent(this, MainActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putInt("shortcut", 0);
-            bundle.putInt("shared", 0);
-            intent.putExtras(bundle);
-        }else{
-            intent = new Intent(this, MessageActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString("userId", user);
-            bundle.putString("chat_id", chat_id);
-            intent.putExtras(bundle);
+            if(type == Data.TYPE_FOLLOW)
+                can_show = daoNotification.Test_Notification(data);
 
-            assert body != null;
-            Update_Last_chat(user, body);
+            if(!can_show){
+
+                RemoteMessage.Notification notification  = remoteMessage.getNotification();
+
+                int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
+
+                Intent intent = null;
+                if(type == Data.TYPE_COMMENT || type == Data.TYPE_FOLLOW){
+                    if(type == Data.TYPE_COMMENT) title = getString(R.string.new_comment);
+                    else {
+                        body = body + " " + getString(R.string.started_following_you);
+                        title = getString(R.string.new_follow);
+                    }
+
+                    intent = new Intent(this, MainActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("shortcut", 0);
+                    bundle.putInt("shared", 0);
+                    intent.putExtras(bundle);
+                }else if(type == Data.TYPE_MESSAGE) {
+                    title = getString(R.string.new_message);
+                    intent = new Intent(this, MessageActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("userId", user);
+                    bundle.putString("chat_id", chat_id);
+                    intent.putExtras(bundle);
+
+                    if(body != null)
+                        Update_Last_chat(user, body);
+                }
+
+                if(intent != null){
+                    data.setTitle(title);
+                    Register_Notification(data, daoNotification, type);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
+
+                    Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                    OreoNotification oreoNotification = new OreoNotification(this, user, type);
+                    Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent, defaultSound, type);
+
+                    int i = 0;
+                    if (j > 0) i=j;
+
+                    oreoNotification.getManager().notify(i, builder.build());
+                }
+            }
         }
+    }
 
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        OreoNotification oreoNotification = new OreoNotification(this);
-        Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent, defaultSound, icon);
-
-        int i = 0;
-        if (j > 0) i=j;
-
-        oreoNotification.getManager().notify(i, builder.build());
+    void Register_Notification(Data data, DaoNotification daoNotification, int type){
+        daoNotification.Register_Notification(data, type);
     }
 
     private void Update_Last_chat(String user, String body) {

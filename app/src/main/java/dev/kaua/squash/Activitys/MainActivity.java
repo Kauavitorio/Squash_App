@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -26,8 +27,10 @@ import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.Login;
+import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ShortCutsHelper;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -39,7 +42,7 @@ import dev.kaua.squash.Tools.MyPrefs;
 @SuppressWarnings("FieldCanBeLocal")
 @SuppressLint({"StaticFieldLeak", "UseCompatLoadingForDrawables"})
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MainActivity_LOG";
     private static final int CHAT_POSITION = 0;
     private static final int MAIN_POSITION = 1;
     private static final int SEARCH_POSITION = 2;
@@ -47,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     public static final int SHARED_ID = 1;
     public static final int SHARED_PLAIN_TEXT = 1;
     public static final int SHARED_IMAGE = 2;
-    public static final String SHORTCUT_TAG = "shortcut";
     public static final String SHARED_TAG = "shared";
     public static final String SHARED_TYPE_TAG = "shared_type";
     public static final String SHARED_CONTENT_TAG = "shared_content";
@@ -61,8 +63,6 @@ public class MainActivity extends AppCompatActivity {
 
     private Bundle bundle;
     private static MainActivity instance;
-    //  Set preferences
-    private SharedPreferences mPrefs;
 
     private static DtoAccount account = new DtoAccount();
 
@@ -79,15 +79,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the adapter onto
         // the view pager
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(4);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(MAIN_POSITION, true);
 
         //  Get all SharedPreferences
-        mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        SharedPreferences sp = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         bundle = getIntent().getExtras();
-        if (sp.contains("pref_account_id") && sp.contains("pref_username")) StartNavigation();
+        if (MyPrefs.getUserInformation(this).getAccount_id() != DtoAccount.NORMAL_ACCOUNT) StartNavigation();
         else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
 
         if(bundle != null){
@@ -99,7 +97,27 @@ public class MainActivity extends AppCompatActivity {
                 else if(bundle.getInt(SHARED_TYPE_TAG) == MainActivity.SHARED_IMAGE)
                     i.putExtra(SHARED_CONTENT_TAG, (Uri) bundle.get(SHARED_CONTENT_TAG));
                 startActivity(i);
+            }else if(bundle.getInt(ShortCutsHelper.SHORTCUT_TAG) != ShortCutsHelper.NONE_SHORT){
+                final int shortCut = bundle.getInt(ShortCutsHelper.SHORTCUT_TAG);
+                LoadingDialog loadingDialog = new LoadingDialog(this);
+                loadingDialog.startLoading();
+                switch (shortCut){
+                    case ShortCutsHelper.NEW_POST: CallComposePost();
+                        loadingDialog.dismissDialog();
+                    case ShortCutsHelper.SEARCH: {
+                        new Handler().postDelayed(() -> {
+                            LoadSearchFragment();
+                            loadingDialog.dismissDialog();
+                        }, 2000);
+                    }
+                    case ShortCutsHelper.PROFILE:
+                        new Handler().postDelayed(() -> {
+                            CallProfile();
+                            loadingDialog.dismissDialog();
+                        }, 500);
+                }
             }
+            Log.d(TAG, "ShortCut -> " + bundle.getInt(ShortCutsHelper.SHORTCUT_TAG));
         }
 
         btn_search_main.setOnClickListener(v -> LoadSearchFragment());

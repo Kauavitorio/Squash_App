@@ -60,7 +60,7 @@ public class RecommendedPosts extends MainFragment {
 
         Posts_Adapters posts_adapters;
         ArrayList<DtoPost> listPostDB = daoPosts.get_post();
-        posts_adapters = new Posts_Adapters(listPostDB, context, Posts_Adapters.CAN_ANIME);
+        posts_adapters = new Posts_Adapters(listPostDB, context);
         SetInRecycler(posts_adapters, recyclerView);
 
         //  Checking if user is connected to a network
@@ -127,18 +127,18 @@ public class RecommendedPosts extends MainFragment {
                         SaveList.addAll(arraylist_base);
                         load++;
                         Log.d(TAG, "Load -> " + load);
-                        if(listPostDB.size() == 100 && arraylist_base.size() > 100) posts_adapters = new Posts_Adapters(arraylist_base, mContext, Posts_Adapters.CAN_ANIME);
+                        if(listPostDB.size() == 100 && arraylist_base.size() > 100) posts_adapters = new Posts_Adapters(arraylist_base, mContext);
                         else if(!arraylist_base.equals(listPostDB)) {
                             daoPosts.Register_Home_Posts(arraylist_base);
                             ArrayList<DtoPost> listLocal = daoPosts.get_post();
-                            posts_adapters = new Posts_Adapters(listLocal, mContext, Posts_Adapters.CAN_ANIME);
+                            posts_adapters = new Posts_Adapters(listLocal, mContext);
                         }
-                        else posts_adapters = new Posts_Adapters(listPostDB, mContext, Posts_Adapters.CAN_ANIME);
+                        else posts_adapters = new Posts_Adapters(listPostDB, mContext);
 
                         SetInRecycler(posts_adapters, recyclerView);
                     }
                 }else {
-                    posts_adapters = new Posts_Adapters(listPostDB, mContext, Posts_Adapters.CAN_ANIME);
+                    posts_adapters = new Posts_Adapters(listPostDB, mContext);
                     SetInRecycler(posts_adapters, recyclerView);
                 }
                 loadingPanel.setVisibility(View.GONE);
@@ -209,7 +209,7 @@ public class RecommendedPosts extends MainFragment {
                             recyclerView.setVisibility(View.GONE);
                         }
                         else{
-                            Posts_Adapters posts_adapters = new Posts_Adapters(arraylist, context, Posts_Adapters.CAN_ANIME);
+                            Posts_Adapters posts_adapters = new Posts_Adapters(arraylist, context);
                             recyclerView.setAdapter(posts_adapters);
                             recyclerView.getRecycledViewPool().clear();
                             recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);

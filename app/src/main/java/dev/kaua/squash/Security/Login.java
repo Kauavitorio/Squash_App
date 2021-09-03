@@ -48,6 +48,7 @@ import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ShortCutsHelper;
 import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -331,10 +332,12 @@ public abstract class Login extends SignInActivity{
     public static final int NOT_DISABLE_ACCOUNT = 1;
     public static final int DISABLE_ACCOUNT = 333;
     public static void LogOut(Context context, int status, int active){
+        final ShortCutsHelper shortCutsHelper = new ShortCutsHelper(context);
+        shortCutsHelper.removeShorCuts();
         loadingDialog = null;
         loadingDialog = new LoadingDialog((Activity)context);
         loadingDialog.startLoading();
-        Methods.status_chat("offline", context); // Set User status with offline
+        Methods.status_chat(Methods.OFFLINE, context); // Set User status with offline
 
         myFirebaseHelper.LogOut(); // LogOut on firebase
 
