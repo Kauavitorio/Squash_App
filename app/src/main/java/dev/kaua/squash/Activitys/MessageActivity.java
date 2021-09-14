@@ -1031,7 +1031,8 @@ public class MessageActivity extends AppCompatActivity {
             if(resultUri != null) {
 
                 //uploading the image
-                storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid()).child("chat__"
+                storageReference = myFirebaseHelper.getFirebaseStorage().child(myFirebaseHelper.USERS_REFERENCE)
+                        .child(myFirebaseHelper.CHATS_REFERENCE).child(myFirebaseHelper.MEDIAS_REFERENCE).child(fUser.getUid()).child("chat__"
                         + getFileName(resultUri).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(3));
                 storageReference.putFile(resultUri).continueWithTask(task -> {
                     if (!task.isSuccessful()) {

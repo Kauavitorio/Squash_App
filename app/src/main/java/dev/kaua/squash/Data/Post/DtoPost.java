@@ -19,6 +19,9 @@ public class DtoPost implements Comparable<DtoPost>{
 
     private String post_id;
 
+    private boolean image_loaded;
+    private boolean info_loaded;
+
     private boolean suggestion;
 
     private String likes;
@@ -58,6 +61,22 @@ public class DtoPost implements Comparable<DtoPost>{
     private String comment_id;
 
     private String verification_level;
+
+    public boolean isImage_loaded() {
+        return image_loaded;
+    }
+
+    public void setImage_loaded(boolean image_loaded) {
+        this.image_loaded = image_loaded;
+    }
+
+    public boolean isInfo_loaded() {
+        return info_loaded;
+    }
+
+    public void setInfo_loaded(boolean info_loaded) {
+        this.info_loaded = info_loaded;
+    }
 
     public long getActive() {
         return active;

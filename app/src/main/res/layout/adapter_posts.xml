@@ -182,29 +182,22 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
+                            android:orientation="vertical"
                             android:maxHeight="100dp">
 
-                            <!-- Main Post Image -->
-                            <ImageView
-                                android:id="@+id/img_firstImage_post"
+                            <androidx.viewpager.widget.ViewPager
+                                android:id="@+id/img_view_paper"
                                 android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:adjustViewBounds="true"
-                                android:maxHeight="200dp"
-                                tools:src="@drawable/img_opss"
-                                tools:ignore="ContentDescription" />
+                                android:layout_height="180dp"/>
 
-                            <!-- Second Image -->
-                            <ImageView
-                                android:id="@+id/img_secondImage_post"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:adjustViewBounds="true"
-                                android:maxHeight="200dp"
-                                android:layout_marginStart="5dp"
-                                tools:src="@drawable/img_opss"
-                                tools:ignore="ContentDescription" />
+                            <com.google.android.material.tabs.TabLayout
+                                android:id="@+id/tab_indicator_images"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:layout_gravity="center"
+                                app:tabIndicator="@null"
+                                app:tabIndicatorColor="#44BFFF"
+                                app:tabBackground="@drawable/device_presentation_indicator_selector"/>
 
                         </LinearLayout>
 

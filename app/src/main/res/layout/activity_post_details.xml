@@ -144,30 +144,22 @@
                         android:id="@+id/container_post_images_details"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:maxHeight="100dp"
-                        android:orientation="horizontal"
-                        android:visibility="visible">
+                        android:orientation="vertical"
+                        android:maxHeight="100dp">
 
-                        <!-- Main Post Image -->
-                        <ImageView
-                            android:id="@+id/img_firstImage_post_details"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:adjustViewBounds="true"
-                            android:maxHeight="200dp"
-                            tools:src="@drawable/img_opss"
-                            tools:ignore="ContentDescription" />
+                        <androidx.viewpager.widget.ViewPager
+                            android:id="@+id/img_view_paper_details"
+                            android:layout_width="wrap_content"
+                            android:layout_height="180dp"/>
 
-                        <!-- Second Image -->
-                        <ImageView
-                            android:id="@+id/img_secondImage_post_details"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="5dp"
-                            android:adjustViewBounds="true"
-                            android:maxHeight="200dp"
-                            tools:src="@drawable/img_opss"
-                            tools:ignore="ContentDescription" />
+                        <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/tab_indicator_images_details"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            app:tabIndicator="@null"
+                            app:tabIndicatorColor="#44BFFF"
+                            app:tabBackground="@drawable/device_presentation_indicator_selector"/>
 
                     </LinearLayout>
 

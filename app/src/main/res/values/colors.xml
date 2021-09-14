@@ -9,6 +9,7 @@
     <color name="dividing_line">#525252</color>
     <color name="status_on">#05df29</color>
     <color name="status_off">#bfbfbf</color>
+    <color name="tab_indicator_gray">#A8C0C0C0</color>
     <color name="dividing_line_settings">#1AFFFFFF</color>
     <color name="background_setting">#0B1929</color>
     <color name="black">#FF000000</color>

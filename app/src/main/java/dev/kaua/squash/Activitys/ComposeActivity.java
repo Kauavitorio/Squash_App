@@ -157,7 +157,7 @@ public class ComposeActivity extends AppCompatActivity {
         });
 
         btn_add_image.setOnClickListener(v -> {
-            if(post_image.size() < 2){
+            if(post_image.size() < 4){
                 UserPermissions.validatePermissions(permissions, this, 189);
                 int GalleryPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
                 if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
@@ -184,7 +184,8 @@ public class ComposeActivity extends AppCompatActivity {
                 if(filePath != null) {
 
                     //uploading the image
-                    storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("posts").child("medias").child(fUser.getUid()).child("post_"
+                    storageReference = myFirebaseHelper.getFirebaseStorage().child(myFirebaseHelper.USERS_REFERENCE)
+                            .child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.MEDIAS_REFERENCE).child(fUser.getUid()).child("post_"
                             + getFileName(filePath).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(5));
                     storageReference.putFile(filePath).continueWithTask(task -> {
                         if (!task.isSuccessful()) {
@@ -227,7 +228,6 @@ public class ComposeActivity extends AppCompatActivity {
                     compose_img01.setVisibility(View.VISIBLE);
                 }else if(i == 1){
                     Picasso.get().load(EncryptHelper.decrypt(post_image.get(1))).into(compose_img02);
-                    btn_add_image.setVisibility(View.GONE);
                     compose_img02.setVisibility(View.VISIBLE);
                 }else if(i == 2){
                     Picasso.get().load(EncryptHelper.decrypt(post_image.get(2))).into(compose_img03);

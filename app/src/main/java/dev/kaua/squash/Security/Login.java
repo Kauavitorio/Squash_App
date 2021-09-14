@@ -96,8 +96,8 @@ public abstract class Login extends SignInActivity{
         String encrypt_password = EncryptHelper.encrypt(EncryptHelper.encrypt(password));
         String placed = Methods.shuffle(Methods.RandomCharacters(40));
         String ip = ConnectionHelper.getIp(context);
-        ip =  placed + Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
-                .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9");
+        ip =  Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
+                .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9") + placed;
         encrypt_password = placed + encrypt_password;
         DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), encrypt_password,
                 EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))),
