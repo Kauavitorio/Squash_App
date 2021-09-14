@@ -60,10 +60,7 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
-import okhttp3.CipherSuite;
-import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
-import okhttp3.TlsVersion;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -131,17 +128,7 @@ public abstract class Methods extends MainActivity {
     }
 
     //  Method to return Default Retrofit Builder
-
-    static final ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-            .tlsVersions(TlsVersion.TLS_1_2)
-            .cipherSuites(
-                    CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-                    CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-                    CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256)
-            .build();
-
     static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
-            .connectionSpecs(Collections.singletonList(spec))
             .connectTimeout(25, TimeUnit.SECONDS)
             .writeTimeout(25, TimeUnit.SECONDS)
             .readTimeout(35, TimeUnit.SECONDS).build();
