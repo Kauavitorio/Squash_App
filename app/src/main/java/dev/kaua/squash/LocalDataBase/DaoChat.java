@@ -16,6 +16,7 @@ import java.util.List;
 
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 
 public class DaoChat extends SQLiteOpenHelper {
     private final String TABLE_BG = "TBL_BACKGROUND";
@@ -25,7 +26,7 @@ public class DaoChat extends SQLiteOpenHelper {
     public static final int DROP_ALL = 999;
 
     public DaoChat(@Nullable Context context) {
-        super(context, "DB_CHAT", null, 63);
+        super(context, "DB_CHAT", null, 65);
     }
 
     @Override
@@ -117,39 +118,43 @@ public class DaoChat extends SQLiteOpenHelper {
                     @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
 
                     if(cursor.moveToFirst()){
-                        ContentValues values = new ContentValues();
-                        values.put("account_id_cry", accounts.get(i).getAccount_id_cry());
-                        values.put("id", accounts.get(i).getId());
-                        values.put("imageURL", accounts.get(i).getImageURL());
-                        values.put("last_seen", accounts.get(i).getLast_seen());
-                        values.put("name_user", accounts.get(i).getName_user());
-                        values.put("search", accounts.get(i).getSearch());
-                        values.put("status_chat", accounts.get(i).getStatus_chat());
-                        values.put("typingTo", accounts.get(i).getTypingTo());
-                        values.put("verification_level", accounts.get(i).getVerification_level());
-                        values.put("username", accounts.get(i).getUsername());
-                        values.put("chat_id", accounts.get(i).getChat_id());
-                        values.put("active", accounts.get(i).getActive());
+                        if(!accounts.get(i).getId().equals(myFirebaseHelper.getFirebaseAuth().getUid())){
+                            ContentValues values = new ContentValues();
+                            values.put("account_id_cry", accounts.get(i).getAccount_id_cry());
+                            values.put("id", accounts.get(i).getId());
+                            values.put("imageURL", accounts.get(i).getImageURL());
+                            values.put("last_seen", accounts.get(i).getLast_seen());
+                            values.put("name_user", accounts.get(i).getName_user());
+                            values.put("search", accounts.get(i).getSearch());
+                            values.put("status_chat", accounts.get(i).getStatus_chat());
+                            values.put("typingTo", accounts.get(i).getTypingTo());
+                            values.put("verification_level", accounts.get(i).getVerification_level());
+                            values.put("username", accounts.get(i).getUsername());
+                            values.put("chat_id", accounts.get(i).getChat_id());
+                            values.put("active", accounts.get(i).getActive());
 
-                        String where = "id=?";
+                            String where = "id=?";
 
-                        getWritableDatabase().update(TABLE_CHAT_LIST, values, where, params);
+                            getWritableDatabase().update(TABLE_CHAT_LIST, values, where, params);
+                        }
                     }else{
-                        ContentValues values = new ContentValues();
-                        values.put("account_id_cry", accounts.get(i).getAccount_id_cry());
-                        values.put("id", accounts.get(i).getId());
-                        values.put("imageURL", accounts.get(i).getImageURL());
-                        values.put("last_seen", accounts.get(i).getLast_seen());
-                        values.put("name_user", accounts.get(i).getName_user());
-                        values.put("search", accounts.get(i).getSearch());
-                        values.put("status_chat", accounts.get(i).getStatus_chat());
-                        values.put("typingTo", accounts.get(i).getTypingTo());
-                        values.put("verification_level", accounts.get(i).getVerification_level());
-                        values.put("username", accounts.get(i).getUsername());
-                        values.put("chat_id", accounts.get(i).getChat_id());
-                        values.put("active", accounts.get(i).getActive());
+                        if(!accounts.get(i).getId().equals(myFirebaseHelper.getFirebaseAuth().getUid())){
+                            ContentValues values = new ContentValues();
+                            values.put("account_id_cry", accounts.get(i).getAccount_id_cry());
+                            values.put("id", accounts.get(i).getId());
+                            values.put("imageURL", accounts.get(i).getImageURL());
+                            values.put("last_seen", accounts.get(i).getLast_seen());
+                            values.put("name_user", accounts.get(i).getName_user());
+                            values.put("search", accounts.get(i).getSearch());
+                            values.put("status_chat", accounts.get(i).getStatus_chat());
+                            values.put("typingTo", accounts.get(i).getTypingTo());
+                            values.put("verification_level", accounts.get(i).getVerification_level());
+                            values.put("username", accounts.get(i).getUsername());
+                            values.put("chat_id", accounts.get(i).getChat_id());
+                            values.put("active", accounts.get(i).getActive());
 
-                        getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
+                            getWritableDatabase().insert(TABLE_CHAT_LIST, null, values);
+                        }
                     }
                 }
             }
@@ -219,6 +224,10 @@ public class DaoChat extends SQLiteOpenHelper {
             result = cursor.moveToFirst();
         }
         return result;
+    }
+
+    public void delete_user_from_chat(String id){
+        getWritableDatabase().delete(TABLE_CHAT_LIST, "id=?", new String[]{id});
     }
 
     public void delete_message(String id_msg){
@@ -292,21 +301,51 @@ public class DaoChat extends SQLiteOpenHelper {
         List<DtoAccount> accounts = new ArrayList<>();
 
         while (cursor.moveToNext()) {
-            DtoAccount account = new DtoAccount();
-            account.setAccount_id_cry(cursor.getString(0));
-            account.setId(cursor.getString(1));
-            account.setImageURL(cursor.getString(2));
-            account.setLast_seen(cursor.getString(3));
-            account.setName_user(cursor.getString(4));
-            account.setSearch(cursor.getString(5));
-            account.setStatus_chat(cursor.getString(6));
-            account.setTypingTo(cursor.getString(7));
-            account.setLast_chat(cursor.getString(8));
-            account.setVerification_level(cursor.getString(9));
-            account.setUsername(cursor.getString(10));
-            account.setChat_id(cursor.getString(11));
-            account.setActive(cursor.getInt(12));
-            accounts.add(account);
+            if(!cursor.getString(1).equals(myFirebaseHelper.getFirebaseAuth().getUid())){
+                DtoAccount account = new DtoAccount();
+                account.setAccount_id_cry(cursor.getString(0));
+                account.setId(cursor.getString(1));
+                account.setImageURL(cursor.getString(2));
+                account.setLast_seen(cursor.getString(3));
+                account.setName_user(cursor.getString(4));
+                account.setSearch(cursor.getString(5));
+                account.setStatus_chat(cursor.getString(6));
+                account.setTypingTo(cursor.getString(7));
+                account.setLast_chat(cursor.getString(8));
+                account.setVerification_level(cursor.getString(9));
+                account.setUsername(cursor.getString(10));
+                account.setChat_id(cursor.getString(11));
+                account.setActive(cursor.getInt(12));
+                accounts.add(account);
+            }
+        }
+        return accounts;
+    }
+
+    public List<DtoAccount> get_CHAT_BY_SEARCH(String src){
+        String command = "SELECT * FROM " + TABLE_CHAT_LIST + " WHERE search like ? ORDER BY last_chat DESC";
+        String[] params = {"%"+ src +"%"};
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        List<DtoAccount> accounts = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            if(!cursor.getString(1).equals(myFirebaseHelper.getFirebaseAuth().getUid())){
+                DtoAccount account = new DtoAccount();
+                account.setAccount_id_cry(cursor.getString(0));
+                account.setId(cursor.getString(1));
+                account.setImageURL(cursor.getString(2));
+                account.setLast_seen(cursor.getString(3));
+                account.setName_user(cursor.getString(4));
+                account.setSearch(cursor.getString(5));
+                account.setStatus_chat(cursor.getString(6));
+                account.setTypingTo(cursor.getString(7));
+                account.setLast_chat(cursor.getString(8));
+                account.setVerification_level(cursor.getString(9));
+                account.setUsername(cursor.getString(10));
+                account.setChat_id(cursor.getString(11));
+                account.setActive(cursor.getInt(12));
+                accounts.add(account);
+            }
         }
         return accounts;
     }

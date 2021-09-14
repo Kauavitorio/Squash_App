@@ -87,7 +87,7 @@ public class UsersOutstandingFragment extends Fragment {
                         finalList.add(account);
                     }
                 }
-                userChatAdapter = new UserChatAdapter(getActivity(), finalList, false);
+                userChatAdapter = new UserChatAdapter(getActivity(), finalList, false, UserChatAdapter.OFF_CHATS);
                 ((SimpleItemAnimator) Objects.requireNonNull(recycler_view_users.getItemAnimator())).setSupportsChangeAnimations(false);
                 recycler_view_users.setAdapter(userChatAdapter);
             }

@@ -92,6 +92,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     private static DtoAccount user;
     public static final boolean CAN_ANIME = true;
     public static final boolean CAN_NOT_ANIME = false;
+    private static final String TAG = "POSTS_ADAPTER";
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
@@ -235,50 +236,46 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     private void LoadImages(@NonNull MyHolderPosts holder, DtoPost postInfo) {
         final DtoPost img_list = daoPosts.get_post_img(Long.parseLong(postInfo.getPost_id()));
         if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0 && !img_list.getPost_images().get(0).equals("NaN")){
-            RequestOptions myOptions = new RequestOptions()
-                    .fitCenter() // or centerCrop
-                    .override(500, 500);
-            int ImagesAmount = img_list.getPost_images().size();
-            if(ImagesAmount < 2){
-                holder.img_firstImage_post.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
-                for (int i = 0; i < 1; i++){
+            try{
+                final RequestOptions myOptions = new RequestOptions()
+                        .fitCenter() // or centerCrop
+                        .override(450, 450);
+                int ImagesAmount = img_list.getPost_images().size();
+                if(ImagesAmount < 2){
+                    holder.img_firstImage_post.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    for (int i = 0; i < 1; i++){
+                        Glide.with(mContext)
+                                .asBitmap()
+                                .apply(myOptions)
+                                .load(EncryptHelper.decrypt(img_list.getPost_images().get(i)))
+                                .into(holder.img_firstImage_post);
+                    }
+                }else{
+                    holder.img_firstImage_post.setMaxWidth(250);
+                    holder.img_secondImage_post.setMaxWidth(250);
                     Glide.with(mContext)
                             .asBitmap()
                             .apply(myOptions)
-                            .load(EncryptHelper.decrypt(img_list.getPost_images().get(i)))
+                            .load(EncryptHelper.decrypt(EncryptHelper.decrypt(EncryptHelper.decrypt(img_list.getPost_images().get(0)))))
                             .into(holder.img_firstImage_post);
+                    Glide.with(mContext)
+                            .asBitmap()
+                            .apply(myOptions)
+                            .load(EncryptHelper.decrypt(EncryptHelper.decrypt(img_list.getPost_images().get(1))))
+                            .into(holder.img_secondImage_post);
+                    holder.img_secondImage_post.setVisibility(View.VISIBLE);
+                    int width = holder.img_firstImage_post.getWidth();
+                    holder.img_firstImage_post.getLayoutParams().width = width - 50;
+                    holder.img_firstImage_post.requestLayout();
                 }
-            }else{
-                holder.img_firstImage_post.setMaxWidth(250);
-                holder.img_secondImage_post.setMaxWidth(250);
-                Glide.with(mContext)
-                        .asBitmap()
-                        .apply(myOptions)
-                        .load(EncryptHelper.decrypt(EncryptHelper.decrypt(EncryptHelper.decrypt(img_list.getPost_images().get(0)))))
-                        .into(holder.img_firstImage_post);
-                Glide.with(mContext)
-                        .asBitmap()
-                        .apply(myOptions)
-                        .load(EncryptHelper.decrypt(EncryptHelper.decrypt(img_list.getPost_images().get(1))))
-                        .into(holder.img_secondImage_post);
-                holder.img_secondImage_post.setVisibility(View.VISIBLE);
-                int width = holder.img_firstImage_post.getWidth();
-                holder.img_firstImage_post.getLayoutParams().width = width - 50;
-                holder.img_firstImage_post.requestLayout();
-                if (ImagesAmount > 2) {
-                    holder.container_third_img.setVisibility(View.VISIBLE);
-                    Picasso.get().load(EncryptHelper.decrypt(EncryptHelper.decrypt(img_list.getPost_images().get(2)))).into(holder.img_thirdImage_post);
-                    if (ImagesAmount == 3) holder.container_blur_post.setVisibility(View.GONE);
-                    else {
-                        holder.txt_images_amount_post.setText("+" + (ImagesAmount - 2));
-                    }
-                }
+            }catch (Exception ex){
+                Log.d(TAG, ex.toString());
             }
         }else holder.img_firstImage_post.setVisibility(View.GONE);
 
-        holder.img_firstImage_post.setOnClickListener(v -> CreateImageViewIntent(0, img_list));
+        holder.img_firstImage_post.setOnClickListener(v -> CreateImageViewIntent(0, img_list, holder.img_firstImage_post));
 
-        holder.img_secondImage_post.setOnClickListener(v -> CreateImageViewIntent(1, img_list));
+        holder.img_secondImage_post.setOnClickListener(v -> CreateImageViewIntent(1, img_list, holder.img_firstImage_post));
 
         holder.icon_user_profile_post.setOnClickListener(v -> {
             holder.icon_user_profile_post.startAnimation(myAnim);
@@ -308,7 +305,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     }
 
     private void LoadBaseInformation(@NonNull MyHolderPosts holder, DtoPost postInfo, int position, boolean CAN_ANIMATE) {
-        Log.d("POSTS_ADAPTER", "ANIME -> " + CAN_ANIMATE);
+        Log.d(TAG, "ANIME -> " + CAN_ANIMATE);
         if(postInfo.getVerification_level() != null){
             if(Integer.parseInt(postInfo.getVerification_level()) != DtoAccount.NORMAL_ACCOUNT){
                 holder.ic_account_badge.setVisibility(View.VISIBLE);
@@ -319,11 +316,10 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
             }else holder.ic_account_badge.setVisibility(View.GONE);
             holder.img_secondImage_post.setVisibility(View.GONE);
-            holder.container_third_img.setVisibility(View.GONE);
             Glide.with(mContext).load(postInfo.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .into(holder.icon_user_profile_post);
             holder.txt_name_user_post.setText(postInfo.getName_user());
-            holder.txt_username_post.setText( "| @" + postInfo.getUsername());
+            holder.txt_username_post.setText( "@" + postInfo.getUsername());
             holder.txt_post_content.setText(postInfo.getPost_content());
 
             holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_likes())));
@@ -337,33 +333,35 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         new PatternEditableBuilder().
                 addPattern(Pattern.compile("@(\\w+)"), mContext.getColor(R.color.base_color),
                         text -> {
-                            DtoAccount account = new DtoAccount();
-                            account.setUsername(text.replace("@", ""));
-                            AccountServices services = retrofit.create(AccountServices.class);
-                            Call<DtoPost> call = services.search_with_username(account);
-                            LoadingDialog loadingDialog = new LoadingDialog(((Activity)mContext));
-                            loadingDialog.startLoading();
-                            call.enqueue(new Callback<DtoPost>() {
-                                @Override
-                                public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                                    loadingDialog.dismissDialog();
-                                    if(response.code() == 200){
-                                        if(response.body() != null){
-                                            Bundle bundle = new Bundle();
-                                            bundle.putString("account_id", response.body().getAccount_id());
-                                            bundle.putInt("control", 0);
-                                            MainActivity.getInstance().GetBundleProfile(bundle);
-                                            MainActivity.getInstance().CallProfile();
-                                            ProfileFragment.getInstance().LoadAnotherUser();
-                                        }
-                                    }else ToastHelper.toast(((Activity)mContext), mContext.getString(R.string.user_not_found), 0);
-                                }
-                                @Override
-                                public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
-                                    loadingDialog.dismissDialog();
-                                    Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_MENTION_CLICK);
-                                }
-                            });
+                            if(ConnectionHelper.isOnline(mContext)) {
+                                DtoAccount account = new DtoAccount();
+                                account.setUsername(text.replace("@", ""));
+                                AccountServices services = retrofit.create(AccountServices.class);
+                                Call<DtoPost> call = services.search_with_username(account);
+                                LoadingDialog loadingDialog = new LoadingDialog(mContext);
+                                loadingDialog.startLoading();
+                                call.enqueue(new Callback<DtoPost>() {
+                                    @Override
+                                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                                        loadingDialog.dismissDialog();
+                                        if(response.code() == 200){
+                                            if(response.body() != null){
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("account_id", response.body().getAccount_id());
+                                                bundle.putInt("control", 0);
+                                                MainActivity.getInstance().GetBundleProfile(bundle);
+                                                MainActivity.getInstance().CallProfile();
+                                                ProfileFragment.getInstance().LoadAnotherUser();
+                                            }
+                                        }else ToastHelper.toast(mContext, mContext.getString(R.string.user_not_found), 0);
+                                    }
+                                    @Override
+                                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                                        loadingDialog.dismissDialog();
+                                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_MENTION_CLICK);
+                                    }
+                                });
+                            }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
                         }).into(holder.txt_post_content);
     }
 
@@ -391,17 +389,18 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         }
     }
 
-    private void CreateImageViewIntent(int position, DtoPost post) {
+    private void CreateImageViewIntent(int position, DtoPost post, ImageView holder) {
         if(ConnectionHelper.isOnline(mContext)){
+            holder.startAnimation(myAnim);
             Intent intent = new Intent(mContext, ViewMediaActivity.class);
-            intent.putExtra("image_url", EncryptHelper.decrypt(post.getPost_images().get(position)));
-            intent.putExtra("receive_time", "post");
+            intent.putExtra(ViewMediaActivity.IMAGE_URL_TAG, EncryptHelper.decrypt(post.getPost_images().get(position)));
+            intent.putExtra(ViewMediaActivity.RECEIVE_TIME_TAG, ViewMediaActivity.POST_TAG);
             String id = post.getUsername() + "_" + post.getPost_id();
             if (id.length() < 11) id += "posts_media";
-            intent.putExtra("chat_id", id);
+            intent.putExtra(ViewMediaActivity.CHAT_ID_TAG, id);
             ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
             ActivityCompat.startActivity(mContext, intent, activityOptionsCompat.toBundle());
-        }else ToastHelper.toast((Activity)mContext , mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
+        }else ToastHelper.toast(mContext , mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
     }
 
     private void EnableActions(final MyHolderPosts holder, int position) {
@@ -536,8 +535,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     private void Like_Un_Like_A_Post(@NotNull MyHolderPosts holder, long position, String post_id) {
         if(ConnectionHelper.isOnline(mContext)){
-            //  Get User info
-            holder.img_heart_like.startAnimation(myAnim);
 
             boolean result_like = daoPosts.get_A_Like(Long.parseLong(post_id), user.getAccount_id());
             long like_now = Long.parseLong(mPostList.get((int) position).getPost_likes());
@@ -578,7 +575,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                 });
 
                 //  Do Like or Un Like
-                /*DtoPost dtoPost = new DtoPost();
+                DtoPost dtoPost = new DtoPost();
                 dtoPost.setPost_id(EncryptHelper.encrypt(post_id));
                 dtoPost.setAccount_id_cry(EncryptHelper.encrypt( String.valueOf(user.getAccount_id())));
                 PostServices services = retrofit.create(PostServices.class);
@@ -588,10 +585,10 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {}
                     @Override
                     public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
-                        ToastHelper.toast((Activity) mContext, mContext.getString(R.string.problem_performing_this_action), ToastHelper.SHORT_DURATION);
+                        ToastHelper.toast(mContext, mContext.getString(R.string.problem_performing_this_action), ToastHelper.SHORT_DURATION);
                         notifyItemChanged((int) position);
                     }
-                });*/
+                });
             }
         }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
     }
@@ -607,11 +604,10 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     static class MyHolderPosts extends RecyclerView.ViewHolder{
         CircleImageView icon_user_profile_post;
-        TextView txt_name_user_post, txt_username_post, txt_post_content, txt_images_amount_post, txt_date_time_post;
+        TextView txt_name_user_post, txt_username_post, txt_post_content, txt_date_time_post;
         TextView txt_likes_post, txt_comments_post, txt_suggestion;
-        ImageView img_firstImage_post, img_secondImage_post, img_thirdImage_post, ic_account_badge, img_heart_like, btn_actions;
-        RelativeLayout container_third_img, container_post_adapter;
-        ConstraintLayout container_blur_post;
+        ImageView img_firstImage_post, img_secondImage_post, ic_account_badge, img_heart_like, btn_actions;
+        RelativeLayout container_post_adapter;
         LinearLayout btn_like_post, btn_share_post, btn_comment_post, suggestion_container;
 
         public MyHolderPosts(@NonNull View itemView) {
@@ -629,13 +625,9 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             txt_post_content = itemView.findViewById(R.id.txt_post_content);
             img_firstImage_post = itemView.findViewById(R.id.img_firstImage_post);
             img_secondImage_post = itemView.findViewById(R.id.img_secondImage_post);
-            container_third_img = itemView.findViewById(R.id.container_third_img_posts);
             btn_share_post = itemView.findViewById(R.id.btn_share_post);
             btn_like_post = itemView.findViewById(R.id.btn_like_post);
-            img_thirdImage_post = itemView.findViewById(R.id.img_thirdImage_post);
             ic_account_badge = itemView.findViewById(R.id.ic_account_badge);
-            container_blur_post = itemView.findViewById(R.id.container_blur_post);
-            txt_images_amount_post = itemView.findViewById(R.id.txt_images_amount_post);
             txt_likes_post = itemView.findViewById(R.id.txt_likes_post);
             txt_comments_post = itemView.findViewById(R.id.txt_comments_post);
         }

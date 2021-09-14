@@ -34,6 +34,10 @@ public class ViewMediaActivity extends AppCompatActivity {
     LottieAnimationView download_btn;
     TextView txt_sent_date, txt_sent_on;
     Bitmap image_bitmap;
+    public static final String IMAGE_URL_TAG = "image_url";
+    public static final String CHAT_ID_TAG = "chat_id";
+    public static final String RECEIVE_TIME_TAG = "receive_time";
+    public static final String POST_TAG = "post";
 
     String image_url, chat_id, receive_time_full;
     String[] receive_time;
@@ -45,17 +49,17 @@ public class ViewMediaActivity extends AppCompatActivity {
         Ids();
 
         Bundle bundle = getIntent().getExtras();
-        image_url = bundle.getString("image_url");
-        chat_id = bundle.getString("chat_id");
-        if(bundle.getString("receive_time").equals("post")){
+        image_url = bundle.getString(IMAGE_URL_TAG);
+        chat_id = bundle.getString(CHAT_ID_TAG);
+        if(bundle.getString(RECEIVE_TIME_TAG).equals(POST_TAG)){
             @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm a").format(new Date());
             receive_time = timeStamp.split("/");
             receive_time_full = timeStamp;
             txt_sent_date.setVisibility(View.GONE);
             txt_sent_on.setVisibility(View.GONE);
         }else{
-            receive_time = bundle.getString("receive_time").split("/");
-            receive_time_full = bundle.getString("receive_time");
+            receive_time = bundle.getString(RECEIVE_TIME_TAG).split("/");
+            receive_time_full = bundle.getString(RECEIVE_TIME_TAG);
         }
         txt_sent_date.setText(receive_time_full);
 

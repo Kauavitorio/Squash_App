@@ -167,7 +167,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/header_main"
-            android:layout_marginTop="5dp">
+            android:layout_marginTop="2dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_Posts"

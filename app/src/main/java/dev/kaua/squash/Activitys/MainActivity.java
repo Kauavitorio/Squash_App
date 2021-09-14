@@ -2,7 +2,6 @@ package dev.kaua.squash.Activitys;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +15,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.android.play.core.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -31,6 +34,7 @@ import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ShortCutsHelper;
+import dev.kaua.squash.Tools.ToastHelper;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         //  Get all SharedPreferences
         bundle = getIntent().getExtras();
-        if (MyPrefs.getUserInformation(this).getAccount_id() != DtoAccount.NORMAL_ACCOUNT) StartNavigation();
+        if (MyPrefs.getUserInformation(this).getAccount_id() > DtoAccount.NORMAL_ACCOUNT) StartNavigation();
         else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
 
         if(bundle != null){
@@ -138,6 +142,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageScrollStateChanged(int state) {}
         });
+
+        ReviewManager manager = ReviewManagerFactory.create(this);
+        Task<ReviewInfo> request = manager.requestReviewFlow();
+        request.addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // We can get the ReviewInfo object
+                ReviewInfo reviewInfo = task.getResult();
+                Task<Void> flow = manager.launchReviewFlow(this, reviewInfo);
+                flow.addOnCompleteListener(tasks -> {
+                    // The flow has finished. The API does not indicate whether the user
+                    // reviewed or not, or even whether the review dialog was shown. Thus, no
+                    // matter the result, we continue our app flow.
+                });
+            } else {
+                // There was some problem, log or handle the error code.
+                ToastHelper.toast(this, task.toString(), ToastHelper.SHORT_DURATION);
+                Log.d(TAG, task.toString());
+            }
+        });
+
     }
 
     private void StartNavigation() {

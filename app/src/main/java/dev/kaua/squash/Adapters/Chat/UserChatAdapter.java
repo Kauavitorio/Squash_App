@@ -2,6 +2,8 @@ package dev.kaua.squash.Adapters.Chat;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -42,23 +44,28 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
+import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 
 public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHolder> {
 
-    private Activity mContext;
-    private List<DtoAccount> mAccounts;
-    private boolean isChat;
+    private final Activity mContext;
+    private final List<DtoAccount> mAccounts;
     private final boolean share;
+    private final boolean CHAT;
     DaoChat daoChat;
     String theLastMessage;
 
-    public UserChatAdapter(Activity mContext, List<DtoAccount> mAccounts, boolean share){
+    public static final boolean CHATS = true;
+    public static final boolean OFF_CHATS = false;
+
+    public UserChatAdapter(Activity mContext, List<DtoAccount> mAccounts, boolean share, boolean CHAT){
         this.mContext = mContext;
         this.mAccounts = mAccounts;
         this.share = share;
+        this.CHAT = CHAT;
         this.daoChat = new DaoChat(mContext);
     }
 
@@ -77,9 +84,48 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         if(account != null){
             try{
 
-                /*if(isChat)
-                    lastMessage(account.getId(), holder.card_no_read_ic);
-                else holder.last_seen.setVisibility(View.GONE);*/
+                holder.itemView.setOnLongClickListener(v -> {
+                    if(CHAT){
+                        final int PositionFinal = position;
+                        holder.itemView.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.click_anim));
+                        AlertDialog.Builder alert = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle)
+                                .setTitle(mContext.getString(R.string.delete_this_conversation))
+                                .setMessage(mContext.getString(R.string.do_you_really_want_to_delete_this_conversation))
+                                .setPositiveButton(mContext.getString(R.string.yes), (dialog, which) -> {
+                                    dialog.dismiss();
+                                    if(ConnectionHelper.isOnline(mContext)){
+                                        DaoChat db = new DaoChat(mContext);
+                                        db.delete_user_from_chat(account.getId());
+                                        LoadingDialog loadingDialog = new LoadingDialog((Activity) mContext);
+                                        loadingDialog.startLoading();
+
+                                        final DatabaseReference chatRef = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE)
+                                                .child(myFirebaseHelper.getFirebaseUser().getUid())
+                                                .child(account.getId());
+
+                                        chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                                if(snapshot.exists()){
+                                                    snapshot.getRef().removeValue();
+                                                    mAccounts.remove(PositionFinal);
+                                                    notifyItemRemoved(PositionFinal);
+                                                    loadingDialog.dismissDialog();
+                                                }
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+                                        });
+
+                                    }else ToastHelper.toast((Activity)mContext , mContext.getString(R.string.you_are_without_internet), 0);
+                                })
+                                .setNeutralButton(mContext.getString(R.string.no), (dialogInterface, i) -> dialogInterface.dismiss());
+                        Dialog mDialog = alert.create();
+                        mDialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
+                        mDialog.show();
+                    }
+                    return false;
+                });
 
                 LoadProfileImage(holder, account);
                 CheckVerification(account, holder);
@@ -127,21 +173,20 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     private void ChatClick(@NonNull ViewHolder holder, DtoAccount account) {
         holder.itemView.setOnClickListener(v -> {
             try {
-                final Animation myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
-                holder.itemView.startAnimation(myAnim);
+                holder.itemView.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.click_anim));
                 Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra("userId", account.getId());
-                intent.putExtra("chat_id", account.getChat_id());
+                intent.putExtra(MessageActivity.USER_ID, account.getId());
+                intent.putExtra(MessageActivity.CHAT_ID, account.getChat_id());
                 if(share){
-                    int shareType = ShareContentActivity.getInstance().GetShareType();
-                    intent.putExtra("shared", MainActivity.SHARED_ID);
-                    intent.putExtra("shared_type", shareType);
+                    final int shareType = ShareContentActivity.getInstance().GetShareType();
+                    intent.putExtra(MessageActivity.SHARE_ID, MainActivity.SHARED_ID);
+                    intent.putExtra(MessageActivity.SHARE_TYPE_ID, shareType);
                     if(shareType == MainActivity.SHARED_PLAIN_TEXT)
-                        intent.putExtra("shared_content", (String) ShareContentActivity.getInstance().GetShareContent());
+                        intent.putExtra(MessageActivity.SHARE_CONTENT_ID, (String) ShareContentActivity.getInstance().GetShareContent());
                     else if(shareType == MainActivity.SHARED_IMAGE)
-                        intent.putExtra("shared_content", (Uri) ShareContentActivity.getInstance().GetShareContent());
+                        intent.putExtra(MessageActivity.SHARE_CONTENT_ID, (Uri) ShareContentActivity.getInstance().GetShareContent());
                     mContext.finish();
-                }else intent.putExtra("shared", 0);
+                }else intent.putExtra(MessageActivity.SHARE_ID, 0);
                 mContext.startActivity(intent);
             }catch (Exception exception){
                 Warnings.showWeHaveAProblem(mContext, ErrorHelper.USER_CHAT_ITEM_CLICK);
@@ -160,12 +205,12 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
 
     private void CheckUserStatus(DtoAccount account, @NonNull ViewHolder holder) {
         if(!mContext.isDestroyed()){
-            isChat = account.getStatus_chat() != null && account.getStatus_chat().equals("online");
+            final boolean isChat = account.getStatus_chat() != null && account.getStatus_chat().equals(Methods.ONLINE);
             holder.img_status.setVisibility(View.VISIBLE);
 
             if(isChat){
                 if(ConnectionHelper.isOnline(mContext)){
-                    if (account.getStatus_chat() != null && account.getStatus_chat().equals("online")){
+                    if (account.getStatus_chat() != null && account.getStatus_chat().equals(Methods.ONLINE)){
                         holder.last_seen.setText(mContext.getString(R.string.online));
                         holder.img_status.setBorderColor(mContext.getColor(R.color.status_on));
                     }

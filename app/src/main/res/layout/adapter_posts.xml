@@ -56,7 +56,7 @@
                 android:id="@+id/icon_user_profile_post"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                android:src="@drawable/img_opss"
+                tools:src="@drawable/img_opss"
                 app:civ_border_color="@color/base_color"
                 app:civ_border_width="1dp"/>
 
@@ -99,13 +99,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:maxLength="25"
-                            tools:text="@string/app_name"
                             android:textColor="@color/black"
                             android:textSize="15sp"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="@string/app_name" />
 
                         <!-- Badge Account -->
                         <ImageView
@@ -129,6 +129,7 @@
                             android:textColor="@color/hint"
                             android:textSize="14sp"
                             android:layout_marginEnd="2dp"
+                            android:layout_marginBottom="2dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_bias="0.0"
@@ -158,9 +159,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txt_date_time_post"
                     android:layout_alignParentStart="true"
-                    tools:text="@string/receive_email_terms"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:text="@string/receive_email_terms" />
 
                 <!-- Container Post Body -->
                 <LinearLayout
@@ -173,7 +174,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="2dp"
                         android:orientation="vertical"
                         tools:ignore="UselessParent">
 
@@ -191,7 +192,7 @@
                                 android:layout_height="match_parent"
                                 android:adjustViewBounds="true"
                                 android:maxHeight="200dp"
-                                android:src="@drawable/img_opss"
+                                tools:src="@drawable/img_opss"
                                 tools:ignore="ContentDescription" />
 
                             <!-- Second Image -->
@@ -202,55 +203,8 @@
                                 android:adjustViewBounds="true"
                                 android:maxHeight="200dp"
                                 android:layout_marginStart="5dp"
-                                android:src="@drawable/ic_search"
+                                tools:src="@drawable/img_opss"
                                 tools:ignore="ContentDescription" />
-
-                        </LinearLayout>
-
-                        <!-- Container More Pictures -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <!-- Container More Pictures -->
-                            <RelativeLayout
-                                android:id="@+id/container_third_img_posts"
-                                android:layout_width="80dp"
-                                android:layout_height="80dp"
-                                tools:ignore="UselessParent">
-
-                                <!-- Third Image -->
-                                <ImageView
-                                    android:id="@+id/img_thirdImage_post"
-                                    android:layout_width="80dp"
-                                    android:layout_height="80dp"
-                                    android:adjustViewBounds="true"
-                                    android:maxHeight="200dp"
-                                    android:src="@drawable/img_opss"
-                                    tools:ignore="ContentDescription" />
-
-                                <!-- Container text Amount -->
-                                <androidx.constraintlayout.widget.ConstraintLayout
-                                    android:id="@+id/container_blur_post"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="@color/third_or_plus_img">
-
-                                    <!-- Text More Picture Amount -->
-                                    <TextView
-                                        android:id="@+id/txt_images_amount_post"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:text="@string/app_name"
-                                        android:textStyle="bold"
-                                        android:textColor="@color/white"
-                                        android:textSize="25sp"
-                                        android:gravity="center"
-                                        tools:ignore="TooDeepLayout" />
-
-                                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                            </RelativeLayout>
 
                         </LinearLayout>
 
@@ -258,7 +212,7 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
-                            android:layout_marginTop="5dp">
+                            android:layout_marginTop="3dp">
 
                             <!-- Container Likes -->
                             <LinearLayout
@@ -289,7 +243,7 @@
                                     android:layout_gravity="center"
                                     android:layout_marginStart="5dp"
                                     android:layout_marginEnd="5dp"
-                                    android:text="@string/app_name"
+                                    tools:text="@string/app_name"
                                     android:textColor="@color/black"
                                     android:textSize="16sp" />
 
@@ -320,7 +274,7 @@
                                     android:layout_gravity="center"
                                     android:layout_marginStart="5dp"
                                     android:layout_marginEnd="5dp"
-                                    android:text="@string/app_name"
+                                    tools:text="@string/app_name"
                                     android:textColor="@color/black"
                                     android:textSize="16sp" />
 

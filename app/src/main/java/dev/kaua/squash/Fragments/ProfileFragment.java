@@ -438,10 +438,10 @@ public class ProfileFragment extends Fragment {
         btn_qr_code.setOnClickListener(v -> {
             if(ConnectionHelper.isOnline(requireContext())){
                 Intent i = new Intent(requireContext(), QrCodeActivity.class);
-                i.putExtra("image_profile", user.getProfile_image());
-                i.putExtra("name_user", user.getName_user());
-                i.putExtra("username", user.getUsername());
-                i.putExtra("account_id", account_id);
+                i.putExtra(QrCodeActivity.PROFILE_IMAGE_TAG, user.getProfile_image());
+                i.putExtra(QrCodeActivity.PROFILE_NAME_TAG, user.getName_user());
+                i.putExtra(QrCodeActivity.PROFILE_USERNAME_TAG, user.getUsername());
+                i.putExtra(QrCodeActivity.PROFILE_ID_TAG, account_id);
                 startActivity(i);
             }else ToastHelper.toast(requireActivity(), getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
         });
@@ -480,7 +480,6 @@ public class ProfileFragment extends Fragment {
                 if(getContext() != null && getActivity() != null){
                     BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.BottomSheetTheme);
                     //  Creating View for SheetMenu
-
                     View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_profile_actions ,
                             getActivity().findViewById(R.id.sheet_profile_action));
 
@@ -532,26 +531,27 @@ public class ProfileFragment extends Fragment {
                     bottomSheetDialog.setContentView(sheetView);
                     bottomSheetDialog.show();
                 }
+                return true;
             case R.id.report_user:
                 if(getContext() != null && getActivity() != null) {
-                    BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.BottomSheetTheme);
+                    BottomSheetDialog bottomSheetDialogReport = new BottomSheetDialog(getContext(), R.style.BottomSheetTheme);
                     //  Creating View for SheetMenu
                     View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_user_report ,
                             getActivity().findViewById(R.id.sheet_report_user));
 
                     sheetView.findViewById(R.id.txt_report_post_message_or_comment).setOnClickListener(v -> {
                         ReportUser(EncryptHelper.encrypt(getString(R.string.report_post_message_or_comment)));
-                        bottomSheetDialog.dismiss();
+                        bottomSheetDialogReport.dismiss();
                     });
 
 
                     sheetView.findViewById(R.id.txt_report_account).setOnClickListener(v -> {
                         ReportUser(EncryptHelper.encrypt(getString(R.string.report_account)));
-                        bottomSheetDialog.dismiss();
+                        bottomSheetDialogReport.dismiss();
                     });
 
-                    bottomSheetDialog.setContentView(sheetView);
-                    bottomSheetDialog.show();
+                    bottomSheetDialogReport.setContentView(sheetView);
+                    bottomSheetDialogReport.show();
                 }
                 return true;
             default:

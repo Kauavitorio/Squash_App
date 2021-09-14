@@ -31,7 +31,7 @@
                 android:id="@+id/icon_user_profile_post_details"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/img_opss"
+                tools:src="@drawable/img_opss"
                 app:civ_border_color="@color/base_color"
                 app:civ_border_width="1dp" />
 
@@ -155,7 +155,7 @@
                             android:layout_height="match_parent"
                             android:adjustViewBounds="true"
                             android:maxHeight="200dp"
-                            android:src="@drawable/img_opss"
+                            tools:src="@drawable/img_opss"
                             tools:ignore="ContentDescription" />
 
                         <!-- Second Image -->
@@ -166,55 +166,8 @@
                             android:layout_marginStart="5dp"
                             android:adjustViewBounds="true"
                             android:maxHeight="200dp"
-                            android:src="@drawable/ic_search"
+                            tools:src="@drawable/img_opss"
                             tools:ignore="ContentDescription" />
-
-                    </LinearLayout>
-
-                    <!-- Container More Pictures -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <!-- Container More Pictures -->
-                        <RelativeLayout
-                            android:id="@+id/container_third_img_posts"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:visibility="gone"
-                            tools:ignore="UselessParent">
-
-                            <!-- Third Image -->
-                            <ImageView
-                                android:id="@+id/img_thirdImage_post"
-                                android:layout_width="80dp"
-                                android:layout_height="80dp"
-                                android:adjustViewBounds="true"
-                                android:maxHeight="200dp"
-                                android:src="@drawable/img_opss"
-                                tools:ignore="ContentDescription" />
-
-                            <!-- Container text Amount -->
-                            <androidx.constraintlayout.widget.ConstraintLayout
-                                android:id="@+id/container_blur_post"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@color/third_or_plus_img">
-
-                                <!-- Text More Picture Amount -->
-                                <TextView
-                                    android:id="@+id/txt_images_amount_post"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:gravity="center"
-                                    android:text="@string/app_name"
-                                    android:textColor="@color/white"
-                                    android:textSize="25sp"
-                                    android:textStyle="bold" />
-
-                            </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        </RelativeLayout>
 
                     </LinearLayout>
 
@@ -368,7 +321,7 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_profile_default"
+                        tools:src="@drawable/img_opss"
                         app:civ_border_color="@color/base_color"
                         app:civ_border_width="1dp"
                         app:layout_constraintEnd_toEndOf="parent"

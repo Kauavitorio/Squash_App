@@ -3,7 +3,20 @@ package dev.kaua.squash.Data.Message;
 import java.util.List;
 
 public class DtoMessage {
-
+    public static final String SENDER = "sender";
+    public static final String RECEIVER = "receiver";
+    public static final String ID_MSG = "id_msg";
+    public static final String CHAT_ID = "chat_id";
+    public static final String REPLY_FROM = "reply_from";
+    public static final String REPLY_CONTENT = "reply_content";
+    public static final String MESSAGE = "message";
+    public static final String IS_SEEN = "isSeen";
+    public static final String MEDIA = "media";
+    public static final String TIME = "time";
+    public static final String NO_ONE = "noOne";
+    public static final String EMPTY = "empty";
+    public static final int  NOT_SEEN = 0;
+    public static final int  SEEN = 1;
 
     public static int SEND = 1;
     public static int  RECEIVED = 2;

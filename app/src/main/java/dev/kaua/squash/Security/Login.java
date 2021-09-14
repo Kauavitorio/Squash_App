@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.util.Log;
 
@@ -43,7 +44,9 @@ import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.LocalDataBase.DaoSystem;
+import dev.kaua.squash.LocalDataBase.Notification.DaoNotification;
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
@@ -90,8 +93,16 @@ public abstract class Login extends SignInActivity{
         String formattedDate = df.format(c.getTime()) + " at " + df_time.format(c.getTime());
         Log.d(TAG, "Current date => "+ formattedDate);
 
-        DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), EncryptHelper.encrypt(password),
-                EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))), EncryptHelper.encrypt("0-river-reliable"), EncryptHelper.encrypt(formattedDate), 0);
+        String encrypt_password = EncryptHelper.encrypt(EncryptHelper.encrypt(password));
+        String placed = Methods.shuffle(Methods.RandomCharacters(40));
+        String ip = ConnectionHelper.getIp(context);
+        ip =  placed + Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
+                .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9");
+        encrypt_password = placed + encrypt_password;
+        DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), encrypt_password,
+                EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))),
+                EncryptHelper.encrypt("0-river-reliable"), EncryptHelper.encrypt(formattedDate), 0, EncryptHelper.encrypt(placed),
+                ip);
         AccountServices login_service = retrofitUser.create(AccountServices.class);
         Call<DtoAccount> call = login_service.login(account);
         call.enqueue(new Callback<DtoAccount>() {
@@ -153,6 +164,9 @@ public abstract class Login extends SignInActivity{
                                     Log.d(TAG, "Login Ok");
                                     Log.d(TAG, "User " + mAuth.getUid());
 
+                                    DaoNotification daoNotification = new DaoNotification(context);
+                                    daoNotification.Register_User(mAuth.getUid());
+
                                     //  Creating analytic for login event
                                     Bundle bundle_Analytics = new Bundle();
                                     bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, mAuth.getUid());
@@ -175,7 +189,6 @@ public abstract class Login extends SignInActivity{
                                     }, 1000);
                                 });
                     }else LogOut(context, LOGOUT_STATUS_WITHOUT_FLAG, DISABLE_ACCOUNT);
-
 
                 }else if(response.code() == 206){
                     Log.d(TAG, "Email not validated");
@@ -226,9 +239,18 @@ public abstract class Login extends SignInActivity{
         String formattedDate = df.format(c.getTime()) + " at " + df_time.format(c.getTime());
         Log.d(TAG, "Current date => "+ formattedDate);
         Log.d(TAG, "Device => "+ device_login);
+        Log.d(TAG, "Root => "+ isRooted());
+        Log.d(TAG, "Debug => "+ Debug.isDebuggerConnected());
 
-        DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), EncryptHelper.encrypt(password),
-                EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))), EncryptHelper.encrypt("0-river"), EncryptHelper.encrypt(formattedDate), 0);
+        String encrypt_password = EncryptHelper.encrypt(EncryptHelper.encrypt(password));
+        String placed = Methods.shuffle(Methods.RandomCharacters(30));
+        String ip = ConnectionHelper.getIp(context);
+        ip =  placed + Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
+                .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9");
+        encrypt_password = placed + encrypt_password;
+        DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), encrypt_password,
+                EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))),
+                EncryptHelper.encrypt("0-river"), EncryptHelper.encrypt(formattedDate), 0, EncryptHelper.encrypt(placed), ip);
         AccountServices login_service = retrofitUser.create(AccountServices.class);
         Call<DtoAccount> call = login_service.login(account);
         call.enqueue(new Callback<DtoAccount>() {
@@ -240,6 +262,9 @@ public abstract class Login extends SignInActivity{
                     if(response.body() != null){
                         //  Clear all prefs before login user
                         mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+
+                        DaoNotification daoNotification = new DaoNotification(context);
+                        daoNotification.Register_User(myFirebaseHelper.getFirebaseUser().getUid());
 
                         if(response.body().getActive() > DtoAccount.ACCOUNT_DISABLE){
 
@@ -324,6 +349,25 @@ public abstract class Login extends SignInActivity{
             @Override
             public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) { Log.d(TAG, t.getMessage()); }
         });
+    }
+
+    private static boolean isRooted() {
+        return findBinary("su");
+    }
+
+    public static boolean findBinary(String binaryName) {
+        boolean found = false;
+        String[] places = {"/sbin/", "/system/bin/",
+                "/system/xbin/", "/data/local/xbin/",
+                "/data/local/bin/", "/system/sd/xbin/",
+                "/system/bin/failsafe/", "/data/local/"};
+        for (String where : places) {
+            if (new File(where + binaryName).exists()) {
+                found = true;
+                break;
+            }
+        }
+        return found;
     }
 
     static Handler timer = new Handler();

@@ -3,7 +3,6 @@ package dev.kaua.squash.Activitys;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -19,12 +18,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -51,7 +48,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
 import com.yalantis.ucrop.UCrop;
 
 import org.jetbrains.annotations.NotNull;
@@ -73,13 +69,11 @@ import dev.kaua.squash.Adapters.AudioRecorder;
 import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
 import dev.kaua.squash.Adapters.Chat.MessageAdapter;
 import dev.kaua.squash.Adapters.Chat.SwipeReply;
-import dev.kaua.squash.Adapters.Chat.ViewProxy;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.Chatslist;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
-import dev.kaua.squash.Fragments.ChatFragment;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.Notifications.APIService;
@@ -90,6 +84,7 @@ import dev.kaua.squash.Notifications.Sender;
 import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.AudioRecord;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.KeyboardUtils;
 import dev.kaua.squash.Tools.LoadingDialog;
@@ -113,7 +108,7 @@ import retrofit2.Response;
 public class MessageActivity extends AppCompatActivity {
 
     private CircleImageView profile_image;
-    public static ConstraintLayout container_no_message_yet, btn_scroll_down_chat;
+    public static ConstraintLayout container_no_message_yet;
     public static ImageView background_chat;
     public static ImageView btn_more_medias;
     public static LinearLayout container_edit_text;
@@ -121,7 +116,7 @@ public class MessageActivity extends AppCompatActivity {
     private static TextView txt_user_name, txt_isOnline_chat, txtQuotedMsg;
     private static RecyclerView recycler_view_msg;
     private EditText text_send;
-    private CardView btn_send, btn_rec_audio;
+    public static CardView btn_send, btn_rec_audio;
     private String message_to_reply;
     private ImageView verification_ic;
     private String reply_from;
@@ -130,8 +125,8 @@ public class MessageActivity extends AppCompatActivity {
     private static ValueEventListener seenListener;
     public static DtoAccount user_im_chat;
     private static final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
-    private static final String[] permissions_audio = { Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE };
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    public static final String[] PERMISSION_audio = { Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE };
+    public static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
     public static FirebaseUser fUser;
 
@@ -143,7 +138,7 @@ public class MessageActivity extends AppCompatActivity {
     private static String userId;
     private static String chat_id;
     String another_user_image = "";
-    private Animation myAnim;
+    public static Animation myAnim;
 
     private APIService apiService;
 
@@ -152,24 +147,29 @@ public class MessageActivity extends AppCompatActivity {
     public static final int PICK_IMAGE_REQUEST = 222;
     public static final int PICK_IMAGE_REQUEST_MEDIA = 333;
     public static final int OPEN_CAMERA = 444;
-    private static final String TAG = "MESSAGE_ACTIVITY";
+    public static final String TAG = "MESSAGE_ACTIVITY";
+    public static final String CHAT_ID = "chat_id";
+    public static final String USER_ID = "userId";
+    public static final String SHARE_ID = "shared";
+    public static final String SHARE_TYPE_ID = "shared_type";
+    public static final String SHARE_CONTENT_ID = "shared_content";
     public static StorageReference storageReference;
 
     Intent intent;
 
     private TextView recordTimeText;
-    private View recordPanel;
-    private View slideText;
-    private boolean recording;
-    private float startedDraggingX = -1;
-    private float distCanMove = dp(80);
+    public static View recordPanel;
+    public static View slideText;
+    public static boolean recording;
+    public static float startedDraggingX = -1;
+    public static float distCanMove = dp(80);
     private long startTime = 0L;
     long timeInMilliseconds = 0L;
     long timeSwapBuff = 0L;
     long updatedTime = 0L;
     private Timer timer;
-    float x1,x2;
-    static final int MIN_DISTANCE = dp(380);
+    public static float x1,x2;
+    public static final int MIN_DISTANCE = dp(380);
     private static AudioRecorder audioRecorder;
 
     @Override
@@ -187,8 +187,8 @@ public class MessageActivity extends AppCompatActivity {
         apiService = Client.getClient(Methods.FCM_URL).create(APIService.class);
 
         intent = getIntent();
-        userId = intent.getStringExtra("userId");
-        chat_id = intent.getStringExtra("chat_id");
+        userId = intent.getStringExtra(USER_ID);
+        chat_id = intent.getStringExtra(CHAT_ID);
         fUser = myFirebaseHelper.getFirebaseUser();
 
         CheckShared();
@@ -301,86 +301,7 @@ public class MessageActivity extends AppCompatActivity {
         profile_image.setOnClickListener(v -> OpenUserProfile());
 
         //  Rec audio click
-        btn_rec_audio.setOnTouchListener((view, motionEvent) -> {
-            if(!recording) btn_rec_audio.startAnimation(myAnim);
-            UserPermissions.validatePermissions(permissions_audio, instance, REQUEST_RECORD_AUDIO_PERMISSION);
-            int RECORD_PERMISSION = ContextCompat.checkSelfPermission(instance, Manifest.permission.RECORD_AUDIO);
-            if (RECORD_PERMISSION == PackageManager.PERMISSION_GRANTED){
-
-                x2 = motionEvent.getX();
-                float deltaX = x2 - x1;
-                Log.d(TAG, "MIN -> " + MIN_DISTANCE);
-                Log.d(TAG, "CURRENT -> " + deltaX);
-
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    if(!recording){
-                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) slideText
-                                .getLayoutParams();
-                        params.leftMargin = dp(30);
-                        slideText.setLayoutParams(params);
-                        ViewProxy.setAlpha(slideText, 1);
-                        startedDraggingX = -1;
-                        // startRecording();
-                        StartRecord();
-                        btn_rec_audio.getParent()
-                                .requestDisallowInterceptTouchEvent(true);
-                    }
-                } else if (Math.abs(deltaX) >= MIN_DISTANCE && motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(recording){
-                        startedDraggingX = -1;
-                        Log.d(TAG, "CANCEL ACTION");
-                        StopRecord(true);
-                        // stopRecording(true);
-                    }
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-                    float x = motionEvent.getX();
-                    /*if (x < -distCanMove) {
-                        StopRecord(false);
-                        // stopRecording(false);
-                    }*/
-                    x = x + ViewProxy.getX(btn_rec_audio);
-                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) slideText
-                            .getLayoutParams();
-                    if (startedDraggingX != -1) {
-                        float dist = (x - startedDraggingX);
-                        params.leftMargin = dp(120) + (int) dist;
-                        slideText.setLayoutParams(params);
-                        float alpha = 1.0f + dist / distCanMove;
-                        if (alpha > 1) alpha = 1;
-                        else if (alpha < 0)
-                            alpha = 0;
-                        ViewProxy.setAlpha(slideText, alpha);
-                    }
-                    if (x <= ViewProxy.getX(slideText) + slideText.getWidth()
-                            + dp(30)) {
-                        if (startedDraggingX == -1) {
-                            startedDraggingX = x;
-                            distCanMove = (recordPanel.getMeasuredWidth()
-                                    - slideText.getMeasuredWidth() - dp(48)) / 2.0f;
-                            if (distCanMove <= 0)
-                                distCanMove = dp(80);
-                            else if (distCanMove > dp(80))
-                                distCanMove = dp(80);
-                        }
-                    }
-                    if (params.leftMargin > dp(30)) {
-                        params.leftMargin = dp(30);
-                        slideText.setLayoutParams(params);
-                        ViewProxy.setAlpha(slideText, 1);
-                        startedDraggingX = -1;
-                    }
-                }else if (motionEvent.getAction() == MotionEvent.ACTION_UP){
-                    if(recording){
-                        startedDraggingX = -1;
-                        Log.d(TAG, "SENT ACTION");
-                        StopRecord(false);
-                    }
-                }
-                view.onTouchEvent(motionEvent);
-                return true;
-            }
-            return true;
-        });
+        btn_rec_audio.setOnTouchListener((view, motionEvent) -> AudioRecord.RecordAudio(motionEvent, view));
 
         setRecyclerSwipe();
     }
@@ -431,9 +352,10 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private static String fileName = null;
+    private static String AudioCurrentTime;
     private MyTimerTask myTimerTask;
-    private void StartRecord() {
-        UserPermissions.validatePermissions(permissions_audio, instance, REQUEST_RECORD_AUDIO_PERMISSION);
+    public void StartRecord() {
+        UserPermissions.validatePermissions(PERMISSION_audio, instance, REQUEST_RECORD_AUDIO_PERMISSION);
         int RECORD_PERMISSION = ContextCompat.checkSelfPermission(instance, Manifest.permission.RECORD_AUDIO);
         if (RECORD_PERMISSION == PackageManager.PERMISSION_GRANTED){
             try {
@@ -464,7 +386,7 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
-    private void StopRecord(final boolean cancel) {
+    public void StopRecord(final boolean cancel) {
         recording = false;
         try {
             if (!cancel) {
@@ -474,6 +396,7 @@ public class MessageActivity extends AppCompatActivity {
                 String audio_path = audioRecorder.stop();
                 String record_time = recordTimeText.getText().toString();
                 String[] record_time_split = record_time.split(":");
+                AudioCurrentTime = recordTimeText.getText().toString();
                 if (timer != null && !record_time.equals("00:00") && Integer.parseInt(record_time_split[1]) > 0) {
                     @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                     Uri uriAudio = Uri.fromFile(new File(audio_path).getAbsoluteFile());
@@ -494,6 +417,7 @@ public class MessageActivity extends AppCompatActivity {
                                     String audio_download = uri.toString();
                                     medias_pin = new ArrayList<>();
                                     medias_pin.add(audio_download);
+                                    notify = true;
                                     sendMessage(fUser.getUid(), userId, text_send.getText().toString());
                                     Log.d(TAG, "OK UPLOAD");
                                 });
@@ -507,7 +431,7 @@ public class MessageActivity extends AppCompatActivity {
                     timer.cancel();
 
                 recordTimeText.setText("00:00");
-                Methods.vibrate(this, Methods.VIBRATE_SHORT);
+                Methods.vibrate(this, Methods.VIBRATE_LONG);
             } else {
                 recordPanel.setVisibility(View.GONE);
                 container_edit_text.setVisibility(View.VISIBLE);
@@ -519,7 +443,7 @@ public class MessageActivity extends AppCompatActivity {
                     timer.cancel();
 
                 recordTimeText.setText("00:00");
-                Methods.vibrate(this, Methods.VIBRATE_SHORT);
+                Methods.vibrate(this, Methods.VIBRATE_LONG);
             }
         }catch (Exception ex){
             Log.d(TAG, ex.toString());
@@ -562,22 +486,45 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void checkChatList(final String userId) {
-        reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE).child(fUser.getUid());
-        reference.addValueEventListener(new ValueEventListener() {
+        reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE).child(fUser.getUid())
+        .child(userId);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
                 if(instance != null && !instance.isFinishing() && !instance.isDestroyed()){
-                    for(DataSnapshot snapshot : datasnapshot.getChildren()){
-                    Chatslist chatList = snapshot.getValue(Chatslist.class);
-                    if(chatList != null)
-                    if(chatList.getId().equals(userId)){
-                        if(chatList.getChat_id() != null)
-                            if(!chatList.getChat_id().equals(EncryptHelper.decrypt(chat_id))) {
-                                Log.d(TAG, chatList.getChat_id());
-                                UpdateChat_Id(chatList.getChat_id());
+                    Chatslist chatList = datasnapshot.getValue(Chatslist.class);
+                    if(chatList != null){
+                        if(chatList.getId().equals(userId)){
+                            if(chatList.getChat_id() != null){
+                                if(!chatList.getChat_id().equals(EncryptHelper.decrypt(chat_id))) {
+                                    Log.d(TAG, chatList.getChat_id());
+                                    UpdateChat_Id(chatList.getChat_id());
+                                }
                             }
+                        }
+                    }else{
+                        reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE).child(userId)
+                                .child(fUser.getUid());
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
+                                if(instance != null && !instance.isFinishing() && !instance.isDestroyed()){
+                                    Chatslist chatList = datasnapshot.getValue(Chatslist.class);
+                                    if(chatList != null)
+                                        if(chatList.getId().equals(fUser.getUid())){
+                                            if(chatList.getChat_id() != null){
+                                                if(!chatList.getChat_id().equals(EncryptHelper.decrypt(chat_id))) {
+                                                    Log.d(TAG, chatList.getChat_id());
+                                                    UpdateChat_Id(chatList.getChat_id());
+                                                }
+                                            }
+                                        }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+                        });
                     }
-                }
                 }
             }
             @Override
@@ -601,10 +548,10 @@ public class MessageActivity extends AppCompatActivity {
 
     void CheckShared() {
         Bundle bundle = getIntent().getExtras();
-        if(bundle.getInt("shared") == MainActivity.SHARED_ID){
-            int shared_type = bundle.getInt("shared_type");
+        if(bundle.getInt(SHARE_ID) == MainActivity.SHARED_ID){
+            int shared_type = bundle.getInt(MainActivity.SHARED_TYPE_TAG);
             if(shared_type == MainActivity.SHARED_PLAIN_TEXT)
-                text_send.setText(bundle.getString("shared_content"));
+                text_send.setText(bundle.getString(MainActivity.SHARED_CONTENT_TAG));
             else if(shared_type == MainActivity.SHARED_IMAGE){
                 ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
             }
@@ -629,7 +576,6 @@ public class MessageActivity extends AppCompatActivity {
         txt_isOnline_chat = findViewById(R.id.txt_isOnline_chat);
         btn_rec_audio = findViewById(R.id.container_btn_rec_audio);
         reply_layout = findViewById(R.id.reply_layout);
-        btn_scroll_down_chat = findViewById(R.id.btn_scroll_down_chat);
         background_chat = findViewById(R.id.background_chat);
         container_edit_text = findViewById(R.id.container_edit_text_chat);
         txtQuotedMsg = findViewById(R.id.txtQuotedMsg);
@@ -637,7 +583,6 @@ public class MessageActivity extends AppCompatActivity {
         text_send = findViewById(R.id.text_send);
         btn_send = findViewById(R.id.container_btn_send);
         btn_send.setElevation(0);
-        findViewById(R.id.card_scroll_down).setElevation(0);
         recycler_view_msg.setHasFixedSize(true);
         recycler_view_msg.setItemViewCacheSize(20);
         recycler_view_msg.setDrawingCacheEnabled(true);
@@ -648,28 +593,6 @@ public class MessageActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.black_intro));
         recordPanel.setVisibility(View.GONE);
         container_edit_text.setVisibility(View.VISIBLE);
-
-        btn_scroll_down_chat.setOnClickListener(v -> {
-            recycler_view_msg.smoothScrollToPosition(recycler_view_msg.getBottom());
-        });
-
-        recycler_view_msg.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if(!scroll_base_down && !can_state_scroll_base_down){
-                    Log.d("MESSAGE_END_TEST", newState + "");
-                    if(recyclerView.canScrollVertically(1)) btn_scroll_down_chat.setVisibility(View.VISIBLE);
-
-                    if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        btn_scroll_down_chat.startAnimation(AnimationUtils.loadAnimation(MessageActivity.this, R.anim.slide_right));
-                        btn_scroll_down_chat.setVisibility(View.GONE);
-                    }
-                }
-            }
-        });
-
-        new Handler().postDelayed(() -> can_state_scroll_base_down = false, 100);
     }
 
     static void seenMessage(String userUid){
@@ -686,7 +609,7 @@ public class MessageActivity extends AppCompatActivity {
                             if(message.getReceiver() != null)
                                 if(message.getReceiver().equals(fUser.getUid()) && message.getSender().equals(userUid)){
                                     HashMap<String, Object> hashMap = new HashMap<>();
-                                    hashMap.put("isSeen", 1);
+                                    hashMap.put(DtoMessage.IS_SEEN, 1);
                                     snapshot.getRef().updateChildren(hashMap);
                                 }
                     }
@@ -701,7 +624,7 @@ public class MessageActivity extends AppCompatActivity {
 
     static SimpleDateFormat df_time;
     static SimpleDateFormat df_time_id;
-    DatabaseReference reference_message;
+    static DatabaseReference reference_message;
     @SuppressLint("SimpleDateFormat")
     void sendMessage(String sender, String receiver, String message){
         c = Calendar.getInstance();
@@ -716,30 +639,30 @@ public class MessageActivity extends AppCompatActivity {
         final DtoMessage new_message = new DtoMessage();
 
         final HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("sender", sender);
-        hashMap.put("receiver", receiver);
-        hashMap.put("id_msg", id_msg);
+        hashMap.put(DtoMessage.SENDER, sender);
+        hashMap.put(DtoMessage.RECEIVER, receiver);
+        hashMap.put(DtoMessage.ID_MSG, id_msg);
         new_message.setId_msg(id_msg);
         new_message.setSender(sender);
         new_message.setReceiver(receiver);
-        if(message_to_reply != null && message_to_reply.length() > 0){
-            hashMap.put("reply_from", reply_from);
-            hashMap.put("reply_content", EncryptHelper.encrypt(message_to_reply));
+        if(message_to_reply != null && message_to_reply.length() > 0) {
+            hashMap.put(DtoMessage.REPLY_FROM, reply_from);
+            hashMap.put(DtoMessage.REPLY_CONTENT, EncryptHelper.encrypt(message_to_reply));
             new_message.setReply_from(reply_from);
             new_message.setReply_content(EncryptHelper.encrypt(message_to_reply));
         }
         else{
-            hashMap.put("reply_from", "noOne");
-            hashMap.put("reply_content", "empty");
-            new_message.setReply_from("noOne");
-            new_message.setReply_content("empty");
+            hashMap.put(DtoMessage.REPLY_FROM, DtoMessage.NO_ONE);
+            hashMap.put(DtoMessage.REPLY_CONTENT, DtoMessage.EMPTY);
+            new_message.setReply_from(DtoMessage.NO_ONE);
+            new_message.setReply_content(DtoMessage.EMPTY);
         }
-        hashMap.put("message", EncryptHelper.encrypt(message));
-        hashMap.put("isSeen", 0);
-        hashMap.put("time", EncryptHelper.encrypt(formattedDate));
-        hashMap.put("media", medias_pin);
+        hashMap.put(DtoMessage.MESSAGE, EncryptHelper.encrypt(message));
+        hashMap.put(DtoMessage.IS_SEEN, DtoMessage.NOT_SEEN);
+        hashMap.put(DtoMessage.TIME, EncryptHelper.encrypt(formattedDate));
+        hashMap.put(DtoMessage.MEDIA, medias_pin);
         new_message.setMessage(EncryptHelper.encrypt(message));
-        new_message.setIsSeen(0);
+        new_message.setIsSeen(DtoMessage.NOT_SEEN);
         new_message.setTime(EncryptHelper.encrypt(formattedDate));
         new_message.setMedia(medias_pin);
 
@@ -750,11 +673,11 @@ public class MessageActivity extends AppCompatActivity {
         chatDB.UPDATE_A_CHAT(user_im_chat, 1);
 
         //  add User to chat fragment
-        final DatabaseReference chatRef = myFirebaseHelper.getFirebaseDatabase().getReference("Chatslist")
+        final DatabaseReference chatRef = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE)
                 .child(fUser.getUid())
                 .child(userId);
 
-        final DatabaseReference chatRefANOTHER_USER = myFirebaseHelper.getFirebaseDatabase().getReference("Chatslist")
+        final DatabaseReference chatRefANOTHER_USER = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE)
                 .child(userId)
                 .child(fUser.getUid());
 
@@ -763,7 +686,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 if(!snapshot.exists()){
                     chatRef.child("id").setValue(userId);
-                    chatRef.child("chat_id").setValue(chat_id);
+                    chatRef.child(DtoMessage.CHAT_ID).setValue(chat_id);
                 }
             }
             @Override
@@ -774,7 +697,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 if(!snapshot.exists()){
                     chatRefANOTHER_USER.child("id").setValue(fUser.getUid());
-                    chatRefANOTHER_USER.child("chat_id").setValue(chat_id);
+                    chatRefANOTHER_USER.child(DtoMessage.CHAT_ID).setValue(chat_id);
                 }
             }
             @Override
@@ -783,7 +706,8 @@ public class MessageActivity extends AppCompatActivity {
 
         if(medias_pin != null && medias_pin.size() > 0){
             String extension = medias_pin.get(0).substring(medias_pin.get(0).lastIndexOf("."));
-            if(extension.startsWith(".3gp")) message = getString(R.string.audio);
+            if(extension.startsWith(".3gp")) message = getString(R.string.audio) + " (" + AudioCurrentTime + ")";
+            else message = getString(R.string.media);
             medias_pin.clear();
         }
 
@@ -791,19 +715,6 @@ public class MessageActivity extends AppCompatActivity {
         notify = false;
 
         text_send.setText("");
-        /*reference = FirebaseDatabase.getInstance().getReference("Users").child(fUser.getUid());
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                DtoAccount account = snapshot.getValue(DtoAccount.class);
-                //if(account != null)
-                //if(notify) sendNotification(receiver, account.getUsername(), msg, EncryptHelper.decrypt(chat_id));
-                notify = false;
-            }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });*/
 
         try {
             ChatsFragment.getInstance().chatList();
@@ -811,14 +722,7 @@ public class MessageActivity extends AppCompatActivity {
             Log.d(TAG, "Cant load list");
         }
         recycler_view_msg.smoothScrollToPosition(recycler_view_msg.getBottom());
-        btn_scroll_down_chat.setVisibility(View.GONE);
         hideReplayLayout();
-    }
-
-    private void currentUser(String userId){
-        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = getSharedPreferences( MyPrefs.PREFS_NOTIFICATION, MODE_PRIVATE).edit();
-        editor.putString("currentUser", userId);
-        editor.apply();
     }
 
     private void sendNotification(String receiver, String username, String message, String chat_id){
@@ -858,7 +762,7 @@ public class MessageActivity extends AppCompatActivity {
     public static void UpdateChat_Id(String id){
         chat_id = id;
         readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
-        new Handler().postDelayed(() -> readMessage(fUser.getUid(), userId, user_im_chat.getImageURL()), 500);
+        //new Handler().postDelayed(() -> readMessage(fUser.getUid(), userId, user_im_chat.getImageURL()), 500);
     }
 
     static boolean can_animate = true;
@@ -937,30 +841,11 @@ public class MessageActivity extends AppCompatActivity {
             LocalMessages.addAll(chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)));
 
             recycler_view_msg.setItemAnimator(null);
-            messageAdapter = new MessageAdapter(instance, LocalMessages, imageURl, can_animate, recycler_view_msg,
+            messageAdapter = new MessageAdapter(instance, LocalMessages, imageURl, recycler_view_msg,
                     MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername(), chat_id);
             messageAdapter.setHasStableIds(true);
             recycler_view_msg.setAdapter(messageAdapter);
             if(recyclerViewState != null && recycler_view_msg.getLayoutManager() != null) recycler_view_msg.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-
-            if (isRecyclerScrollable()) {
-                btn_scroll_down_chat.setVisibility(View.VISIBLE);
-            }else btn_scroll_down_chat.setVisibility(View.GONE);
-        }
-    }
-
-    static boolean scroll_base_down = true;
-    static boolean can_state_scroll_base_down = true;
-    public static boolean isRecyclerScrollable() {
-        if(!scroll_base_down && !can_state_scroll_base_down){
-            LinearLayoutManager layoutManager = (LinearLayoutManager) recycler_view_msg.getLayoutManager();
-            //noinspection rawtypes
-            RecyclerView.Adapter adapter = recycler_view_msg.getAdapter();
-            if (layoutManager == null || adapter == null) return false;
-            return layoutManager.findLastCompletelyVisibleItemPosition() < adapter.getItemCount() - 1;
-        }else {
-            scroll_base_down = false;
-            return false;
         }
     }
 
@@ -1011,7 +896,7 @@ public class MessageActivity extends AppCompatActivity {
         if(text_send.getText() != null && text_send.getText().toString().length() > 0 ){
             btn_rec_audio.setVisibility(View.GONE);
             btn_send.setVisibility(View.VISIBLE);
-        }else{
+        }else {
             if(btn_send.getVisibility() != CardView.GONE)
                 btn_send.startAnimation(AnimationUtils.loadAnimation(MessageActivity.this ,R.anim.slide_donw));
             btn_send.setVisibility(View.GONE);
@@ -1159,6 +1044,7 @@ public class MessageActivity extends AppCompatActivity {
                         Uri downloadUri = task.getResult();
                         medias_pin = new ArrayList<>();
                         medias_pin.add(downloadUri.toString());
+                        notify = true;
                         sendMessage(fUser.getUid(), userId, text_send.getText().toString());
 
                     } else {
@@ -1212,7 +1098,7 @@ public class MessageActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Methods.status_chat(Methods.ONLINE, this);
-        currentUser(userId);
+        MyPrefs.currentUser(this, userId);
     }
 
     @Override
@@ -1223,14 +1109,9 @@ public class MessageActivity extends AppCompatActivity {
         }catch (Exception ex){
             Log.d(TAG, ex.toString());
         }
-        try {
-            MainActivity instance = MainActivity.getInstance();
-            if(instance == null) Methods.status_chat(Methods.OFFLINE, this);
-        }catch (Exception ex){
-            Methods.status_chat(Methods.OFFLINE, this);
-        }
+        Methods.status_chat(Methods.OFFLINE, this);
         Methods.typingTo_chat_Status(Methods.NO_ONE);
-        currentUser("none");
+        MyPrefs.currentUser(this, MyPrefs.NONE_USER);
     }
 
     @Override

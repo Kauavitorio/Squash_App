@@ -44,7 +44,7 @@
     <string name="the_validation_code_is_invalid">The validation code is invalid.</string>
     <string name="unable_to_login">We were unable to log into your account due to your email being pending.</string>
     <string name="account_will_not_be_validated_leave">If you leave this page your account will not be validated and you will not be able to login.\nReally want to leave?</string>
-    <string name="phone_email_or_username">Phone, email or username.</string>
+    <string name="email_or_username">E-mail or username.</string>
     <string name="login_to_squash">Log in to Squash.</string>
     <string name="forgot_your_password">Forgot your password?</string>
     <string name="login_or_password_invalid">Login or password invalid.</string>
@@ -225,4 +225,7 @@
     <string name="notifications">Notifications</string>
     <string name="search">Search</string>
     <string name="new_post">New Post</string>
+    <string name="squash_profile">Squash Profile</string>
+    <string name="delete_this_conversation">Delete this conversation</string>
+    <string name="do_you_really_want_to_delete_this_conversation">Do you really want to delete this conversation from your list? Messages will not be deleted.</string>
 </resources>

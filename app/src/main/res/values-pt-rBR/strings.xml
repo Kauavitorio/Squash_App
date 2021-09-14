@@ -40,7 +40,7 @@
     <string name="the_validation_code_is_invalid">O código de validação é inválido.</string>
     <string name="unable_to_login">Não foi possível entrar na sua conta, devido à pendência de validação do seu email.</string>
     <string name="account_will_not_be_validated_leave">Se você sair desta página, sua conta não será validada e você não poderá fazer o login.\nQuer mesmo sair?</string>
-    <string name="phone_email_or_username">Telefone, e-mail ou nome de usuário.</string>
+    <string name="email_or_username">E-mail ou nome de usuário.</string>
     <string name="login_to_squash">Entrar no Squash.</string>
     <string name="forgot_your_password">Esqueceu sua senha?</string>
     <string name="login_or_password_invalid">Login ou senha inválidos.</string>
@@ -215,4 +215,7 @@
     <string name="notifications">Notificações</string>
     <string name="search">Pesquisa</string>
     <string name="new_post">Nova postagem</string>
+    <string name="squash_profile">Perfil Squash</string>
+    <string name="delete_this_conversation">Excluir esta conversa</string>
+    <string name="do_you_really_want_to_delete_this_conversation">Deseja realmente excluir essa conversa de sua lista? As mensagens não seram deletadas.</string>
 </resources>

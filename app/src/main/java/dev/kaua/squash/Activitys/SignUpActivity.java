@@ -115,6 +115,7 @@ public class SignUpActivity extends AppCompatActivity {
             edit_phone.setText(bundle.getString("phone_user"));
             edit_bornDate.setText(bundle.getString("date_birth"));
             edit_password.setText(bundle.getString("password"));
+            age_user = bundle.getInt("age");
         }
 
         //  Creating Calendar
@@ -325,7 +326,7 @@ public class SignUpActivity extends AppCompatActivity {
     //  Method to get last version of Privacy Policy
     private void Privacy_PolicyCheck(){
         if(ConnectionHelper.isOnline(SignUpActivity.this)){
-            reference = FirebaseDatabase.getInstance().getReference("System");
+            reference = myFirebaseHelper.getFirebaseDatabase().getReference("System");
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -369,6 +370,7 @@ public class SignUpActivity extends AppCompatActivity {
         goTo_SignUp.putExtra("phone_user", Objects.requireNonNull(edit_phone.getText()).toString());
         goTo_SignUp.putExtra("date_birth", Objects.requireNonNull(edit_bornDate.getText()).toString());
         goTo_SignUp.putExtra("password", Objects.requireNonNull(edit_password.getText()).toString());
+        goTo_SignUp.putExtra("age", age_user);
         ActivityCompat.startActivity(this, goTo_SignUp, activityOptionsCompat.toBundle());
         finish();
     }

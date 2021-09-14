@@ -124,4 +124,17 @@ public abstract class MyPrefs {
         sp = context.getSharedPreferences(PREFS_TERMS, MODE_PRIVATE);
         sp.edit().clear().apply();
     }
+
+    public static final String NONE_USER = "none";
+    public static final String CURRENT_USER = "currentUser";
+    public static void currentUser(Context context, String userId){
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = context.getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE).edit();
+        editor.putString(CURRENT_USER, userId);
+        editor.apply();
+    }
+
+    public static String getCurrentUser(Context context){
+        sp = context.getSharedPreferences(MyPrefs.PREFS_NOTIFICATION, MODE_PRIVATE);
+        return sp.getString(CURRENT_USER, NONE_USER);
+    }
 }

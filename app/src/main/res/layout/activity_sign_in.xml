@@ -34,20 +34,19 @@
             android:id="@+id/container_input_signIn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_marginTop="20dp"
-            android:padding="20dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/container_signin">
+            android:background="@drawable/container_signin"
+            android:padding="20dp">
 
             <!-- Img Arrow -->
             <ImageView
                 android:id="@+id/btn_back_signIn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_arrow_back_black"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
+                android:src="@drawable/ic_arrow_back_black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -82,7 +81,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/hint"
-                    android:hint="@string/phone_email_or_username"
+                    android:hint="@string/email_or_username"
                     android:inputType="text"
                     android:minHeight="50dp"
                     android:textColor="@color/hint"
@@ -96,12 +95,12 @@
                 android:id="@+id/edit_ls_password_signIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/edit_ls_login_method_signIn"
                 android:layout_marginTop="10dp"
                 android:maxWidth="320dp"
                 android:minWidth="320dp"
                 app:hintEnabled="true"
-                app:passwordToggleEnabled="true"
-                android:layout_below="@id/edit_ls_login_method_signIn">
+                app:passwordToggleEnabled="true">
 
                 <!-- Edit Text -->
                 <com.google.android.material.textfield.TextInputEditText
@@ -109,11 +108,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/hint"
-                    android:textColorHint="@color/hint"
-                    android:textColor="@color/hint"
                     android:hint="@string/password"
                     android:inputType="textPassword"
                     android:minHeight="50dp"
+                    android:textColor="@color/hint"
+                    android:textColorHint="@color/hint"
                     android:textSize="18sp" />
 
             </com.google.android.material.textfield.TextInputLayout>

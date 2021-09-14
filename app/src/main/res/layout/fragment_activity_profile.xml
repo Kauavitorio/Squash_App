@@ -81,10 +81,10 @@
                     <!-- Img User Story -->
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/ic_ProfileUser_profile"
-                        android:layout_width="63dp"
+                        android:layout_width="83dp"
                         android:layout_height="63dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_profile_default"
+                        tools:src="@drawable/ic_profile_default"
                         app:civ_border_color="@color/base_color"
                         app:civ_border_width="1dp"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -188,6 +188,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
+                            android:textAlignment="center"
                             android:text="@string/posts"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
@@ -224,6 +225,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:text="@string/followers"
+                            android:textAlignment="center"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
 
@@ -259,6 +261,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/following"
+                            android:textAlignment="center"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
 

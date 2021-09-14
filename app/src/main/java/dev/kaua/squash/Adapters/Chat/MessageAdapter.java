@@ -39,7 +39,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -79,7 +78,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private final String myUsername;
     private final String chat_id;
     FirebaseStorage firebaseStorage;
-    private final boolean can_animate;
     private RecyclerView recycler_view_msg;
     private MediaPlayer mediaPlayer;
     private Handler handler = new Handler();
@@ -89,18 +87,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private static int LayoutType;
     FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
 
-    public MessageAdapter(MessageActivity mContext, List<DtoMessage> mMessages, String imageURL, boolean can_animate, RecyclerView recycler_view_msg
+    public MessageAdapter(MessageActivity mContext, List<DtoMessage> mMessages, String imageURL, RecyclerView recycler_view_msg
     , String myUsername, String chat_Username, String chat_id){
         this.mContext = mContext;
         MessageAdapter.mMessages = mMessages;
         this.imageURL = imageURL;
         this.chat_Username = chat_Username;
         this.myUsername = myUsername;
-        this.can_animate = can_animate;
         this.recycler_view_msg = recycler_view_msg;
         this.chat_id = chat_id;
         this.daoChat = new DaoChat(mContext);
-        myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
+        myAnim = AnimationUtils.loadAnimation(mContext, R.anim.click_anim);
         checkMessagesSize();
     }
 
@@ -160,7 +157,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                         return false;
                     }));
 
-                    if(message.getReply_from() != null && !message.getReply_from().equals("noOne") && !message.getReply_content().equals("empty")){
+                    if(message.getReply_from() != null && !message.getReply_from().equals(DtoMessage.NO_ONE) && !message.getReply_content().equals(DtoMessage.EMPTY)){
                         viewHolder.container_reply.setVisibility(View.VISIBLE);
                         if(fUser.getUid().equals(message.getReply_from()))
                             viewHolder.txt_reply_from.setText(mContext.getString(R.string.reply_to) + " " + myUsername);
@@ -170,7 +167,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                         viewHolder.reply_content.setText(EncryptHelper.decrypt(message.getReply_content()));
 
                         viewHolder.container_reply.setOnClickListener(v -> {
-                            recycler_view_msg.scrollToPosition(41);
                             viewHolder.container_reply.startAnimation(myAnim);
                             String current_message = EncryptHelper.decrypt(message.getReply_content());
                             for (int i = 0; i < mMessages.size(); i++){
@@ -195,7 +191,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 }
 
                 if(LayoutType == MSG_TYPE_LEFT_MEDIA || LayoutType == MSG_TYPE_RIGHT_MEDIA){
-                    viewHolder.container_msg.setVisibility(View.VISIBLE);
+                    if(viewHolder.container_msg != null
+                    ) viewHolder.container_msg.setVisibility(View.VISIBLE);
                     viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
                     viewHolder.media_img.setVisibility(View.VISIBLE);
                     Glide.with(context).load(message.getMedia().get(0)).dontAnimate().diskCacheStrategy(DiskCacheStrategy.ALL).thumbnail(0.5f).into(holder.media_img);
@@ -308,7 +305,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 viewHolder.message_container.setPadding(2, 2, 20, 2);
                 if(position == mMessages.size() - 1){
                     DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-                    Query seen_last = ref.child(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(message.getId_msg());
+                    Query seen_last = ref.child(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).orderByChild(DtoMessage.ID_MSG).equalTo(message.getId_msg());
                     seen_last.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -316,7 +313,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
                                     DtoMessage finalMessage = appleSnapshot.getValue(DtoMessage.class);
                                     if(finalMessage != null && finalMessage.getId_msg() != null){
-                                        if (finalMessage.getIsSeen() == 1) viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_seen));
+                                        if (finalMessage.getIsSeen() == DtoMessage.SEEN) viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_seen));
                                         else viewHolder.img_seen.setImageDrawable(context.getDrawable(R.drawable.ic_delivered));
                                     }
                                 }
@@ -372,7 +369,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     (dialog, which) -> {
                         if(ConnectionHelper.isOnline(mContext)){
                             DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-                            Query applesQuery = ref.child(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).orderByChild("id_msg").equalTo(id_msg);
+                            Query applesQuery = ref.child(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).orderByChild(DtoMessage.ID_MSG).equalTo(id_msg);
 
                             applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override

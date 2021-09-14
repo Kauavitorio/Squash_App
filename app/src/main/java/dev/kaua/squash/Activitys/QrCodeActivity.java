@@ -12,8 +12,10 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,14 +24,21 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import net.glxn.qrgen.android.QRCode;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.charset.StandardCharsets;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Adapters.CaptureAct;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
@@ -49,7 +58,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class QrCodeActivity extends AppCompatActivity {
+    public static final String PROFILE_IMAGE_TAG = "image_profile";
+    public static final String PROFILE_NAME_TAG = "name_user";
+    public static final String PROFILE_USERNAME_TAG = "username";
+    public static final String PROFILE_ID_TAG = "account_id";
     private ImageView btn_close, img_qr_code;
+    private CircleImageView ic_qrCode_Profile;
     private TextView qr_code_username;
     private CardView btn_scan_qr;
     private Animation myAnim;
@@ -67,43 +81,60 @@ public class QrCodeActivity extends AppCompatActivity {
         Ids();
 
         Bundle bundle = getIntent().getExtras();
-        account.setProfile_image(bundle.getString("image_profile"));
-        account.setName_user(bundle.getString("name_user"));
-        account.setUsername(bundle.getString("username"));
-        account.setAccount_id(bundle.getLong("account_id"));
-        LoadQrCode();
+        if(bundle != null){
+            account.setProfile_image(bundle.getString(PROFILE_IMAGE_TAG));
+            account.setName_user(bundle.getString(PROFILE_NAME_TAG));
+            account.setUsername(bundle.getString(PROFILE_USERNAME_TAG));
+            account.setAccount_id(bundle.getLong(PROFILE_ID_TAG));
+            LoadQrCode();
 
+            btn_close.setOnClickListener(v -> {
+                btn_close.startAnimation(myAnim);
+                finish();
+            });
 
-        btn_close.setOnClickListener(v -> {
-            btn_close.startAnimation(myAnim);
-            finish();
-        });
-
-        btn_scan_qr.setOnClickListener(v -> {
-            btn_scan_qr.startAnimation(myAnim);
-            UserPermissions.validatePermissions(permissions, this, OPEN_CAMERA);
-            int GalleryPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-            if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
-                IntentIntegrator integrator = new IntentIntegrator(this);
-                integrator.setCaptureActivity(CaptureAct.class);
-                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
-                integrator.setBarcodeImageEnabled(true);
-                integrator.setOrientationLocked(false);
-                integrator.setBeepEnabled(false);
-                integrator.setCameraId(0);  // Use a specific camera of the device
-                integrator.setPrompt(getString(R.string.scan_qr_code));
-                integrator.initiateScan();
-            }
-        });
+            btn_scan_qr.setOnClickListener(v -> {
+                btn_scan_qr.startAnimation(myAnim);
+                UserPermissions.validatePermissions(permissions, this, OPEN_CAMERA);
+                int GalleryPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+                if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
+                    IntentIntegrator integrator = new IntentIntegrator(this);
+                    integrator.setCaptureActivity(CaptureAct.class);
+                    integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+                    integrator.setBarcodeImageEnabled(true);
+                    integrator.setOrientationLocked(false);
+                    integrator.setBeepEnabled(false);
+                    integrator.setCameraId(0);  // Use a specific camera of the device
+                    integrator.setPrompt(getString(R.string.scan_qr_code));
+                    integrator.initiateScan();
+                }
+            });
+        }else finish();
     }
 
     @SuppressLint("SetTextI18n")
     private void LoadQrCode() {
         if(ConnectionHelper.isOnline(this)){
-            Bitmap myBitmap = QRCode.from(Methods.BASE_URL_HTTPS + account.getUsername() + "/profile" + "?access=" + MOBILE_URL_INFO + "&?request="
-                    + Methods.RandomCharactersWithoutSpecials(10) + "_" + account.getAccount_id())
-                    .withHint(EncodeHintType.CHARACTER_SET, "UTF-8").bitmap();
-            img_qr_code.setImageBitmap(myBitmap);
+            Glide.with(this).load(account.getProfile_image()).into(ic_qrCode_Profile);
+
+            //  Generate QrCode
+            Bitmap QRBitmap = QRCode.from(Methods.BASE_URL_HTTPS + account.getUsername() + "/p" + "?acc="
+                    + MOBILE_URL_INFO + "&?r="
+                    + Methods.shuffle(String.valueOf(account.getAccount_id())))
+                    .withSize(250, 250)
+                    .withErrorCorrection(ErrorCorrectionLevel.L)
+                    .withHint(EncodeHintType.CHARACTER_SET, StandardCharsets.UTF_8).bitmap();
+
+            //  Loading App Logo
+            Glide.with(this).asBitmap().load(R.mipmap.ic_launcher)
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            img_qr_code.setImageBitmap(Methods.mergeBitmaps(resource, QRBitmap));
+                        }
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {}
+                    });
             qr_code_username.setText("@" + account.getUsername());
         }else{
             finish();
@@ -112,9 +143,10 @@ public class QrCodeActivity extends AppCompatActivity {
     }
 
     void Ids(){
-        myAnim = AnimationUtils.loadAnimation(this,R.anim.click_anim);
+        myAnim = AnimationUtils.loadAnimation(this, R.anim.click_anim);
         btn_close = findViewById(R.id.btn_close_qr_code);
         img_qr_code = findViewById(R.id.img_qr_code);
+        ic_qrCode_Profile = findViewById(R.id.ic_qrCode_Profile);
         qr_code_username = findViewById(R.id.qr_code_username);
         btn_scan_qr = findViewById(R.id.btn_scan_qr);
 
@@ -131,10 +163,9 @@ public class QrCodeActivity extends AppCompatActivity {
                 WindowManager.LayoutParams lp = getWindow().getAttributes();
                 lp.screenBrightness = 255/(float)255;
                 getWindow().setAttributes(lp);
-            }
-            catch(Settings.SettingNotFoundException e){
+            } catch(Settings.SettingNotFoundException e){
                 Log.e(TAG, "Cannot access system brightness");
-                e.printStackTrace();
+                Log.e(TAG, "Error -> " + e.toString());
             }
         } else Warnings.Sheet_Setting_Permissions(this);
     }
