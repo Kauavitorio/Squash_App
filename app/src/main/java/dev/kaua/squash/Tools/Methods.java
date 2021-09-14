@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -30,7 +31,6 @@ import androidx.core.app.ActivityOptionsCompat;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +60,10 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import okhttp3.CipherSuite;
+import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
+import okhttp3.TlsVersion;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -78,6 +80,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public abstract class Methods extends MainActivity {
 
     //  Base API URL
+    private static final String TAG = "METHODS_LOG";
     public static final String BASE_URL_HTTPS = "https://squash-social.herokuapp.com/";
     public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
@@ -128,7 +131,17 @@ public abstract class Methods extends MainActivity {
     }
 
     //  Method to return Default Retrofit Builder
+
+    static final ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+            .tlsVersions(TlsVersion.TLS_1_2)
+            .cipherSuites(
+                    CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+                    CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+                    CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256)
+            .build();
+
     static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectionSpecs(Collections.singletonList(spec))
             .connectTimeout(25, TimeUnit.SECONDS)
             .writeTimeout(25, TimeUnit.SECONDS)
             .readTimeout(35, TimeUnit.SECONDS).build();
@@ -165,12 +178,11 @@ public abstract class Methods extends MainActivity {
     }
 
     public static void LoadFollowersAndFollowing(@NonNull Context context, final int base){
-        SharedPreferences sp_First = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
         if(base == 0){
-            AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))), AsyncLikes_Posts.NOT_NOTIFY);
+            AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , MyPrefs.getUserInformation(context).getAccount_id(), AsyncLikes_Posts.NOT_NOTIFY);
             //noinspection unchecked
             async.execute();
-            AsyncLikes_Posts_Comment posts_comment = new AsyncLikes_Posts_Comment((Activity) context , Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)))));
+            AsyncLikes_Posts_Comment posts_comment = new AsyncLikes_Posts_Comment((Activity) context , MyPrefs.getUserInformation(context).getAccount_id());
             //noinspection unchecked
             posts_comment.execute();
         }
@@ -178,19 +190,18 @@ public abstract class Methods extends MainActivity {
         if(base != 999){
             final Retrofit retrofitUser = GetRetrofitBuilder();
             SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-            DtoAccount account = new DtoAccount();
+            final DtoAccount account = new DtoAccount();
             account.setAccount_id_cry(sp.getString("pref_account_id", null));
             AccountServices services = retrofitUser.create(AccountServices.class);
             Call<DtoAccount> call = services.get_followers_following(account);
             call.enqueue(new Callback<DtoAccount>() {
                 @Override
                 public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                    if(response.code() == 200){
-                        DtoAccount info = new DtoAccount();
-                        String id = EncryptHelper.decrypt(sp.getString("pref_account_id", null));
-                        if(id != null){
-                            info.setAccount_id(Long.parseLong(id));
-                            assert response.body() != null;
+                    if(response.code() == 200 && response.body() != null){
+                        final DtoAccount info = new DtoAccount();
+                        final long id = MyPrefs.getUserInformation(context).getAccount_id();
+                        if(id > DtoAccount.ACCOUNT_DISABLE){
+                            info.setAccount_id(id);
                             info.setFollowers(response.body().getFollowers());
                             info.setFollowing(response.body().getFollowing());
                             DaoAccount daoAccount = new DaoAccount(context);
@@ -269,9 +280,9 @@ public abstract class Methods extends MainActivity {
         //noinspection ConstantConditions
         if(firebaseUser != null && firebaseUser.getUid() != null){
             reference = null;
-            reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
-            HashMap<String, Object> hashMap = new HashMap<>();
-            if(status.equals("offline"))
+            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(firebaseUser.getUid());
+            final HashMap<String, Object> hashMap = new HashMap<>();
+            if(status.equals(OFFLINE))
                 hashMap.put("last_seen", formattedDate);
             hashMap.put("status_chat", status);
             hashMap.put("verification_level", EncryptHelper.encrypt(MyPrefs.getUserInformation(context).getVerification_level()));
@@ -361,14 +372,33 @@ public abstract class Methods extends MainActivity {
         return t.toString();
     }
 
+    public static Bitmap mergeBitmaps(final Bitmap logo, final Bitmap qrcode) {
+        final Bitmap combined = Bitmap.createBitmap(qrcode.getWidth(), qrcode.getHeight(), qrcode.getConfig());
+        final Canvas canvas = new Canvas(combined);
+        final int canvasWidth = canvas.getWidth();
+        final int canvasHeight = canvas.getHeight();
+        canvas.drawBitmap(qrcode, new Matrix(), null);
+
+        Bitmap resizeLogo = Bitmap.createScaledBitmap(logo, canvasWidth / 5, canvasHeight / 5, true);
+        final int centreX = (canvasWidth - resizeLogo.getWidth()) /2;
+        final int centreY = (canvasHeight - resizeLogo.getHeight()) / 2;
+        canvas.drawBitmap(resizeLogo, centreX, centreY, null);
+        return combined;
+    }
+
     private static String showTimeAgo(myTimeHelper now, String goal, Context context) {
-        myTimeHelper desired = myTimeHelper.parse(goal);
-        myTimeHelper lack = desired.difference(now);
-        String result =  lack + "";
-        String[] result_split = result.split(":");
-        if(result_split[0].equals("00")) result = result_split[1] + " " + context.getString(R.string.minutes_ago);
-        else if(Integer.parseInt(result_split[0]) > 1) result = result_split[0] + " " + context.getString(R.string.hours_ago);
-        else result = result_split[0].replace("0", "") + " " + context.getString(R.string.hour_ago);
+        String result = "";
+        try {
+            myTimeHelper desired = myTimeHelper.parse(goal);
+            myTimeHelper lack = desired.difference(now);
+            result = String.valueOf(lack);
+            String[] result_split = result.split(":");
+            if(result_split[0].equals("00")) result = result_split[1] + " " + context.getString(R.string.minutes_ago);
+            else if(Integer.parseInt(result_split[0]) > 1) result = result_split[0] + " " + context.getString(R.string.hours_ago);
+            else result = result_split[0].replace("0", "") + " " + context.getString(R.string.hour_ago);
+        }catch (Exception ex){
+            Log.d(TAG, ex.toString());
+        }
         return result;
     }
 
@@ -380,7 +410,7 @@ public abstract class Methods extends MainActivity {
             if(vibrator == null) vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(VIBRATE_TIME);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d(TAG, e.toString());
         }
     }
 

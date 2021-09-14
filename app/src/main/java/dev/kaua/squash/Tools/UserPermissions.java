@@ -18,11 +18,11 @@ public class UserPermissions {
 
         //  Checks permissions already granted
         for (String permission : permissions) {
-            boolean HavePermission = ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED;
+            final boolean HavePermission = ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED;
             if (!HavePermission)
                 PermissionList.add(permission);
         }
-        Log.d(TAG, "Request Permission List -> " + PermissionList);
+        Log.d(TAG, "Request Permission List -> " + PermissionList.toString());
         if (!PermissionList.isEmpty()){
             String[] PermissionsVector = new String[PermissionList.size()];
             PermissionList.toArray(PermissionsVector);

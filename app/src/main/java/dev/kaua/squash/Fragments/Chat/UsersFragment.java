@@ -142,7 +142,7 @@ public class UsersFragment extends Fragment {
                             finalList.add(accounts);
                         }
                 }
-                userChatAdapter = new UserChatAdapter(instance, finalList, false);
+                userChatAdapter = new UserChatAdapter(instance, finalList, false, UserChatAdapter.OFF_CHATS);
                 recycler_view_users.setAdapter(userChatAdapter);
             }
             if(finalList.size() > 0)

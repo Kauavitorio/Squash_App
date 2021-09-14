@@ -5,7 +5,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
-public interface    AccountServices {
+public interface AccountServices {
 
     @POST("user/register")
     Call<DtoAccount> registerUser (@Body DtoAccount account);
@@ -16,7 +16,7 @@ public interface    AccountServices {
     @POST("user/search/from/username")
     Call<DtoPost> search_with_username (@Body DtoAccount account);
 
-    @POST("user/login")
+    @POST("user/login-new")
     Call<DtoAccount> login (@Body DtoAccount account);
 
     @POST("user/info/user")

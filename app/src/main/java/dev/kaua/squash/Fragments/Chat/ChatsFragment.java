@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -96,7 +96,7 @@ public class ChatsFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(s != null && s.length() > 0)
-                searchUsers(s.toString().toLowerCase());
+                    searchUsers(s.toString().toLowerCase());
                 else{
                     base_reload = true;
                     chatList();
@@ -110,34 +110,14 @@ public class ChatsFragment extends Fragment {
     }
 
     private void searchUsers(String str) {
-        FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
-        Query query = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).orderByChild("search")
-                .startAt(str)
-                .endAt(str + "\uf8ff");
-
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                if(activity != null && !activity.isFinishing() && !activity.isDestroyed()){
-                    First_List_Accounts.clear();
-                    for (DataSnapshot snapshot : datasnapshot.getChildren()){
-                        DtoAccount account = snapshot.getValue(DtoAccount.class);
-                        assert account != null;
-                        if(!account.getId().equals(fUser.getUid())){
-                            for (int i = 0; i < ChatList_List.size(); i++){
-                                if(ChatList_List.get(i).getId().equals(account.getId())){
-                                    account.setChat_id(ChatList_List.get(i).getChat_id());
-                                    First_List_Accounts.add(account);
-                                }
-                            }
-                        }
-                    }
-                    LoadChatRecycler();
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
+        try {
+            First_List_Accounts.clear();
+            First_List_Accounts.addAll(chatDB.get_CHAT_BY_SEARCH(str));
+            userChatAdapter = new UserChatAdapter(getActivity(), First_List_Accounts, false, UserChatAdapter.CHATS);
+            recycler_myMsg.setAdapter(userChatAdapter);
+        }catch (Exception ex){
+            Log.d("CHAT_SEARCH", ex.toString());
+        }
     }
 
     private void Ids(View view) {
@@ -185,7 +165,8 @@ public class ChatsFragment extends Fragment {
                                 DtoAccount account = snapshot.getValue(DtoAccount.class);
                                 if(account != null && account.getId() != null && account.getName_user() != null && account.getName_user().length() > 0){
                                     for(Chatslist chatList : ChatList_List){
-                                        if(account.getId().equals(chatList.getId()) && chatList.getChat_id() != null){
+                                        if(account.getId().equals(chatList.getId()) && chatList.getChat_id() != null &&
+                                                !account.getId().equals(myFirebaseHelper.getFirebaseUser().getUid())){
                                             account.setChat_id(chatList.getChat_id());
                                             First_List_Accounts.add(account);
                                         }
@@ -231,7 +212,7 @@ public class ChatsFragment extends Fragment {
                 recycler_myMsg.setVisibility(View.GONE);
                 txt_not_start_conversation.setVisibility(View.VISIBLE);
             }
-            userChatAdapter = new UserChatAdapter(getActivity(), finalList, false);
+            userChatAdapter = new UserChatAdapter(getActivity(), finalList, false, UserChatAdapter.CHATS);
             if(recycler_myMsg.getItemAnimator() != null) ((SimpleItemAnimator) recycler_myMsg.getItemAnimator()).setSupportsChangeAnimations(false);
             recycler_myMsg.setAdapter(userChatAdapter);
             mAccountsBase.clear();

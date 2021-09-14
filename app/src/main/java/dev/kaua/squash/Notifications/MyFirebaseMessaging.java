@@ -64,8 +64,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         String user = remoteMessage.getData().get(Data.TAG_USER);
 
-        SharedPreferences preferences  = getSharedPreferences(MyPrefs.PREFS_NOTIFICATION, MODE_PRIVATE);
-        String currentUser = preferences.getString("currentUser", "none");
+        String currentUser = MyPrefs.getCurrentUser(this);
         Log.d("Current", currentUser);
 
         FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();

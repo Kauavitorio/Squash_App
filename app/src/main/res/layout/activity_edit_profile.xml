@@ -166,6 +166,7 @@
                     android:layout_height="match_parent"
                     android:backgroundTint="@color/hint"
                     android:hint="@string/username"
+                    android:digits="0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
                     android:inputType="textPersonName|textCapSentences"
                     android:maxLength="20"
                     android:textColor="@color/black"
@@ -179,9 +180,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/username_tl_edit_profile"
+                android:layout_centerHorizontal="true"
                 android:layout_marginTop="5dp"
                 android:maxWidth="320dp"
-                android:layout_centerHorizontal="true"
                 android:minWidth="320dp"
                 app:counterEnabled="true"
                 app:counterMaxLength="150"
@@ -190,12 +191,12 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_bio"
-                    android:hint="@string/bio"
-                    android:maxLength="150"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/hint"
+                    android:hint="@string/bio"
                     android:inputType="textPersonName|textCapSentences|textMultiLine"
+                    android:maxLength="150"
                     android:textColor="@color/black"
                     android:textColorHint="@color/hint" />
 

@@ -51,55 +51,100 @@
         app:layout_constraintTop_toBottomOf="@+id/header_qr_code">
 
         <!-- Info Container -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/container_qr_code"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="300dp"
-            android:minHeight="280dp"
-            android:maxHeight="280dp"
-            app:cardCornerRadius="20dp"
+            android:layout_height="350dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Container -->
-            <LinearLayout
+            <!-- QR Info BG -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/container_qr_code"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="300dp"
+                android:maxHeight="280dp"
+                android:minWidth="280dp"
                 android:minHeight="280dp"
-                android:padding="15dp"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+                app:cardCornerRadius="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Img User -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/ic_qrCode_Profile"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_profile_default"
+                android:elevation="10dp"
+                app:civ_border_color="@color/white"
+                app:civ_border_width="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Squash Profile -->
+            <TextView
+                android:id="@+id/qr_code_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:elevation="10dp"
+                android:maxWidth="300dp"
+                android:layout_marginTop="3dp"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ic_qrCode_Profile"
+                tools:text="kaualima"/>
+
+            <!-- UserName -->
+            <TextView
+                android:id="@+id/txt_squash_profile_qr_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:maxWidth="300dp"
+                android:textAlignment="center"
+                android:textColor="@color/hint"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:elevation="11dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/qr_code_username"
+                android:text="@string/squash_profile" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:elevation="20dp"
+                app:layout_constraintBottom_toBottomOf="@+id/container_qr_code"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_squash_profile_qr_code">
 
                 <!-- QrCode -->
                 <ImageView
                     android:id="@+id/img_qr_code"
                     android:layout_width="match_parent"
-                    android:layout_height="260dp"
-                    android:maxHeight="280dp"
-                    android:minHeight="280dp"
-                    android:scaleType="fitXY"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="5dp"
                     tools:ignore="ContentDescription" />
 
-                <!-- UserName -->
-                <TextView
-                    android:id="@+id/qr_code_username"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:maxWidth="300dp"
-                    android:textAlignment="center"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    tools:text="kaualima"/>
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -126,11 +171,12 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="9dp"
+                android:paddingEnd="9dp"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                tools:ignore="UseCompoundDrawables">
 
                 <!-- Camera -->
                 <ImageView

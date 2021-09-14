@@ -121,7 +121,7 @@ public class ShareContentActivity extends AppCompatActivity {
                         }
                     }
                 }
-                userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, false);
+                userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, false, UserChatAdapter.OFF_CHATS);
                 recycler_view_users.setAdapter(userChatAdapter);
             }
             @Override
@@ -131,7 +131,7 @@ public class ShareContentActivity extends AppCompatActivity {
 
     private void readAccounts() {
         mAccounts = chatDB.get_CHAT_LIST();
-        userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true);
+        userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true, UserChatAdapter.OFF_CHATS);
         recycler_view_users.setAdapter(userChatAdapter);
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
         reference.addValueEventListener(new ValueEventListener() {
@@ -151,7 +151,7 @@ public class ShareContentActivity extends AppCompatActivity {
                         }
                     }
 
-                    userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true);
+                    userChatAdapter = new UserChatAdapter(ShareContentActivity.this, mAccounts, true, UserChatAdapter.OFF_CHATS);
                     recycler_view_users.setAdapter(userChatAdapter);
                 }
             }

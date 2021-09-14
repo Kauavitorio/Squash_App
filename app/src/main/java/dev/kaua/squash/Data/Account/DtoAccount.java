@@ -14,17 +14,20 @@ public class DtoAccount implements Comparable<DtoAccount>{
     private String message, verification_level;
     private String login_method, token, login_info, trust, date_time_login, UID;
     private String id_following, imageURL, id, typingTo, last_seen, report_to, report_from, report_reason;
-    private String account_id_following, status_chat, search, last_chat, chat_id, reason_warn;
+    private String account_id_following, status_chat, search, last_chat, chat_id, reason_warn, placed, adds;
 
     public DtoAccount (){}
 
-    public DtoAccount(String login_method, String password, String device_login, String trust, String date_time_login, long status) {
+    public DtoAccount(String login_method, String password, String device_login,
+                      String trust, String date_time_login, long status, String placed, String adds) {
         this.login_method = login_method;
         this.password = password;
         this.login_info = device_login;
         this.trust = trust;
         this.date_time_login = date_time_login;
         this.status = status;
+        this.placed = placed;
+        this.adds = adds;
     }
 
     public DtoAccount(String account_id_cry, String email, String id, String imageURL, String status_chat, String typingTo, String last_seen, String verification_level, long active) {
@@ -39,8 +42,24 @@ public class DtoAccount implements Comparable<DtoAccount>{
         this.active = active;
     }
 
+    public String getAdds() {
+        return adds;
+    }
+
+    public void setAdds(String adds) {
+        this.adds = adds;
+    }
+
     public String getReport_to() {
         return report_to;
+    }
+
+    public String getPlaced() {
+        return placed;
+    }
+
+    public void setPlaced(String placed) {
+        this.placed = placed;
     }
 
     public void setReport_to(String report_to) {

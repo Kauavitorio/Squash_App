@@ -37,7 +37,7 @@ public class PrivacyPolicyUpdateActivity extends AppCompatActivity {
             new Handler().postDelayed(() -> {
                 loadingDialog.dismissDialog();
                 finish();
-            }, 1000);
+            }, 900);
         });
 
     }

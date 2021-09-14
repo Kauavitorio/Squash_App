@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -117,6 +118,7 @@ public class SearchFragment extends Fragment {
                     Log.d("SearchUser", "Loaded");
                     FinalAccounts.clear();
                     FinalAccounts.addAll(mAccounts);
+                    Collections.shuffle(FinalAccounts);
                     SearchItemArrayAdapter adapter = new SearchItemArrayAdapter(getContext(), R.layout.adapter_search_layout, R.id.txt_user_name_search, FinalAccounts);
 
                     //edit_search.setDropDownBackgroundDrawable(context.getDrawable(R.drawable.custom_edit_register_new));
@@ -126,6 +128,14 @@ public class SearchFragment extends Fragment {
                         edit_search.requestFocus();
                         return false;
                     });
+
+                    edit_search.setOnFocusChangeListener((view, hasFocus) -> {
+                        try {
+                            Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(!hasFocus);
+                        }catch (Exception ex){
+                            Log.d("SEARCH_FRAGMENT", ex.toString());
+                        }
+                    });
                 }
             }
         }
@@ -133,7 +143,7 @@ public class SearchFragment extends Fragment {
 
     final ArrayList<DtoPost> arrayListDto = new ArrayList<>();
     Posts_Adapters posts_adapters = null;
-    private void loadFeed() {
+    void loadFeed() {
         reference_posts = null;
         if(getContext() != null){
             daoFollowing = new DaoFollowing(getContext());
@@ -183,6 +193,7 @@ public class SearchFragment extends Fragment {
         super.setMenuVisibility(visible);
         if (visible){
             if(getContext() != null){
+                edit_search.clearFocus();
                 Toolbar toolbar = view.findViewById(R.id.toolbar_search);
                 ((AppCompatActivity)requireActivity()).setSupportActionBar(toolbar);
                 Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("");
