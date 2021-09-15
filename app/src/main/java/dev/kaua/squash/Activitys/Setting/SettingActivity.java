@@ -1,4 +1,4 @@
-package dev.kaua.squash.Activitys;
+package dev.kaua.squash.Activitys.Setting;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,8 +19,7 @@ import com.bumptech.glide.Glide;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Activitys.Setting.AccountSettingActivity;
-import dev.kaua.squash.Activitys.Setting.ConnectionUsageActivity;
+import dev.kaua.squash.Activitys.AppSupportActivity;
 import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.R;
@@ -40,7 +39,7 @@ public class SettingActivity extends AppCompatActivity {
     CircleImageView profile_image;
     TextView txt_app_version;
     private LinearLayout btn_account, btn_notifications, btn_data, btn_logout;
-    private LinearLayout btn_policy_and_Privacy;
+    private LinearLayout btn_policy_and_Privacy, btn_support_ad;
     private DtoAccount mAccount;
     private Animation myAnim;
 
@@ -78,6 +77,12 @@ public class SettingActivity extends AppCompatActivity {
             Methods.browseTo(this, Methods.POLICY_PRIVACY_LINK);
         });
 
+        btn_support_ad.setOnClickListener(v -> {
+            btn_support_ad.startAnimation(myAnim);
+            Intent intent = new Intent(this, AppSupportActivity.class);
+            startActivity(intent);
+        });
+
         //  Logout click
         btn_logout.setOnClickListener(v -> {
             btn_logout.startAnimation(myAnim);
@@ -107,7 +112,8 @@ public class SettingActivity extends AppCompatActivity {
         txt_username = findViewById(R.id.txt_username_setting);
         btn_notifications = findViewById(R.id.btn_notifications);
         btn_data = findViewById(R.id.btn_data);
-        btn_policy_and_Privacy = findViewById(R.id.btn_policy_and_Privacy);
+        btn_policy_and_Privacy = findViewById(R.id.btn_policy_and_privacy);
+        btn_support_ad = findViewById(R.id.btn_support_ad);
         profile_image = findViewById(R.id.profile_image_setting);
 
         //  Set text with app version and system info

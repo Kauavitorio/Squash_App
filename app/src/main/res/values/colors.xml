@@ -48,6 +48,8 @@
     <color name="tab_background_unselected">#10ace0</color>
     <color name="base_color_disable">#B248C5EF</color>
     <color name="base_color_click">#0F9CCC</color>
+    <color name="card_ad_support">#FFE1A7</color>
+    <color name="card_support_action">#FFC75A</color>
 
     <!-- QRCODE READER -->
     <color name="zxing_viewfinder_laser">#FF6C26</color>

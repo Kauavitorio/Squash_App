@@ -16,6 +16,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Vibrator;
 import android.text.SpannableStringBuilder;
@@ -29,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 
@@ -56,6 +58,7 @@ import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts_Comment;
+import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
@@ -78,6 +81,11 @@ public abstract class Methods extends MainActivity {
 
     //  Base API URL
     private static final String TAG = "METHODS_LOG";
+    public static final String REWARDED_AD_ID = "ca-app-pub-5161149668539506/2830793531";
+    public static final String INTERSTICIAL_AD_ID = "ca-app-pub-5161149668539506/3847296073";
+    public static final long VERIFY_AD_GOAL = 15000;
+    public static final String PAYPAL_DONATE = "https://www.paypal.com/donate?hosted_button_id=PRKZAKGHHKA7S";
+    public static final String GOOGLE_PLAY_APP_LINK = "https://play.google.com/store/apps/details?id=dev.kaua.squash";
     public static final String BASE_URL_HTTPS = "https://squash-social.herokuapp.com/";
     public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
@@ -141,6 +149,28 @@ public abstract class Methods extends MainActivity {
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+    }
+
+    public static void SharePost(Activity mContext, DtoPost postInfo, FirebaseAnalytics mFirebaseAnalytics){
+        Intent myIntent = new Intent(Intent.ACTION_SEND);
+        myIntent.setType("text/plain");
+        final String search_from;
+        final String verify = MyPrefs.getUserInformation(mContext).getVerification_level();
+        if(verify != null && Integer.parseInt(verify) == DtoAccount.ACCOUNT_IS_ADM) search_from = "STAFF";
+        else search_from = Methods.RandomCharactersWithoutSpecials(3);
+        String body = Methods.BASE_URL_HTTPS + "share/" + postInfo.getUsername().replace(" ", "")
+                + "/post/" +  postInfo.getPost_id()
+                + "?s=" + search_from;
+        body = body.replace(" ", "");
+        myIntent.putExtra(Intent.EXTRA_TEXT, body);
+        mContext.startActivity(Intent.createChooser(myIntent, mContext.getString(R.string.share_using)));
+
+        //  Creating analytic for share action
+        Bundle bundle_Analytics = new Bundle();
+        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, myFirebaseHelper.getFirebaseUser().getUid() + "_" + postInfo.getPost_id());
+        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, postInfo.getPost_id());
+        bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, postInfo.getUsername());
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, bundle_Analytics);
     }
 
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {

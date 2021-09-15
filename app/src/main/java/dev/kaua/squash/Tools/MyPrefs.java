@@ -50,9 +50,30 @@ public abstract class MyPrefs {
         account.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
         account.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
         account.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
+        account.setAd_points(sp.getLong("pref_ad_points", 0));
+        account.setSupport_visit(sp.getBoolean("pref_support_visit", false));
         account.setActive(sp.getLong("pref_active", DtoAccount.ACCOUNT_ACTIVE));
 
         return account;
+    }
+
+    public static long SetAd_Point(@NonNull Context context, long points){
+        sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
+
+        //  Add Request prefs
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putLong("pref_ad_points", points);
+        editor.apply();
+        return points;
+    }
+
+    public static void SetSupportVisit(@NonNull Context context){
+        sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
+
+        //  Add Request prefs
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean("pref_support_visit", true);
+        editor.apply();
     }
 
     public static void setUpdateRequest_Show(@NonNull Context context, int request){

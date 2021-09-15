@@ -218,4 +218,19 @@
     <string name="squash_profile">Perfil Squash</string>
     <string name="delete_this_conversation">Excluir esta conversa</string>
     <string name="do_you_really_want_to_delete_this_conversation">Deseja realmente excluir essa conversa de sua lista? As mensagens não seram deletadas.</string>
+    <string name="help_squash">Ajudar o Squash</string>
+    <string name="make_donate">Faça uma doação</string>
+    <string name="support_types">Tipos de Suporte</string>
+    <string name="support_description_header">A Squash é uma plataforma desenvolvida por um grupo de amigos sem auxilio ou apoio de uma organização.\nAtualmente a Squash está se mantendo por recursos próprios e para que possamos fornecer uma melhor estabilidade e mais recursos disponibilizamos algumas alternativas para que você possa nos apoiar, caso queira.</string>
+    <string name="watch_ad">Assistir anúncio</string>
+    <string name="no_internet_connection">Sem conexão de internet</string>
+    <string name="paypal_donate_desc">Aqui você pode fazer uma doação através do paypal do desenvolvedor Kauã Vitorio, qualquer valor é aceito, todas as doações serão convertidas em melhorias para a plataforma Squash, futuramente estará disponível uma guia com todos os doadores, obrigado.</string>
+    <string name="more_information">Mais Informações…</string>
+    <string name="click_to_collapse">Clique para recolher…</string>
+    <string name="share_app_desc">Caso queira, você pode compartilhar o aplicativo com seus amigos e isso ajuda muito a Squash.</string>
+    <string name="text_share_app">Olá, venha conhecer uma rede social chamada Squash que estou usando e adorando.</string>
+    <string name="goal">Meta</string>
+    <string name="thanks_for_watching_the_ad">Obrigado por assistir o anúncio.\nSua recompensa foi de %1$s Squash points.</string>
+    <string name="ad_desc">Aqui você poderá assistir a um anúncio para nos ajudar e assistindo até o final você será recompensado com “Squash Points” que é uma moeda criada pela Squash com o intuito de incentivar nossos usuários a utilizar a plataforma, você pode gastar seus Squash Points em nossa loja “Squash Shop”. Obrigado.</string>
+    <string name="shop_under_development">Ainda estamos desenvolvendo nossa loja, mas você já pode ir juntando seus pontos :).\nSerá anunciado pelo perfil oficial da Squash quando a loja estiver pronta.</string>
 </resources>
