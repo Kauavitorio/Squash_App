@@ -3,11 +3,10 @@ package dev.kaua.squash.Activitys;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager.widget.ViewPager;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -17,7 +16,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.util.Linkify;
@@ -37,11 +35,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -57,6 +55,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Adapters.ViewPagerAdapterImages;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncComments_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;
@@ -89,7 +88,7 @@ import retrofit2.Retrofit;
 public class PostDetailsActivity extends AppCompatActivity {
     private CircleImageView icon_user_profile, ic_ProfileUser_profile_compose_comment;
     private RelativeLayout container_post;
-    private ImageView ic_account_badge_post, img_firstImage_post, img_secondImage_post, img_heart_like_post, btn_actions, ic_account_badge_profile_compose_comment;
+    private ImageView ic_account_badge_post, img_heart_like_post, btn_actions, ic_account_badge_profile_compose_comment;
     private TextView txt_name_user_post, txt_username_post, txt_date_time_post, txt_post_content, txt_likes_post, txt_comments_post;
     private TextView txt_user_name_compose_comment, txt_username_name_compose_comment;
     private LinearLayout btn_like_post, btn_comment_post, btn_share_post;
@@ -100,6 +99,8 @@ public class PostDetailsActivity extends AppCompatActivity {
     private BottomSheetDialog bottomSheetDialog;
     private RecyclerView recycler_comments;
     static DaoPosts daoPosts;
+    ViewPager img_view_paper;
+    TabLayout tab_indicator_images;
     InputMethodManager imm;
     FirebaseStorage firebaseStorage;
     FirebaseUser fUser;
@@ -368,17 +369,6 @@ public class PostDetailsActivity extends AppCompatActivity {
             }
             else Warnings.NeedLoginWithShortCutAlert(this, 0);
         });
-
-        img_firstImage_post.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ViewMediaActivity.class);
-            intent.putExtra("image_url", EncryptHelper.decrypt(post_info.getPost_images().get(0)));
-            intent.putExtra("receive_time", "post");
-            String id = post_info.getUsername() + "_" + post_info.getPost_id();
-            if (id.length() < 11) id += "posts_media";
-            intent.putExtra("chat_id", id);
-            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.move_to_left_go, R.anim.move_to_right_go);
-            ActivityCompat.startActivity(this, intent, activityOptionsCompat.toBundle());
-        });
     }
 
     private void StartSendNotify(String comment) {
@@ -480,8 +470,7 @@ public class PostDetailsActivity extends AppCompatActivity {
         apiService = Client.getClient(Methods.FCM_URL).create(APIService.class);
         daoPosts = new DaoPosts(this);
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        SharedPreferences sp_First = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-        account.setAccount_id_cry(EncryptHelper.decrypt(sp_First.getString("pref_account_id", null)));
+        account.setAccount_id_cry(String.valueOf(MyPrefs.getUserInformation(this).getAccount_id()));
         icon_user_profile = findViewById(R.id.icon_user_profile_post_details);
         txt_name_user_post = findViewById(R.id.txt_name_user_post_details);
         swipeRefreshLayout_comments = findViewById(R.id.swipeRefreshLayout_comments);
@@ -493,11 +482,9 @@ public class PostDetailsActivity extends AppCompatActivity {
         ic_account_badge_profile_compose_comment = findViewById(R.id.ic_account_badge_profile_compose_comment);
         edit_comment_msg = findViewById(R.id.edit_comment_msg);
         txt_date_time_post = findViewById(R.id.txt_date_time_post_details);
-        img_firstImage_post = findViewById(R.id.img_firstImage_post_details);
         txt_user_name_compose_comment = findViewById(R.id.txt_user_name_compose_comment);
         btn_post_comment_Cancel = findViewById(R.id.btn_post_comment_Cancel);
         txt_username_name_compose_comment = findViewById(R.id.txt_username_name_compose_comment);
-        img_secondImage_post = findViewById(R.id.img_secondImage_post_details);
         btn_like_post = findViewById(R.id.btn_like_post_details);
         container_post_images = findViewById(R.id.container_post_images_details);
         img_heart_like_post = findViewById(R.id.img_heart_like_post_details);
@@ -512,6 +499,8 @@ public class PostDetailsActivity extends AppCompatActivity {
         container_post.setVisibility(View.GONE);
         container_compose_comment.setVisibility(View.GONE);
         ic_account_badge_post.setVisibility(View.GONE);
+        img_view_paper = findViewById(R.id.img_view_paper_details);
+        tab_indicator_images = findViewById(R.id.tab_indicator_images_details);
         recycler_comments.setLayoutManager(new LinearLayoutManager(this));
 
         edit_comment_msg.setInputType(InputType.TYPE_CLASS_TEXT |
@@ -585,7 +574,7 @@ public class PostDetailsActivity extends AppCompatActivity {
                                                     .into(icon_user_profile);
 
                                             txt_name_user_post.setText(EncryptHelper.decrypt(post_info.getName_user()));
-                                            txt_username_post.setText("| @" + EncryptHelper.decrypt(post_info.getUsername()));
+                                            txt_username_post.setText("@" + EncryptHelper.decrypt(post_info.getUsername()));
                                             txt_date_time_post.setText(LastSeenRefactor(EncryptHelper.decrypt(post_info.getPost_date())));
                                             txt_post_content.setText(EncryptHelper.decrypt(post_info.getPost_content()));
                                             Linkify.addLinks(txt_post_content, Linkify.ALL);
@@ -595,16 +584,22 @@ public class PostDetailsActivity extends AppCompatActivity {
                                             if(post_info.getPost_images() == null || post_info.getPost_images().size() <= 0) container_post_images.setVisibility(View.GONE);
                                             else{
                                                 container_post_images.setVisibility(View.VISIBLE);
-                                                String url_img_one = EncryptHelper.decrypt(post_info.getPost_images().get(0));
-                                                Picasso.get().load(url_img_one)
-                                                        .into(img_firstImage_post);
-                                                img_firstImage_post.setVisibility(View.VISIBLE);
+                                                // Creating Object of ViewPagerAdapterImages
+                                                ViewPagerAdapterImages mViewPagerAdapterImages;
+                                                // Initializing the ViewPager Object
+
+                                                // Initializing the ViewPagerAdapterImages
+                                                mViewPagerAdapterImages = new ViewPagerAdapterImages(PostDetailsActivity.this, post_info, post_info.getPost_images());
+
+                                                // Adding the Adapter to the ViewPager
+                                                img_view_paper.setAdapter(mViewPagerAdapterImages);
+
+                                                tab_indicator_images.setupWithViewPager(img_view_paper);
+
+                                                if(post_info.getPost_images().size() > 1){
+                                                    tab_indicator_images.setVisibility(View.VISIBLE);
+                                                }else tab_indicator_images.setVisibility(View.GONE);
                                                 container_post_images.setVisibility(View.VISIBLE);
-                                                if(post_info.getPost_images().size() > 1) {
-                                                    Picasso.get().load(EncryptHelper.decrypt(post_info.getPost_images().get(1)))
-                                                            .into(img_secondImage_post);
-                                                    img_secondImage_post.setVisibility(View.VISIBLE);
-                                                }
                                             }
 
                                             swipeRefreshLayout_comments.setVisibility(View.VISIBLE);

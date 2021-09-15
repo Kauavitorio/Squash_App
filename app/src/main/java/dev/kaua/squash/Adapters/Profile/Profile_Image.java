@@ -46,7 +46,7 @@ public class Profile_Image extends EditProfileActivity {
                 Log.d("UPDATE_PROFILE_IMAGE", "Resize size -> " + BitmapCompat.getAllocationByteCount(bitMapSendUpload));
                 byte[] dataUpload = baos.toByteArray();
                 ic_edit_ProfileUser.setCircleBackgroundColor(context.getColor(R.color.base_color));
-                storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("profile").child("User_" + user.getAccount_id() +
+                storageReference = myFirebaseHelper.getFirebaseStorage().child(myFirebaseHelper.USERS_REFERENCE).child(myFirebaseHelper.PROFILE_REFERENCE).child("User_" + user.getAccount_id() +
                         "_" + myFirebaseHelper.getFirebaseAuth().getUid());
                 storageReference.putBytes(dataUpload).addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {

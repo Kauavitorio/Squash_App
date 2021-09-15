@@ -77,7 +77,8 @@ public class RecommendedPosts extends MainFragment {
                             if(post != null  && post.getActive() > DtoAccount.ACCOUNT_DISABLE){
                                 if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))) == MyPrefs.getUserInformation(context).getAccount_id()||
                                         daoFollowing.check_if_follow(MyPrefs.getUserInformation(context).getAccount_id(),
-                                                Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))))){
+                                                Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))))
+                                && post.getActive() > DtoAccount.ACCOUNT_DISABLE){
                                     post.setPost_id(EncryptHelper.decrypt(post.getPost_id()));
                                     post.setAccount_id(EncryptHelper.decrypt(post.getAccount_id()));
                                     post.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
@@ -112,21 +113,18 @@ public class RecommendedPosts extends MainFragment {
     }
 
     static final ArrayList<DtoPost> SaveList = new ArrayList<>();
-    static int normal = 0;
-    static int load = 0;
     private static void LoadPostsFromLocal(Activity mContext, RecyclerView recyclerView, ConstraintLayout loadingPanel, @NonNull DaoPosts daoPosts) {
         try{
-            normal++;
-            Log.d(TAG, "Normal -> " + normal);
             Posts_Adapters posts_adapters;
             ArrayList<DtoPost> listPostDB = daoPosts.get_post();
             if (listPostDB.size() > 0) {
+                Log.d(TAG, "Sizes 01 -> " + arraylist_base.size());
+                Log.d(TAG, "Sizes 02 -> " + SaveList.size());
                 if(ConnectionHelper.isOnline(mContext) && loaded){
                     if(arraylist_base.size() != SaveList.size()){
                         SaveList.clear();
                         SaveList.addAll(arraylist_base);
-                        load++;
-                        Log.d(TAG, "Load -> " + load);
+                        Log.d(TAG, "Load -> " + SaveList.size());
                         if(listPostDB.size() == 100 && arraylist_base.size() > 100) posts_adapters = new Posts_Adapters(arraylist_base, mContext);
                         else if(!arraylist_base.equals(listPostDB)) {
                             daoPosts.Register_Home_Posts(arraylist_base);
