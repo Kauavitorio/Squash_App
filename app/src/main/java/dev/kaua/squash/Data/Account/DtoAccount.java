@@ -7,7 +7,8 @@ public class DtoAccount implements Comparable<DtoAccount>{
     public static final int ACCOUNT_IS_ADM = 2;
     public static final int NORMAL_ACCOUNT = 0;
     public static final int VERIFY_ACCOUNT = 1;
-    private long account_id, id_user, verify, status, active;
+    private long account_id, id_user, verify, status, active, ad_points;
+    private boolean support_visit;
     private String account_id_cry, id_user_cry;
     private String name_user, username, email, phone_user, password, verify_id;
     private String banner_user, profile_image, bio_user, url_user, following, followers, born_date, joined_date;
@@ -40,6 +41,22 @@ public class DtoAccount implements Comparable<DtoAccount>{
         this.last_seen = last_seen;
         this.verification_level = verification_level;
         this.active = active;
+    }
+
+    public boolean isSupport_visit() {
+        return support_visit;
+    }
+
+    public void setSupport_visit(boolean support_visit) {
+        this.support_visit = support_visit;
+    }
+
+    public long getAd_points() {
+        return ad_points;
+    }
+
+    public void setAd_points(long ad_points) {
+        this.ad_points = ad_points;
     }
 
     public String getAdds() {

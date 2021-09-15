@@ -405,9 +405,46 @@
                 android:visibility="gone"
                 android:background="@color/dividing_line_settings"/>
 
+            <!-- Support Ad Squash -->
+            <LinearLayout
+                android:id="@+id/btn_support_ad"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:minHeight="42dp"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Help Squash Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_money_setting"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Help Squash Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/help_squash"/>
+
+            </LinearLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_marginStart="30dp"
+                android:layout_height="1dp"
+                android:visibility="visible"
+                android:background="@color/dividing_line_settings"/>
+
             <!-- Policy and Privacy -->
             <LinearLayout
-                android:id="@+id/btn_policy_and_Privacy"
+                android:id="@+id/btn_policy_and_privacy"
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
                 android:minHeight="42dp"

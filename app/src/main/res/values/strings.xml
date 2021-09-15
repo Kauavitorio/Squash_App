@@ -5,6 +5,10 @@
     <string name="no">No</string>
     <string name="ok">OK</string> <!-- End Natural Text -->
 
+    <!-- ADS -->
+    <string name="main_banner" translatable="false">ca-app-pub-5161149668539506/1257131065</string>
+    <string name="main_rewarded" translatable="false">ca-app-pub-5161149668539506/2830793531</string>
+
     <string name="app_name" translatable="false">Squash</string>
     <string name="intro_description">Choose a way to start.</string>
     <string name="create_account">Create account</string>
@@ -228,4 +232,21 @@
     <string name="squash_profile">Squash Profile</string>
     <string name="delete_this_conversation">Delete this conversation</string>
     <string name="do_you_really_want_to_delete_this_conversation">Do you really want to delete this conversation from your list? Messages will not be deleted.</string>
+    <string name="help_squash">Help Squash</string>
+    <string name="make_donate">Make Donate</string>
+    <string name="support_types">Support Types</string>
+    <string name="support_description_header">Squash is a platform developed by a group of friends without the help or support of an organization.\nCurrently Squash is supporting itself by its own resources and so that we can provide better stability and more resources we have made available some alternatives so that you can support us if you want.</string>
+    <string name="watch_ad">Watch Ad</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="squash_points" translatable="false">Squash points</string>
+    <string name="paypal_donate_desc">Here you can make a donation through Kauã Vitorio developer paypal, any amount is accepted, all donations will be converted into improvements for the Squash platform, in the future a tab with all donors will be available. Thanks.</string>
+    <string name="more_information">More information…</string>
+    <string name="click_to_collapse">Click to collapse…</string>
+    <string name="share_app_desc">If you want, you can share the app with your friends and it helps a lot for Squash.</string>
+    <string name="text_share_app">Hi, come and meet a social media called Squash I\'m using and loving it.</string>
+    <string name="goal">Goal</string>
+    <string name="thanks_for_watching_the_ad">Thanks for watching the ad.\nYour reward was %1$s Squash points.</string>
+    <string name="squash_shop" translatable="false">Squash Shop</string>
+    <string name="ad_desc">Here you can watch an ad to help us and watch until the end you will be rewarded with “Squash Points” which is a currency created with the intention of encouraging our users to use the platform, you can spend your Squash Points in our store “Squash Shop ”. Thanks.</string>
+    <string name="shop_under_development">We are still developing our store, but you can start collecting your points :).\nIt will be announced by the official Squash profile when the store is ready.</string>
 </resources>

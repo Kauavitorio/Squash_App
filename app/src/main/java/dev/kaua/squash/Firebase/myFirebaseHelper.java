@@ -14,6 +14,7 @@ public class myFirebaseHelper {
     public static final String POSTS_REFERENCE = "Posts";
     public static final String MEDIAS_REFERENCE = "Medias";
     public static final String USERS_REFERENCE = "Users";
+    public static final String POINTS_REFERENCE = "Points";
     public static final String PROFILE_REFERENCE = "Profile";
     public static final String PUBLISHED_CHILD = "Published";
     public static final String CHATS_REFERENCE = "Chats";

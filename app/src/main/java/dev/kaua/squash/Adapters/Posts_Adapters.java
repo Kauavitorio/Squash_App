@@ -50,9 +50,11 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Activitys.AppSupportActivity;
 import dev.kaua.squash.Activitys.DeletePostReportActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.PostDetailsActivity;
+import dev.kaua.squash.Activitys.SquashShop.SquashShopActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
@@ -149,25 +151,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
         holder.btn_share_post.setOnClickListener(v -> {
             holder.btn_share_post.startAnimation(myAnim);
-            Intent myIntent = new Intent(Intent.ACTION_SEND);
-            myIntent.setType("text/plain");
-            final String search_from;
-            final String verify = MyPrefs.getUserInformation(mContext).getVerification_level();
-            if(verify != null && Integer.parseInt(verify) == DtoAccount.ACCOUNT_IS_ADM) search_from = "STAFF";
-            else search_from = Methods.RandomCharactersWithoutSpecials(3);
-            String body = Methods.BASE_URL_HTTPS + "share/" + postInfo.getUsername().replace(" ", "")
-                    + "/post/" +  postInfo.getPost_id()
-                    + "?s=" + search_from;
-            body = body.replace(" ", "");
-            myIntent.putExtra(Intent.EXTRA_TEXT, body);
-            mContext.startActivity(Intent.createChooser(myIntent, mContext.getString(R.string.share_using)));
-
-            //  Creating analytic for share action
-            Bundle bundle_Analytics = new Bundle();
-            bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, myFirebaseHelper.getFirebaseUser().getUid() + "_" + postInfo.getPost_id());
-            bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, postInfo.getPost_id());
-            bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, postInfo.getUsername());
-            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, bundle_Analytics);
+            Methods.SharePost(mContext, postInfo, mFirebaseAnalytics);
         });
 
         EnableActions(holder, position);
@@ -348,6 +332,29 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                                 });
                             }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
                         }).into(holder.txt_post_content);
+
+        HelpSquashPattern(holder, "Ajudar o Squash");
+        HelpSquashPattern(holder, "Ajudar o squash");
+        HelpSquashPattern(holder, "ajudar o Squash");
+        HelpSquashPattern(holder, "ajudar o squash");
+        HelpSquashPattern(holder, "Help Squash");
+        HelpSquashPattern(holder, "Help squash");
+        HelpSquashPattern(holder, "help Squash");
+        HelpSquashPattern(holder, "help squash");
+        new PatternEditableBuilder().addPattern(Pattern.compile(mContext.getString(R.string.squash_shop)),
+                mContext.getColor(R.color.base_color),
+                        text -> {
+                            Intent intent = new Intent(mContext, SquashShopActivity.class);
+                            mContext.startActivity(intent);
+                        }).into(holder.txt_post_content);
+    }
+
+    private void HelpSquashPattern(@NonNull MyHolderPosts holder, String s) {
+        new PatternEditableBuilder().addPattern(Pattern.compile(s), mContext.getColor(R.color.base_color),
+                text -> {
+                    Intent intent = new Intent(mContext, AppSupportActivity.class);
+                    mContext.startActivity(intent);
+                }).into(holder.txt_post_content);
     }
 
     private String LastSeenRefactor(final int position) {

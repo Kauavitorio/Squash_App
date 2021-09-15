@@ -15,7 +15,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.util.Linkify;
@@ -149,13 +148,10 @@ public class PostDetailsActivity extends AppCompatActivity {
         });
 
         btn_share_post.setOnClickListener(v -> {
-            Intent myIntent = new Intent(Intent.ACTION_SEND);
-            myIntent.setType("text/plain");
-            String body = Methods.BASE_URL_HTTPS + "share/" + Objects.requireNonNull(EncryptHelper.decrypt(post_info.getUsername())).replace(" ", "")
-                    + "/post/" +  EncryptHelper.decrypt(post_info.getPost_id())
-                    + "?s=" + Methods.RandomCharactersWithoutSpecials(3);
-            myIntent.putExtra(Intent.EXTRA_TEXT,body);
-            startActivity(Intent.createChooser(myIntent, "Share Using"));
+            DtoPost post = new DtoPost();
+            post.setUsername(EncryptHelper.decrypt(post_info.getUsername()));
+            post.setPost_id(EncryptHelper.decrypt(post_info.getPost_id()));
+            Methods.SharePost(this, post, myFirebaseHelper.getFirebaseAnalytics(this));
         });
 
         btn_actions.setOnClickListener(v -> {

@@ -25,7 +25,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -37,7 +36,7 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Activitys.SettingActivity;
+import dev.kaua.squash.Activitys.Setting.SettingActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.myFirebaseHelper;

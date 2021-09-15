@@ -34,6 +34,12 @@
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Activitys.SquashShop.SquashShopActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.AppSupportActivity"
+            android:exported="true" />
+        <activity
             android:name=".Notifications.NotificationActivity"
             android:exported="true" />
         <activity
@@ -85,7 +91,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activitys.ShareContentActivity" />
-        <activity android:name=".Activitys.SettingActivity" />
+        <activity android:name=".Activitys.Setting.SettingActivity" />
         <activity android:name=".Activitys.WebActivity" />
         <activity android:name=".Activitys.PostDetailsActivity" />
         <activity android:name=".Activitys.EditProfileActivity" />
@@ -161,6 +167,9 @@
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5161149668539506~9587773570" />
     </application>
 
 </manifest>
