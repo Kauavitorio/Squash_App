@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +29,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -55,7 +59,6 @@ import dev.kaua.squash.Activitys.DeletePostReportActivity;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.PostDetailsActivity;
 import dev.kaua.squash.Activitys.SquashShop.SquashShopActivity;
-import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
@@ -93,10 +96,17 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     public static final boolean CAN_ANIME = true;
     public static final boolean CAN_NOT_ANIME = false;
     private static final String TAG = "POSTS_ADAPTER";
+    private static int LayoutType;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
     public Posts_Adapters(ArrayList<DtoPost> ArrayList, Activity mContext) {
+        /*DtoPost post_ad = new DtoPost();
+        post_ad.setPost_type(DtoPost.AD_POST);
+        ArrayList<DtoPost> mPostListAD = new ArrayList<>();
+        mPostListAD.add(post_ad);
+        mPostListAD.addAll(ArrayList);
+        this.mPostList = mPostListAD;*/
         this.mPostList = ArrayList;
         instance = this;
         Posts_Adapters.mContext = mContext;
@@ -109,8 +119,19 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     @NonNull
     @Override
     public MyHolderPosts onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View listItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_posts, parent, false);
-        return new MyHolderPosts(listItem);
+        LayoutType = viewType;
+        Context context = parent.getContext();
+        View view;
+        if(LayoutType == DtoPost.NORMAL_POST){
+            view = LayoutInflater.from(context).inflate(R.layout.adapter_posts, parent, false);
+            return new MyHolderPosts(view);
+        }else if(LayoutType == DtoPost.AD_POST){
+            view = LayoutInflater.from(context).inflate(R.layout.adapter_ad_post, parent, false);
+            return new MyHolderPosts(view);
+        } else{
+            view = LayoutInflater.from(context).inflate(R.layout.adapter_posts, parent, false);
+            return new MyHolderPosts(view);
+        }
     }
 
     @SuppressWarnings("RegExpRedundantEscape")
@@ -119,100 +140,121 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     public void onBindViewHolder(@NonNull MyHolderPosts holder, int position) {
         final DtoPost postInfo = mPostList.get(position);
 
-        LoadBaseInformation(holder, postInfo, position, CAN_NOT_ANIME);
-        LoadMentions(holder);
+        if(LayoutType == DtoPost.NORMAL_POST){
+            LoadBaseInformation(holder, postInfo, position, CAN_NOT_ANIME);
+            LoadMentions(holder);
 
-        SetInfoClickable(holder);
+            SetInfoClickable(holder);
 
-        Check_Like(holder, position);
+            Check_Like(holder, position);
 
-        LoadImages(holder, postInfo);
+            LoadImages(holder, postInfo);
 
-        holder.itemView.setOnClickListener(v -> {
-            holder.itemView.startAnimation(myAnim);
+            holder.itemView.setOnClickListener(v -> {
+                holder.itemView.startAnimation(myAnim);
+                if(ConnectionHelper.isOnline(mContext)){
+                    Intent i = new Intent(mContext, PostDetailsActivity.class);
+                    i.putExtra("post_id", Long.parseLong(postInfo.getPost_id()));
+                    i.putExtra("comment", 0);
+                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
+                    ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
+                }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
+            });
+
+            holder.btn_comment_post.setOnClickListener(v -> {
+                holder.btn_comment_post.startAnimation(myAnim);
+                if(ConnectionHelper.isOnline(mContext)){
+                    Intent i = new Intent(mContext, PostDetailsActivity.class);
+                    i.putExtra("post_id", Long.parseLong(postInfo.getPost_id()));
+                    i.putExtra("comment", 1);
+                    mContext.startActivity(i);
+                }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
+            });
+
+            holder.btn_share_post.setOnClickListener(v -> {
+                holder.btn_share_post.startAnimation(myAnim);
+                Methods.SharePost(mContext, postInfo, mFirebaseAnalytics);
+            });
+
+            EnableActions(holder, position);
+
+            holder.btn_like_post.setOnClickListener(v -> Like_Un_Like_A_Post(holder, position, postInfo.getPost_id()));
+
+            if(postInfo.isSuggestion()) {
+                holder.suggestion_container.setVisibility(View.VISIBLE);
+                if(postInfo.getAccount_id().equals("5")) holder.txt_suggestion.setText(mContext.getString(R.string.developer_post));
+            }
+            else holder.suggestion_container.setVisibility(View.GONE);
+
+            final int PostPosition = position;
             if(ConnectionHelper.isOnline(mContext)){
-                Intent i = new Intent(mContext, PostDetailsActivity.class);
-                i.putExtra("post_id", Long.parseLong(postInfo.getPost_id()));
-                i.putExtra("comment", 0);
-                ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
-                ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
-            }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
-        });
+                final DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
+                        .equalTo(EncryptHelper.encrypt(postInfo.getPost_id()));
+                applesQuery.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(!mContext.isDestroyed() && !mContext.isFinishing()){
+                            for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
+                                final DtoPost post = appleSnapshot.getValue(DtoPost.class);
+                                final DtoPost finalPost = new DtoPost();
+                                if(post != null){
+                                    finalPost.setPost_id(EncryptHelper.decrypt(post.getPost_id()));
+                                    finalPost.setAccount_id(EncryptHelper.decrypt(post.getAccount_id()));
+                                    finalPost.setActive(post.getActive());
+                                    finalPost.setName_user(EncryptHelper.decrypt(post.getName_user()));
+                                    finalPost.setPost_comments_amount(EncryptHelper.decrypt(post.getPost_comments_amount()));
+                                    finalPost.setPost_content(EncryptHelper.decrypt(post.getPost_content()));
+                                    finalPost.setPost_date(EncryptHelper.decrypt(post.getPost_date()));
+                                    finalPost.setPost_likes(EncryptHelper.decrypt(post.getPost_likes()));
+                                    finalPost.setPost_time(EncryptHelper.decrypt(post.getPost_time()));
+                                    finalPost.setPost_topic(EncryptHelper.decrypt(post.getPost_topic()));
+                                    finalPost.setProfile_image(EncryptHelper.decrypt(post.getProfile_image()));
+                                    finalPost.setUsername(EncryptHelper.decrypt(post.getUsername()));
+                                    finalPost.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
 
-        holder.btn_comment_post.setOnClickListener(v -> {
-            holder.btn_comment_post.startAnimation(myAnim);
-            if(ConnectionHelper.isOnline(mContext)){
-                Intent i = new Intent(mContext, PostDetailsActivity.class);
-                i.putExtra("post_id", Long.parseLong(postInfo.getPost_id()));
-                i.putExtra("comment", 1);
-                mContext.startActivity(i);
-            }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
-        });
+                                    if(Long.parseLong(finalPost.getPost_likes()) != Long.parseLong(mPostList.get(PostPosition).getPost_likes()))
+                                        LoadBaseInformation(holder, finalPost, PostPosition, CAN_ANIME);
+                                    else LoadBaseInformation(holder, finalPost, PostPosition, CAN_NOT_ANIME);
 
-        holder.btn_share_post.setOnClickListener(v -> {
-            holder.btn_share_post.startAnimation(myAnim);
-            Methods.SharePost(mContext, postInfo, mFirebaseAnalytics);
-        });
+                                    mPostList.get(PostPosition).setPost_likes(finalPost.getPost_likes());
 
-        EnableActions(holder, position);
+                                    LoadMentions(holder);
 
-        holder.btn_like_post.setOnClickListener(v -> Like_Un_Like_A_Post(holder, position, postInfo.getPost_id()));
+                                    SetInfoClickable(holder);
 
-        if(postInfo.isSuggestion()) {
-            holder.suggestion_container.setVisibility(View.VISIBLE);
-            if(postInfo.getAccount_id().equals("5")) holder.txt_suggestion.setText(mContext.getString(R.string.developer_post));
-        }
-        else holder.suggestion_container.setVisibility(View.GONE);
+                                    Check_Like(holder, PostPosition);
 
-        final int PostPosition = position;
-        if(ConnectionHelper.isOnline(mContext)){
-            final DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-            Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
-                    .equalTo(EncryptHelper.encrypt(postInfo.getPost_id()));
-            applesQuery.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(!mContext.isDestroyed() && !mContext.isFinishing()){
-                        for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
-                            final DtoPost post = appleSnapshot.getValue(DtoPost.class);
-                            final DtoPost finalPost = new DtoPost();
-                            if(post != null){
-                                finalPost.setPost_id(EncryptHelper.decrypt(post.getPost_id()));
-                                finalPost.setAccount_id(EncryptHelper.decrypt(post.getAccount_id()));
-                                finalPost.setActive(post.getActive());
-                                finalPost.setName_user(EncryptHelper.decrypt(post.getName_user()));
-                                finalPost.setPost_comments_amount(EncryptHelper.decrypt(post.getPost_comments_amount()));
-                                finalPost.setPost_content(EncryptHelper.decrypt(post.getPost_content()));
-                                finalPost.setPost_date(EncryptHelper.decrypt(post.getPost_date()));
-                                finalPost.setPost_likes(EncryptHelper.decrypt(post.getPost_likes()));
-                                finalPost.setPost_time(EncryptHelper.decrypt(post.getPost_time()));
-                                finalPost.setPost_topic(EncryptHelper.decrypt(post.getPost_topic()));
-                                finalPost.setProfile_image(EncryptHelper.decrypt(post.getProfile_image()));
-                                finalPost.setUsername(EncryptHelper.decrypt(post.getUsername()));
-                                finalPost.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
+                                    LoadImages(holder, finalPost);
 
-                                if(Long.parseLong(finalPost.getPost_likes()) != Long.parseLong(mPostList.get(PostPosition).getPost_likes()))
-                                    LoadBaseInformation(holder, finalPost, PostPosition, CAN_ANIME);
-                                else LoadBaseInformation(holder, finalPost, PostPosition, CAN_NOT_ANIME);
-
-                                mPostList.get(PostPosition).setPost_likes(finalPost.getPost_likes());
-
-                                LoadMentions(holder);
-
-                                SetInfoClickable(holder);
-
-                                Check_Like(holder, PostPosition);
-
-                                LoadImages(holder, finalPost);
-
+                                }
                             }
                         }
                     }
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {}
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+            }
+        }else if(LayoutType == DtoPost.AD_POST){
+            if(ConnectionHelper.isOnline(mContext)){
+                AdView adView = new AdView(mContext);
+                AdSize adSize = new AdSize(300, 200);
+                adView.setAdSize(adSize);
+                adView.setAdUnitId(mContext.getString(R.string.main_banner));
+                AdRequest adRequest = new AdRequest.Builder().build();
+                adView.loadAd(adRequest);
+                holder.adView_post.addView(adView);
+            }
         }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if(mPostList.get(position).getPost_type() == DtoPost.NORMAL_POST)
+            return DtoPost.NORMAL_POST;
+        else if(mPostList.get(position).getPost_type() == DtoPost.AD_POST)
+            return DtoPost.AD_POST;
+        else return DtoPost.NORMAL_POST;
     }
 
     private void LoadImages(@NonNull MyHolderPosts holder, DtoPost postInfo) {
@@ -301,37 +343,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     private void LoadMentions(@NonNull MyHolderPosts holder) {
         new PatternEditableBuilder().
                 addPattern(Pattern.compile("@(\\w+)"), mContext.getColor(R.color.base_color),
-                        text -> {
-                            if(ConnectionHelper.isOnline(mContext)) {
-                                DtoAccount account = new DtoAccount();
-                                account.setUsername(text.replace("@", ""));
-                                AccountServices services = retrofit.create(AccountServices.class);
-                                Call<DtoPost> call = services.search_with_username(account);
-                                LoadingDialog loadingDialog = new LoadingDialog(mContext);
-                                loadingDialog.startLoading();
-                                call.enqueue(new Callback<DtoPost>() {
-                                    @Override
-                                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                                        loadingDialog.dismissDialog();
-                                        if(response.code() == 200){
-                                            if(response.body() != null){
-                                                Bundle bundle = new Bundle();
-                                                bundle.putString("account_id", response.body().getAccount_id());
-                                                bundle.putInt("control", 0);
-                                                MainActivity.getInstance().GetBundleProfile(bundle);
-                                                MainActivity.getInstance().CallProfile();
-                                                ProfileFragment.getInstance().LoadAnotherUser();
-                                            }
-                                        }else ToastHelper.toast(mContext, mContext.getString(R.string.user_not_found), 0);
-                                    }
-                                    @Override
-                                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
-                                        loadingDialog.dismissDialog();
-                                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_MENTION_CLICK);
-                                    }
-                                });
-                            }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
-                        }).into(holder.txt_post_content);
+                        text -> Methods.Profile_From_USERNAME(mContext, text)).into(holder.txt_post_content);
 
         HelpSquashPattern(holder, "Ajudar o Squash");
         HelpSquashPattern(holder, "Ajudar o squash");
@@ -600,28 +612,33 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         RelativeLayout container_post_adapter;
         ViewPager img_view_paper;
         TabLayout tab_indicator_images;
+        AdView adView_post;
         LinearLayout btn_like_post, btn_share_post, btn_comment_post, suggestion_container;
 
         public MyHolderPosts(@NonNull View itemView) {
             super(itemView);
-            txt_date_time_post = itemView.findViewById(R.id.txt_date_time_post);
-            suggestion_container = itemView.findViewById(R.id.suggestion_container);
-            txt_suggestion = itemView.findViewById(R.id.txt_suggestion);
-            container_post_adapter = itemView.findViewById(R.id.container_post_adapter);
-            btn_comment_post = itemView.findViewById(R.id.btn_comment_post);
-            icon_user_profile_post = itemView.findViewById(R.id.icon_user_profile_post);
-            txt_name_user_post = itemView.findViewById(R.id.txt_name_user_post);
-            btn_actions = itemView.findViewById(R.id.btn_actions);
-            img_heart_like = itemView.findViewById(R.id.img_heart_like_post);
-            txt_username_post = itemView.findViewById(R.id.txt_username_post);
-            txt_post_content = itemView.findViewById(R.id.txt_post_content);
-            btn_share_post = itemView.findViewById(R.id.btn_share_post);
-            btn_like_post = itemView.findViewById(R.id.btn_like_post);
-            ic_account_badge = itemView.findViewById(R.id.ic_account_badge);
-            txt_likes_post = itemView.findViewById(R.id.txt_likes_post);
-            txt_comments_post = itemView.findViewById(R.id.txt_comments_post);
-            img_view_paper = itemView.findViewById(R.id.img_view_paper);
-            tab_indicator_images = itemView.findViewById(R.id.tab_indicator_images);
+            if(LayoutType == DtoPost.NORMAL_POST){
+                txt_date_time_post = itemView.findViewById(R.id.txt_date_time_post);
+                suggestion_container = itemView.findViewById(R.id.suggestion_container);
+                txt_suggestion = itemView.findViewById(R.id.txt_suggestion);
+                container_post_adapter = itemView.findViewById(R.id.container_post_adapter);
+                btn_comment_post = itemView.findViewById(R.id.btn_comment_post);
+                icon_user_profile_post = itemView.findViewById(R.id.icon_user_profile_post);
+                txt_name_user_post = itemView.findViewById(R.id.txt_name_user_post);
+                btn_actions = itemView.findViewById(R.id.btn_actions);
+                img_heart_like = itemView.findViewById(R.id.img_heart_like_post);
+                txt_username_post = itemView.findViewById(R.id.txt_username_post);
+                txt_post_content = itemView.findViewById(R.id.txt_post_content);
+                btn_share_post = itemView.findViewById(R.id.btn_share_post);
+                btn_like_post = itemView.findViewById(R.id.btn_like_post);
+                ic_account_badge = itemView.findViewById(R.id.ic_account_badge);
+                txt_likes_post = itemView.findViewById(R.id.txt_likes_post);
+                txt_comments_post = itemView.findViewById(R.id.txt_comments_post);
+                img_view_paper = itemView.findViewById(R.id.img_view_paper);
+                tab_indicator_images = itemView.findViewById(R.id.tab_indicator_images);
+            }else{
+                adView_post = itemView.findViewById(R.id.adView_post);
+            }
         }
     }
 }

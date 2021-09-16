@@ -60,6 +60,7 @@ import dev.kaua.squash.Data.Post.AsyncLikes_Posts;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts_Comment;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -83,6 +84,7 @@ public abstract class Methods extends MainActivity {
     private static final String TAG = "METHODS_LOG";
     public static final String REWARDED_AD_ID = "ca-app-pub-5161149668539506/2830793531";
     public static final String INTERSTICIAL_AD_ID = "ca-app-pub-5161149668539506/3847296073";
+    public static final String NATIVE_POST_AD_ID = "ca-app-pub-5161149668539506/1027483623";
     public static final long VERIFY_AD_GOAL = 15000;
     public static final String PAYPAL_DONATE = "https://www.paypal.com/donate?hosted_button_id=PRKZAKGHHKA7S";
     public static final String GOOGLE_PLAY_APP_LINK = "https://play.google.com/store/apps/details?id=dev.kaua.squash";
@@ -517,6 +519,39 @@ public abstract class Methods extends MainActivity {
         }
 
         return inSampleSize;
+    }
+
+
+    public static void Profile_From_USERNAME(Activity mContext, String text) {
+        if(ConnectionHelper.isOnline(mContext)){
+            DtoAccount account = new DtoAccount();
+            account.setUsername(text.replace("@", ""));
+            AccountServices services = GetRetrofitBuilder().create(AccountServices.class);
+            Call<DtoPost> call = services.search_with_username(account);
+            LoadingDialog loadingDialog = new LoadingDialog(mContext);
+            loadingDialog.startLoading();
+            call.enqueue(new Callback<DtoPost>() {
+                @Override
+                public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                    loadingDialog.dismissDialog();
+                    if(response.code() == 200){
+                        if(response.body() != null){
+                            Bundle bundle = new Bundle();
+                            bundle.putString("account_id", response.body().getAccount_id());
+                            bundle.putInt("control", 0);
+                            MainActivity.getInstance().GetBundleProfile(bundle);
+                            MainActivity.getInstance().CallProfile();
+                            ProfileFragment.getInstance().LoadAnotherUser();
+                        }
+                    }else ToastHelper.toast(mContext, mContext.getString(R.string.user_not_found), ToastHelper.SHORT_DURATION);
+                }
+                @Override
+                public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                    loadingDialog.dismissDialog();
+                    Warnings.showWeHaveAProblem(mContext, ErrorHelper.PROFILE_MENTION_CLICK);
+                }
+            });
+        }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
     }
 
     // This method can be used in the future

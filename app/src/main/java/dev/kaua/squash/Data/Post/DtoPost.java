@@ -9,6 +9,8 @@ import java.util.List;
 import dev.kaua.squash.Security.EncryptHelper;
 
 public class DtoPost implements Comparable<DtoPost>{
+    public static final int AD_POST = 555;
+    public static final int NORMAL_POST = 0;
 
     @SerializedName("Posts_Search")
     private ArrayList<Posts_Search>  posts;
@@ -18,49 +20,38 @@ public class DtoPost implements Comparable<DtoPost>{
     }
 
     private String post_id;
-
+    private int post_type;
     private boolean image_loaded;
     private boolean info_loaded;
-
     private boolean suggestion;
-
     private String likes;
     private long active;
-
     private String delete_by;
     private String delete_reason;
-
     private String account_id;
-
     private String account_id_cry;
-
     private String comment;
-
     private String reply_to;
-
     private String name_user;
-
     private String username;
-
     private String profile_image;
-
     private String post_date;
-
     private String post_time;
-
     private String post_content;
-
     private List<String> post_images;
-
     private String post_likes;
-
     private String post_comments_amount;
-
     private String post_topic;
-
     private String comment_id;
-
     private String verification_level;
+
+    public int getPost_type() {
+        return post_type;
+    }
+
+    public void setPost_type(int post_type) {
+        this.post_type = post_type;
+    }
 
     public boolean isImage_loaded() {
         return image_loaded;
