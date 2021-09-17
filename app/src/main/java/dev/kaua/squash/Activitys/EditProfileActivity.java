@@ -50,10 +50,12 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.UserPermissions;
 import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
@@ -95,100 +97,105 @@ public class EditProfileActivity extends AppCompatActivity {
 
         btn_edit_profile.setOnClickListener(v -> {
             btn_edit_profile.startAnimation(myAnim);
-            if(!username_check) showError(edit_username, getString(R.string.username_is_already_in_use));
+            if(edit_username.getText() != null && ConnectionHelper.isOnline(this)){
+                if(!username_check) showError(edit_username, getString(R.string.username_is_already_in_use));
+                else if(!MyPrefs.getUserInformation(this).getUsername().equals(Methods.SQUASH_ORIGINAL_USERNAME)
+                        && edit_username.getText().toString().equals(Methods.SQUASH_ORIGINAL_USERNAME))
+                    showError(edit_username, getString(R.string.username_is_already_in_use));
             else if(edit_username.getText() == null || edit_username.getText().toString().replace(" ", "").length() < 6)
-                showError(edit_username, getString(R.string.required_field));
-            else if(edit_name.getText() == null || edit_name.getText().toString().length() < 2)
-                showError(edit_name, getString(R.string.required_field));
-            else{
-                btn_edit_profile.setEnabled(false);
-                AccountServices services = retrofit.create(AccountServices.class);
+                    showError(edit_username, getString(R.string.required_field));
+                else if(edit_name.getText() == null || edit_name.getText().toString().length() < 2)
+                    showError(edit_name, getString(R.string.required_field));
+                else{
+                    btn_edit_profile.setEnabled(false);
+                    AccountServices services = retrofit.create(AccountServices.class);
 
-                DtoAccount newInfo = new DtoAccount();
-                newInfo.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
-                newInfo.setName_user(EncryptHelper.encrypt(edit_name.getText().toString()));
-                newInfo.setUsername(EncryptHelper.encrypt(edit_username.getText().toString().replace(" ", "")));
-                if(edit_bio.getText() == null) newInfo.setBio_user(EncryptHelper.encrypt(""));
-                else newInfo.setBio_user(EncryptHelper.encrypt(edit_bio.getText().toString()));
-                newInfo.setProfile_image(EncryptHelper.encrypt(new_image));
+                    DtoAccount newInfo = new DtoAccount();
+                    newInfo.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
+                    newInfo.setName_user(EncryptHelper.encrypt(edit_name.getText().toString()));
+                    newInfo.setUsername(EncryptHelper.encrypt(edit_username.getText().toString().replace(" ", "")));
+                    if(edit_bio.getText() == null) newInfo.setBio_user(EncryptHelper.encrypt(""));
+                    else newInfo.setBio_user(EncryptHelper.encrypt(edit_bio.getText().toString()));
+                    newInfo.setProfile_image(EncryptHelper.encrypt(new_image));
 
-                loadingDialog = new LoadingDialog(this);
-                loadingDialog.startLoading();
-                Call<DtoAccount> call = services.edit(newInfo);
-                call.enqueue(new Callback<DtoAccount>() {
-                    @Override
-                    public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                        loadingDialog.dismissDialog();
-                        if(response.code() == 200){
-                            btn_edit_profile.setEnabled(false);
+                    loadingDialog = new LoadingDialog(this);
+                    loadingDialog.startLoading();
+                    Call<DtoAccount> call = services.edit(newInfo);
+                    call.enqueue(new Callback<DtoAccount>() {
+                        @Override
+                        public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                            loadingDialog.dismissDialog();
+                            if(response.code() == 200){
+                                btn_edit_profile.setEnabled(false);
 
-                            //  Clear all prefs before login user
-                            mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+                                //  Clear all prefs before login user
+                                mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
 
-                            //  Add User prefs
-                            SharedPreferences.Editor editor = mPrefs.edit();
-                            if(response.body() != null){
-                                editor.putString("pref_name_user", EncryptHelper.encrypt(edit_name.getText().toString()));
-                                editor.putString("pref_username", EncryptHelper.encrypt(edit_username.getText().toString()));
-                                editor.putString("pref_profile_image", EncryptHelper.encrypt(new_image));
-                                editor.putString("pref_bio_user", EncryptHelper.encrypt(edit_bio.getText().toString()));
-                                editor.apply();
-                            }
+                                //  Add User prefs
+                                SharedPreferences.Editor editor = mPrefs.edit();
+                                if(response.body() != null){
+                                    editor.putString("pref_name_user", EncryptHelper.encrypt(edit_name.getText().toString()));
+                                    editor.putString("pref_username", EncryptHelper.encrypt(edit_username.getText().toString()));
+                                    editor.putString("pref_profile_image", EncryptHelper.encrypt(new_image));
+                                    editor.putString("pref_bio_user", EncryptHelper.encrypt(edit_bio.getText().toString()));
+                                    editor.apply();
+                                }
 
-                            //  Register new user on Firebase Database
-                            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
-                            HashMap<String, Object> hashMap = new HashMap<>();
+                                //  Register new user on Firebase Database
+                                reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
+                                HashMap<String, Object> hashMap = new HashMap<>();
 
-                            hashMap.put("username", edit_username.getText().toString().trim());
-                            hashMap.put("name_user", edit_name.getText().toString().trim());
-                            hashMap.put("search", edit_username.getText().toString().trim());
-                            hashMap.put("imageURL", new_image);
+                                hashMap.put("username", edit_username.getText().toString().trim());
+                                hashMap.put("name_user", edit_name.getText().toString().trim());
+                                hashMap.put("search", edit_username.getText().toString().trim());
+                                hashMap.put("imageURL", new_image);
 
-                            reference.updateChildren(hashMap).addOnCompleteListener(task1 -> {
-                                if(task1.isSuccessful()) Log.d(TAG, "Register in Realtime database Successful");
-                            });
+                                reference.updateChildren(hashMap).addOnCompleteListener(task1 -> {
+                                    if(task1.isSuccessful()) Log.d(TAG, "Register in Realtime database Successful");
+                                });
 
-                            //  Update all user posts
-                            Query applesQuery = myFirebaseHelper.getFirebaseDatabase().getReference()
-                                    .child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("account_id")
-                                    .equalTo(EncryptHelper.encrypt(MyPrefs.getUserInformation(EditProfileActivity.this).getAccount_id() + ""));
+                                //  Update all user posts
+                                Query applesQuery = myFirebaseHelper.getFirebaseDatabase().getReference()
+                                        .child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("account_id")
+                                        .equalTo(EncryptHelper.encrypt(MyPrefs.getUserInformation(EditProfileActivity.this).getAccount_id() + ""));
 
-                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                                        HashMap<String, Object> hashMap = new HashMap<>();
-                                        hashMap.put("username", EncryptHelper.encrypt(edit_username.getText().toString().trim()));
-                                        hashMap.put("name_user", EncryptHelper.encrypt(edit_name.getText().toString().trim()));
-                                        hashMap.put("profile_image", EncryptHelper.encrypt(new_image));
-                                        appleSnapshot.getRef().updateChildren(hashMap);
+                                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                            HashMap<String, Object> hashMap = new HashMap<>();
+                                            hashMap.put("username", EncryptHelper.encrypt(edit_username.getText().toString().trim()));
+                                            hashMap.put("name_user", EncryptHelper.encrypt(edit_name.getText().toString().trim()));
+                                            hashMap.put("profile_image", EncryptHelper.encrypt(new_image));
+                                            appleSnapshot.getRef().updateChildren(hashMap);
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public void onCancelled(@NotNull DatabaseError databaseError) {
-                                    Log.e("EditProfile", "onCancelled", databaseError.toException());
-                                }
-                            });
+                                    @Override
+                                    public void onCancelled(@NotNull DatabaseError databaseError) {
+                                        Log.e("EditProfile", "onCancelled", databaseError.toException());
+                                    }
+                                });
 
-                            ProfileFragment.getInstance().GetUserInfo(EditProfileActivity.this);
-                            finish();
+                                ProfileFragment.getInstance().GetUserInfo(EditProfileActivity.this);
+                                finish();
+                            }
+                            else if(response.code() == 400) showError(edit_username, getString(R.string.bad_username));
+                            else if(response.code() == 405) showError(edit_name, getString(R.string.bad_username));
+                            else if(response.code() == 401) showError(edit_username, getString(R.string.username_is_already_in_use));
+                            else
+                                Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT);
                         }
-                        else if(response.code() == 400) showError(edit_username, getString(R.string.bad_username));
-                        else if(response.code() == 405) showError(edit_name, getString(R.string.bad_username));
-                        else if(response.code() == 401) showError(edit_username, getString(R.string.username_is_already_in_use));
-                        else
-                            Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT);
-                    }
 
-                    @Override
-                    public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
-                        loadingDialog.dismissDialog();
-                        btn_edit_profile.setEnabled(true);
-                        Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT);
-                    }
-                });
-            }
+                        @Override
+                        public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
+                            loadingDialog.dismissDialog();
+                            btn_edit_profile.setEnabled(true);
+                            Warnings.showWeHaveAProblem(EditProfileActivity.this, ErrorHelper.PROFILE_EDIT);
+                        }
+                    });
+                }
+            }else ToastHelper.toast(this, getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
         });
 
         ic_edit_ProfileUser.setOnClickListener(v -> {
@@ -229,20 +236,26 @@ public class EditProfileActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 runOnUiThread(() -> {
-                                    DtoAccount account = new DtoAccount();
-                                    account.setUsername(EncryptHelper.encrypt(s.toString().replace(" ", "")));
-                                    AccountServices services = retrofit.create(AccountServices.class);
-                                    Call<DtoAccount> call = services.check_username(account);
-                                    call.enqueue(new Callback<DtoAccount>() {
-                                        @Override
-                                        public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                                            if(response.code() == 401) username_check = false;
-                                            else if (response.code() == 200) username_check = true;
-                                            DoUsernameValidation();
+                                    try {
+                                        if(ConnectionHelper.isOnline(EditProfileActivity.this)){
+                                            DtoAccount account = new DtoAccount();
+                                            account.setUsername(EncryptHelper.encrypt(s.toString().replace(" ", "")));
+                                            AccountServices services = retrofit.create(AccountServices.class);
+                                            Call<DtoAccount> call = services.check_username(account);
+                                            call.enqueue(new Callback<DtoAccount>() {
+                                                @Override
+                                                public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                                                    if(response.code() == 401) username_check = false;
+                                                    else if (response.code() == 200) username_check = true;
+                                                    DoUsernameValidation();
+                                                }
+                                                @Override
+                                                public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+                                            });
                                         }
-                                        @Override
-                                        public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
-                                    });
+                                    }catch (Exception e){
+                                        Log.d(TAG, e.getMessage());
+                                    }
                                 });
                             }
                         }, DELAY);

@@ -73,7 +73,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_user_items, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_user_items, parent, false);
         return new ViewHolder(view);
     }
 
@@ -81,9 +81,8 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull @NotNull UserChatAdapter.ViewHolder holder, int position) {
         DtoAccount account = mAccounts.get(position);
-        if(account != null){
+        if(account != null && account.getId() != null){
             try{
-
                 holder.itemView.setOnLongClickListener(v -> {
                     if(CHAT){
                         final int PositionFinal = position;

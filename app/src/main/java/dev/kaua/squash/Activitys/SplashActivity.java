@@ -1,7 +1,5 @@
 package dev.kaua.squash.Activitys;
 
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,7 +43,6 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         getWindow().setStatusBarColor(getColor(R.color.base_color));
         getWindow().setNavigationBarColor(getColor(R.color.base_color));
-        AnimateLogo();
 
         SharedPreferences sp_network = getSharedPreferences(MyPrefs.PREFS_NETWORK_USAGE, MODE_PRIVATE);
         if (!sp_network.contains("pref_start_time")) MyPrefs.InsertNetworkCount(this);
@@ -139,9 +135,9 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void verifyIfUsersLogged() {
-        DaoSystem daoSystem = new DaoSystem(this);
+        final DaoSystem daoSystem = new DaoSystem(this);
         if(daoSystem.getNeedResetAccount()){
-            Bundle bundle = getIntent().getExtras();
+            final Bundle bundle = getIntent().getExtras();
             if(bundle != null) {
                 if(bundle.getInt(ACCOUNT_DISABLE) == Login.DISABLE_ACCOUNT){
                     Intent goto_intro = new Intent(this, SignInActivity.class);
@@ -152,20 +148,6 @@ public class SplashActivity extends AppCompatActivity {
                 }else LoadBase();
             }else LoadBase();
         }else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
-    }
-
-    void AnimateLogo(){
-        ImageView iv = findViewById(R.id.img_squash_logo_splash);
-        ObjectAnimator scaleDown = ObjectAnimator.ofPropertyValuesHolder(
-                iv,
-                PropertyValuesHolder.ofFloat("scaleX", 1.2f),
-                PropertyValuesHolder.ofFloat("scaleY", 1.2f));
-        scaleDown.setDuration(1500);
-
-        scaleDown.setRepeatCount(ObjectAnimator.INFINITE);
-        scaleDown.setRepeatMode(ObjectAnimator.REVERSE);
-
-        scaleDown.start();
     }
 
     void LoadBase(){
@@ -184,7 +166,7 @@ public class SplashActivity extends AppCompatActivity {
     private void GoToMain(){
         Intent goto_main = new Intent(this, MainActivity.class);
         goto_main.putExtra(ShortCutsHelper.SHORTCUT_TAG, ShortCutsHelper.NONE_SHORT);
-        goto_main.putExtra(MainActivity.SHARED_TAG, 0);
+        goto_main.putExtra(MainActivity.SHARED_TAG, ShortCutsHelper.NONE_SHORT);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
         ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
         finishAffinity();

@@ -518,145 +518,151 @@ public class PostDetailsActivity extends AppCompatActivity {
                         Toast.makeText(PostDetailsActivity.this, getString(R.string.post_not_found), Toast.LENGTH_SHORT).show();
                         finish();
                     }else{
-                        container_post.setVisibility(View.VISIBLE);
-                        final DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-                        Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
-                                .equalTo(EncryptHelper.encrypt(String.valueOf(post_id)));
-                        applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(!PostDetailsActivity.this.isDestroyed() && !PostDetailsActivity.this.isFinishing()){
-                                    for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
-                                        final DtoPost post = appleSnapshot.getValue(DtoPost.class);
-                                        if(post != null){
-                                            container_post.setVisibility(View.VISIBLE);
-                                            loadingDialog.dismissDialog();
+                        if(myFirebaseHelper.getFirebaseAuth().getUid() != null){
+                            container_post.setVisibility(View.VISIBLE);
+                            final DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                            Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
+                                    .equalTo(EncryptHelper.encrypt(String.valueOf(post_id)));
+                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(!PostDetailsActivity.this.isDestroyed() && !PostDetailsActivity.this.isFinishing()){
+                                        for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
+                                            final DtoPost post = appleSnapshot.getValue(DtoPost.class);
+                                            if(post != null){
+                                                container_post.setVisibility(View.VISIBLE);
+                                                loadingDialog.dismissDialog();
 
-                                            post_info.setPost_id(post.getPost_id());
-                                            post_info.setAccount_id(post.getAccount_id());
-                                            post_info.setVerification_level(post.getVerification_level());
-                                            post_info.setName_user(post.getName_user());
-                                            post_info.setUsername(post.getUsername());
-                                            post_info.setProfile_image(post.getProfile_image());
-                                            post_info.setPost_date(post.getPost_date());
-                                            post_info.setPost_time(post.getPost_time());
-                                            post_info.setPost_content(post.getPost_content());
-                                            post_info.setPost_images(post.getPost_images());
-                                            post_info.setPost_likes(post.getPost_likes());
-                                            post_info.setPost_comments_amount(post.getPost_comments_amount());
-                                            post_info.setPost_topic(post.getPost_topic());
-                                            current_comments = Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_comments_amount())));
-                                            current_likes = Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_likes())));
-                                            if(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getVerification_level()))) != 0){
-                                                ic_account_badge_post.setVisibility(View.VISIBLE);
-                                                if (Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getVerification_level()))) == 1)
-                                                    ic_account_badge_post.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
-                                                else
-                                                    ic_account_badge_post.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
-
-                                            }else ic_account_badge_post.setVisibility(View.GONE);
-
-                                            if(account.getAccount_id_cry() != null){
-                                                boolean result_like = daoPosts.get_A_Like(post_id, Long.parseLong(account.getAccount_id_cry()));
-                                                if(result_like) img_heart_like_post.setImageDrawable(getDrawable(R.drawable.red_heart));
-                                                else img_heart_like_post.setImageDrawable(getDrawable(R.drawable.ic_heart));
-
-                                                if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getAccount_id())))
-                                                        == Long.parseLong(account.getAccount_id_cry())) btn_actions.setVisibility(View.VISIBLE);
-                                                else btn_actions.setVisibility(View.GONE);
-                                            }else btn_actions.setVisibility(View.GONE);
-
-                                            Glide.with(PostDetailsActivity.this).load(EncryptHelper.decrypt(post_info.getProfile_image())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                                                    .into(icon_user_profile);
-
-                                            txt_name_user_post.setText(EncryptHelper.decrypt(post_info.getName_user()));
-                                            txt_username_post.setText("@" + EncryptHelper.decrypt(post_info.getUsername()));
-                                            txt_date_time_post.setText(LastSeenRefactor(EncryptHelper.decrypt(post_info.getPost_date())));
-                                            txt_post_content.setText(EncryptHelper.decrypt(post_info.getPost_content()));
-                                            Linkify.addLinks(txt_post_content, Linkify.ALL);
-                                            txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_likes())))));
-                                            txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_comments_amount())))));
-
-                                            if(post_info.getPost_images() == null || post_info.getPost_images().size() <= 0) container_post_images.setVisibility(View.GONE);
-                                            else{
-                                                container_post_images.setVisibility(View.VISIBLE);
-                                                // Creating Object of ViewPagerAdapterImages
-                                                ViewPagerAdapterImages mViewPagerAdapterImages;
-                                                // Initializing the ViewPager Object
-
-                                                // Initializing the ViewPagerAdapterImages
-                                                mViewPagerAdapterImages = new ViewPagerAdapterImages(PostDetailsActivity.this, post_info, post_info.getPost_images());
-
-                                                // Adding the Adapter to the ViewPager
-                                                img_view_paper.setAdapter(mViewPagerAdapterImages);
-
-                                                tab_indicator_images.setupWithViewPager(img_view_paper);
-
-                                                if(post_info.getPost_images().size() > 1){
-                                                    tab_indicator_images.setVisibility(View.VISIBLE);
-                                                }else tab_indicator_images.setVisibility(View.GONE);
-                                                container_post_images.setVisibility(View.VISIBLE);
-                                            }
-
-                                            swipeRefreshLayout_comments.setVisibility(View.VISIBLE);
-                                            if(comment_type != 0){
-                                                swipeRefreshLayout_comments.setVisibility(View.GONE);
-                                                DtoAccount account = MyPrefs.getUserInformation(PostDetailsActivity.this);
-                                                Picasso.get().load(account.getProfile_image()).into(ic_ProfileUser_profile_compose_comment);
-                                                txt_user_name_compose_comment.setText(account.getName_user());
-                                                txt_username_name_compose_comment.setText("| @" + account.getUsername());
-                                                if(Integer.parseInt(account.getVerification_level()) != 0){
-                                                    ic_account_badge_profile_compose_comment.setVisibility(View.VISIBLE);
-                                                    if (Integer.parseInt(Objects.requireNonNull(account.getVerification_level())) == 1)
-                                                        ic_account_badge_profile_compose_comment.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
+                                                post_info.setPost_id(post.getPost_id());
+                                                post_info.setAccount_id(post.getAccount_id());
+                                                post_info.setVerification_level(post.getVerification_level());
+                                                post_info.setName_user(post.getName_user());
+                                                post_info.setUsername(post.getUsername());
+                                                post_info.setProfile_image(post.getProfile_image());
+                                                post_info.setPost_date(post.getPost_date());
+                                                post_info.setPost_time(post.getPost_time());
+                                                post_info.setPost_content(post.getPost_content());
+                                                post_info.setPost_images(post.getPost_images());
+                                                post_info.setPost_likes(post.getPost_likes());
+                                                post_info.setPost_comments_amount(post.getPost_comments_amount());
+                                                post_info.setPost_topic(post.getPost_topic());
+                                                current_comments = Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_comments_amount())));
+                                                current_likes = Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_likes())));
+                                                if(Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getVerification_level()))) != 0){
+                                                    ic_account_badge_post.setVisibility(View.VISIBLE);
+                                                    if (Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getVerification_level()))) == 1)
+                                                        ic_account_badge_post.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
                                                     else
-                                                        ic_account_badge_profile_compose_comment.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
-                                                    BangedAnimation();
-                                                }else ic_account_badge_profile_compose_comment.setVisibility(View.GONE);
-                                                container_compose_comment.setVisibility(View.VISIBLE);
-                                                edit_comment_msg.requestFocus();
-                                                KeyboardUtils.showKeyboard(PostDetailsActivity.this);
-                                                edit_comment_msg.requestFocus();
-                                            }
+                                                        ic_account_badge_post.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
 
-                                            LoadComments(post_id);
+                                                }else ic_account_badge_post.setVisibility(View.GONE);
 
-                                            //  Get current likes
-                                            Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
-                                                    .equalTo(EncryptHelper.encrypt(String.valueOf(post_id)));
+                                                if(account.getAccount_id_cry() != null){
+                                                    boolean result_like = daoPosts.get_A_Like(post_id, Long.parseLong(account.getAccount_id_cry()));
+                                                    if(result_like) img_heart_like_post.setImageDrawable(getDrawable(R.drawable.red_heart));
+                                                    else img_heart_like_post.setImageDrawable(getDrawable(R.drawable.ic_heart));
 
-                                            applesQuery.addValueEventListener(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                    if(!PostDetailsActivity.this.isDestroyed() && !PostDetailsActivity.this.isFinishing()){
-                                                        for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
-                                                            try {
-                                                                DtoPost dtoPost = appleSnapshot.getValue(DtoPost.class);
-                                                                if(dtoPost != null){
-                                                                    current_likes = Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_likes())));
-                                                                    txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_likes())))));
-                                                                    txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_comments_amount())))));
+                                                    if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getAccount_id())))
+                                                            == Long.parseLong(account.getAccount_id_cry())) btn_actions.setVisibility(View.VISIBLE);
+                                                    else btn_actions.setVisibility(View.GONE);
+                                                }else btn_actions.setVisibility(View.GONE);
+
+                                                Glide.with(PostDetailsActivity.this).load(EncryptHelper.decrypt(post_info.getProfile_image())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                                        .into(icon_user_profile);
+
+                                                txt_name_user_post.setText(EncryptHelper.decrypt(post_info.getName_user()));
+                                                txt_username_post.setText("@" + EncryptHelper.decrypt(post_info.getUsername()));
+                                                txt_date_time_post.setText(LastSeenRefactor(EncryptHelper.decrypt(post_info.getPost_date())));
+                                                txt_post_content.setText(EncryptHelper.decrypt(post_info.getPost_content()));
+                                                Linkify.addLinks(txt_post_content, Linkify.ALL);
+                                                txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_likes())))));
+                                                txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post_info.getPost_comments_amount())))));
+
+                                                if(post_info.getPost_images() == null || post_info.getPost_images().size() <= 0) container_post_images.setVisibility(View.GONE);
+                                                else{
+                                                    container_post_images.setVisibility(View.VISIBLE);
+                                                    img_view_paper.setVisibility(View.VISIBLE);
+                                                    // Creating Object of ViewPagerAdapterImages
+                                                    ViewPagerAdapterImages mViewPagerAdapterImages;
+                                                    // Initializing the ViewPager Object
+
+                                                    // Initializing the ViewPagerAdapterImages
+                                                    mViewPagerAdapterImages = new ViewPagerAdapterImages(PostDetailsActivity.this, post_info, post_info.getPost_images());
+
+                                                    // Adding the Adapter to the ViewPager
+                                                    img_view_paper.setAdapter(mViewPagerAdapterImages);
+
+                                                    tab_indicator_images.setupWithViewPager(img_view_paper);
+
+                                                    if(post_info.getPost_images().size() > 1){
+                                                        tab_indicator_images.setVisibility(View.VISIBLE);
+                                                    }else tab_indicator_images.setVisibility(View.GONE);
+                                                    container_post_images.setVisibility(View.VISIBLE);
+                                                }
+
+                                                swipeRefreshLayout_comments.setVisibility(View.VISIBLE);
+                                                if(comment_type != 0){
+                                                    swipeRefreshLayout_comments.setVisibility(View.GONE);
+                                                    DtoAccount account = MyPrefs.getUserInformation(PostDetailsActivity.this);
+                                                    Picasso.get().load(account.getProfile_image()).into(ic_ProfileUser_profile_compose_comment);
+                                                    txt_user_name_compose_comment.setText(account.getName_user());
+                                                    txt_username_name_compose_comment.setText("| @" + account.getUsername());
+                                                    if(Integer.parseInt(account.getVerification_level()) != 0){
+                                                        ic_account_badge_profile_compose_comment.setVisibility(View.VISIBLE);
+                                                        if (Integer.parseInt(Objects.requireNonNull(account.getVerification_level())) == 1)
+                                                            ic_account_badge_profile_compose_comment.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
+                                                        else
+                                                            ic_account_badge_profile_compose_comment.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
+                                                        BangedAnimation();
+                                                    }else ic_account_badge_profile_compose_comment.setVisibility(View.GONE);
+                                                    container_compose_comment.setVisibility(View.VISIBLE);
+                                                    edit_comment_msg.requestFocus();
+                                                    KeyboardUtils.showKeyboard(PostDetailsActivity.this);
+                                                    edit_comment_msg.requestFocus();
+                                                }
+
+                                                LoadComments(post_id);
+
+                                                //  Get current likes
+                                                Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
+                                                        .equalTo(EncryptHelper.encrypt(String.valueOf(post_id)));
+
+                                                applesQuery.addValueEventListener(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                        if(!PostDetailsActivity.this.isDestroyed() && !PostDetailsActivity.this.isFinishing()){
+                                                            for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
+                                                                try {
+                                                                    DtoPost dtoPost = appleSnapshot.getValue(DtoPost.class);
+                                                                    if(dtoPost != null){
+                                                                        current_likes = Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_likes())));
+                                                                        txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_likes())))));
+                                                                        txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(dtoPost.getPost_comments_amount())))));
+                                                                    }
+                                                                }catch (Exception ex){
+                                                                    Log.d("PostDetails", ex.toString());
                                                                 }
-                                                            }catch (Exception ex){
-                                                                Log.d("PostDetails", ex.toString());
                                                             }
                                                         }
                                                     }
-                                                }
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {}
-                                            });
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError error) {}
+                                                });
 
-                                        }else{
-                                            Toast.makeText(PostDetailsActivity.this, getString(R.string.post_not_found), Toast.LENGTH_SHORT).show();
-                                            finish();
+                                            }else{
+                                                Toast.makeText(PostDetailsActivity.this, getString(R.string.post_not_found), Toast.LENGTH_SHORT).show();
+                                                finish();
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {}
-                        });
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {}
+                            });
+                        }else{
+                            ToastHelper.toast(PostDetailsActivity.this, getString(R.string.must_be_logged_in), ToastHelper.SHORT_DURATION);
+                            finish();
+                        }
                     }
                 }
                 @Override

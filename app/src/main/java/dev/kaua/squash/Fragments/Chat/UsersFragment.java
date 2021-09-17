@@ -2,7 +2,6 @@ package dev.kaua.squash.Fragments.Chat;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,7 +25,6 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,12 +37,10 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
-import dev.kaua.squash.Tools.ToastHelper;
 
 @SuppressLint("StaticFieldLeak")
 public class UsersFragment extends Fragment {
     private static RecyclerView recycler_view_users;
-    private static SwipeRefreshLayout swipe;
     private static TextView no_user_fount_user_chat;
     private EditText search_users;
     private static DaoFollowing daoFollowing;
@@ -74,8 +69,6 @@ public class UsersFragment extends Fragment {
             public void afterTextChanged(Editable s) {}
         });
 
-        swipe.setOnRefreshListener(this::readAccounts);
-
         return view;
     }
 
@@ -87,9 +80,8 @@ public class UsersFragment extends Fragment {
         }
         daoFollowing = new DaoFollowing(requireContext());
         myAccount = MyPrefs.getUserInformation(requireContext());
-        recycler_view_users = view.findViewById(R.id.recycler_view_users);
+        recycler_view_users = view.findViewById(R.id.recycler_view_users_following);
         no_user_fount_user_chat = view.findViewById(R.id.no_user_fount_user_chat);
-        swipe = view.findViewById(R.id.swipe_following_chat_user);
         search_users = view.findViewById(R.id.search_users);
         recycler_view_users.setHasFixedSize(true);
         recycler_view_users.setItemViewCacheSize(20);
@@ -129,7 +121,7 @@ public class UsersFragment extends Fragment {
     final static List<DtoAccount> finalList = new ArrayList<>();
     static DaoAccount db;
     static void LoadAdapter(){
-        if(mAccounts.size() > 0){
+        if(mAccounts.size() > 0 && instance != null && db != null){
             DtoAccount account_follow = db.get_followers_following(MyPrefs.getUserInformation(instance).getAccount_id());
             if(Long.parseLong(account_follow.getFollowing()) != finalList.size()){
                 finalList.clear();
@@ -142,6 +134,14 @@ public class UsersFragment extends Fragment {
                             finalList.add(accounts);
                         }
                 }
+
+                // FIXME: 9/16/2021 - Following list without users
+                //  Without this the list doesn't appear to user
+                //   The adapter is working normally with chat list but no here
+                DtoAccount a = new DtoAccount();
+                a.setEmail("AAAAAA"); // .-.
+                finalList.add(a); // I really don't know why
+
                 userChatAdapter = new UserChatAdapter(instance, finalList, false, UserChatAdapter.OFF_CHATS);
                 recycler_view_users.setAdapter(userChatAdapter);
             }
@@ -152,6 +152,9 @@ public class UsersFragment extends Fragment {
         if(finalList.size() > 0)
             no_user_fount_user_chat.setVisibility(View.GONE);
         else no_user_fount_user_chat.setVisibility(View.VISIBLE);
+
+        if(!ConnectionHelper.isOnline(instance)) no_user_fount_user_chat.setText(instance.getString(R.string.you_are_without_internet));
+        else no_user_fount_user_chat.setText(instance.getString(R.string.no_user_found));
     }
 
     @Override
@@ -164,7 +167,7 @@ public class UsersFragment extends Fragment {
     private void readAccounts() {
         if(getContext() != null){
             if(ConnectionHelper.isOnline(getContext())){
-                Query query = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).orderByChild("status_chat");
+                Query query = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).orderByChild("last_seen");
 
                 query.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -174,14 +177,14 @@ public class UsersFragment extends Fragment {
                             for(DataSnapshot snapshot: datasnapshot.getChildren()){
                                 DtoAccount account = snapshot.getValue(DtoAccount.class);
                                 if(account != null && fUser != null){
-                                    if(account.getId() != null && !account.getId().equals(fUser.getUid()))
+                                    if(account.getId() != null && !account.getId().equals(fUser.getUid())
+                                    && account.getActive() > DtoAccount.ACCOUNT_DISABLE)
                                         mAccounts.add(account);
                                 }
                             }
-                            Collections.reverse(mAccounts);
+                            //Collections.reverse(mAccounts);
                             LoadAdapter();
                         }
-                        swipe.setRefreshing(false);
                         if(finalList.size() > 0)
                             no_user_fount_user_chat.setVisibility(View.GONE);
                         else no_user_fount_user_chat.setVisibility(View.VISIBLE);

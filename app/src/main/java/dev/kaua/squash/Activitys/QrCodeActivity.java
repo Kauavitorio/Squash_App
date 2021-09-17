@@ -67,7 +67,7 @@ public class QrCodeActivity extends AppCompatActivity {
     private TextView qr_code_username;
     private CardView btn_scan_qr;
     private Animation myAnim;
-    private static final String MOBILE_URL_INFO = "Mobile_QR";
+    private static final String MOBILE_URL_INFO = "Squash_QR";
     private static final String TAG = "QRCODE_ACTIVITY";
     private final static DtoAccount account = new DtoAccount();
     private static final String[] permissions = { Manifest.permission.CAMERA };
@@ -120,7 +120,7 @@ public class QrCodeActivity extends AppCompatActivity {
             //  Generate QrCode
             Bitmap QRBitmap = QRCode.from(Methods.BASE_URL_HTTPS + account.getUsername() + "/p" + "?acc="
                     + MOBILE_URL_INFO + "&?r="
-                    + Methods.shuffle(String.valueOf(account.getAccount_id())))
+                    + account.getAccount_id())
                     .withSize(250, 250)
                     .withErrorCorrection(ErrorCorrectionLevel.L)
                     .withHint(EncodeHintType.CHARACTER_SET, StandardCharsets.UTF_8).bitmap();

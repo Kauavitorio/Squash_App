@@ -31,9 +31,9 @@
                 android:id="@+id/icon_user_profile_post_details"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                tools:src="@drawable/img_opss"
                 app:civ_border_color="@color/base_color"
-                app:civ_border_width="1dp" />
+                app:civ_border_width="1dp"
+                tools:src="@drawable/img_opss" />
 
             <!-- Container User Profile Image -->
             <LinearLayout
@@ -58,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLength="25"
-                        android:text="@string/app_name"
+                        tools:text="@string/app_name"
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:textStyle="bold"
@@ -85,7 +85,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="2dp"
                         android:maxLength="20"
-                        android:text="@string/app_name"
+                        tools:text="@string/app_name"
                         android:textColor="@color/hint"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -101,14 +101,14 @@
                 android:id="@+id/txt_date_time_post_details"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:maxLength="20"
-                android:layout_marginStart="10dp"
-                android:text="@string/app_name"
-                android:textColor="@color/hint"
-                android:textSize="13sp"
                 android:layout_below="@+id/container_user_info_post"
-                android:layout_toEndOf="@+id/icon_user_profile_post_details"/>
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_toEndOf="@+id/icon_user_profile_post_details"
+                android:maxLength="20"
+                tools:text="@string/app_name"
+                android:textColor="@color/hint"
+                android:textSize="13sp" />
 
 
             <!-- Text Post Content -->
@@ -119,7 +119,7 @@
                 android:layout_below="@+id/txt_date_time_post_details"
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@+id/icon_user_profile_post_details"
-                android:text="@string/receive_email_terms"
+                tools:text="@string/receive_email_terms"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -150,7 +150,8 @@
                         <androidx.viewpager.widget.ViewPager
                             android:id="@+id/img_view_paper_details"
                             android:layout_width="wrap_content"
-                            android:layout_height="180dp"/>
+                            android:layout_height="180dp"
+                            android:visibility="gone"/>
 
                         <com.google.android.material.tabs.TabLayout
                             android:id="@+id/tab_indicator_images_details"
@@ -198,7 +199,7 @@
                                 android:layout_gravity="center"
                                 android:layout_marginStart="5dp"
                                 android:layout_marginEnd="5dp"
-                                android:text="@string/app_name"
+                                tools:text="@string/app_name"
                                 android:textColor="@color/black"
                                 android:textSize="16sp" />
 
@@ -229,7 +230,7 @@
                                 android:layout_gravity="center"
                                 android:layout_marginStart="5dp"
                                 android:layout_marginEnd="5dp"
-                                android:text="@string/app_name"
+                                tools:text="@string/app_name"
                                 android:textColor="@color/black"
                                 android:textSize="16sp" />
 
@@ -263,6 +264,7 @@
                             android:layout_height="match_parent"
                             android:layout_marginEnd="10dp"
                             android:src="@drawable/ic_three_dots"
+                            android:visibility="gone"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"

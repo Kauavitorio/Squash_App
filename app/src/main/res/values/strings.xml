@@ -257,4 +257,5 @@
     <string name="ad_desc">Here you can watch an ad to help us and watch until the end you will be rewarded with “Squash Points” which is a currency created with the intention of encouraging our users to use the platform, you can spend your Squash Points in our store “Squash Shop ”. Thanks.</string>
     <string name="shop_under_development">We are still developing our store, but you can start collecting your points :).\nIt will be announced by the official Squash profile when the store is ready.</string>
     <string name="contact">Contact</string>
+    <string name="must_be_logged_in">Must be logged in</string>
 </resources>

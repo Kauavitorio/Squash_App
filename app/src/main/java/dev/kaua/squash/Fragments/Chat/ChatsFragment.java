@@ -44,7 +44,7 @@ public class ChatsFragment extends Fragment {
     private RecyclerView recycler_myMsg;
     private TextView txt_not_start_conversation;
     private UserChatAdapter userChatAdapter;
-    private List<DtoAccount> First_List_Accounts;
+    private List<DtoAccount> First_List_Accounts = new ArrayList<>();
     private EditText search_users;
     private DaoChat chatDB;
     private static ChatsFragment instance;

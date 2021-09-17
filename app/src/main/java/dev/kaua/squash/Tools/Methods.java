@@ -82,6 +82,7 @@ public abstract class Methods extends MainActivity {
 
     //  Base API URL
     private static final String TAG = "METHODS_LOG";
+    public static final String SQUASH_ORIGINAL_USERNAME = "squash";
     public static final String REWARDED_AD_ID = "ca-app-pub-5161149668539506/2830793531";
     public static final String INTERSTICIAL_AD_ID = "ca-app-pub-5161149668539506/3847296073";
     public static final long VERIFY_AD_GOAL = 15000;
