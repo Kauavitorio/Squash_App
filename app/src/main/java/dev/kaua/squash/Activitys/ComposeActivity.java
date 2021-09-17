@@ -309,6 +309,7 @@ public class ComposeActivity extends AppCompatActivity {
     }
 
     private void Ids() {
+        getWindow().setStatusBarColor(getColor(R.color.background_menu_sheet));
         fUser = myFirebaseHelper.getFirebaseUser();
         userAccount = MyPrefs.getUserInformation(this);
         btn_post = findViewById(R.id.btn_post);

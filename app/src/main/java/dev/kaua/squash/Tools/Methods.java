@@ -84,7 +84,6 @@ public abstract class Methods extends MainActivity {
     private static final String TAG = "METHODS_LOG";
     public static final String REWARDED_AD_ID = "ca-app-pub-5161149668539506/2830793531";
     public static final String INTERSTICIAL_AD_ID = "ca-app-pub-5161149668539506/3847296073";
-    public static final String NATIVE_POST_AD_ID = "ca-app-pub-5161149668539506/1027483623";
     public static final long VERIFY_AD_GOAL = 15000;
     public static final String PAYPAL_DONATE = "https://www.paypal.com/donate?hosted_button_id=PRKZAKGHHKA7S";
     public static final String GOOGLE_PLAY_APP_LINK = "https://play.google.com/store/apps/details?id=dev.kaua.squash";
@@ -92,7 +91,6 @@ public abstract class Methods extends MainActivity {
     public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
     public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.;])[A-Za-z\\d@$!%*#?&.;]{8,}$";
-    public static final String POLICY_PRIVACY_LINK = "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
     private static long account_id_hold;

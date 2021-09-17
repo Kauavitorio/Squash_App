@@ -45,16 +45,6 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-        <!-- User banner  -->
-        <!-- Will Be available in future updates -->
-        <ImageView
-            android:id="@+id/img_banner_profile"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            android:src="@drawable/ic_verified_account"
-            tools:ignore="ContentDescription" />
-
         <!-- Container Body User Information -->
         <LinearLayout
             android:id="@+id/linearLayout_body_profile"
@@ -84,7 +74,7 @@
                         android:layout_width="83dp"
                         android:layout_height="63dp"
                         android:layout_gravity="center"
-                        tools:src="@drawable/ic_profile_default"
+                        tools:src="@drawable/ic_logo"
                         app:civ_border_color="@color/base_color"
                         app:civ_border_width="1dp"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -332,6 +322,18 @@
                         android:background="@drawable/background_button_following"
                         android:minWidth="200dp"
                         android:text="@string/message"
+                        android:textColor="@color/black"
+                        tools:ignore="ButtonStyle" />
+
+                    <!-- Btn Contact Info -->
+                    <Button
+                        android:id="@+id/btn_contact_info_profile"
+                        android:layout_width="34dp"
+                        android:layout_height="35dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/background_button_following"
+                        android:drawableEnd="@drawable/ic_arrow_down_simple"
+                        android:scaleType="center"
                         android:textColor="@color/black"
                         tools:ignore="ButtonStyle" />
 

@@ -243,7 +243,7 @@ public class AppSupportActivity extends AppCompatActivity {
         if(!ON_COOLDOWN){
             ON_COOLDOWN = true;
             Log.d(TAG, "----- Start CoolDown -----");
-            new CountDownTimer(30000, 1000) {
+            new CountDownTimer(25000, 1000) {
 
                 public void onTick(long duration) {
                     //tTimer.setText("seconds remaining: " + millisUntilFinished / 1000);

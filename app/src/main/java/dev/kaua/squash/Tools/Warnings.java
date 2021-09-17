@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -65,9 +66,8 @@ public class Warnings {
         txt_version_app.setText(context.getString(R.string.have_new_version, versionName));
 
         sheetView.findViewById(R.id.btn_update_now).setOnClickListener(v -> {
-            String url = "https://play.google.com/store/apps/details?id=dev.kaua.squash";
             Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
+            i.setData(Uri.parse(Methods.GOOGLE_PLAY_APP_LINK));
             context.startActivity(i);
             bottomSheetDialog.dismiss();
         });
@@ -279,7 +279,33 @@ public class Warnings {
     public static void goToUpdateInPrivacyPolicy(Activity context, long privacy_policy) {
         Intent i = new Intent(context, PrivacyPolicyUpdateActivity.class);
         ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context,R.anim.move_to_left_go, R.anim.move_to_right_go);
-        i.putExtra("privacy_policy", privacy_policy);
+        i.putExtra(PrivacyPolicyUpdateActivity.PRIVACY_POLICY_TAG, privacy_policy);
         ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
+    }
+
+    //  Create Contact Profile Sheet
+    public static void Sheet_Contact_Profile(Activity context, DtoAccount account) {
+        bottomSheetDialog = new BottomSheetDialog(context, R.style.BottomSheetTheme);
+        //  Creating View for SheetMenu
+        View sheetView = LayoutInflater.from(context).inflate(R.layout.adapter_sheet_contact_profile,
+                context.findViewById(R.id.adapter_sheet_contact_profile));
+        ImageView close = sheetView.findViewById(R.id.close_contact_profile);
+
+        TextView txt_email = sheetView.findViewById(R.id.txt_email_contact_profile);
+        txt_email.setText(account.getEmail());
+
+        txt_email.setOnClickListener(v -> {
+            txt_email.startAnimation(AnimationUtils.loadAnimation(context, R.anim.click_anim));
+            Intent intent = new Intent(Intent.ACTION_SENDTO);
+            intent.setData(Uri.parse("mailto:" + account.getEmail()));
+            intent.putExtra(Intent.EXTRA_EMAIL, account.getEmail());
+            if (intent.resolveActivity(context.getPackageManager()) != null)
+                context.startActivity(intent);
+        });
+
+        close.setOnClickListener(v -> bottomSheetDialog.dismiss());
+
+        bottomSheetDialog.setContentView(sheetView);
+        bottomSheetDialog.show();
     }
 }

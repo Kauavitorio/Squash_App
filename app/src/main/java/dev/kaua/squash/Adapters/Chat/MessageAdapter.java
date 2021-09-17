@@ -180,25 +180,24 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     }
 
                     if(EncryptHelper.decrypt(mMessages.get(position).getMessage()) == null || EncryptHelper.decrypt(message.getMessage()).length() <= 0)
-                        viewHolder.msg_chat_item.setVisibility(View.GONE);
+                        if(viewHolder.msg_chat_item != null) viewHolder.msg_chat_item.setVisibility(View.GONE);
 
                     viewHolder.msg_chat_item.setOnLongClickListener(v -> {
-                        viewHolder.container_msg.startAnimation(myAnim);
-                        viewHolder.voicePlayerView.startAnimation(myAnim);
+                        if(viewHolder.container_msg != null) viewHolder.container_msg.startAnimation(myAnim);
+                        if(viewHolder.voicePlayerView != null) viewHolder.voicePlayerView.startAnimation(myAnim);
                         message_Action(fUser.getUid(), viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
                         return false;
                     });
                 }
 
                 if(LayoutType == MSG_TYPE_LEFT_MEDIA || LayoutType == MSG_TYPE_RIGHT_MEDIA){
-                    if(viewHolder.container_msg != null
-                    ) viewHolder.container_msg.setVisibility(View.VISIBLE);
+                    if(viewHolder.container_msg != null) viewHolder.container_msg.setVisibility(View.VISIBLE);
                     viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
                     viewHolder.media_img.setVisibility(View.VISIBLE);
                     Glide.with(context).load(message.getMedia().get(0)).dontAnimate().diskCacheStrategy(DiskCacheStrategy.ALL).thumbnail(0.5f).into(holder.media_img);
 
                     viewHolder.container_media_img_chat.setOnClickListener(v -> {
-                        viewHolder.container_media_img_chat.startAnimation(myAnim);
+                        if(viewHolder.container_media_img_chat != null) viewHolder.container_media_img_chat.startAnimation(myAnim);
                         Intent i = new Intent(mContext, ViewMediaActivity.class);
                         i.putExtra("image_url", message.getMedia().get(0));
                         i.putExtra("receive_time", EncryptHelper.decrypt(message.getTime()).replace("-", "/"));

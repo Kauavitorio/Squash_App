@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [
+    <!ENTITY privacy_policy "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy_PT_BR.pdf">
+    ]>
 <resources>
+    <string name="privacy_policy_url">&privacy_policy;</string>
     <string name="intro_description">ESCOLHA UMA MANEIRA DE COMEÇAR.</string>
     <string name="create_account">Criar Conta</string>
     <string name="have_an_account_already"><font color='#504F4F'>Já possui uma conta?</font> <font color='#10ace0'>Conecte-se</font></string>
@@ -143,9 +147,9 @@
     <string name="unable_to_download_the_image">Não foi possível baixar a imagem, tente mais tarde.</string>
     <string name="image_downloaded_successfully">Imagem baixada com sucesso</string>
     <string name="updating_its_terms_and_privacy_policy">Squash está atualizando seus termos e política de privacidade.</string>
-    <string name="key_updates_include_more_information_about">Com esta <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">atualização</a></font>, estamos fornecendo mais informações em nossos termos e política de privacidade, incluindo como você pode conversar com empresas, se desejar. Isso inclui: </string>
+    <string name="key_updates_include_more_information_about">Com esta <font color='#FF6C26'><a href="&privacy_policy;">atualização</a></font>, estamos fornecendo mais informações em nossos termos e política de privacidade, incluindo como você pode conversar com empresas, se desejar. Isso inclui: </string>
     <string name="services_and_how_we_process_your_data">1- Mais informações sobre como funciona o Squash; incluindo como processamos dados e mantemos sua conta segura.</string>
-    <string name="please_accept_these_terms">Aceite estes <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">termos</a></font> para continuar usando o Squash após esta data. Saiba mais sobre como processamos seus dados em nossa <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">política de privacidade atualizada.</a></font></string>
+    <string name="please_accept_these_terms">Aceite estes <font color='#FF6C26'><a href="&privacy_policy;">termos</a></font> para continuar usando o Squash após esta data. Saiba mais sobre como processamos seus dados em nossa <font color='#FF6C26'><a href="&privacy_policy;">política de privacidade atualizada.</a></font></string>
     <string name="accept">Aceitar</string>
     <string name="network_usage">Uso de rede</string>
     <string name="usage">Uso</string>
@@ -233,4 +237,5 @@
     <string name="thanks_for_watching_the_ad">Obrigado por assistir o anúncio.\nSua recompensa foi de %1$s Squash points.</string>
     <string name="ad_desc">Aqui você poderá assistir a um anúncio para nos ajudar e assistindo até o final você será recompensado com “Squash Points” que é uma moeda criada pela Squash com o intuito de incentivar nossos usuários a utilizar a plataforma, você pode gastar seus Squash Points em nossa loja “Squash Shop”. Obrigado.</string>
     <string name="shop_under_development">Ainda estamos desenvolvendo nossa loja, mas você já pode ir juntando seus pontos :).\nSerá anunciado pelo perfil oficial da Squash quando a loja estiver pronta.</string>
+    <string name="contact">Contato</string>
 </resources>

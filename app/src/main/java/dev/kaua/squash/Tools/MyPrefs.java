@@ -53,6 +53,9 @@ public abstract class MyPrefs {
         account.setAd_points(sp.getLong("pref_ad_points", 0));
         account.setSupport_visit(sp.getBoolean("pref_support_visit", false));
         account.setActive(sp.getLong("pref_active", DtoAccount.ACCOUNT_ACTIVE));
+        String type_acc = EncryptHelper.decrypt(sp.getString("pref_type_acc", null));
+        if(type_acc == null) type_acc = String.valueOf(DtoAccount.NORMAL_ACCOUNT);
+        account.setType_acc(type_acc);
 
         return account;
     }

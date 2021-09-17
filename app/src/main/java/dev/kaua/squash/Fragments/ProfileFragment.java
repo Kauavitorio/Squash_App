@@ -93,12 +93,12 @@ import retrofit2.Retrofit;
 @SuppressLint({"UseCompatLoadingForDrawables", "StaticFieldLeak"})
 public class ProfileFragment extends Fragment {
     //  Fragments Items
-    private static ImageView img_banner_profile, ic_account_badge_profile;
+    private static ImageView ic_account_badge_profile;
     private static CircleImageView ic_ProfileUser_profile;
     private static final String TAG = "PROFILE_FRAGMENT";
     private static TextView txt_user_name, txt_username_name, txt_user_bio_profile,
             txt_amount_following_profile, txt_amount_followers_profile, txt_joined, posts_size;
-    private static Button btn_follow_following_profile, btn_go_chat_profile;
+    private static Button btn_follow_following_profile, btn_go_chat_profile, btn_contact_info_profile;
     private RelativeLayout noPost_profile;
     private LinearLayout container_following_profile, container_followers_profile;
     private CardView btn_plus_story_profile;
@@ -112,7 +112,6 @@ public class ProfileFragment extends Fragment {
     private static long account_another_user = 0, account_id, warn_id, active_level;
     private static int control;
     private static String user_image;
-    private boolean visible_control;
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
@@ -137,10 +136,10 @@ public class ProfileFragment extends Fragment {
                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
                 btn_follow_following_profile.setText(requireContext().getString(R.string.following));
                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.black));
-                txt_amount_followers_profile.setText((actual + 1) + "");
+                txt_amount_followers_profile.setText(String.valueOf((actual + 1)));
                 account = new DtoAccount();
-                account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
-                account.setAccount_id_following(EncryptHelper.encrypt(account_another_user + ""));
+                account.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(account_id)));
+                account.setAccount_id_following(EncryptHelper.encrypt(String.valueOf(account_another_user)));
                 AccountServices services = retrofitUser.create(AccountServices.class);
                 Call<DtoAccount> call = services.follow_a_user(account);
                 call.enqueue(new Callback<DtoAccount>() {
@@ -185,11 +184,11 @@ public class ProfileFragment extends Fragment {
                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_follow));
                 btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
-                txt_amount_followers_profile.setText((actual - 1) + "");
+                txt_amount_followers_profile.setText(String.valueOf((actual - 1)));
                 btn_go_chat_profile.setVisibility(View.GONE);
                 account = new DtoAccount();
-                account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
-                account.setAccount_id_following(EncryptHelper.encrypt(account_another_user + ""));
+                account.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(account_id)));
+                account.setAccount_id_following(EncryptHelper.encrypt(String.valueOf(account_another_user)));
                 AccountServices services = retrofitUser.create(AccountServices.class);
                 Call<DtoAccount> call = services.un_follow_a_user(account);
                 call.enqueue(new Callback<DtoAccount>() {
@@ -306,18 +305,27 @@ public class ProfileFragment extends Fragment {
                                                 user_image = EncryptHelper.decrypt(response.body().getProfile_image());
                                                 txt_user_name.setText(EncryptHelper.decrypt(response.body().getName_user()));
                                                 txt_username_name.setText("@" + EncryptHelper.decrypt(response.body().getUsername()));
-                                                txt_user_bio_profile.setText(EncryptHelper.decrypt(response.body().getBio_user()));
+                                                if(EncryptHelper.decrypt(response.body().getBio_user()) == null ||
+                                                        EncryptHelper.decrypt(response.body().getBio_user()) != null &&
+                                                                Objects.requireNonNull(EncryptHelper.decrypt(response.body().getBio_user())).replace(" ", "").length() == 0)
+                                                    txt_user_bio_profile.setVisibility(View.GONE);
+                                                else{
+                                                    txt_user_bio_profile.setVisibility(View.VISIBLE);
+                                                    txt_user_bio_profile.setText(EncryptHelper.decrypt(response.body().getBio_user()));
+                                                }
                                                 txt_joined.setText(LoadJoined(EncryptHelper.decrypt(response.body().getJoined_date())));
                                                 Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
                                                 LoadUserMentions();
                                                 username = EncryptHelper.decrypt(response.body().getUsername());
-                                                txt_amount_following_profile.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowing())))));
-                                                txt_amount_followers_profile.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowers())))));
+                                                if(response.body().getFollowing() != null){
+                                                    txt_amount_following_profile.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowing())))));
+                                                    txt_amount_followers_profile.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowers())))));
+                                                }
                                                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_follow));
                                                 btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
                                                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
 
-                                                int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getVerification_level())));
+                                                final int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getVerification_level())));
                                                 if(verified != 0){
                                                     if (verified == 2)
                                                         ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_employee_account));
@@ -326,8 +334,12 @@ public class ProfileFragment extends Fragment {
                                                     ic_account_badge_profile.setVisibility(View.VISIBLE);
                                                     BangedAnimation();
                                                 }
+
+                                                Check_Contact_Account(response.body());
+
                                                 RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile
                                                         , posts_size, search_account);
+
 
                                                 DaoFollowing daoFollowing = new DaoFollowing(getContext());
                                                 ArrayList<DtoAccount> accounts = daoFollowing.get_followers_following(account_id, Long.parseLong(bundle.getString("account_id")));
@@ -377,6 +389,26 @@ public class ProfileFragment extends Fragment {
         }else GetUserInfo(requireActivity());
     }
 
+    private void Check_Contact_Account(DtoAccount account) {
+        btn_contact_info_profile.setVisibility(View.GONE);
+        if(account != null && account.getType_acc() != null){
+            try {
+                final int type_acc = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getType_acc())));
+                if(type_acc == DtoAccount.BUSINESS_ACCOUNT
+                        || Integer.parseInt(MyPrefs.getUserInformation(requireContext()).getVerification_level()) == DtoAccount.ACCOUNT_IS_ADM){
+                    btn_contact_info_profile.setVisibility(View.VISIBLE);
+                    btn_contact_info_profile.setOnClickListener(v -> {
+                        DtoAccount contact_account = new DtoAccount();
+                        contact_account.setEmail(EncryptHelper.decrypt(account.getEmail()));
+                        Warnings.Sheet_Contact_Profile(getActivity(), contact_account);
+                    });
+                }
+            }catch (Exception ex){
+                Log.d(TAG, ex.getMessage());
+            }
+        }
+    }
+
     private String LoadJoined(final String date) {
         String format_date = date;
         if(date != null){
@@ -398,7 +430,7 @@ public class ProfileFragment extends Fragment {
         DtoAccount user = MyPrefs.getUserInformation(requireContext());
         account_id = user.getAccount_id();
         account.setAccount_id(account_id);
-        account.setAccount_id_cry(EncryptHelper.encrypt(account_id + ""));
+        account.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(account_id)));
         RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile, posts_size, account);
 
         DaoAccount db = new DaoAccount(activity);
@@ -425,7 +457,14 @@ public class ProfileFragment extends Fragment {
                 .into(ic_ProfileUser_profile);
         txt_user_name.setText(user.getName_user());
         txt_username_name.setText("@" + user.getUsername());
-        txt_user_bio_profile.setText(user.getBio_user());
+        if(user.getBio_user() == null ||
+                user.getBio_user() != null &&
+                        user.getBio_user().replace(" ", "").length() == 0)
+            txt_user_bio_profile.setVisibility(View.GONE);
+        else{
+            txt_user_bio_profile.setVisibility(View.VISIBLE);
+            txt_user_bio_profile.setText(user.getBio_user());
+        }
         txt_joined.setText(LoadJoined(user.getJoined_date()));
         btn_follow_following_profile.setBackground(activity.getDrawable(R.drawable.background_button_following));
         btn_follow_following_profile.setEnabled(true);
@@ -433,6 +472,11 @@ public class ProfileFragment extends Fragment {
         btn_follow_following_profile.setTextColor(activity.getColor(R.color.black));
         Linkify.addLinks(txt_user_bio_profile, Linkify.ALL);
         LoadUserMentions();
+
+        DtoAccount account_contact = new DtoAccount();
+        account_contact.setType_acc(EncryptHelper.encrypt(user.getType_acc()));
+        account_contact.setEmail(EncryptHelper.encrypt(user.getEmail()));
+        Check_Contact_Account(account_contact);
 
         btn_qr_code.setVisibility(View.VISIBLE);
         btn_qr_code.setOnClickListener(v -> {
@@ -634,9 +678,9 @@ public class ProfileFragment extends Fragment {
         instance = this;
         myAnim = AnimationUtils.loadAnimation(requireContext() ,R.anim.click_anim);
         account = MyPrefs.getUserInformation(requireContext());
-        img_banner_profile = view.findViewById(R.id.img_banner_profile);
         posts_size = view.findViewById(R.id.txt_posts_size_amount_profile);
         btn_go_chat_profile = view.findViewById(R.id.btn_go_chat_profile);
+        btn_contact_info_profile = view.findViewById(R.id.btn_contact_info_profile);
         btn_plus_story_profile = view.findViewById(R.id.btn_plus_story_profile);
         btn_qr_code = view.findViewById(R.id.btn_qr_code_profile);
         txt_joined = view.findViewById(R.id.txt_joined);
@@ -659,6 +703,7 @@ public class ProfileFragment extends Fragment {
         }));
 
 
+        btn_contact_info_profile.setVisibility(View.GONE);
         btn_follow_following_profile = view.findViewById(R.id.btn_follow_following_profile);
         txt_amount_following_profile = view.findViewById(R.id.txt_amount_following_profile);
         txt_amount_followers_profile = view.findViewById(R.id.txt_amount_followers_profile);
@@ -670,35 +715,7 @@ public class ProfileFragment extends Fragment {
         if(getContext() != null){
             new PatternEditableBuilder().
                     addPattern(Pattern.compile("@(\\w+)"), getContext().getColor(R.color.base_color),
-                            text -> {
-                                DtoAccount account = new DtoAccount();
-                                account.setUsername(text.replace("@", ""));
-                                AccountServices services = retrofit.create(AccountServices.class);
-                                Call<DtoPost> call = services.search_with_username(account);
-                                LoadingDialog loadingDialog = new LoadingDialog(((Activity)getContext()));
-                                loadingDialog.startLoading();
-                                call.enqueue(new Callback<DtoPost>() {
-                                    @Override
-                                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                                        loadingDialog.dismissDialog();
-                                        if(response.code() == 200){
-                                            if(response.body() != null){
-                                                Bundle bundle = new Bundle();
-                                                bundle.putString("account_id", response.body().getAccount_id());
-                                                bundle.putInt("control", 0);
-                                                MainActivity.getInstance().GetBundleProfile(bundle);
-                                                MainActivity.getInstance().CallProfile();
-                                                ProfileFragment.getInstance().LoadAnotherUser();
-                                            }
-                                        }else ToastHelper.toast(((Activity) requireContext()), requireContext().getString(R.string.user_not_found), 0);
-                                    }
-                                    @Override
-                                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
-                                        loadingDialog.dismissDialog();
-                                        Warnings.showWeHaveAProblem(requireContext(), ErrorHelper.PROFILE_MENTION_CLICK);
-                                    }
-                                });
-                            }).into(txt_user_bio_profile);
+                            text -> Methods.Profile_From_USERNAME(getActivity(), text)).into(txt_user_bio_profile);
 
             txt_user_bio_profile.setMovementMethod(BetterLinkMovementMethod.newInstance().setOnLinkClickListener((textView, url) -> {
                 if (Patterns.WEB_URL.matcher(url).matches()) {
@@ -712,7 +729,6 @@ public class ProfileFragment extends Fragment {
     }
 
     void BangedAnimation(){
-
         final ObjectAnimator oa1 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 1f, 0f);
         final ObjectAnimator oa2 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 0f, 1f);
         oa1.setInterpolator(new DecelerateInterpolator());
@@ -732,7 +748,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public void setMenuVisibility(final boolean visible) {
         super.setMenuVisibility(visible);
-        visible_control = visible;
         if (visible){
             if(getContext() != null){
                 Toolbar toolbar = view.findViewById(R.id.toolbar_profile);

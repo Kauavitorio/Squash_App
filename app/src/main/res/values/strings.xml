@@ -1,9 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [
+    <!ENTITY privacy_policy "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy_EN.pdf">
+    ]>
 <resources>
 
     <!-- Natural Text -->
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">OK</string> <!-- End Natural Text -->
+
+    <!-- Privacy Policy -->
+    <string name="privacy_policy_url">&privacy_policy;</string>
 
     <!-- ADS -->
     <string name="main_banner" translatable="false">ca-app-pub-5161149668539506/1257131065</string>
@@ -105,7 +112,7 @@
     <string name="have_new_version">We have a new application update available (%1$s), to ensure better experience in our application we recommend that you update.</string>
     <string name="need_login_msg">To access this function it is necessary to be logged in.\nWould you like to login?</string>
     <string name="url_copied">URL copied to your clipboard</string>
-    <string name="secure_website"><font color='#98F33C'>This website is using a secure connection.</font>nInformation shared with this website, such as passwords or credit card numbers, is submitted securely</string>
+    <string name="secure_website"><font color='#98F33C'>This website is using a secure connection.</font>\nInformation shared with this website, such as passwords or credit card numbers, is submitted securely</string>
     <string name="not_secure_website"><font color='#FD0000'>This site is not using a secure connection.</font>\nInformation shared with this site, such as passwords or credit card numbers, is not sent securely</string>
     <string name="remove_image">Remove image</string>
     <string name="desc_remove_image_post">Do you want to remove the selected image from your post?</string>
@@ -155,9 +162,9 @@
     <string name="unable_to_download_the_image">Unable to download the image</string>
     <string name="image_downloaded_successfully">Image downloaded successfully</string>
     <string name="updating_its_terms_and_privacy_policy">Squash is updating its terms and privacy policy.</string>
-    <string name="key_updates_include_more_information_about">With this <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">update</a></font>, we\'re providing more information in our terms and privacy policy, including how you can chat with businesses if you choose. This include:</string>
+    <string name="key_updates_include_more_information_about">With this <font color='#FF6C26'><a href="&privacy_policy;">update</a></font>, we\'re providing more information in our terms and privacy policy, including how you can chat with businesses if you choose. This include:</string>
     <string name="services_and_how_we_process_your_data">1- More information about how Squash works; including how we process data and keep your account safe.</string>
-    <string name="please_accept_these_terms">Please accept these <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">terms</a></font> to continue using Squash after this date. Learn about how we process your data in our updated <font color='#FF6C26'><a href="https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy.pdf">privacy policy.</a></font></string>
+    <string name="please_accept_these_terms">Please accept these <font color='#FF6C26'><a href="&privacy_policy;">terms</a></font> to continue using Squash after this date. Learn about how we process your data in our updated <font color='#FF6C26'><a href="&privacy_policy;">privacy policy.</a></font></string>
     <string name="accept">Accept</string>
     <string name="network_usage">Network usage</string>
     <string name="usage">Usage</string>
@@ -249,4 +256,5 @@
     <string name="squash_shop" translatable="false">Squash Shop</string>
     <string name="ad_desc">Here you can watch an ad to help us and watch until the end you will be rewarded with “Squash Points” which is a currency created with the intention of encouraging our users to use the platform, you can spend your Squash Points in our store “Squash Shop ”. Thanks.</string>
     <string name="shop_under_development">We are still developing our store, but you can start collecting your points :).\nIt will be announced by the official Squash profile when the store is ready.</string>
+    <string name="contact">Contact</string>
 </resources>

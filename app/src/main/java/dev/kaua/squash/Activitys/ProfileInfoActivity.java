@@ -60,7 +60,6 @@ public class ProfileInfoActivity extends AppCompatActivity {
             txt_username.setText( "@" + bundle.getString(REQUEST_USERNAME_ID));
             Glide.with(this).load(bundle.getString(REQUEST_PROFILE_IMAGE_ID)).into(profile_image);
 
-
             viewPaperAdapter = new ViewPaperAdapter(getSupportFragmentManager());
             viewPaperAdapter.addFragment(new FollowersFragment(), bundle.getString(REQUEST_FOLLOWERS_AMOUNT) + " " + getString(R.string.followers));
             viewPaperAdapter.addFragment(new FollowingFragment(), bundle.getString(REQUEST_FOLLOWING_AMOUNT) + " " + getString(R.string.following));
