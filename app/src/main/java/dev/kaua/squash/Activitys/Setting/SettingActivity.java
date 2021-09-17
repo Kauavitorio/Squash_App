@@ -74,7 +74,7 @@ public class SettingActivity extends AppCompatActivity {
         //  Privacy Policy click
         btn_policy_and_Privacy.setOnClickListener(v -> {
             btn_policy_and_Privacy.startAnimation(myAnim);
-            Methods.browseTo(this, Methods.POLICY_PRIVACY_LINK);
+            Methods.browseTo(this, getString(R.string.privacy_policy_url));
         });
 
         btn_support_ad.setOnClickListener(v -> {

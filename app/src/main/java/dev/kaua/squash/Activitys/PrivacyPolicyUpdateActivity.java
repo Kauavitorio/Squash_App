@@ -14,10 +14,10 @@ import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.MyPrefs;
 
 public class PrivacyPolicyUpdateActivity extends AppCompatActivity {
+    public static String PRIVACY_POLICY_TAG = "privacy_policy";
     TextView txt_include_information, txt_please_accept;
     CardView btn_accept;
     boolean accept = false;
-    long version;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class PrivacyPolicyUpdateActivity extends AppCompatActivity {
         Ids();
 
         Bundle bundle = getIntent().getExtras();
-        version = bundle.getLong("privacy_policy");
+        final long version = bundle.getLong(PRIVACY_POLICY_TAG);
 
         btn_accept.setOnClickListener(v -> {
             accept = true;
@@ -37,7 +37,7 @@ public class PrivacyPolicyUpdateActivity extends AppCompatActivity {
             new Handler().postDelayed(() -> {
                 loadingDialog.dismissDialog();
                 finish();
-            }, 900);
+            }, 500);
         });
 
     }

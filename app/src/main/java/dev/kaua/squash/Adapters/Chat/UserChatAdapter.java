@@ -73,7 +73,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_user_items, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_user_items, parent, false);
         return new ViewHolder(view);
     }
 
@@ -81,9 +81,8 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull @NotNull UserChatAdapter.ViewHolder holder, int position) {
         DtoAccount account = mAccounts.get(position);
-        if(account != null){
+        if(account != null && account.getId() != null){
             try{
-
                 holder.itemView.setOnLongClickListener(v -> {
                     if(CHAT){
                         final int PositionFinal = position;
@@ -268,30 +267,5 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
             img_status = itemView.findViewById(R.id.img_status_user);
             card_no_read_ic = itemView.findViewById(R.id.card_no_read_ic);
         }
-    }
-
-    //  check for last message
-    private void lastMessage(String userId, CardView ic_not_seen){
-        theLastMessage  = DtoAccount.DEFAULT;
-        FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
-        DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHATS_REFERENCE);
-        reference.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                for (DataSnapshot snapshot : datasnapshot.getChildren()){
-                    DtoMessage message = snapshot.getValue(DtoMessage.class);
-                    if(message != null)
-                        if(message.getReceiver() != null)
-                            if(message.getReceiver().equals(firebaseUser.getUid()) && message.getSender().equals(userId) ||
-                                    message.getReceiver().equals(userId) && message.getSender().equals(firebaseUser.getUid())){
-                                if(firebaseUser.getUid().equals(message.getReceiver()) && message.getSender().equals(userId) && message.getIsSeen() == 0) ic_not_seen.setVisibility(View.VISIBLE);
-                            }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
-
     }
 }

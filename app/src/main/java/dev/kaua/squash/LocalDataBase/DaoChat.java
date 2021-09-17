@@ -26,7 +26,7 @@ public class DaoChat extends SQLiteOpenHelper {
     public static final int DROP_ALL = 999;
 
     public DaoChat(@Nullable Context context) {
-        super(context, "DB_CHAT", null, 65);
+        super(context, "DB_CHAT", null, 66);
     }
 
     @Override
@@ -112,7 +112,9 @@ public class DaoChat extends SQLiteOpenHelper {
     public void REGISTER_CHAT_LIST(List<DtoAccount> accounts){
         if(accounts != null && accounts.size() > 0){
             for(int i = 0; i < accounts.size(); i++){
-                if(accounts.get(i).getChat_id() != null){
+                if(accounts.get(i).getChat_id() != null && accounts.get(i).getActive() > DtoAccount.ACCOUNT_DISABLE
+                && accounts.get(i).getVerification_level() != null && accounts.get(i).getAccount_id_cry() != null
+                && accounts.get(i).getId() != null){
                     String command = "SELECT * FROM " + TABLE_CHAT_LIST + " WHERE  id = ?";
                     String[] params = {accounts.get(i).getId()};
                     @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);

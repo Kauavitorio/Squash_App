@@ -11,7 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp"
+        android:padding="4dp"
         android:paddingStart="15dp"
         android:paddingEnd="10dp"
         tools:ignore="UselessParent">
@@ -19,8 +19,8 @@
         <!-- User Icon Image -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_image_users"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:src="@mipmap/ic_launcher" />
 

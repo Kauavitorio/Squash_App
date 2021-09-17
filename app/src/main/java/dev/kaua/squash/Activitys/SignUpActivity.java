@@ -72,6 +72,7 @@ import retrofit2.Retrofit;
  *  @author Kaua Vitorio
  **/
 
+@SuppressLint("StaticFieldLeak")
 @SuppressWarnings("ConstantConditions")
 public class SignUpActivity extends AppCompatActivity {
     private ImageView btn_back_signUp;
@@ -86,7 +87,6 @@ public class SignUpActivity extends AppCompatActivity {
     private static DatePickerDialog.OnDateSetListener date;
     private LoadingDialog loadingDialog;
     private Animation myAnim;
-    @SuppressLint("StaticFieldLeak")
     private static SignUpActivity instance;
     private static SharedPreferences mPrefs;
     private TextView txt_policy_and_privacy;
@@ -127,7 +127,7 @@ public class SignUpActivity extends AppCompatActivity {
         };
 
         //  Privacy Policy click
-        txt_policy_and_privacy.setOnClickListener(v -> Methods.browseTo(this, Methods.POLICY_PRIVACY_LINK));
+        txt_policy_and_privacy.setOnClickListener(v -> Methods.browseTo(this, getString(R.string.privacy_policy_url)));
 
         //  Privacy Policy check status
         policy_and_privacy_check.setOnClickListener(v -> policy_and_privacy = policy_and_privacy_check.isChecked());

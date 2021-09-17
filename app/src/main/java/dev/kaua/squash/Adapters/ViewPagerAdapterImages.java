@@ -3,6 +3,9 @@ package dev.kaua.squash.Adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +15,14 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.util.List;
 import java.util.Objects;
@@ -45,7 +52,6 @@ public class ViewPagerAdapterImages extends PagerAdapter {
     final RequestOptions myOptions = new RequestOptions()
             .fitCenter() // or centerCrop
             .override(450, 450);
-
 
     // Viewpager Constructor
     public ViewPagerAdapterImages(Context context, DtoPost postInfo, List<String> images) {
@@ -84,6 +90,23 @@ public class ViewPagerAdapterImages extends PagerAdapter {
                     .apply(myOptions)
                     .load(EncryptHelper.decrypt(images.get(position)))
                     .into(imageView);
+
+            Glide.with(context)
+                    .asBitmap()
+                    .apply(myOptions)
+                    .load(EncryptHelper.decrypt(images.get(position)))
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            RoundedBitmapDrawable img = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                            img.setCornerRadius(25);
+                            imageView.setImageDrawable(img);
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                        }
+                    });
 
             imageView.setOnClickListener(v -> CreateImageViewIntent(postInfo, images.get(position), imageView));
 

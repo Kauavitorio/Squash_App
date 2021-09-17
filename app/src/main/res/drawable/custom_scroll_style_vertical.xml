@@ -3,9 +3,9 @@
 
     <gradient
         android:angle="405"
-        android:endColor="@color/base_color_disable"
+        android:endColor="@color/background_my_message_middle"
         android:centerColor="@color/base_color"
-        android:startColor="@color/base_color_click" />
+        android:startColor="@color/background_my_message_bottom" />
 
     <corners android:radius="10dp" />
     <size android:width="4dp"/>

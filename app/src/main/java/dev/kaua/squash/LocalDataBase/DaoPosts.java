@@ -92,36 +92,38 @@ public class DaoPosts extends SQLiteOpenHelper {
         ClearTable(DROP_POST_AND_IMAGE);
         int size = Math.min(post.size(), 100);
         for (int i = 0; i < size; i++){
-            ContentValues values = new ContentValues();
-            values.put("post_id", Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id())));
-            values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
-            values.put("verification_level", post.get(i).getVerification_level());
-            values.put("name_user", post.get(i).getName_user());
-            values.put("username", post.get(i).getUsername());
-            values.put("profile_image", post.get(i).getProfile_image());
-            values.put("post_date", post.get(i).getPost_date());
-            values.put("post_time", post.get(i).getPost_time());
-            values.put("post_content", post.get(i).getPost_content());
-            values.put("post_likes", post.get(i).getPost_likes());
-            if(post.get(i).getPost_images() != null && post.get(i).getPost_images().size() > 0) {
-                long post_id = Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id()));
-                long account_id = Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id()));
-                for (int img = 0; img < post.get(i).getPost_images().size(); img++){
-                    if(post.get(i).getPost_images().get(img) != null){
-                        ContentValues values_images = new ContentValues();
-                        values_images.put("post_id", post_id);
-                        values_images.put("image_link", post.get(i).getPost_images().get(img));
-                        values_images.put("account_id", account_id);
-                        getWritableDatabase().insert(TABLE_POST_IMAGE, null, values_images);
+            if(post.get(i).getPost_type() == DtoPost.NORMAL_POST){
+                ContentValues values = new ContentValues();
+                values.put("post_id", Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id())));
+                values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
+                values.put("verification_level", post.get(i).getVerification_level());
+                values.put("name_user", post.get(i).getName_user());
+                values.put("username", post.get(i).getUsername());
+                values.put("profile_image", post.get(i).getProfile_image());
+                values.put("post_date", post.get(i).getPost_date());
+                values.put("post_time", post.get(i).getPost_time());
+                values.put("post_content", post.get(i).getPost_content());
+                values.put("post_likes", post.get(i).getPost_likes());
+                if(post.get(i).getPost_images() != null && post.get(i).getPost_images().size() > 0) {
+                    long post_id = Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id()));
+                    long account_id = Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id()));
+                    for (int img = 0; img < post.get(i).getPost_images().size(); img++){
+                        if(post.get(i).getPost_images().get(img) != null){
+                            ContentValues values_images = new ContentValues();
+                            values_images.put("post_id", post_id);
+                            values_images.put("image_link", post.get(i).getPost_images().get(img));
+                            values_images.put("account_id", account_id);
+                            getWritableDatabase().insert(TABLE_POST_IMAGE, null, values_images);
+                        }
                     }
                 }
-            }
-            else values.put("post_images", "NaN");
-            values.put("post_comments_amount", post.get(i).getPost_comments_amount());
-            values.put("post_topic", post.get(i).getPost_topic());
-            Log.d("InsertPost", post.get(i).getName_user());
+                else values.put("post_images", "NaN");
+                values.put("post_comments_amount", post.get(i).getPost_comments_amount());
+                values.put("post_topic", post.get(i).getPost_topic());
+                Log.d("InsertPost", post.get(i).getName_user());
 
-            getWritableDatabase().insert(TABLE_POSTS, null, values);
+                getWritableDatabase().insert(TABLE_POSTS, null, values);
+            }
         }
     }
 

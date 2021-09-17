@@ -12,6 +12,7 @@
     android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
     tools:context=".Activitys.EditProfileActivity">
 
+    <!-- Main Container -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -78,7 +79,7 @@
             <!-- Container User Profile -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_profile_img_edit"
-                android:layout_width="75dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_centerHorizontal="true"
@@ -89,10 +90,10 @@
                 <!-- Img User Story -->
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/ic_edit_ProfileUser"
-                    android:layout_width="73dp"
-                    android:layout_height="73dp"
+                    android:layout_width="93dp"
+                    android:layout_height="93dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_profile_default"
+                    tools:src="@drawable/ic_logo"
                     app:civ_border_color="@color/base_color"
                     app:civ_border_width="1dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -201,6 +202,31 @@
                     android:textColorHint="@color/hint" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:id="@+id/dividing_line_edit_profile_more_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="3dp"
+                android:layout_below="@+id/bio_tl_edit_profile"
+                android:layout_centerHorizontal="true"
+                android:background="@color/tab_indicator_gray"
+                android:visibility="gone"
+                android:orientation="horizontal" />
+
+            <!-- More Info Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:visibility="gone"
+                android:layout_below="@+id/dividing_line_edit_profile_more_info"
+                android:layout_centerHorizontal="true">
+
+
+
+            </LinearLayout>
 
         </RelativeLayout>
 

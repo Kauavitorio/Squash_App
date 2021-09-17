@@ -143,6 +143,7 @@ public abstract class Login extends SignInActivity{
                         editor.putString("pref_password", EncryptHelper.encrypt(password));
                         editor.putString("pref_verification_level", response.body().getVerification_level());
                         editor.putLong("pref_active", response.body().getActive());
+                        editor.putString("pref_type_acc", response.body().getType_acc());
                         editor.apply();
 
                         //  Getting Followers and Followings
@@ -250,7 +251,7 @@ public abstract class Login extends SignInActivity{
         encrypt_password = placed + encrypt_password;
         DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), encrypt_password,
                 EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))),
-                EncryptHelper.encrypt("0-river"), EncryptHelper.encrypt(formattedDate), 0, EncryptHelper.encrypt(placed), ip);
+                EncryptHelper.encrypt(placed), EncryptHelper.encrypt(formattedDate), 0, EncryptHelper.encrypt(placed), ip);
         AccountServices login_service = retrofitUser.create(AccountServices.class);
         Call<DtoAccount> call = login_service.login(account);
         call.enqueue(new Callback<DtoAccount>() {
@@ -299,7 +300,6 @@ public abstract class Login extends SignInActivity{
                             });
 
                             if(response.body() != null){
-                                mPrefs.edit().clear().apply();
                                 //  Add User prefs
                                 SharedPreferences.Editor editor = mPrefs.edit();
                                 editor.putString("pref_account_id", response.body().getAccount_id_cry());
@@ -320,6 +320,7 @@ public abstract class Login extends SignInActivity{
                                 editor.putString("pref_password", EncryptHelper.encrypt(password));
                                 editor.putString("pref_verification_level", response.body().getVerification_level());
                                 editor.putLong("pref_active", response.body().getActive());
+                                editor.putString("pref_type_acc", response.body().getType_acc());
                                 editor.apply();
 
                                 //  Getting Followers and Followings
