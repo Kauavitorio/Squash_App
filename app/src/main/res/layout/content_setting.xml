@@ -49,7 +49,7 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp"
                 android:minHeight="42dp"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:layout_height="wrap_content"
                 tools:ignore="UseCompoundDrawables">
 
@@ -78,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="30dp"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:background="@color/dividing_line_settings"/>
 
             <!-- Notification and Sounds -->

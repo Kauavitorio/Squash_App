@@ -11,7 +11,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 56
-        versionName "1.14.6-STAFF"
+        versionName "1.14.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -118,6 +118,9 @@ dependencies {
 
     //  Click on URL
     implementation 'me.saket:better-link-movement-method:2.2.0'
+
+    //  Meta Property
+    implementation 'org.jsoup:jsoup:1.10.2'
 
     //  Image CircleImageView
     implementation 'de.hdodenhof:circleimageview:3.1.0'

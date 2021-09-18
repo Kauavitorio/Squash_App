@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background_media_action"
+    android:id="@+id/adapter_sheet_menu_profile"
+    android:layout_height="wrap_content">
+
+    <!-- Close Ic -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/close_ic_profile_sheet"
+        android:layout_width="50dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="7dp"
+        app:cardBackgroundColor="@color/dividing_line_settings"
+        app:cardCornerRadius="25dp"/>
+
+    <!-- Container Body -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
+
+        <!-- Setting Button -->
+        <LinearLayout
+            android:id="@+id/btn_setting_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:minHeight="45dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:ignore="UseCompoundDrawables">
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setting"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+        <!-- Your Activity Button -->
+        <LinearLayout
+            android:id="@+id/btn_your_activity_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:minHeight="45dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:ignore="UseCompoundDrawables">
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/your_activity"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+        <!-- Report Button -->
+        <LinearLayout
+            android:id="@+id/btn_report_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:minHeight="45dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:ignore="UseCompoundDrawables">
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/report_account"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+        <!-- Options Button -->
+        <LinearLayout
+            android:id="@+id/btn_options_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:minHeight="45dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:ignore="UseCompoundDrawables">
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/options"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

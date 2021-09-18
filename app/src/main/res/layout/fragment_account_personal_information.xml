@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Main Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header Text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/hint"
+            android:textSize="15sp"
+            android:padding="15dp"
+            android:textAlignment="textStart"
+            android:text="@string/personal_information_info"/>
+
+        <!-- Email Address -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical">
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/email_address"
+                android:textSize="15sp"
+                android:textColor="@color/hint"/>
+
+            <!-- User Email -->
+            <TextView
+                android:id="@+id/email_personal_information"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/email_address"
+                android:textSize="16sp"
+                android:layout_marginTop="3dp"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
+        <!-- Dividing line -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:visibility="visible"
+            android:layout_marginTop="3dp"
+            android:background="@color/tab_indicator_gray"/>
+
+        <!-- Phone Number -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="15dp"
+            android:orientation="vertical">
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/phone_number"
+                android:textSize="15sp"
+                android:textColor="@color/hint"/>
+
+            <!-- User Phone -->
+            <TextView
+                android:id="@+id/phone_personal_information"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/phone"
+                android:textSize="16sp"
+                android:layout_marginTop="3dp"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
+        <!-- Dividing line -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:visibility="visible"
+            android:layout_marginTop="3dp"
+            android:background="@color/tab_indicator_gray"/>
+
+        <!-- Birthday -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical">
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/birthday"
+                android:textSize="15sp"
+                android:textColor="@color/hint"/>
+
+            <!-- User Phone -->
+            <TextView
+                android:id="@+id/birthday_personal_information"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/birthday"
+                android:textSize="16sp"
+                android:layout_marginTop="3dp"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
+        <!-- Dividing line -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:visibility="visible"
+            android:layout_marginTop="3dp"
+            android:background="@color/tab_indicator_gray"/>
+
+    </LinearLayout>
+
+</ScrollView>

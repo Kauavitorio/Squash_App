@@ -310,7 +310,11 @@ public abstract class Methods extends MainActivity {
     }
 
     public static String getMonth(int month) {
-        return new DateFormatSymbols().getMonths()[month-1];
+        try {
+            return new DateFormatSymbols().getMonths()[month-1];
+        }catch (Exception ex){
+            return String.valueOf(month);
+        }
     }
 
     public static final String NO_ONE = "noOne";

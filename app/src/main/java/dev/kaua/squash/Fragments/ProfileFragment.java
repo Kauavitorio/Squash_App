@@ -95,24 +95,24 @@ public class ProfileFragment extends Fragment {
     private static ImageView ic_account_badge_profile;
     private static CircleImageView ic_ProfileUser_profile;
     private static final String TAG = "PROFILE_FRAGMENT";
-    private static TextView txt_user_name, txt_username_name, txt_user_bio_profile,
+    public static TextView txt_user_name, txt_username_name, txt_user_bio_profile,
             txt_amount_following_profile, txt_amount_followers_profile, txt_joined, posts_size;
     private static Button btn_follow_following_profile, btn_go_chat_profile, btn_contact_info_profile;
     private RelativeLayout noPost_profile;
     private LinearLayout container_following_profile, container_followers_profile;
     private CardView btn_plus_story_profile;
-    private ImageView btn_qr_code;
+    private ImageView btn_qr_code, btn_menu_profile;
     private String username;
     private RecyclerView recyclerView_Posts_profile;
 
     private static View view;
     private static ProfileFragment instance;
     private final Handler timer = new Handler();
-    private static long account_another_user = 0, account_id, warn_id, active_level;
+    public static long account_another_user = 0, account_id, warn_id, active_level;
     private static int control;
-    private static String user_image;
+    public static String user_image;
 
-    final Retrofit retrofit = Methods.GetRetrofitBuilder();
+    static final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
     // User Info
     private static DtoAccount account = new DtoAccount();
@@ -334,6 +334,9 @@ public class ProfileFragment extends Fragment {
                                                     BangedAnimation();
                                                 }
 
+                                                btn_menu_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_menu_profile_dot));
+                                                btn_menu_profile.setOnClickListener(v -> Warnings.Sheet_Menu_Profile(requireActivity(), username, account_another_user));
+
                                                 Check_Contact_Account(response.body());
 
                                                 RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile
@@ -432,6 +435,9 @@ public class ProfileFragment extends Fragment {
         account.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(account_id)));
         RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile, posts_size, account);
 
+        btn_menu_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_arrow_down_simple));
+        btn_menu_profile.setOnClickListener(v -> Warnings.Sheet_Menu_Profile(requireActivity(), username, account_id));
+
         DaoAccount db = new DaoAccount(activity);
         DtoAccount account_follow = db.get_followers_following(account_id);
         if(account_follow != null && account_follow.getFollowing() != null && account_follow.getFollowers() != null){
@@ -442,9 +448,9 @@ public class ProfileFragment extends Fragment {
             txt_amount_followers_profile.setText(Methods.NumberTrick(0));
         }
 
-        int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(user.getVerification_level())));
-        if(verified != 0){
-            if (verified == 2)
+        int verified = Integer.parseInt(user.getVerification_level());
+        if(verified != DtoAccount.NORMAL_ACCOUNT){
+            if (verified == DtoAccount.ACCOUNT_IS_ADM)
                 ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_employee_account));
             else
                 ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
@@ -507,108 +513,18 @@ public class ProfileFragment extends Fragment {
 
     void EnableOptions(long id){
         warn_id = id;
-        if(getContext() != null){
-            setHasOptionsMenu(id != MyPrefs.getUserInformation(requireContext()).getAccount_id());
-        }else
-            setHasOptionsMenu(false);
-
+        setHasOptionsMenu(false);
     }
 
-    String UID_USER_WARN = null;
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.options_profile:
-                if(getContext() != null && getActivity() != null){
-                    BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.BottomSheetTheme);
-                    //  Creating View for SheetMenu
-                    View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_profile_actions ,
-                            getActivity().findViewById(R.id.sheet_profile_action));
+    public static String UID_USER_WARN = null;
 
-                    sheetView.findViewById(R.id.btn_warn_user).setOnClickListener(v -> {
-                        LoadingDialog loadingDialog = new LoadingDialog(requireActivity());
-                        loadingDialog.startLoading();
-                        DtoAccount account_warn = new DtoAccount();
-                        DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE);
-                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull @NotNull DataSnapshot fullSnapshot) {
-                                for(DataSnapshot snapshot: fullSnapshot.getChildren()){
-                                    DtoAccount account = snapshot.getValue(DtoAccount.class);
-                                    if(account != null){
-                                        if(account.getUsername().equals(username)){
-                                            if(account_warn.getAccount_id_cry() == null){
-                                                account_warn.setId(account.getId());
-                                                account_warn.setUsername(account.getUsername());
-                                                account_warn.setAccount_id_cry(account.getId());
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if(account_warn.getAccount_id_cry() != null){
-                                    if(account_warn.getName_user() == null || !account_warn.getName_user().equals("go")){
-                                        if(account_warn.getUsername().equals(username)){
-                                            loadingDialog.dismissDialog();
-                                            UID_USER_WARN = account_warn.getId();
-                                            Intent i = new Intent(getActivity(), WarnTheUserActivity.class);
-                                            i.putExtra(WarnTheUserActivity.ACCOUNT_ID_REQUEST_ID, warn_id);
-                                            i.putExtra(WarnTheUserActivity.ACCOUNT_ACTIVE_REQUEST_ID, active_level);
-                                            i.putExtra(WarnTheUserActivity.ACCOUNT_NAME_REQUEST_ID, txt_user_name.getText().toString());
-                                            i.putExtra(WarnTheUserActivity.ACCOUNT_USERNAME_REQUEST_ID, txt_username_name.getText().toString());
-                                            i.putExtra(WarnTheUserActivity.ACCOUNT_IMAGE_REQUEST_ID, user_image);
-                                            i.putExtra(WarnTheUserActivity.ACCOUNT_ACTIVE_REQUEST_UID, UID_USER_WARN);
-                                            startActivity(i);
-                                        }else ToastHelper.toast(requireActivity(), getString(R.string.user_not_found), ToastHelper.SHORT_DURATION);
-                                    }
-                                }
-                            }
-                            @Override
-                            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-                        });
-
-                        bottomSheetDialog.dismiss();
-                    });
-
-                    bottomSheetDialog.setContentView(sheetView);
-                    bottomSheetDialog.show();
-                }
-                return true;
-            case R.id.report_user:
-                if(getContext() != null && getActivity() != null) {
-                    BottomSheetDialog bottomSheetDialogReport = new BottomSheetDialog(getContext(), R.style.BottomSheetTheme);
-                    //  Creating View for SheetMenu
-                    View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_user_report ,
-                            getActivity().findViewById(R.id.sheet_report_user));
-
-                    sheetView.findViewById(R.id.txt_report_post_message_or_comment).setOnClickListener(v -> {
-                        ReportUser(EncryptHelper.encrypt(getString(R.string.report_post_message_or_comment)));
-                        bottomSheetDialogReport.dismiss();
-                    });
-
-
-                    sheetView.findViewById(R.id.txt_report_account).setOnClickListener(v -> {
-                        ReportUser(EncryptHelper.encrypt(getString(R.string.report_account)));
-                        bottomSheetDialogReport.dismiss();
-                    });
-
-                    bottomSheetDialogReport.setContentView(sheetView);
-                    bottomSheetDialogReport.show();
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    void ReportUser(String reason){
-        if(getContext() != null && getActivity() != null){
-            LoadingDialog loadingDialog = new LoadingDialog(getActivity());
+    public static void ReportUser(Activity activity, String reason){
+        if(activity != null){
+            LoadingDialog loadingDialog = new LoadingDialog(activity);
             loadingDialog.startLoading();
 
             DtoAccount dtoAccount = new DtoAccount();
-            dtoAccount.setReport_from(EncryptHelper.encrypt(String.valueOf(MyPrefs.getUserInformation(getContext()).getAccount_id())));
+            dtoAccount.setReport_from(EncryptHelper.encrypt(String.valueOf(MyPrefs.getUserInformation(activity).getAccount_id())));
             dtoAccount.setReport_to(EncryptHelper.encrypt(String.valueOf(warn_id)));
             dtoAccount.setReport_reason(reason);
             AccountServices services = retrofit.create(AccountServices.class);
@@ -618,29 +534,17 @@ public class ProfileFragment extends Fragment {
                 public void onResponse(@NonNull Call<DtoAccount> call, @NonNull Response<DtoAccount> response) {
                     loadingDialog.dismissDialog();
                     if(response.code() == 200){
-                        ToastHelper.toast(requireActivity(), getString(R.string.report_sent_successfully), ToastHelper.SHORT_DURATION);
+                        ToastHelper.toast(activity, activity.getString(R.string.report_sent_successfully), ToastHelper.SHORT_DURATION);
                     }else
-                        Warnings.showWeHaveAProblem(getContext(), ErrorHelper.REPORT_AN_USER);
+                        Warnings.showWeHaveAProblem(activity, ErrorHelper.REPORT_AN_USER);
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<DtoAccount> call, @NonNull Throwable t) {
                     loadingDialog.dismissDialog();
-                    Warnings.showWeHaveAProblem(getContext(), ErrorHelper.REPORT_AN_USER);
+                    Warnings.showWeHaveAProblem(activity, ErrorHelper.REPORT_AN_USER);
                 }
             });
-        }
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        requireActivity().getMenuInflater().inflate(R.menu.menu_profile, menu);
-        super.onCreateOptionsMenu(menu,inflater);
-
-        if(menu.findItem(R.id.options_profile) != null &&
-                Integer.parseInt(MyPrefs.getUserInformation(requireContext()).getVerification_level()) == DtoAccount.ACCOUNT_IS_ADM){
-            menu.findItem(R.id.options_profile).setVisible(true);
         }
     }
 
@@ -677,6 +581,7 @@ public class ProfileFragment extends Fragment {
         instance = this;
         myAnim = AnimationUtils.loadAnimation(requireContext() ,R.anim.click_anim);
         account = MyPrefs.getUserInformation(requireContext());
+        btn_menu_profile = view.findViewById(R.id.btn_menu_profile);
         posts_size = view.findViewById(R.id.txt_posts_size_amount_profile);
         btn_go_chat_profile = view.findViewById(R.id.btn_go_chat_profile);
         btn_contact_info_profile = view.findViewById(R.id.btn_contact_info_profile);
