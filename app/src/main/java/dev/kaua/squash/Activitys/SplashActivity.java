@@ -14,8 +14,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-
-import dev.kaua.squash.Activitys.Setting.AccountSettingActivity;
 import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -48,42 +46,42 @@ public class SplashActivity extends AppCompatActivity {
         SharedPreferences sp_network = getSharedPreferences(MyPrefs.PREFS_NETWORK_USAGE, MODE_PRIVATE);
         if (!sp_network.contains("pref_start_time")) MyPrefs.InsertNetworkCount(this);
 
-        Intent intent = getIntent();
-        Uri data = intent.getData();
-        String action = intent.getAction();
-        String type = intent.getType();
+        final Intent intent = getIntent();
+        final Uri data = intent.getData();
+        final String action = intent.getAction();
+        final String type = intent.getType();
         if(data != null){
-            String UrlGetFrom = data.toString();
-            UrlGetFrom = UrlGetFrom.replace(Methods.BASE_URL_HTTPS, "").replace(Methods.BASE_URL_HTTP, "");
-            String[] KnowContent = UrlGetFrom.split("/");
-            if (KnowContent[0].equals("verify-account")){
-                if(KnowContent[1] != null && KnowContent[1].length() > 3 ){
-                    try {
-                        String result = ValidateEmailActivity.TestIntent();
-                        if(result.length() > 0){
-                            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("validate_email_intent"));
-                            DoValidation(KnowContent[1]);
+            if(data.getPath() != null){
+                final String[] KnowContent = data.getPath().split("/");
+                if (data.getPath().contains("verify-account")){
+                    if(KnowContent.length > 1 && KnowContent[2] != null && KnowContent[2].length() > 2){
+                        try {
+                            String result = ValidateEmailActivity.TestIntent();
+                            if(result.length() > 0){
+                                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("validate_email_intent"));
+                                DoValidation(KnowContent[2]);
+                            }
+                        }catch (Exception ex){
+                            DoValidation(KnowContent[2]);
                         }
-                    }catch (Exception ex){
-                        DoValidation(KnowContent[1]);
-                    }
-                }
-            } else if(KnowContent[0].equals("share")){
-                try {
-                    Log.d(TAG, KnowContent[3]);
-                    int indexBase = KnowContent[3].indexOf("?");
-                    String post_id = KnowContent[3].substring(0, indexBase);
-                    Log.d(TAG, post_id);
-                    finish();
-                    Intent i = new Intent(this, PostDetailsActivity.class);
-                    i.putExtra("post_id", Long.parseLong(post_id));
-                    i.putExtra("comment", 0);
-                    startActivity(i);
-                }catch (Exception ex){
-                    Log.d(TAG, ex.toString());
-                    finishAffinity();
-                    verifyIfUsersLogged();
-                }
+                    }else verifyIfUsersLogged();
+                } else if(data.getPath().contains("share") && data.getPath().contains("post")){
+                    if(KnowContent.length > 4){
+                        try {
+                            final String post_id = KnowContent[4];
+                            Log.d(TAG, post_id);
+                            finish();
+                            Intent i = new Intent(this, PostDetailsActivity.class);
+                            i.putExtra("post_id", Long.parseLong(post_id));
+                            i.putExtra("comment", 0);
+                            startActivity(i);
+                        }catch (Exception ex){
+                            Log.d(TAG, ex.toString());
+                            finishAffinity();
+                            verifyIfUsersLogged();
+                        }
+                    }else verifyIfUsersLogged();
+                }else verifyIfUsersLogged();
             }else verifyIfUsersLogged();
         }else if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type))
@@ -91,7 +89,6 @@ public class SplashActivity extends AppCompatActivity {
             else if (type.startsWith("image/"))
                 handleSendImage(intent); // Handle single image being sent
         } else verifyIfUsersLogged();
-
     }
 
     void handleSendText(Intent intent) {
@@ -141,7 +138,7 @@ public class SplashActivity extends AppCompatActivity {
             final Bundle bundle = getIntent().getExtras();
             if(bundle != null) {
                 if(bundle.getInt(ACCOUNT_DISABLE) == Login.DISABLE_ACCOUNT){
-                    Intent goto_intro = new Intent(this, SignInActivity.class);
+                    final Intent goto_intro = new Intent(this, SignInActivity.class);
                     goto_intro.putExtra(ACCOUNT_DISABLE, Login.DISABLE_ACCOUNT);
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
                     ActivityCompat.startActivity(this, goto_intro, activityOptionsCompat.toBundle());
@@ -150,25 +147,6 @@ public class SplashActivity extends AppCompatActivity {
             }else LoadBase();
         }else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
     }
-/*
-    public void verifyIfUsersLogged() {
-        Intent i = new Intent(this, AccountSettingActivity.class);
-        startActivity(i);
-        finish();
-        final DaoSystem daoSystem = new DaoSystem(this);
-        if(daoSystem.getNeedResetAccount()){
-            final Bundle bundle = getIntent().getExtras();
-            if(bundle != null) {
-                if(bundle.getInt(ACCOUNT_DISABLE) == Login.DISABLE_ACCOUNT){
-                    Intent goto_intro = new Intent(this, SignInActivity.class);
-                    goto_intro.putExtra(ACCOUNT_DISABLE, Login.DISABLE_ACCOUNT);
-                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
-                    ActivityCompat.startActivity(this, goto_intro, activityOptionsCompat.toBundle());
-                    finishAffinity();
-                }else LoadBase();
-            }else LoadBase();
-        }else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
-    }*/
 
     void LoadBase(){
         MyPrefs.setUpdateRequest_Show(this, 0);

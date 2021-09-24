@@ -12,7 +12,11 @@ import androidx.annotation.Nullable;
 import java.net.URL;
 import java.util.ArrayList;
 
+import dev.kaua.squash.Activitys.WebActivity;
+import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.System.DtoSystem;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.Tools.MyPrefs;
 
 public class DaoBrowser extends SQLiteOpenHelper {
     private final String TABLE = "TBL_BROWSER";
@@ -50,8 +54,10 @@ public class DaoBrowser extends SQLiteOpenHelper {
         }
     }
 
-    public void InsertLink(DtoSystem info){
+    public void InsertLink(DtoSystem info, Context context){
         try {
+            if(MyPrefs.getUserInformation(context).getAccount_id() > DtoAccount.ACCOUNT_DISABLE
+                    && myFirebaseHelper.getFirebaseAuth().getUid() != null)
             if(info.getTitle() != null && info.getDate_time() != null && info.getLink() != null
             && info.getLink().length() > 5){
                 ContentValues values = new ContentValues();

@@ -33,7 +33,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
@@ -96,8 +95,7 @@ public class WebActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
 
                 SetUrlLink(url);
-
-                if(view.getTitle().replace("_", " ").replace(".pdf", "").equals(getString(R.string.squash_privacy_policy)))
+                if(view.getTitle().contains("Squash_Privacy_Policy"))
                     status_web.setText(getString(R.string.squash_privacy_policy));
                 else{
                     String web_title = view.getTitle();
@@ -106,6 +104,7 @@ public class WebActivity extends AppCompatActivity {
                     status_web.setText(web_title);
                 }
 
+                Log.e("Property", "Load -> " +  FIRST_LOAD);
                 if(FIRST_LOAD){
                     FIRST_LOAD = false;
                     new FetchMetadataFromURL().execute();
@@ -224,6 +223,7 @@ public class WebActivity extends AppCompatActivity {
             try {
                 // Connect to website
                 Document document = Jsoup.connect(url_active).get();
+                Log.e("Property", "URL=> " + url_active);
                 // Get the html document title
                 websiteTitle = document.title();
 
@@ -231,17 +231,17 @@ public class WebActivity extends AppCompatActivity {
                 Elements metaElems = document.select("meta");
                 for (Element metaElem : metaElems) {
                     String property = metaElem.attr("property");
-                    Log.e("Property", "Property =" + property + " \n Value =" + metaElem.attr("content"));
+                    Log.e("Property", "Property -> " + property + " \n Value -> " + metaElem.attr("content"));
                 }
                 // Locate the content attribute
                 websiteDescription = metaElems.attr("content");
                 Elements metaOgImage = document.select("meta[property=og:image]");
                 if (metaOgImage != null) {
                     ImgUrl = metaOgImage.first().attr("content");
-                     Log.e("Property", "Image =" + ImgUrl);
+                     Log.e("Property", "Image -> " + ImgUrl);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                Log.w("Property", e.getMessage());
             }
             return null;
         }
@@ -250,9 +250,13 @@ public class WebActivity extends AppCompatActivity {
         protected void onPostExecute(Void result) {
             @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd/MM/yyyy");
             String formattedDate = df_date.format(Calendar.getInstance().getTime());
-            DtoSystem link = new DtoSystem(websiteTitle, url_active, formattedDate,
-                    ImgUrl);
-            daoBrowser.InsertLink(link);
+            if(websiteTitle != null){
+                FIRST_LOAD = true;
+                Log.e("Property", "Insert -> " +  websiteTitle);
+                DtoSystem link = new DtoSystem(websiteTitle, url_active, formattedDate,
+                        ImgUrl);
+                daoBrowser.InsertLink(link, WebActivity.this);
+            }
 
         }
 
