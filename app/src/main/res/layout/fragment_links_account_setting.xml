@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Links You're Visited -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/links_youve_visited"/>
+
+    </LinearLayout>
+
+    <!-- Body -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Your history is empty -->
+        <TextView
+            android:id="@+id/history_is_empty_links_account_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:text="@string/your_history_is_empty"/>
+
+        <!-- Links List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_links_account_setting"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

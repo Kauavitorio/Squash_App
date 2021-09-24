@@ -5,6 +5,7 @@
 <resources>
 
     <!-- Natural Text -->
+    <string name="language_tag">en</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">OK</string> <!-- End Natural Text -->
@@ -258,4 +259,30 @@
     <string name="shop_under_development">We are still developing our store, but you can start collecting your points :).\nIt will be announced by the official Squash profile when the store is ready.</string>
     <string name="contact">Contact</string>
     <string name="must_be_logged_in">Must be logged in</string>
+    <string name="personal_information">Personal Information</string>
+    <string name="about_your_account">About Your Account</string>
+    <string name="your_activity">Your Activity</string>
+    <string name="language">Language</string>
+    <string name="personal_information_info">Provide your personal information, even if the account is used for a business, a pet or something else. This won\'t be part of your public profile.</string>
+    <string name="phone_number">Phone number</string>
+    <string name="birthday">Birthday</string>
+    <string name="account_information">Account Information</string>
+    <string name="account_information_description">To help keep our community authentic, we\'re showing information about accounts that reach a lot of people or advertise on Squash. People can see this by tapping on the ••• on your profile and choosing About This Account.</string>
+    <string name="date_joined">Date Joined</string>
+    <string name="account_based_in">Account Based in</string>
+    <string name="account_type">Account Type</string>
+    <string name="business_account">Business Account</string>
+    <string name="personal_account">Personal Account</string>
+    <string name="account_level">Account Level</string>
+    <string name="your_account_is_common_accounts_group">Your account is part of the common accounts group.</string>
+    <string name="your_account_is_verified_accounts_group">Your account is part of the group of accounts verified by Squash.</string>
+    <string name="your_account_is_employee_accounts_group">Your account is part of the Squash employee group.</string>
+    <string name="portuguese_brazil">Portuguese (Brazil)</string>
+    <string name="english">English (US)</string>
+    <string name="do_you_really_want_to_change_the_application_language">Do you really want to change the application language to %1$s?</string>
+    <string name="change_language">Change language</string>
+    <string name="links" translatable="false">Links</string>
+    <string name="time">Time</string>
+    <string name="links_youve_visited">Links You\'ve Visited</string>
+    <string name="your_history_is_empty">Your history is empty</string>
 </resources>

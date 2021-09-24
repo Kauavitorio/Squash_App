@@ -6,6 +6,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -27,10 +28,16 @@ public class myFirebaseHelper {
     private static FirebaseStorage firebaseStorageInstance;
     private static FirebaseDatabase firebaseDatabase;
     private static FirebaseMessaging firebaseMessaging;
+    private static FirebaseDynamicLinks firebaseDynamicLinks;
 
     public static FirebaseAnalytics getFirebaseAnalytics(Context context){
         if (firebaseAnalytics == null) firebaseAnalytics = FirebaseAnalytics.getInstance(context);
         return firebaseAnalytics;
+    }
+
+    public static FirebaseDynamicLinks getFirebaseDynamicLinks(){
+        if (firebaseDynamicLinks == null) firebaseDynamicLinks = FirebaseDynamicLinks.getInstance();
+        return firebaseDynamicLinks;
     }
 
     public static FirebaseAuth getFirebaseAuth(){

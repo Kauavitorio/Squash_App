@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -27,10 +28,18 @@ import android.widget.TextView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import org.jetbrains.annotations.NotNull;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Objects;
 
 import dev.kaua.squash.Adapters.ProgressBarAnimation;
+import dev.kaua.squash.Data.System.DtoSystem;
+import dev.kaua.squash.LocalDataBase.DaoBrowser;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
@@ -43,8 +52,10 @@ public class WebActivity extends AppCompatActivity {
     private TextView status_web, url_web;
     static Uri url_start;
     private String url_active;
+    private DaoBrowser daoBrowser;
     private ProgressBarAnimation anim;
     private static final String DOCS_URL = "https://docs.google.com/gview?embedded=true&url=";
+    private static boolean FIRST_LOAD = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,14 +95,19 @@ public class WebActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
 
                 SetUrlLink(url);
-
-                if(view.getTitle().replace("_", " ").replace(".pdf", "").equals(getString(R.string.squash_privacy_policy)))
+                if(view.getTitle().contains("Squash_Privacy_Policy"))
                     status_web.setText(getString(R.string.squash_privacy_policy));
                 else{
                     String web_title = view.getTitle();
                     if(web_title.length() > 40)
                         web_title = web_title.substring(0, 38) + "…";
                     status_web.setText(web_title);
+                }
+
+                Log.e("Property", "Load -> " +  FIRST_LOAD);
+                if(FIRST_LOAD){
+                    FIRST_LOAD = false;
+                    new FetchMetadataFromURL().execute();
                 }
             }
         });
@@ -140,6 +156,7 @@ public class WebActivity extends AppCompatActivity {
     }
 
     private void Ids() {
+        daoBrowser = new DaoBrowser(this);
         progressBar = findViewById(R.id.progress_web);
         status_web = findViewById(R.id.status_web);
         secure_status_web = findViewById(R.id.secure_status_web);
@@ -193,5 +210,55 @@ public class WebActivity extends AppCompatActivity {
                 return true;
         }
         return false;
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    @SuppressWarnings("deprecation")
+    private class FetchMetadataFromURL extends AsyncTask<Void, Void, Void> {
+        String websiteTitle, websiteDescription, ImgUrl;
+        @Override
+        protected void onPreExecute() { super.onPreExecute();}
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                // Connect to website
+                Document document = Jsoup.connect(url_active).get();
+                Log.e("Property", "URL=> " + url_active);
+                // Get the html document title
+                websiteTitle = document.title();
+
+                //Here It's just print whole property of URL
+                Elements metaElems = document.select("meta");
+                for (Element metaElem : metaElems) {
+                    String property = metaElem.attr("property");
+                    Log.e("Property", "Property -> " + property + " \n Value -> " + metaElem.attr("content"));
+                }
+                // Locate the content attribute
+                websiteDescription = metaElems.attr("content");
+                Elements metaOgImage = document.select("meta[property=og:image]");
+                if (metaOgImage != null) {
+                    ImgUrl = metaOgImage.first().attr("content");
+                     Log.e("Property", "Image -> " + ImgUrl);
+                }
+            } catch (Exception e) {
+                Log.w("Property", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd/MM/yyyy");
+            String formattedDate = df_date.format(Calendar.getInstance().getTime());
+            if(websiteTitle != null){
+                FIRST_LOAD = true;
+                Log.e("Property", "Insert -> " +  websiteTitle);
+                DtoSystem link = new DtoSystem(websiteTitle, url_active, formattedDate,
+                        ImgUrl);
+                daoBrowser.InsertLink(link, WebActivity.this);
+            }
+
+        }
+
     }
 }

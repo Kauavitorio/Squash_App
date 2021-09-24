@@ -49,7 +49,9 @@ public abstract class MyPrefs {
         account.setJoined_date(EncryptHelper.decrypt(sp.getString("pref_joined_date", null)));
         account.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
         account.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
-        account.setVerification_level(EncryptHelper.decrypt(sp.getString("pref_verification_level", null)));
+        String account_level = EncryptHelper.decrypt(sp.getString("pref_verification_level", null));
+        if(account_level == null) account_level = String.valueOf(DtoAccount.NORMAL_ACCOUNT);
+        account.setVerification_level(account_level);
         account.setAd_points(sp.getLong("pref_ad_points", 0));
         account.setSupport_visit(sp.getBoolean("pref_support_visit", false));
         account.setActive(sp.getLong("pref_active", DtoAccount.ACCOUNT_ACTIVE));

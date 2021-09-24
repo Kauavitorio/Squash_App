@@ -179,10 +179,6 @@ public class ChatFragment extends Fragment {
             case R.id.starred_messages_chat:
                 ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
                 return true;
-            case R.id.setting_chat:
-                Intent i = new Intent(requireActivity(), SettingActivity.class);
-                startActivity(i);
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -3,6 +3,7 @@
     <!ENTITY privacy_policy "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy_PT_BR.pdf">
     ]>
 <resources>
+    <string name="language_tag">pt-BR</string>
     <string name="privacy_policy_url">&privacy_policy;</string>
     <string name="intro_description">ESCOLHA UMA MANEIRA DE COMEÇAR.</string>
     <string name="create_account">Criar Conta</string>
@@ -72,7 +73,7 @@
     <string name="yesterday">Ontem</string>
     <string name="setting">Definições</string>
     <string name="starred_messages">Mensagens com estrelas</string>
-    <string name="my_account">Minha conta</string>
+    <string name="my_account">Minha Conta</string>
     <string name="pin">Fixar</string>
     <string name="post">Postar</string>
     <string name="whats_up">Fala aí…</string>
@@ -239,4 +240,29 @@
     <string name="shop_under_development">Ainda estamos desenvolvendo nossa loja, mas você já pode ir juntando seus pontos :).\nSerá anunciado pelo perfil oficial da Squash quando a loja estiver pronta.</string>
     <string name="contact">Contato</string>
     <string name="must_be_logged_in">Deve estar logado para fazer isso</string>
+    <string name="personal_information">Informações pessoais</string>
+    <string name="about_your_account">Sobre Sua Conta</string>
+    <string name="your_activity">Sua Atividade</string>
+    <string name="language">Línguagem</string>
+    <string name="personal_information_info">Forneça suas informações pessoais, mesmo se a conta for usada para uma empresa, um animal de estimação ou outra coisa. Isso não fará parte do seu perfil público.</string>
+    <string name="phone_number">Número de telefone</string>
+    <string name="birthday">Aniversário</string>
+    <string name="account_information">Informação da conta</string>
+    <string name="account_information_description">Para ajudar a manter nossa comunidade autêntica, estamos exibindo informações sobre contas que alcançam muitas pessoas ou anunciam no Squash. As pessoas podem ver isso tocando em ••• em seu perfil e escolhendo Sobre esta conta.</string>
+    <string name="date_joined">Data de entrada</string>
+    <string name="account_based_in">Conta baseada em</string>
+    <string name="account_type">Tipo de conta</string>
+    <string name="business_account">Conta de negócios</string>
+    <string name="personal_account">Conta pessoal</string>
+    <string name="account_level">Nível da conta</string>
+    <string name="your_account_is_common_accounts_group">Sua conta faz parte do grupo de contas comuns.</string>
+    <string name="your_account_is_verified_accounts_group">Sua conta faz parte do grupo de contas verificadas pelo Squash.</string>
+    <string name="your_account_is_employee_accounts_group">Sua conta faz parte do grupo de funcionários da Squash.</string>
+    <string name="portuguese_brazil">Português (Brasil)</string>
+    <string name="english">Inglês (US)</string>
+    <string name="do_you_really_want_to_change_the_application_language">Deseja realmente mudar o idioma do aplicativo para %1$s?</string>
+    <string name="change_language">Mudar idioma</string>
+    <string name="time">Tempo</string>
+    <string name="links_youve_visited">Links que você visitou</string>
+    <string name="your_history_is_empty">Seu histórico está vazio</string>
 </resources>

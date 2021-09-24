@@ -33,13 +33,23 @@
                 android:layout_height="wrap_content"
                 tools:text="@string/username"/>
 
-            <!-- QrCode -->
+            <!-- Menu -->
             <ImageView
-                android:id="@+id/btn_qr_code_profile"
+                android:id="@+id/btn_menu_profile"
                 android:layout_width="30dp"
                 android:layout_gravity="end"
                 android:layout_height="30dp"
-                android:layout_marginEnd="20dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_arrow_down_simple"
+                tools:ignore="ContentDescription" />
+
+            <!-- QrCode -->
+            <ImageView
+                android:id="@+id/btn_qr_code_profile"
+                android:layout_width="25dp"
+                android:layout_gravity="end"
+                android:layout_height="25dp"
+                android:layout_marginEnd="15dp"
                 android:src="@drawable/ic_qr_code"
                 tools:ignore="ContentDescription" />
 

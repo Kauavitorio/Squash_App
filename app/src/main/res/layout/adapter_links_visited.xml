@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="wrap_content">
+
+    <!-- Body -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="horizontal"
+        tools:ignore="UselessParent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="UseCompoundDrawables,UselessParent">
+
+            <!-- Link Image -->
+            <ImageView
+                android:id="@+id/link_image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                tools:src="@drawable/ic_logo"
+                android:layout_gravity="center"
+                android:scaleType="fitXY"
+                tools:ignore="ContentDescription" />
+
+            <!-- Body -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!-- WebSite Title -->
+                <TextView
+                    android:id="@+id/webSite_Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:maxLength="35"
+                    android:layout_marginStart="5dp"
+                    tools:text="WebSite Title" />
+
+                <!-- WebSite Link -->
+                <TextView
+                    android:id="@+id/webSite_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/hint"
+                    android:textSize="14sp"
+                    android:layout_marginStart="5dp"
+                    tools:text="WebSite Link" />
+
+                <!-- WebSite Date Time -->
+                <TextView
+                    android:id="@+id/webSite_date_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/hint"
+                    android:textSize="14sp"
+                    android:layout_marginStart="5dp"
+                    tools:text="WebSite Date Time" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

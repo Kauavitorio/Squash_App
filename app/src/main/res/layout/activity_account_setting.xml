@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
+    android:orientation="vertical"
     tools:context=".Activitys.Setting.AccountSettingActivity">
 
-    <!-- Change Account Type -->
-    <TextView
+    <!-- Header -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_my_account"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/switch_account_type"
-        android:textColor="@color/base_color"
-        android:textSize="17sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="50dp"
+        android:background="@color/black_intro"
+        app:theme="@style/ToolbarColored"
+        app:titleTextColor="@color/white"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/MenuStyle">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- My Account Title -->
+        <TextView
+            android:id="@+id/txt_title_account_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:text="@string/my_account"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Fragments -->
+    <FrameLayout
+        android:id="@+id/frameLayoutAccount_Setting"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+</LinearLayout>

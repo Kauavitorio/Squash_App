@@ -18,18 +18,28 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
 import dev.kaua.squash.Activitys.PrivacyPolicyUpdateActivity;
+import dev.kaua.squash.Activitys.Setting.AccountSettingActivity;
+import dev.kaua.squash.Activitys.Setting.SettingActivity;
 import dev.kaua.squash.Activitys.SignInActivity;
+import dev.kaua.squash.Activitys.WarnTheUserActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Validation.ValidationServices;
+import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import retrofit2.Call;
@@ -304,6 +314,123 @@ public class Warnings {
         });
 
         close.setOnClickListener(v -> bottomSheetDialog.dismiss());
+
+        bottomSheetDialog.setContentView(sheetView);
+        bottomSheetDialog.show();
+    }
+
+    //  Create Menu Profile
+    public static void Sheet_Menu_Profile(Activity context, String username, final long id) {
+        bottomSheetDialog = new BottomSheetDialog(context, R.style.BottomSheetTheme);
+        //  Creating View for SheetMenu
+        View sheetView = LayoutInflater.from(context).inflate(R.layout.adapter_menu_profile_sheet,
+                context.findViewById(R.id.adapter_sheet_menu_profile));
+        sheetView.findViewById(R.id.close_ic_profile_sheet).setElevation(0);
+
+        if(id == MyPrefs.getUserInformation(context).getAccount_id()){
+            sheetView.findViewById(R.id.btn_report_profile).setVisibility(View.GONE);
+            sheetView.findViewById(R.id.btn_options_profile).setVisibility(View.GONE);
+            sheetView.findViewById(R.id.btn_your_activity_profile).setVisibility(View.VISIBLE);
+        }else{
+            sheetView.findViewById(R.id.btn_report_profile).setVisibility(View.VISIBLE);
+            sheetView.findViewById(R.id.btn_options_profile).setVisibility(View.VISIBLE);
+            sheetView.findViewById(R.id.btn_your_activity_profile).setVisibility(View.GONE);
+        }
+
+        // Setting Click
+        sheetView.findViewById(R.id.btn_setting_profile).setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            Intent i = new Intent(context, SettingActivity.class);
+            context.startActivity(i);
+        });
+
+        // Setting Click
+        sheetView.findViewById(R.id.btn_your_activity_profile).setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            Intent i = new Intent(context, AccountSettingActivity.class);
+            i.putExtra(AccountSettingActivity.REQUEST_TAG, AccountSettingActivity.ACTIVITY);
+            context.startActivity(i);
+        });
+
+        // Report Click
+        sheetView.findViewById(R.id.btn_report_profile).setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            BottomSheetDialog bottomSheetDialogReport = new BottomSheetDialog(context, R.style.BottomSheetTheme);
+            //  Creating View for SheetMenu
+            View sheetViewReport = LayoutInflater.from(context).inflate(R.layout.adapter_user_report ,
+                    context.findViewById(R.id.sheet_report_user));
+
+            sheetViewReport.findViewById(R.id.txt_report_post_message_or_comment).setOnClickListener(v1 -> {
+                ProfileFragment.ReportUser(context, EncryptHelper.encrypt(context.getString(R.string.report_post_message_or_comment)));
+                bottomSheetDialogReport.dismiss();
+            });
+
+
+            sheetViewReport.findViewById(R.id.txt_report_account).setOnClickListener(v1 -> {
+                ProfileFragment.ReportUser(context, EncryptHelper.encrypt(context.getString(R.string.report_account)));
+                bottomSheetDialogReport.dismiss();
+            });
+
+            bottomSheetDialogReport.setContentView(sheetViewReport);
+            bottomSheetDialogReport.show();
+        });
+
+        // Options Click
+        sheetView.findViewById(R.id.btn_options_profile).setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context, R.style.BottomSheetTheme);
+            //  Creating View for SheetMenu
+            View sheetViewOptions = LayoutInflater.from(context).inflate(R.layout.adapter_profile_actions ,
+                    context.findViewById(R.id.sheet_profile_action));
+
+            sheetViewOptions.findViewById(R.id.btn_warn_user).setOnClickListener(v1 -> {
+                LoadingDialog loadingDialog = new LoadingDialog(context);
+                loadingDialog.startLoading();
+                DtoAccount account_warn = new DtoAccount();
+                DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot fullSnapshot) {
+                        for(DataSnapshot snapshot: fullSnapshot.getChildren()){
+                            DtoAccount account = snapshot.getValue(DtoAccount.class);
+                            if(account != null){
+                                if(account.getUsername().equals(username)){
+                                    if(account_warn.getAccount_id_cry() == null){
+                                        account_warn.setId(account.getId());
+                                        account_warn.setUsername(account.getUsername());
+                                        account_warn.setAccount_id_cry(account.getId());
+                                    }
+                                }
+                            }
+                        }
+
+                        if(account_warn.getAccount_id_cry() != null){
+                            if(account_warn.getName_user() == null || !account_warn.getName_user().equals("go")){
+                                if(account_warn.getUsername().equals(username)){
+                                    loadingDialog.dismissDialog();
+                                    ProfileFragment.UID_USER_WARN = account_warn.getId();
+                                    Intent i = new Intent(context, WarnTheUserActivity.class);
+                                    i.putExtra(WarnTheUserActivity.ACCOUNT_ID_REQUEST_ID, ProfileFragment.warn_id);
+                                    i.putExtra(WarnTheUserActivity.ACCOUNT_ACTIVE_REQUEST_ID, ProfileFragment.active_level);
+                                    i.putExtra(WarnTheUserActivity.ACCOUNT_NAME_REQUEST_ID, ProfileFragment.txt_user_name.getText().toString());
+                                    i.putExtra(WarnTheUserActivity.ACCOUNT_USERNAME_REQUEST_ID, ProfileFragment.txt_username_name.getText().toString());
+                                    i.putExtra(WarnTheUserActivity.ACCOUNT_IMAGE_REQUEST_ID, ProfileFragment.user_image);
+                                    i.putExtra(WarnTheUserActivity.ACCOUNT_ACTIVE_REQUEST_UID, ProfileFragment.UID_USER_WARN);
+                                    context.startActivity(i);
+                                }else ToastHelper.toast(context, context.getString(R.string.user_not_found), ToastHelper.SHORT_DURATION);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+                });
+
+                bottomSheetDialog.dismiss();
+            });
+
+            bottomSheetDialog.setContentView(sheetViewOptions);
+            bottomSheetDialog.show();
+        });
 
         bottomSheetDialog.setContentView(sheetView);
         bottomSheetDialog.show();

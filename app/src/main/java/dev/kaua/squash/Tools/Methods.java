@@ -91,6 +91,7 @@ public abstract class Methods extends MainActivity {
     public static final String BASE_URL_HTTPS = "https://squash-social.herokuapp.com/";
     public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
+    public static final String DOMAIN_SHORT_DYNAMIC_LINKS = "https://squashc.com/url/";
     public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.;])[A-Za-z\\d@$!%*#?&.;]{8,}$";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
@@ -310,7 +311,11 @@ public abstract class Methods extends MainActivity {
     }
 
     public static String getMonth(int month) {
-        return new DateFormatSymbols().getMonths()[month-1];
+        try {
+            return new DateFormatSymbols().getMonths()[month-1];
+        }catch (Exception ex){
+            return String.valueOf(month);
+        }
     }
 
     public static final String NO_ONE = "noOne";

@@ -13,9 +13,4 @@
         android:visible="false"
         app:showAsAction="never"/>
 
-    <item
-        android:id="@+id/setting_chat"
-        android:title="@string/setting"
-        app:showAsAction="never"/>
-
 </menu>
