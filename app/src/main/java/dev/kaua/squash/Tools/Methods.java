@@ -416,9 +416,9 @@ public abstract class Methods extends MainActivity {
             myTimeHelper lack = desired.difference(now);
             result = String.valueOf(lack);
             String[] result_split = result.split(":");
-            if(result_split[0].equals("00")) result = result_split[1] + " " + context.getString(R.string.minutes_ago);
-            else if(Integer.parseInt(result_split[0]) > 1) result = result_split[0] + " " + context.getString(R.string.hours_ago);
-            else result = result_split[0].replace("0", "") + " " + context.getString(R.string.hour_ago);
+            if(result_split[0].equals("00")) result = result_split[1] + context.getString(R.string.m_ago);
+            else if(Integer.parseInt(result_split[0]) > 1) result = result_split[0] + context.getString(R.string.h_ago);
+            else result = result_split[0].replace("0", "") + context.getString(R.string.h_ago);
         }catch (Exception ex){
             Log.d(TAG, ex.toString());
         }

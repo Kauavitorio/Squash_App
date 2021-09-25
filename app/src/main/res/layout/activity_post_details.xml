@@ -19,7 +19,7 @@
             android:id="@+id/container_post"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/background_post"
+            android:background="@drawable/background_post_left"
             android:minHeight="80dp"
             android:orientation="vertical"
             android:padding="6dp"

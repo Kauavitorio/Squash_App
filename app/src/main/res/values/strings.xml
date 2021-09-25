@@ -285,4 +285,6 @@
     <string name="time">Time</string>
     <string name="links_youve_visited">Links You\'ve Visited</string>
     <string name="your_history_is_empty">Your history is empty</string>
+    <string name="h_ago">h ago</string>
+    <string name="m_ago">m ago</string>
 </resources>

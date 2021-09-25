@@ -9,7 +9,8 @@
     android:layout_marginBottom="3dp"
     android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
-    android:background="@drawable/background_post"
+    android:id="@+id/main_container_post_adapter"
+    android:background="@drawable/background_post_left"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Suggestion Container -->
@@ -50,15 +51,30 @@
         <!-- Image User Profile -->
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
+            <!-- User Profile Image -->
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/icon_user_profile_post"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                tools:src="@drawable/img_opss"
+                tools:src="@drawable/ic_logo"
                 app:civ_border_color="@color/base_color"
                 app:civ_border_width="1dp"/>
+
+            <!-- Ic Arrow Down -->
+            <ImageView
+                android:id="@+id/btn_actions"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/ic_arrow_down_simple"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
 
         </LinearLayout>
 
@@ -160,154 +176,138 @@
                     android:layout_below="@+id/txt_date_time_post"
                     android:layout_alignParentStart="true"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
-                    tools:text="@string/receive_email_terms" />
+                    android:textSize="@dimen/post_content_text"
+                    tools:text="@string/setting" />
 
                 <!-- Container Post Body -->
+                <!-- Message Body -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:orientation="vertical"
                     android:layout_below="@+id/txt_post_content">
 
-                    <!-- Message Body -->
+                    <!-- Main Image Container -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
                         android:orientation="vertical"
-                        tools:ignore="UselessParent">
+                        android:maxHeight="100dp">
 
-                        <!-- Main Image Container -->
+                        <androidx.viewpager.widget.ViewPager
+                            android:id="@+id/img_view_paper"
+                            android:layout_width="wrap_content"
+                            android:layout_height="180dp"/>
+
+                        <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/tab_indicator_images"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            app:tabIndicator="@null"
+                            app:tabIndicatorColor="#44BFFF"
+                            app:tabBackground="@drawable/device_presentation_indicator_selector"/>
+
+                    </LinearLayout>
+
+                    <!-- Container Post Info -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="2dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <!-- Container Likes -->
                         <LinearLayout
+                            android:id="@+id/btn_like_post"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:maxHeight="100dp">
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:minWidth="80dp"
+                            android:layout_marginStart="5dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="UseCompoundDrawables,UselessParent">
 
-                            <androidx.viewpager.widget.ViewPager
-                                android:id="@+id/img_view_paper"
-                                android:layout_width="wrap_content"
-                                android:layout_height="180dp"/>
-
-                            <com.google.android.material.tabs.TabLayout
-                                android:id="@+id/tab_indicator_images"
-                                android:layout_width="wrap_content"
-                                android:layout_height="30dp"
+                            <!-- Icon Heart -->
+                            <ImageView
+                                android:id="@+id/img_heart_like_post"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
                                 android:layout_gravity="center"
-                                app:tabIndicator="@null"
-                                app:tabIndicatorColor="#44BFFF"
-                                app:tabBackground="@drawable/device_presentation_indicator_selector"/>
+                                android:src="@drawable/ic_heart"
+                                tools:ignore="ContentDescription" />
+
+                            <!-- Text Likes -->
+                            <TextView
+                                android:id="@+id/txt_likes_post"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                tools:text="@string/app_name"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/post_actions_texts" />
 
                         </LinearLayout>
 
-                        <!-- Container Post Info -->
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <!-- Container Comments -->
+                        <LinearLayout
+                            android:id="@+id/btn_comment_post"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginTop="3dp">
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:layout_constraintEnd_toStartOf="@+id/btn_share_post"
+                            app:layout_constraintStart_toEndOf="@+id/btn_like_post"
+                            tools:ignore="UseCompoundDrawables,UselessParent">
 
-                            <!-- Container Likes -->
-                            <LinearLayout
-                                android:id="@+id/btn_like_post"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:minWidth="80dp"
-                                android:layout_marginStart="5dp"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                tools:ignore="UseCompoundDrawables,UselessParent">
-
-                                <!-- Icon Heart -->
-                                <ImageView
-                                    android:id="@+id/img_heart_like_post"
-                                    android:layout_width="25dp"
-                                    android:layout_height="25dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_heart"
-                                    tools:ignore="ContentDescription" />
-
-                                <!-- Text Likes -->
-                                <TextView
-                                    android:id="@+id/txt_likes_post"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:layout_marginStart="5dp"
-                                    android:layout_marginEnd="5dp"
-                                    tools:text="@string/app_name"
-                                    android:textColor="@color/black"
-                                    android:textSize="16sp" />
-
-                            </LinearLayout>
-
-                            <!-- Container Comments -->
-                            <LinearLayout
-                                android:id="@+id/btn_comment_post"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                app:layout_constraintEnd_toStartOf="@+id/btn_share_post"
-                                app:layout_constraintStart_toEndOf="@+id/btn_like_post"
-                                tools:ignore="UseCompoundDrawables,UselessParent">
-
-                                <!-- Icon Pencil -->
-                                <ImageView
-                                    android:layout_width="22dp"
-                                    android:layout_height="22dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_comment"
-                                    tools:ignore="ContentDescription" />
-
-                                <!-- Text Comments -->
-                                <TextView
-                                    android:id="@+id/txt_comments_post"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:layout_marginStart="5dp"
-                                    android:layout_marginEnd="5dp"
-                                    tools:text="@string/app_name"
-                                    android:textColor="@color/black"
-                                    android:textSize="16sp" />
-
-                            </LinearLayout>
-
-                            <!-- Container Share -->
-                            <LinearLayout
-                                android:id="@+id/btn_share_post"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:layout_marginEnd="10dp"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/btn_actions"
-                                app:layout_constraintTop_toTopOf="parent"
-                                tools:ignore="UseCompoundDrawables,UselessParent">
-
-                                <!-- Icon Share -->
-                                <ImageView
-                                    android:layout_width="35dp"
-                                    android:layout_height="25dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_share"
-                                    tools:ignore="ContentDescription" />
-
-                            </LinearLayout>
-
-                            <!-- Ic Three dots -->
+                            <!-- Icon Pencil -->
                             <ImageView
-                                android:id="@+id/btn_actions"
-                                android:layout_width="20dp"
-                                android:layout_height="0dp"
-                                android:layout_gravity="end"
-                                android:layout_marginBottom="2dp"
-                                android:src="@drawable/ic_three_dots"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_comment"
                                 tools:ignore="ContentDescription" />
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                            <!-- Text Comments -->
+                            <TextView
+                                android:id="@+id/txt_comments_post"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                tools:text="@string/app_name"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/post_actions_texts" />
+
+                        </LinearLayout>
+
+                        <!-- Container Share -->
+                        <LinearLayout
+                            android:id="@+id/btn_share_post"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0"
+                            android:layout_marginEnd="10dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/btn_actions"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="UseCompoundDrawables,UselessParent">
+
+                            <!-- Icon Share -->
+                            <ImageView
+                                android:layout_width="35dp"
+                                android:layout_height="25dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_share"
+                                tools:ignore="ContentDescription" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
