@@ -218,9 +218,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Check_Fragments(int position){
-        btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search));
-        btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home));
         btn_chat_main.setImageDrawable(getDrawable(R.drawable.ic_chat_no_focus));
+        btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home));
+        btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search));
         btn_profile_main.setBorderWidth(0);
         if(position == CHAT_POSITION) btn_chat_main.setImageDrawable(getDrawable(R.drawable.ic_chat_focus));
         else if(position == MAIN_POSITION) btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
         else if(position == PROFILE_POSITION) btn_profile_main.setBorderWidth(3);
     }
 
-    private void Ids() {
+    void Ids() {
         instance = this;
         getWindow().setStatusBarColor(getColor(R.color.BarColor));
         getWindow().setNavigationBarColor(getColor(R.color.BarColor));

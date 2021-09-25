@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_sheet_base"
+    android:id="@+id/main_container_sheet_options_share"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <!-- Hold to hide -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="50dp"
+        android:layout_height="8dp"
+        android:layout_gravity="center"
+        app:cardCornerRadius="20dp"
+        android:layout_marginTop="8dp"
+        app:cardBackgroundColor="@color/tab_indicator_gray"/>
+
+    <!-- Options -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        tools:ignore="DisableBaselineAlignment">
+
+        <!-- Copy Link -->
+        <RelativeLayout
+            android:id="@+id/copy_link_option_share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <!-- Link Image -->
+            <LinearLayout
+                android:id="@+id/link_image_share_option"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_centerHorizontal="true"
+                android:padding="5dp"
+                android:background="@drawable/circle_share_options">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_link"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+            <!-- Text Link -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:layout_below="@+id/link_image_share_option"
+                android:text="@string/link"/>
+
+        </RelativeLayout>
+
+        <!-- Share -->
+        <RelativeLayout
+            android:id="@+id/share_option_share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <!-- Share Image -->
+            <LinearLayout
+                android:id="@+id/share_image_share_option"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_centerHorizontal="true"
+                android:padding="15dp"
+                android:background="@drawable/circle_share_options">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_share_post"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+            <!-- Text Share -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:layout_below="@+id/share_image_share_option"
+                android:text="@string/share"/>
+
+        </RelativeLayout>
+
+        <!-- Report -->
+        <RelativeLayout
+            android:id="@+id/report_option_share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <!-- Report Image -->
+            <LinearLayout
+                android:id="@+id/report_image_share_option"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_centerHorizontal="true"
+                android:padding="15dp"
+                android:background="@drawable/circle_share_options_red">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_warning_shield"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+            <!-- Text Report -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="2dp"
+                android:textColor="@android:color/holo_red_light"
+                android:textSize="16sp"
+                android:layout_below="@+id/report_image_share_option"
+                android:text="@string/report_dots"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <!-- Dividing line -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/tab_indicator_gray"/>
+
+    <!-- Hide -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingEnd="10dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/hide_share_options_post"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/hide"
+            android:textSize="18sp"
+            android:minHeight="30dp"
+            android:textColor="@color/hint"/>
+
+    </LinearLayout>
+
+</LinearLayout>

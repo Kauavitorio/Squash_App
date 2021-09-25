@@ -2,6 +2,8 @@ package dev.kaua.squash.Tools;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,12 +26,15 @@ import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -85,9 +90,10 @@ public abstract class Methods extends MainActivity {
     public static final String SQUASH_ORIGINAL_USERNAME = "squash";
     public static final String REWARDED_AD_ID = "ca-app-pub-5161149668539506/2830793531";
     public static final String INTERSTICIAL_AD_ID = "ca-app-pub-5161149668539506/3847296073";
-    public static final long VERIFY_AD_GOAL = 15000;
+    public static final long VERIFY_AD_GOAL = 20000;
     public static final String PAYPAL_DONATE = "https://www.paypal.com/donate?hosted_button_id=PRKZAKGHHKA7S";
     public static final String GOOGLE_PLAY_APP_LINK = "https://play.google.com/store/apps/details?id=dev.kaua.squash";
+    public static final String GOOGLE_PLAY_APP_LINK_SHORT = "https://squashc.com/url/app";
     public static final String BASE_URL_HTTPS = "https://squash-social.herokuapp.com/";
     public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
@@ -154,6 +160,7 @@ public abstract class Methods extends MainActivity {
     }
 
     public static void SharePost(Activity mContext, DtoPost postInfo, FirebaseAnalytics mFirebaseAnalytics){
+
         Intent myIntent = new Intent(Intent.ACTION_SEND);
         myIntent.setType("text/plain");
         final String search_from;
@@ -165,14 +172,45 @@ public abstract class Methods extends MainActivity {
                 + "?s=" + search_from;
         body = body.replace(" ", "");
         myIntent.putExtra(Intent.EXTRA_TEXT, body);
-        mContext.startActivity(Intent.createChooser(myIntent, mContext.getString(R.string.share_using)));
 
-        //  Creating analytic for share action
-        Bundle bundle_Analytics = new Bundle();
-        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, myFirebaseHelper.getFirebaseUser().getUid() + "_" + postInfo.getPost_id());
-        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, postInfo.getPost_id());
-        bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, postInfo.getUsername());
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, bundle_Analytics);
+
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(mContext, R.style.BottomSheetTheme);
+        //  Creating View for SheetMenu
+        View sheetView = LayoutInflater.from(mContext).inflate(R.layout.adapter_sheet_post_options_share,
+                mContext.findViewById(R.id.main_container_sheet_options_share));
+        TextView close = sheetView.findViewById(R.id.hide_share_options_post);
+
+
+        final String SHARE_URL = body;
+        //  Copy Link Click
+        sheetView.findViewById(R.id.copy_link_option_share).setOnClickListener(v -> {
+            ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("URL_" + SHARE_URL, SHARE_URL);
+            clipboard.setPrimaryClip(clip);
+            ToastHelper.toast(mContext, mContext.getString(R.string.url_copied), ToastHelper.SHORT_DURATION);
+            bottomSheetDialog.dismiss();
+        });
+
+        //  Share Click
+        sheetView.findViewById(R.id.share_option_share).setOnClickListener(v -> {
+            mContext.startActivity(Intent.createChooser(myIntent, mContext.getString(R.string.share_using)));
+
+            //  Creating analytic for share action
+            Bundle bundle_Analytics = new Bundle();
+            bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, myFirebaseHelper.getFirebaseUser().getUid() + "_" + postInfo.getPost_id());
+            bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, postInfo.getPost_id());
+            bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, postInfo.getUsername());
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, bundle_Analytics);
+            bottomSheetDialog.dismiss();
+        });
+
+        //  Report Click
+        sheetView.findViewById(R.id.report_option_share).setOnClickListener(v -> ToastHelper.toast(mContext, mContext.getString(R.string.under_development), ToastHelper.SHORT_DURATION));
+
+        close.setOnClickListener(v -> bottomSheetDialog.dismiss());
+
+        bottomSheetDialog.setContentView(sheetView);
+        bottomSheetDialog.show();
     }
 
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {

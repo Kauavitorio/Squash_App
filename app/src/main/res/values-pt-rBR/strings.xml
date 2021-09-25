@@ -267,4 +267,5 @@
     <string name="your_history_is_empty">Seu histórico está vazio</string>
     <string name="h_ago" translatable="false">h atrás</string>
     <string name="m_ago" translatable="false">m atrás</string>
+    <string name="hide">Esconder</string>
 </resources>

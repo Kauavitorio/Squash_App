@@ -606,7 +606,7 @@ public class PostDetailsActivity extends AppCompatActivity {
                                                     DtoAccount account = MyPrefs.getUserInformation(PostDetailsActivity.this);
                                                     Picasso.get().load(account.getProfile_image()).into(ic_ProfileUser_profile_compose_comment);
                                                     txt_user_name_compose_comment.setText(account.getName_user());
-                                                    txt_username_name_compose_comment.setText("| @" + account.getUsername());
+                                                    txt_username_name_compose_comment.setText(" @" + account.getUsername());
                                                     if(Integer.parseInt(account.getVerification_level()) != 0){
                                                         ic_account_badge_profile_compose_comment.setVisibility(View.VISIBLE);
                                                         if (Integer.parseInt(Objects.requireNonNull(account.getVerification_level())) == 1)

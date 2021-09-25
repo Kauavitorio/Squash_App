@@ -220,6 +220,7 @@ public class SearchFragment extends Fragment {
             }
             if(currentSize != finalFeedList.size() && !getActivity().isFinishing() && !getActivity().isDestroyed()){
                 currentSize = finalFeedList.size();
+                Collections.shuffle(finalFeedList);
                 Log.d("FeedNotFollow", "Loaded -> " + currentSize);
                 posts_adapters = new Posts_Adapters((ArrayList<DtoPost>) finalFeedList, getActivity());
                 if(finalFeedList.size() > 0) posts_adapters.notifyItemRangeChanged(0, finalFeedList.size()-1);

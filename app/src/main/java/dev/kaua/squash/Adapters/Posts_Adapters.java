@@ -168,7 +168,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     i.putExtra("comment", 0);
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
                     ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
-                }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
+                }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
             });
 
             holder.btn_comment_post.setOnClickListener(v -> {
@@ -347,7 +347,8 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
             holder.txt_name_user_post.setText(postInfo.getName_user());
             holder.txt_username_post.setText( "@" + postInfo.getUsername());
-            holder.txt_post_content.setText(postInfo.getPost_content());
+            if(postInfo.getPost_content() != null)
+                holder.txt_post_content.setText(postInfo.getPost_content().trim());
 
             //  Check Posts Likes Amount
             if(Long.parseLong(postInfo.getPost_likes()) != 0){

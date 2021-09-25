@@ -217,12 +217,12 @@ public class MessageActivity extends AppCompatActivity {
 
         if(ConnectionHelper.isOnline(this)){
             reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(userId);
-            reference.addValueEventListener(new ValueEventListener() {
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                     if(instance != null && !instance.isDestroyed() && !instance.isFinishing()){
-                        DtoAccount account = snapshot.getValue(DtoAccount.class);
+                        final DtoAccount account = snapshot.getValue(DtoAccount.class);
                         if(account != null){
                             user_im_chat = account;
                             LoadAnotherUserInfo();
@@ -318,7 +318,7 @@ public class MessageActivity extends AppCompatActivity {
             txt_user_name.setText(user_im_chat.getName_user());
             if(another_user_image != null && !another_user_image.equals(user_im_chat.getImageURL())){
                 another_user_image = user_im_chat.getImageURL();
-                if(user_im_chat.getImageURL() == null || user_im_chat.getImageURL().equals("default")) profile_image.setImageResource(R.drawable.pumpkin_default_image);
+                if(user_im_chat.getImageURL() == null || user_im_chat.getImageURL().equals(DtoAccount.DEFAULT)) profile_image.setImageResource(R.drawable.pumpkin_default_image);
                 else Glide.with(this).load(EncryptHelper.decrypt(another_user_image)).into(profile_image);
             }
             //readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
@@ -402,8 +402,10 @@ public class MessageActivity extends AppCompatActivity {
                     Uri uriAudio = Uri.fromFile(new File(audio_path).getAbsoluteFile());
                     LoadingDialog loadingDialog = new LoadingDialog(this);
                     loadingDialog.startLoading();
-                    storageReference = myFirebaseHelper.getFirebaseStorage().child("user").child("chat").child("medias").child(fUser.getUid())
-                            .child("audios").child("squash_audio_" + timeStamp + ".3gp");
+                    storageReference = myFirebaseHelper.getFirebaseStorage()
+                            .child(myFirebaseHelper.USERS_REFERENCE).child(myFirebaseHelper.CHATS_REFERENCE)
+                            .child(myFirebaseHelper.MEDIAS_REFERENCE).child(fUser.getUid())
+                            .child(myFirebaseHelper.AUDIOS_REFERENCE).child("squash_audio_" + timeStamp + ".3gp");
                     storageReference.putFile(uriAudio).addOnCompleteListener(task -> {
                         if (!task.isSuccessful()) {
                             loadingDialog.dismissDialog();

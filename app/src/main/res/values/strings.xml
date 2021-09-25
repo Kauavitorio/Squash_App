@@ -287,4 +287,7 @@
     <string name="your_history_is_empty">Your history is empty</string>
     <string name="h_ago">h ago</string>
     <string name="m_ago">m ago</string>
+    <string name="link" translatable="false">Link</string>
+    <string name="report_dots" translatable="false">Report...</string>
+    <string name="hide">Hide</string>
 </resources>

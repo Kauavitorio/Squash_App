@@ -23,7 +23,6 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -102,31 +101,32 @@ public class ComposeActivity extends AppCompatActivity {
                 String time = df_time.format(c.getTime());
 
                 //  Set on DtoPost post information
-                DtoPost post = new DtoPost();
+                final DtoPost post = new DtoPost();
                 post.setAccount_id(EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
                 post.setPost_time(EncryptHelper.encrypt(time));
                 post.setPost_date(EncryptHelper.encrypt(date));
+                compose_text = compose_text.trim();
                 post.setPost_content(EncryptHelper.encrypt(compose_text));
                 post.setPost_topic(EncryptHelper.encrypt(""));
                 post.setPost_images(post_image);
 
                 PostServices services = retrofit.create(PostServices.class);
                 Call<DtoPost> call = services.do_new_post(post);
+                final String finalCompose_text = compose_text;
                 call.enqueue(new Callback<DtoPost>() {
                     @Override
                     public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
                         loadingDialog.dismissDialog();
                         if(response.code() == 201){
                             if(response.body() != null){
-                                String post_id = response.body().getPost_id();
+                                final String post_id = response.body().getPost_id();
 
-                                DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference();
                                 final HashMap<String, Object> hashMap = new HashMap<>();
                                 hashMap.put("post_id", post_id);
-                                hashMap.put("account_id", EncryptHelper.encrypt(userAccount.getAccount_id() + ""));
+                                hashMap.put("account_id", EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
                                 hashMap.put("post_time", EncryptHelper.encrypt(time));
                                 hashMap.put("post_date", EncryptHelper.encrypt(date));
-                                hashMap.put("post_content", EncryptHelper.encrypt(compose_text));
+                                hashMap.put("post_content", EncryptHelper.encrypt(finalCompose_text));
                                 hashMap.put("post_topic", EncryptHelper.encrypt(""));
                                 hashMap.put("post_images", post_image);
 
@@ -134,10 +134,12 @@ public class ComposeActivity extends AppCompatActivity {
                                 hashMap.put("username", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getUsername()));
                                 hashMap.put("verification_level", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getVerification_level()));
                                 hashMap.put("profile_image", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getProfile_image()));
-                                hashMap.put("post_likes", EncryptHelper.encrypt(0 + ""));
-                                hashMap.put("post_comments_amount", EncryptHelper.encrypt(0 + ""));
+                                hashMap.put("post_likes", EncryptHelper.encrypt(String.valueOf(0)));
+                                hashMap.put("post_comments_amount", EncryptHelper.encrypt(String.valueOf(0)));
                                 hashMap.put("active", MyPrefs.getUserInformation(ComposeActivity.this).getActive());
-                                reference.child("Posts").child("Published").push().setValue(hashMap);
+                                myFirebaseHelper.getFirebaseDatabase().getReference()
+                                        .child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD)
+                                        .push().setValue(hashMap);
 
                                 MainFragment.RefreshRecycler();
                                 ProfileFragment.getInstance().ReloadRecycler();

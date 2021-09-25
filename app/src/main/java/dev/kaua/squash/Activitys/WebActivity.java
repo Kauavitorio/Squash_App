@@ -206,7 +206,7 @@ public class WebActivity extends AppCompatActivity {
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("URL_" + url_active, url_active);
                 clipboard.setPrimaryClip(clip);
-                ToastHelper.toast(this, getString(R.string.url_copied), 0);
+                ToastHelper.toast(this, getString(R.string.url_copied), ToastHelper.SHORT_DURATION);
                 return true;
         }
         return false;
