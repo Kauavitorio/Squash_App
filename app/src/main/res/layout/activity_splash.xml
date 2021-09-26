@@ -12,8 +12,53 @@
         android:id="@+id/img_squash_logo_splash"
         android:layout_width="match_parent"
         android:layout_height="180dp"
-        android:src="@drawable/logo_with_name"
         android:layout_centerVertical="true"
+        android:src="@drawable/logo_no_bg"
         tools:ignore="ContentDescription" />
+
+    <!-- Squash Group -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:orientation="vertical">
+
+        <!-- Squash Name -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- App Name -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="@string/app_name"
+                android:textAllCaps="true"
+                android:textColor="@color/squash_splash_name"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <!-- Another Company -->
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Squash Group Banner -->
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:layout_weight="1"
+                android:src="@drawable/banner_squash_group"
+                tools:ignore="ContentDescription" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>

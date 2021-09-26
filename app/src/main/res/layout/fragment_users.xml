@@ -5,21 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.Chat.UsersFragment">
 
-    <EditText
-        android:id="@+id/search_users"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="45dp"
-        android:inputType="text"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:textColor="@color/black"
-        android:textColorHint="@color/hint"
-        android:background="@drawable/custom_edit_register_new"
-        android:layout_margin="5dp"
-        android:hint="@string/search_with_dots"
-        tools:ignore="Autofill" />
-
     <!-- No user found -->
     <TextView
         android:id="@+id/no_user_fount_user_chat"
@@ -35,7 +20,6 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_users_following"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/search_users" />
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

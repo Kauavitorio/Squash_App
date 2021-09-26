@@ -14,6 +14,7 @@
     <color name="background_setting">#0B1929</color>
     <color name="black">#FF000000</color>
     <color name="transparent_black">#66100804</color>
+    <color name="squash_splash_name">#66FFFFFF</color>
     <color name="black_intro">#333333</color>
     <color name="hint">#C1171717</color>
     <color name="hint_time_message">#9F171717</color>

@@ -81,7 +81,7 @@ public class ViewPagerAdapterImages extends PagerAdapter {
 
         if(images.get(position) != null && images.get(position).length() > 5){
 
-            // referencing the image view from the item.xml file
+            // referencing the image view from the adapter_images_post.xml file
             ImageView imageView = itemView.findViewById(R.id.imageViewMain);
 
             // setting the image in the imageView

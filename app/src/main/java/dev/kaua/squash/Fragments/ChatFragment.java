@@ -36,13 +36,11 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Activitys.Setting.SettingActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.Fragments.Chat.ChatsFragment;
 import dev.kaua.squash.Fragments.Chat.UsersFragment;
-import dev.kaua.squash.Fragments.Chat.UsersOutstandingFragment;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ConnectionHelper;
@@ -149,7 +147,6 @@ public class ChatFragment extends Fragment {
 
             viewPaperAdapter.addFragment(new UsersFragment(), instance_activity.getString(R.string.following));
 
-            if(Outstanding > 0) viewPaperAdapter.addFragment(new UsersOutstandingFragment(), "(" + Outstanding + ") " + instance_activity.getString(R.string.outstanding));
             view_paper_chat.setAdapter(viewPaperAdapter);
             tab_layout_chat.setupWithViewPager(view_paper_chat);
         }

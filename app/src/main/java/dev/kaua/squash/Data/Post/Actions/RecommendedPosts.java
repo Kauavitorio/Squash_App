@@ -221,6 +221,6 @@ public class RecommendedPosts extends MainFragment {
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {}
             });
-        }else ToastHelper.toast(context, context.getString(R.string.you_are_without_internet), 0);
+        }else ToastHelper.toast(context, context.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
     }
 }

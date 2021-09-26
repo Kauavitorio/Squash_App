@@ -3,12 +3,9 @@ package dev.kaua.squash.Fragments.Chat;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,7 +39,6 @@ import dev.kaua.squash.Tools.MyPrefs;
 public class UsersFragment extends Fragment {
     private static RecyclerView recycler_view_users;
     private static TextView no_user_fount_user_chat;
-    private EditText search_users;
     private static DaoFollowing daoFollowing;
     private static DtoAccount myAccount;
     private static Activity instance;
@@ -57,18 +53,6 @@ public class UsersFragment extends Fragment {
         Ids(view);
         readAccounts();
 
-        //  Search an user
-        search_users.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchUsers(s.toString().toLowerCase());
-            }
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-
         return view;
     }
 
@@ -82,7 +66,6 @@ public class UsersFragment extends Fragment {
         myAccount = MyPrefs.getUserInformation(requireContext());
         recycler_view_users = view.findViewById(R.id.recycler_view_users_following);
         no_user_fount_user_chat = view.findViewById(R.id.no_user_fount_user_chat);
-        search_users = view.findViewById(R.id.search_users);
         recycler_view_users.setHasFixedSize(true);
         recycler_view_users.setItemViewCacheSize(20);
         recycler_view_users.setDrawingCacheEnabled(true);
@@ -172,7 +155,7 @@ public class UsersFragment extends Fragment {
                 query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot datasnapshot) {
-                        if(search_users.getText().toString().equals("") && !instance.isFinishing()){
+                        if(!instance.isFinishing() && !instance.isDestroyed()){
                             mAccounts.clear();
                             for(DataSnapshot snapshot: datasnapshot.getChildren()){
                                 DtoAccount account = snapshot.getValue(DtoAccount.class);

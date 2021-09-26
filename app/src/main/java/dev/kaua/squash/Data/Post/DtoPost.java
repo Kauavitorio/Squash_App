@@ -6,8 +6,6 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.kaua.squash.Security.EncryptHelper;
-
 public class DtoPost implements Comparable<DtoPost>{
     public static final int AD_POST = 555;
     public static final int NORMAL_POST = 0;
@@ -24,6 +22,7 @@ public class DtoPost implements Comparable<DtoPost>{
     private boolean image_loaded;
     private boolean info_loaded;
     private boolean suggestion;
+    private boolean profile_img_load;
     private String likes;
     private long active;
     private String delete_by;
@@ -91,6 +90,14 @@ public class DtoPost implements Comparable<DtoPost>{
 
     public void setVerification_level(String verification_level) {
         this.verification_level = verification_level;
+    }
+
+    public boolean isProfile_img_load() {
+        return profile_img_load;
+    }
+
+    public void setProfile_img_load(boolean profile_img_load) {
+        this.profile_img_load = profile_img_load;
     }
 
     public String getDelete_by() {

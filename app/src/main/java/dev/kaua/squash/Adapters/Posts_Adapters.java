@@ -140,6 +140,16 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     public void onBindViewHolder(@NonNull MyHolderPosts holder, int position) {
         final DtoPost postInfo = mPostList.get(position);
 
+        int valor = position % 2;
+        if(valor == 0){
+            //imprima é par
+            holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_left));
+        }
+        else if(valor == 1){
+            // imprima é impar
+            holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_right));
+        }
+
         if(LayoutType == DtoPost.NORMAL_POST){
             LoadBaseInformation(holder, postInfo, position, CAN_NOT_ANIME);
             LoadMentions(holder);
@@ -158,7 +168,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     i.putExtra("comment", 0);
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
                     ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
-                }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
+                }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
             });
 
             holder.btn_comment_post.setOnClickListener(v -> {
@@ -327,16 +337,34 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
 
             }else holder.ic_account_badge.setVisibility(View.GONE);
-            Glide.with(mContext).load(postInfo.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                    .into(holder.icon_user_profile_post);
+
+            if(!mPostList.get(position).isProfile_img_load() ||  !postInfo.getProfile_image().equals(mPostList.get(position).getProfile_image())){
+                mPostList.get(position).setProfile_image(postInfo.getProfile_image());
+                mPostList.get(position).setProfile_img_load(true);
+                Glide.with(mContext).load(postInfo.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                        .into(holder.icon_user_profile_post);
+            }
+
             holder.txt_name_user_post.setText(postInfo.getName_user());
             holder.txt_username_post.setText( "@" + postInfo.getUsername());
-            holder.txt_post_content.setText(postInfo.getPost_content());
+            if(postInfo.getPost_content() != null)
+                holder.txt_post_content.setText(postInfo.getPost_content().trim());
 
-            holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_likes())));
+            //  Check Posts Likes Amount
+            if(Long.parseLong(postInfo.getPost_likes()) != 0){
+                holder.txt_likes_post.setVisibility(View.VISIBLE);
+                holder.txt_likes_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_likes())));
+            }else holder.txt_likes_post.setVisibility(View.GONE);
+
+            //  Check Posts Comment Amount
+            if(Long.parseLong(postInfo.getPost_comments_amount()) != 0){
+                holder.txt_comments_post.setVisibility(View.VISIBLE);
+                holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_comments_amount())));
+            }else holder.txt_comments_post.setVisibility(View.GONE);
+
+
             if(CAN_ANIMATE) holder.txt_likes_post.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.slide_up));
             holder.txt_date_time_post.setText(LastSeenRefactor(position));
-            holder.txt_comments_post.setText(Methods.NumberTrick(Long.parseLong(postInfo.getPost_comments_amount())));
         }
     }
 
@@ -613,7 +641,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         ViewPager img_view_paper;
         TabLayout tab_indicator_images;
         AdView adView_post;
-        LinearLayout btn_like_post, btn_share_post, btn_comment_post, suggestion_container;
+        LinearLayout main_container, btn_like_post, btn_share_post, btn_comment_post, suggestion_container;
 
         public MyHolderPosts(@NonNull View itemView) {
             super(itemView);
@@ -636,6 +664,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                 txt_comments_post = itemView.findViewById(R.id.txt_comments_post);
                 img_view_paper = itemView.findViewById(R.id.img_view_paper);
                 tab_indicator_images = itemView.findViewById(R.id.tab_indicator_images);
+                main_container = itemView.findViewById(R.id.main_container_post_adapter);
             }else{
                 adView_post = itemView.findViewById(R.id.adView_post);
             }

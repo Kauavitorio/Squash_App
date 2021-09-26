@@ -59,7 +59,7 @@ public class SearchItemArrayAdapter extends ArrayAdapter<DtoAccount> {
                 final ImageView ic_account_badge_search = view.findViewById(R.id.ic_account_badge_search);
                 final CircleImageView circleImageView = view.findViewById(R.id.ic_user_image);
                 if (lblName != null && ic_account_badge_search != null){
-                    if(people.getImageURL() == null || people.getImageURL().equals("default")) circleImageView.setImageResource(R.drawable.pumpkin_default_image);
+                    if(people.getImageURL() == null || people.getImageURL().equals(DtoAccount.DEFAULT)) circleImageView.setImageResource(R.drawable.pumpkin_default_image);
                     else Glide.with(context).load(people.getImageURL()).into(circleImageView);
                     lblName.setText(people.getUsername());
                     txt_name_search.setText(people.getName_user());
