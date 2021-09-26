@@ -268,4 +268,7 @@
     <string name="h_ago" translatable="false">h atrás</string>
     <string name="m_ago" translatable="false">m atrás</string>
     <string name="hide">Esconder</string>
+    <string name="enter_your_phone_number">Digite seu número de telefone</string>
+    <string name="enter_your_birthday_date">Insira sua data de aniversário</string>
+    <string name="minimum_age_to_use_the_platform">A idade mínima para usar nossa plataforma é 13 anos.</string>
 </resources>

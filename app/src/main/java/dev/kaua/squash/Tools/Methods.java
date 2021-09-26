@@ -235,42 +235,44 @@ public abstract class Methods extends MainActivity {
     }
 
     public static void LoadFollowersAndFollowing(@NonNull Context context, final int base){
-        if(base == 0){
-            AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , MyPrefs.getUserInformation(context).getAccount_id(), AsyncLikes_Posts.NOT_NOTIFY);
-            //noinspection unchecked
-            async.execute();
-            AsyncLikes_Posts_Comment posts_comment = new AsyncLikes_Posts_Comment((Activity) context , MyPrefs.getUserInformation(context).getAccount_id());
-            //noinspection unchecked
-            posts_comment.execute();
-        }
+        if(MyPrefs.getUserInformation(context).getAccount_id() != DtoAccount.ACCOUNT_DISABLE){
+            if(base == 0){
+                AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , MyPrefs.getUserInformation(context).getAccount_id(), AsyncLikes_Posts.NOT_NOTIFY);
+                //noinspection unchecked
+                async.execute();
+                AsyncLikes_Posts_Comment posts_comment = new AsyncLikes_Posts_Comment((Activity) context , MyPrefs.getUserInformation(context).getAccount_id());
+                //noinspection unchecked
+                posts_comment.execute();
+            }
 
-        if(base != 999){
-            final Retrofit retrofitUser = GetRetrofitBuilder();
-            SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-            final DtoAccount account = new DtoAccount();
-            account.setAccount_id_cry(sp.getString("pref_account_id", null));
-            AccountServices services = retrofitUser.create(AccountServices.class);
-            Call<DtoAccount> call = services.get_followers_following(account);
-            call.enqueue(new Callback<DtoAccount>() {
-                @Override
-                public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                    if(response.code() == 200 && response.body() != null){
-                        final DtoAccount info = new DtoAccount();
-                        final long id = MyPrefs.getUserInformation(context).getAccount_id();
-                        if(id > DtoAccount.ACCOUNT_DISABLE){
-                            info.setAccount_id(id);
-                            info.setFollowers(response.body().getFollowers());
-                            info.setFollowing(response.body().getFollowing());
-                            DaoAccount daoAccount = new DaoAccount(context);
-                            long lines = daoAccount.Register_Followers_Following(info);
-                            if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
-                            else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+            if(base != 999){
+                final Retrofit retrofitUser = GetRetrofitBuilder();
+                SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+                final DtoAccount account = new DtoAccount();
+                account.setAccount_id_cry(sp.getString("pref_account_id", null));
+                AccountServices services = retrofitUser.create(AccountServices.class);
+                Call<DtoAccount> call = services.get_followers_following(account);
+                call.enqueue(new Callback<DtoAccount>() {
+                    @Override
+                    public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                        if(response.code() == 200 && response.body() != null){
+                            final DtoAccount info = new DtoAccount();
+                            final long id = MyPrefs.getUserInformation(context).getAccount_id();
+                            if(id > DtoAccount.ACCOUNT_DISABLE){
+                                info.setAccount_id(id);
+                                info.setFollowers(response.body().getFollowers());
+                                info.setFollowing(response.body().getFollowing());
+                                DaoAccount daoAccount = new DaoAccount(context);
+                                long lines = daoAccount.Register_Followers_Following(info);
+                                if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
+                                else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+                            }
                         }
                     }
-                }
-                @Override
-                public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
-            });
+                    @Override
+                    public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+                });
+            }
         }
     }
 

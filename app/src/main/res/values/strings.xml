@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE resources [
-    <!ENTITY privacy_policy "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy_EN.pdf">
-    ]>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources [<!ENTITY privacy_policy "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy_EN.pdf">]>
 <resources>
 
     <!-- Natural Text -->
@@ -290,4 +287,7 @@
     <string name="link" translatable="false">Link</string>
     <string name="report_dots" translatable="false">Report...</string>
     <string name="hide">Hide</string>
+    <string name="enter_your_phone_number">Enter Your Phone Number</string>
+    <string name="enter_your_birthday_date">Enter Your Birthday date</string>
+    <string name="minimum_age_to_use_the_platform">The minimum age to use our platform is 13 years old.</string>
 </resources>

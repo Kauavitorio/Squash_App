@@ -45,4 +45,7 @@ public interface AccountServices {
 
     @POST("user/report/user/")
     Call<DtoAccount> report_an_user (@Body DtoAccount account);
+
+    @POST("user/action/update/base/info/")
+    Call<DtoAccount> update_base_info (@Body DtoAccount account);
 }

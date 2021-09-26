@@ -14,7 +14,7 @@ public class DtoAccount implements Comparable<DtoAccount>{
     private String name_user, username, email, phone_user, password, verify_id;
     private String banner_user, profile_image, bio_user, url_user, following, followers, born_date, joined_date;
     private String message, verification_level;
-    private String login_method, token, login_info, trust, date_time_login, UID;
+    private String login_method, token, login_info, trust, date_time_login, UID, content;
     private String id_following, imageURL, id, typingTo, last_seen, report_to, report_from, report_reason;
     private String account_id_following, status_chat, search, last_chat, chat_id, reason_warn, placed, adds, type_acc;
 
@@ -42,6 +42,14 @@ public class DtoAccount implements Comparable<DtoAccount>{
         this.last_seen = last_seen;
         this.verification_level = verification_level;
         this.active = active;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getType_acc() {

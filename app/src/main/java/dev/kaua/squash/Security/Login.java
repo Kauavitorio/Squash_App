@@ -71,6 +71,8 @@ public abstract class Login extends SignInActivity{
     private static LoadingDialog loadingDialog;
     private static FirebaseAuth mAuth;
     private final static String TAG = "LOGIN_ACTIONS";
+    static final int min = 35;
+    static final int max = 90;
 
     //  Set preferences
     private static SharedPreferences mPrefs;
@@ -94,7 +96,7 @@ public abstract class Login extends SignInActivity{
         Log.d(TAG, "Current date => "+ formattedDate);
 
         String encrypt_password = EncryptHelper.encrypt(EncryptHelper.encrypt(password));
-        String placed = Methods.shuffle(Methods.RandomCharacters(40));
+        String placed = Methods.shuffle(Methods.RandomCharacters((int)Math.floor(Math.random()*(max-min+1)+min)));
         String ip = ConnectionHelper.getIp(context);
         ip =  Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
                 .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9") + placed;
@@ -244,7 +246,7 @@ public abstract class Login extends SignInActivity{
         Log.d(TAG, "Debug => "+ Debug.isDebuggerConnected());
 
         String encrypt_password = EncryptHelper.encrypt(EncryptHelper.encrypt(password));
-        String placed = Methods.shuffle(Methods.RandomCharacters(30));
+        String placed = Methods.shuffle(Methods.RandomCharacters((int)Math.floor(Math.random()*(max-min+1)+min)));
         String ip = ConnectionHelper.getIp(context);
         ip =  placed + Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
                 .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9");
