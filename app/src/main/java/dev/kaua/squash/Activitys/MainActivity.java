@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
         getUserInformationAndLoadProfile();
         Methods.status_chat(Methods.ONLINE, this);
         Methods.LoadFollowersAndFollowing(this, 1);
-        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this, account.getAccount_id());
+        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(this);
         asyncUser_follow.execute();
     }
 

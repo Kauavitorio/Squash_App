@@ -12,11 +12,17 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"/>
 
-    <!-- User recyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_followers"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <!-- User recyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_followers"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Text ArraySize -->
     <TextView

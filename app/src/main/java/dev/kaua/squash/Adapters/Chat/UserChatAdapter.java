@@ -252,20 +252,16 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         private final TextView user_name, last_seen;
         private final CircleImageView profile_image;
         private final CircleImageView img_status;
-        private final CardView card_no_read_ic;
-        private final ImageView ic_pinned_chat;
         private final ImageView verification_ic;
 
         @SuppressLint("CutPasteId")
         public ViewHolder(View itemView){
             super(itemView);
-            ic_pinned_chat = itemView.findViewById(R.id.ic_pinned_chat);
             user_name = itemView.findViewById(R.id.user_name_users);
             verification_ic = itemView.findViewById(R.id.verification_ic_user_chat);
             profile_image = itemView.findViewById(R.id.profile_image_users);
             last_seen = itemView.findViewById(R.id.last_seen);
             img_status = itemView.findViewById(R.id.img_status_user);
-            card_no_read_ic = itemView.findViewById(R.id.card_no_read_ic);
         }
     }
 }

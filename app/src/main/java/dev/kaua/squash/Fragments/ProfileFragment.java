@@ -69,6 +69,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
+import dev.kaua.squash.Tools.FollowAccountHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
@@ -127,6 +128,7 @@ public class ProfileFragment extends Fragment {
         GetUserInfo(requireActivity());
 
         btn_follow_following_profile.setOnClickListener(v -> {
+            final FollowAccountHelper followAccountHelper = new FollowAccountHelper(requireActivity());
             String follow = getString(R.string.follow);
             String following = getString(R.string.following);
             String edit_profile = getString(R.string.edit_profile);
@@ -136,48 +138,8 @@ public class ProfileFragment extends Fragment {
                 btn_follow_following_profile.setText(requireContext().getString(R.string.following));
                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.black));
                 txt_amount_followers_profile.setText(String.valueOf((actual + 1)));
-                account = new DtoAccount();
-                account.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(account_id)));
-                account.setAccount_id_following(EncryptHelper.encrypt(String.valueOf(account_another_user)));
-                AccountServices services = retrofitUser.create(AccountServices.class);
-                Call<DtoAccount> call = services.follow_a_user(account);
-                call.enqueue(new Callback<DtoAccount>() {
-                    @Override
-                    public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                        if(response.code() == 201){
-                            btn_go_chat_profile.setVisibility(View.VISIBLE);
-                            Methods.LoadFollowersAndFollowing(requireActivity(), 1);
-                            MainFragment.RefreshRecycler();
-                            AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
-                            asyncUser_follow.execute();
-
-                            DtoAccount account_chat = new DtoAccount();
-                            DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE);
-                            reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull @NotNull DataSnapshot fullSnapshot) {
-                                    for(DataSnapshot snapshot: fullSnapshot.getChildren()){
-                                        DtoAccount account = snapshot.getValue(DtoAccount.class);
-                                        if(account != null){
-                                            if(account.getUsername().equals(username)){
-                                                if(account_chat.getAccount_id_cry() == null && getContext() != null){
-                                                    SenderHelper.sendFollow(account.getId(),
-                                                            MyPrefs.getUserInformation(getContext()).getUsername());
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                @Override
-                                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-                            });
-                        }
-                    }
-                    @Override
-                    public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
-                        Warnings.showWeHaveAProblem(requireActivity(), ErrorHelper.PROFILE_FOLLOW_AN_USER);
-                    }
-                });
+                new Handler().postDelayed(() -> btn_go_chat_profile.setVisibility(View.VISIBLE), 1000);
+                followAccountHelper.DoFollow(account_another_user, username, requireActivity());
             }
             else if(btn_follow_following_profile.getText().toString().equals(following)){
                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_follow));
@@ -185,26 +147,7 @@ public class ProfileFragment extends Fragment {
                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
                 txt_amount_followers_profile.setText(String.valueOf((actual - 1)));
                 btn_go_chat_profile.setVisibility(View.GONE);
-                account = new DtoAccount();
-                account.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(account_id)));
-                account.setAccount_id_following(EncryptHelper.encrypt(String.valueOf(account_another_user)));
-                AccountServices services = retrofitUser.create(AccountServices.class);
-                Call<DtoAccount> call = services.un_follow_a_user(account);
-                call.enqueue(new Callback<DtoAccount>() {
-                    @Override
-                    public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                        if(response.code() == 201){
-                            Methods.LoadFollowersAndFollowing(requireActivity(), 1);
-                            AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account_id);
-                            asyncUser_follow.execute();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
-                        Warnings.showWeHaveAProblem(requireActivity(), ErrorHelper.PROFILE_UNFOLLOW_AN_USER);
-                    }
-                });
+                followAccountHelper.DoUnFollow(account_another_user, requireActivity());
             }
             else if(btn_follow_following_profile.getText().toString().equals(edit_profile)){
                 Intent i = new Intent(requireContext(), EditProfileActivity.class);
@@ -266,7 +209,7 @@ public class ProfileFragment extends Fragment {
         btn_go_chat_profile.setVisibility(View.GONE);
         ic_account_badge_profile.setVisibility(View.GONE);
         Methods.LoadFollowersAndFollowing(requireContext(), 1);
-        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity(), account.getAccount_id());
+        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow(requireActivity());
         asyncUser_follow.execute();
         control++;
         Bundle bundle = MainActivity.getInstance().SetBundleProfile();

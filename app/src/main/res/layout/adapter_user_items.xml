@@ -4,101 +4,125 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="1dp"
-    android:maxHeight="80dp"
     android:layout_height="wrap_content">
 
     <!-- Container Main -->
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="4dp"
-        android:paddingStart="15dp"
+        android:paddingStart="10dp"
         android:paddingEnd="10dp"
+        android:orientation="horizontal"
         tools:ignore="UselessParent">
 
-        <!-- User Icon Image -->
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profile_image_users"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_centerVertical="true"
-            android:src="@mipmap/ic_launcher" />
-
-        <!-- Text UserName -->
-        <TextView
-            android:id="@+id/user_name_users"
+        <!-- Profile Image -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/profile_image_users"
-            android:text="@string/app_name"
-            android:textColor="@color/black"
-            android:textSize="18sp" />
+            android:minHeight="50dp">
 
-        <!-- Image Verification Level -->
-        <ImageView
-            android:id="@+id/verification_ic_user_chat"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="4dp"
-            android:layout_toEndOf="@+id/user_name_users"
-            android:src="@drawable/ic_verified_account"
-            tools:ignore="ContentDescription" />
+            <!-- User Icon Image -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_image_users"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                tools:src="@mipmap/ic_launcher"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Image Status -->
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/img_status_user"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_below="@id/user_name_users"
-            android:layout_marginStart="-12dp"
-            android:layout_marginTop="12dp"
-            android:layout_toEndOf="@id/profile_image_users"
-            android:src="@mipmap/ic_launcher"
-            android:visibility="visible"
-            app:civ_border_color="@color/status_off"
-            app:civ_border_width="10dp" />
+            <!-- Image Status -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_status_user"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_toEndOf="@id/profile_image_users"
+                android:src="@mipmap/ic_launcher"
+                android:visibility="visible"
+                app:civ_border_color="@color/status_off"
+                app:civ_border_width="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Text Last message -->
-        <TextView
-            android:id="@+id/last_seen"
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- User Info Container -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/user_name_users"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_toEndOf="@id/profile_image_users"
-            android:maxLength="40"
-            android:maxLines="1"
-            android:textSize="13sp"
-            tools:text="Kauã Vitorio"
-            android:textColor="@color/hint" />
+            android:orientation="vertical">
 
-        <!-- Card un read message -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_no_read_ic"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp"
+            <!-- User Info -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Text UserName -->
+                <TextView
+                    android:id="@+id/user_name_users"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:maxWidth="200dp"
+                    tools:text="Squahs App"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <!-- Image Verification Level -->
+                <ImageView
+                    android:id="@+id/verification_ic_user_chat"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="3dp"
+                    android:src="@drawable/ic_verified_account"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+            <!-- Text Last message -->
+            <TextView
+                android:id="@+id/last_seen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="1dp"
+                android:maxLength="40"
+                android:maxLines="1"
+                android:textSize="13sp"
+                tools:text="Kauã Vitorio"
+                android:textColor="@color/hint" />
+
+        </LinearLayout>
+
+        <!-- Container Follow Button -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container_follow_adapter_user"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:visibility="gone"
-            app:cardBackgroundColor="@color/base_color"
-            app:cardCornerRadius="10dp" />
+            tools:visibility="visible">
 
-        <!-- Image Pined chat -->
-        <ImageView
-            android:id="@+id/ic_pinned_chat"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/ic_pinned"
-            android:visibility="gone"
-            tools:ignore="ContentDescription" />
+            <!-- Btn Follow -->
+            <Button
+                android:id="@+id/btn_follow_adapter_user"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/background_button_follow"
+                android:minWidth="100dp"
+                android:text="@string/follow"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>

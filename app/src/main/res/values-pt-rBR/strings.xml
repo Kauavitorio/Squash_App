@@ -233,7 +233,7 @@
     <string name="more_information">Mais Informações…</string>
     <string name="click_to_collapse">Clique para recolher…</string>
     <string name="share_app_desc">Caso queira, você pode compartilhar o aplicativo com seus amigos e isso ajuda muito a Squash.</string>
-    <string name="text_share_app">Olá, venha conhecer uma rede social chamada Squash que estou usando e adorando.</string>
+    <string name="text_share_app">Estou no Squash como @%1$s. Instale o aplicativo para seguir minhas postagens :).</string>
     <string name="goal">Meta</string>
     <string name="thanks_for_watching_the_ad">Obrigado por assistir o anúncio.\nSua recompensa foi de %1$s Squash points.</string>
     <string name="ad_desc">Aqui você poderá assistir a um anúncio para nos ajudar e assistindo até o final você será recompensado com “Squash Points” que é uma moeda criada pela Squash com o intuito de incentivar nossos usuários a utilizar a plataforma, você pode gastar seus Squash Points em nossa loja “Squash Shop”. Obrigado.</string>

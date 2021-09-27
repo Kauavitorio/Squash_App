@@ -2,7 +2,6 @@ package dev.kaua.squash.Adapters;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,10 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -28,19 +29,24 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Fragments.ProfileFragment;
+import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
+import dev.kaua.squash.Tools.FollowAccountHelper;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.Warnings;
 
 public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_FollowingAdapter.ViewHolder> {
 
-    private final Context mContext;
+    private final Activity mContext;
     private final List<DtoAccount> mAccounts;
+    private static DaoFollowing daoFollowing;
 
-    public Followers_FollowingAdapter(Context mContext, List<DtoAccount> mAccounts){
+    public Followers_FollowingAdapter(Activity mContext, List<DtoAccount> mAccounts){
         this.mContext = mContext;
         this.mAccounts = mAccounts;
+        daoFollowing = new DaoFollowing(mContext);
     }
 
     @NonNull
@@ -67,7 +73,7 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
                         final Animation myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
                         holder.itemView.startAnimation(myAnim);
                         Bundle bundle = new Bundle();
-                        bundle.putString("account_id", mAccounts.get(position).getAccount_id() + "");
+                        bundle.putString("account_id", String.valueOf(account.getAccount_id()));
                         bundle.putInt("control", 0);
                         MainActivity.getInstance().GetBundleProfile(bundle);
                         MainActivity.getInstance().CallProfile();
@@ -77,6 +83,42 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
                         Warnings.showWeHaveAProblem(mContext, ErrorHelper.FOLLOWING_FOLLOWERS_CLICK);
                     }
                 });
+
+                if(account.getAccount_id() != MyPrefs.getUserInformation(mContext).getAccount_id()){
+                    holder.container_follow_adapter_user.setVisibility(View.VISIBLE);
+                    if(daoFollowing.check_if_follow(MyPrefs.getUserInformation(mContext).getAccount_id(),
+                            account.getAccount_id())){
+                        holder.btn_follow_adapter_user.setBackground(mContext.getDrawable(R.drawable.background_button_following));
+                        holder.btn_follow_adapter_user.setText(mContext.getString(R.string.following));
+                        holder.btn_follow_adapter_user.setTextColor(mContext.getColor(R.color.black));
+                    }else{
+                        holder.btn_follow_adapter_user.setBackground(mContext.getDrawable(R.drawable.background_button_follow));
+                        holder.btn_follow_adapter_user.setText(mContext.getString(R.string.follow));
+                        holder.btn_follow_adapter_user.setTextColor(mContext.getColor(R.color.white));
+                    }
+
+                    //   Follow / Un Follow Click
+                    holder.btn_follow_adapter_user.setOnClickListener(v -> {
+                        if(account.getAccount_id() != MyPrefs.getUserInformation(mContext).getAccount_id()){
+                            final FollowAccountHelper followAccountHelper = new FollowAccountHelper(mContext);
+                            String follow = mContext.getString(R.string.follow);
+                            String following = mContext.getString(R.string.following);
+                            if(holder.btn_follow_adapter_user.getText().toString().equals(follow)){
+                                holder.btn_follow_adapter_user.setBackground(mContext.getDrawable(R.drawable.background_button_following));
+                                holder.btn_follow_adapter_user.setText(mContext.getString(R.string.following));
+                                holder.btn_follow_adapter_user.setTextColor(mContext.getColor(R.color.black));
+                                followAccountHelper.DoFollow(account.getAccount_id(), account.getUsername(), mContext);
+                            }
+                            else if(holder.btn_follow_adapter_user.getText().toString().equals(following)){
+                                holder.btn_follow_adapter_user.setBackground(mContext.getDrawable(R.drawable.background_button_follow));
+                                holder.btn_follow_adapter_user.setText(mContext.getString(R.string.follow));
+                                holder.btn_follow_adapter_user.setTextColor(mContext.getColor(R.color.white));
+                                followAccountHelper.DoUnFollow(account.getAccount_id(), mContext);
+                            }
+                        }
+                    });
+
+                }else holder.container_follow_adapter_user.setVisibility(View.GONE);
 
                 if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
                     holder.verification_ic.setVisibility(View.VISIBLE);
@@ -101,6 +143,8 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
 
         private final TextView user_name, last_seen;
         private final CircleImageView profile_image;
+        private final ConstraintLayout container_follow_adapter_user;
+        private final Button btn_follow_adapter_user;
         private final CircleImageView img_status;
         private final ImageView verification_ic;
 
@@ -112,6 +156,9 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
             profile_image = itemView.findViewById(R.id.profile_image_users);
             last_seen = itemView.findViewById(R.id.last_seen);
             img_status = itemView.findViewById(R.id.img_status_user);
+            container_follow_adapter_user = itemView.findViewById(R.id.container_follow_adapter_user);
+            btn_follow_adapter_user = itemView.findViewById(R.id.btn_follow_adapter_user);
+            setIsRecyclable(false);
         }
     }
 }

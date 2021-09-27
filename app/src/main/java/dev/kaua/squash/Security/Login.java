@@ -148,7 +148,7 @@ public abstract class Login extends SignInActivity{
 
                         //  Getting Followers and Followings
                         Methods.LoadFollowersAndFollowing(context, 0);
-                        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow((Activity) context, account.getAccount_id());
+                        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow((Activity) context);
                         //noinspection unchecked
                         asyncUser_follow.execute();
 

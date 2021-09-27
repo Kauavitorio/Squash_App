@@ -248,7 +248,7 @@
     <string name="more_information">More information…</string>
     <string name="click_to_collapse">Click to collapse…</string>
     <string name="share_app_desc">If you want, you can share the app with your friends and it helps a lot for Squash.</string>
-    <string name="text_share_app">Hi, come and meet a social media called Squash I\'m using and loving it.</string>
+    <string name="text_share_app">I\'m on Squash as @%1$s. Install the app to follow my posts :).</string>
     <string name="goal">Goal</string>
     <string name="thanks_for_watching_the_ad">Thanks for watching the ad.\nYour reward was %1$s Squash points.</string>
     <string name="squash_shop" translatable="false">Squash Shop</string>
