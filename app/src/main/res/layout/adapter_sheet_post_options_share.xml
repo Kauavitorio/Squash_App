@@ -10,6 +10,7 @@
 
     <!-- Hold to hide -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/card_hold_to_close_post_share_option"
         android:layout_width="50dp"
         android:layout_height="8dp"
         android:layout_gravity="center"

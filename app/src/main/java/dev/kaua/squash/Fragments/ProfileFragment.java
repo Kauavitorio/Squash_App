@@ -397,7 +397,7 @@ public class ProfileFragment extends Fragment {
             try {
                 final int type_acc = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getType_acc())));
                 if(type_acc == DtoAccount.BUSINESS_ACCOUNT
-                        || Integer.parseInt(MyPrefs.getUserInformation(requireContext()).getVerification_level()) == DtoAccount.ACCOUNT_IS_ADM){
+                        || Methods.getUserLevel(requireContext()) == DtoAccount.ACCOUNT_IS_ADM){
                     btn_contact_info_profile.setVisibility(View.VISIBLE);
                     btn_contact_info_profile.setOnClickListener(v -> {
                         DtoAccount contact_account = new DtoAccount();
@@ -448,7 +448,7 @@ public class ProfileFragment extends Fragment {
             txt_amount_followers_profile.setText(Methods.NumberTrick(0));
         }
 
-        int verified = Integer.parseInt(user.getVerification_level());
+        final long verified = Methods.getUserLevel(activity);
         if(verified != DtoAccount.NORMAL_ACCOUNT){
             if (verified == DtoAccount.ACCOUNT_IS_ADM)
                 ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_employee_account));

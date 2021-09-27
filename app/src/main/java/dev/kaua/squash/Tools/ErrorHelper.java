@@ -39,4 +39,6 @@ public abstract class ErrorHelper {
     public static final String REPORT_AN_USER = "36";
     public static final String UPDATE_BASE_INFO_REQUEST = "37";
     public static final String UPDATE_BASE_INFO_FAILURE = "37/2";
+    public static final String REQUEST_VERIFICATION_REQUEST = "38";
+    public static final String REQUEST_VERIFICATION_FAILURE = "38/2";
 }

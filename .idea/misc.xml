@@ -8,6 +8,7 @@
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_audio_chat.xml" value="0.290625" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_bottom_main.xml" value="0.28615384615384615" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_button_follow.xml" value="0.290625" />
+        <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_button_follow_disable.xml" value="0.25833333333333336" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_button_following.xml" value="0.290625" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_fill.xml" value="0.26944444444444443" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_header_main.xml" value="0.2547945205479452" />
@@ -19,6 +20,8 @@
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_sheet_base.xml" value="0.262037037037037" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_sheet_base_dark.xml" value="0.2547945205479452" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_squash_shop.xml" value="0.2547945205479452" />
+        <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/btn_simple_disable.xml" value="0.2547945205479452" />
+        <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/btn_simple_enable.xml" value="0.2547945205479452" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/circle_share_options.xml" value="0.2547945205479452" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/circle_share_options_red.xml" value="0.2547945205479452" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/container_signin.xml" value="0.2547945205479452" />
@@ -87,6 +90,7 @@
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_profile_actions.xml" value="0.2439814814814815" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_search_layout.xml" value="0.2406392694063927" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_contact_profile.xml" value="0.2439814814814815" />
+        <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_document_type_selector.xml" value="0.2439814814814815" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_media_action.xml" value="0.2406392694063927" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_menu_base.xml" value="0.24722222222222223" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_menu_post_action.xml" value="0.21944444444444444" />
@@ -100,6 +104,7 @@
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/fragment_about_your_accoun.xml" value="0.2439814814814815" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/fragment_about_your_account.xml" value="0.264" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/fragment_account_personal_information.xml" value="0.2439814814814815" />
+        <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/fragment_account_request_verification.xml" value="0.2439814814814815" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/fragment_activity_chat.xml" value="0.27447916666666666" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/fragment_activity_main.xml" value="0.264" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/fragment_activity_profile.xml" value="0.2" />

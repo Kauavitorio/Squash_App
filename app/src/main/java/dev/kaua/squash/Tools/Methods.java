@@ -180,6 +180,8 @@ public abstract class Methods extends MainActivity {
                 mContext.findViewById(R.id.main_container_sheet_options_share));
         TextView close = sheetView.findViewById(R.id.hide_share_options_post);
 
+        sheetView.findViewById(R.id.card_hold_to_close_post_share_option).setElevation(0);
+
 
         final String SHARE_URL = body;
         //  Copy Link Click
@@ -356,6 +358,20 @@ public abstract class Methods extends MainActivity {
         }catch (Exception ex){
             return String.valueOf(month);
         }
+    }
+
+    public static long getUserLevel(Context context){
+       try {
+           return Long.parseLong(MyPrefs.getUserInformation(context).getVerification_level());
+       }catch (Exception ex){
+           return DtoAccount.NORMAL_ACCOUNT;
+       }
+    }
+
+    static final int min = 35;
+    static final int max = 100;
+    public static int getRandomAmount(){
+        return (int) Math.floor(Math.random()*(max-min+1)+min);
     }
 
     public static final String NO_ONE = "noOne";
