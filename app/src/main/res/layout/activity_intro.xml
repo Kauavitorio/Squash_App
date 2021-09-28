@@ -18,7 +18,7 @@
 
         <!-- Text Intro Description -->
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textView_intro_title"
             android:layout_width="244dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
@@ -40,7 +40,7 @@
             app:layout_constraintBottom_toTopOf="@+id/guideline_intro_app"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/textView_intro_title"
             tools:ignore="ContentDescription" />
 
         <!-- CardView btn Sign In -->

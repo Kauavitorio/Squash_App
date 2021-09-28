@@ -23,7 +23,6 @@ import dev.kaua.squash.Tools.ToastHelper;
 
 public class OptionsFragment extends Fragment {
     private ListView options_list;
-    TextView txt_options_list;
     String[] options;
     private static View view;
 
@@ -37,7 +36,6 @@ public class OptionsFragment extends Fragment {
 
     private void Ids() {
         options_list = view.findViewById(R.id.options_list_account_setting);
-        txt_options_list = view.findViewById(R.id.textView);
 
         GenerateOptionsList();
     }

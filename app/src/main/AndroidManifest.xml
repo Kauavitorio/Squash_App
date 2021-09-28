@@ -34,6 +34,9 @@
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Activitys.Setting.FollowAndInvite.FollowAndInviteActivity"
+            android:exported="true" />
+        <activity
             android:name=".Activitys.Setting.AccountSetting.ChangeSingleInfoActivity"
             android:exported="true" />
         <activity

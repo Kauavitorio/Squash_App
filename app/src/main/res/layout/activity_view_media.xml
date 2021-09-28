@@ -14,15 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guide_line_view_media" />
-
-    <!-- Guide Line from image -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guide_line_view_media"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="35dp" />
+        app:layout_constraintTop_toBottomOf="@+id/container_header_terms" />
 
     <!-- Header -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -70,7 +62,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginBottom="5dp"
             android:maxWidth="280dp"
-            android:text="@string/sent_on"
+            tools:text="@string/sent_on"
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"

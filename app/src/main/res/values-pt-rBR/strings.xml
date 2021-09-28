@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE resources [
-    <!ENTITY privacy_policy "https://squash.kauavitorio.com/documentation/mobile/asset/Squash_Privacy_Policy_PT_BR.pdf">
+    <!ENTITY privacy_policy "https://squashc.com/privacy/asset/Squash_Privacy_Policy_PT_BR.pdf">
     ]>
 <resources>
     <string name="language_tag">pt-BR</string>
@@ -300,4 +300,10 @@
     <string name="need_to_select_a_document">Necessário selecionar um documento.</string>
     <string name="link_is_inserted_incorrectly">Link %1$s inserido incorretamente</string>
     <string name="your_request_was_successful">Seu requisição foi realizado com sucesso.</string>
+    <string name="follow_and_invite_friends">Siga e convide amigos</string>
+    <string name="invite_friends_by_whatsapp">Convide amigos pelo WhatsApp</string>
+    <string name="invite_friends_by_email">Convide amigos por e-mail</string>
+    <string name="invite_friends_by_choose">Convide amigos por…</string>
+    <string name="whatsapp_have_not_been_installed">Whatsapp não foi instalado.</string>
+    <string name="invited_you_to_join_squash">%1$s convidou você para entrar no Squash!</string>
 </resources>

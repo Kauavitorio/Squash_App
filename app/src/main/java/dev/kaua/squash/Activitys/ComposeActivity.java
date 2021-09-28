@@ -132,7 +132,7 @@ public class ComposeActivity extends AppCompatActivity {
 
                                 hashMap.put("name_user", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getName_user()));
                                 hashMap.put("username", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getUsername()));
-                                hashMap.put("verification_level", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getVerification_level()));
+                                hashMap.put("verification_level", EncryptHelper.encrypt(String.valueOf(Methods.getUserLevel(ComposeActivity.this))));
                                 hashMap.put("profile_image", EncryptHelper.encrypt(MyPrefs.getUserInformation(ComposeActivity.this).getProfile_image()));
                                 hashMap.put("post_likes", EncryptHelper.encrypt(String.valueOf(0)));
                                 hashMap.put("post_comments_amount", EncryptHelper.encrypt(String.valueOf(0)));

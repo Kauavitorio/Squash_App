@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         //  Get all SharedPreferences
         bundle = getIntent().getExtras();
-        if (MyPrefs.getUserInformation(this).getAccount_id() > DtoAccount.NORMAL_ACCOUNT) StartNavigation();
+        if (account.getAccount_id() > DtoAccount.NORMAL_ACCOUNT) StartNavigation();
         else Login.LogOut(this, Login.LOGOUT_STATUS_WITHOUT_FLAG, Login.NOT_DISABLE_ACCOUNT);
 
         if(bundle != null){
@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
         if(position == CHAT_POSITION) btn_chat_main.setImageDrawable(getDrawable(R.drawable.ic_chat_focus));
         else if(position == MAIN_POSITION) btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
         else if(position == SEARCH_POSITION) btn_search_main.setImageDrawable(getDrawable(R.drawable.ic_search_select));
-        else if(position == PROFILE_POSITION) btn_profile_main.setBorderWidth(3);
+        else if(position == PROFILE_POSITION) btn_profile_main.setBorderWidth(4);
     }
 
     void Ids() {
@@ -243,15 +243,16 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(this);
         btn_home_main.setImageDrawable(getDrawable(R.drawable.ic_home_select));
 
+        getUserInformationAndLoadProfile();
+        Login.ReloadUserinfo(this, account.getEmail(), account.getPassword());
+        new Handler().postDelayed(() -> NotificationManagerCompat.from(MainActivity.this).cancelAll(), 2000);
+
         //  Creating analytic for open app event
         Bundle bundle_Analytics = new Bundle();
         bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, myFirebaseHelper.getFirebaseUser().getUid());
         bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(account.getUsername()));
         bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle_Analytics);
-        getUserInformationAndLoadProfile();
-        Login.ReloadUserinfo(this, MyPrefs.getUserInformation(this).getEmail(), MyPrefs.getUserInformation(this).getPassword());
-        NotificationManagerCompat.from(this).cancelAll();
     }
 
     @SuppressWarnings("unchecked")
