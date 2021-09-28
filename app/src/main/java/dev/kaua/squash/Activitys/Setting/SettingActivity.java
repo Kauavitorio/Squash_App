@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.AppSupportActivity;
+import dev.kaua.squash.Activitys.Setting.FollowAndInvite.FollowAndInviteActivity;
 import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.R;
@@ -38,9 +39,8 @@ public class SettingActivity extends AppCompatActivity {
     TextView txt_username;
     CircleImageView profile_image;
     TextView txt_app_version;
-    private LinearLayout btn_account, btn_notifications, btn_data, btn_logout;
+    private LinearLayout btn_follow_and_invite, btn_account, btn_data, btn_logout;
     private LinearLayout btn_policy_and_Privacy, btn_support_ad;
-    private DtoAccount mAccount;
     private Animation myAnim;
 
     @Override
@@ -55,20 +55,14 @@ public class SettingActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        btn_notifications.setOnClickListener(v -> {
-            btn_notifications.startAnimation(myAnim);
-        });
-
         btn_data.setOnClickListener(v -> {
             btn_data.startAnimation(myAnim);
-            Intent intent = new Intent(this, ConnectionUsageActivity.class);
-            startActivity(intent);
+            StartAnIntent(ConnectionUsageActivity.class);
         });
 
         btn_account.setOnClickListener(v -> {
             btn_account.startAnimation(myAnim);
-            Intent intent = new Intent(this, AccountSettingActivity.class);
-            startActivity(intent);
+            StartAnIntent(AccountSettingActivity.class);
         });
 
         //  Privacy Policy click
@@ -79,8 +73,12 @@ public class SettingActivity extends AppCompatActivity {
 
         btn_support_ad.setOnClickListener(v -> {
             btn_support_ad.startAnimation(myAnim);
-            Intent intent = new Intent(this, AppSupportActivity.class);
-            startActivity(intent);
+            StartAnIntent(AppSupportActivity.class);
+        });
+
+        btn_follow_and_invite.setOnClickListener( v -> {
+            btn_follow_and_invite.startAnimation(myAnim);
+            StartAnIntent(FollowAndInviteActivity.class);
         });
 
         //  Logout click
@@ -100,21 +98,25 @@ public class SettingActivity extends AppCompatActivity {
         });
     }
 
+    void StartAnIntent(Class<?> aClass){
+        startActivity(new Intent(this, aClass));
+    }
+
     @SuppressLint("SetTextI18n")
     private void Ids() {
+        final DtoAccount mAccount = MyPrefs.getUserInformation(this);
         myAnim = AnimationUtils.loadAnimation(this,R.anim.click_anim);
         getWindow().setStatusBarColor(getColor(R.color.background_menu_sheet));
         getWindow().setNavigationBarColor(getColor(R.color.background_setting));
-        mAccount = MyPrefs.getUserInformation(this);
         btn_account = findViewById(R.id.btn_account_setting);
         txt_app_version = findViewById(R.id.txt_app_version);
         btn_logout = findViewById(R.id.btn_logout);
         txt_username = findViewById(R.id.txt_username_setting);
-        btn_notifications = findViewById(R.id.btn_notifications);
         btn_data = findViewById(R.id.btn_data);
         btn_policy_and_Privacy = findViewById(R.id.btn_policy_and_privacy);
         btn_support_ad = findViewById(R.id.btn_support_ad);
         profile_image = findViewById(R.id.profile_image_setting);
+        btn_follow_and_invite = findViewById(R.id.btn_follow_and_invite);
 
         //  Set text with app version and system info
         txt_app_version.setText(getString(R.string.squash_for_mobile, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE) + " " + Build.SUPPORTED_ABIS[0]);

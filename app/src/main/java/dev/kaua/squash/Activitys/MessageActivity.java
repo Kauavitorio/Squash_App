@@ -204,10 +204,9 @@ public class MessageActivity extends AppCompatActivity {
             notify = true;
             String msg = text_send.getText().toString();
             if(!msg.equals("") && msg.trim().replaceAll(" +", "").length() > 0){
-                if(ConnectionHelper.isOnline(this)) sendMessage(fUser.getUid(), userId, msg);
+                if(ConnectionHelper.isOnline(this)) sendMessage(fUser.getUid(), userId, msg.trim());
                 else ToastHelper.toast(this, getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
             }
-            else ToastHelper.toast(this, getString(R.string.the_message_cannot_be_empty), ToastHelper.SHORT_DURATION);
             text_send.setText("");
         });
 
@@ -659,11 +658,11 @@ public class MessageActivity extends AppCompatActivity {
             new_message.setReply_from(DtoMessage.NO_ONE);
             new_message.setReply_content(DtoMessage.EMPTY);
         }
-        hashMap.put(DtoMessage.MESSAGE, EncryptHelper.encrypt(message));
+        hashMap.put(DtoMessage.MESSAGE, EncryptHelper.encrypt(message.trim()));
         hashMap.put(DtoMessage.IS_SEEN, DtoMessage.NOT_SEEN);
         hashMap.put(DtoMessage.TIME, EncryptHelper.encrypt(formattedDate));
         hashMap.put(DtoMessage.MEDIA, medias_pin);
-        new_message.setMessage(EncryptHelper.encrypt(message));
+        new_message.setMessage(EncryptHelper.encrypt(message.trim()));
         new_message.setIsSeen(DtoMessage.NOT_SEEN);
         new_message.setTime(EncryptHelper.encrypt(formattedDate));
         new_message.setMedia(medias_pin);
@@ -1035,7 +1034,7 @@ public class MessageActivity extends AppCompatActivity {
                 //uploading the image
                 storageReference = myFirebaseHelper.getFirebaseStorage().child(myFirebaseHelper.USERS_REFERENCE)
                         .child(myFirebaseHelper.CHATS_REFERENCE).child(myFirebaseHelper.MEDIAS_REFERENCE).child(fUser.getUid()).child("chat__"
-                        + getFileName(resultUri).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(3));
+                        + getFileName(resultUri).replace(" ", "") + "_" + Methods.RandomCharactersWithoutSpecials(5));
                 storageReference.putFile(resultUri).continueWithTask(task -> {
                     if (!task.isSuccessful()) {
                         Log.d(TAG, Objects.requireNonNull(task.getException()).toString());

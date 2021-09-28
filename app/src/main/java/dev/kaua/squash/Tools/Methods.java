@@ -164,8 +164,7 @@ public abstract class Methods extends MainActivity {
         Intent myIntent = new Intent(Intent.ACTION_SEND);
         myIntent.setType("text/plain");
         final String search_from;
-        final String verify = MyPrefs.getUserInformation(mContext).getVerification_level();
-        if(verify != null && Integer.parseInt(verify) == DtoAccount.ACCOUNT_IS_ADM) search_from = "STAFF";
+        if(getUserLevel(mContext) == DtoAccount.ACCOUNT_IS_ADM) search_from = "STAFF";
         else search_from = Methods.RandomCharactersWithoutSpecials(3);
         String body = Methods.BASE_URL_HTTPS + "share/" + postInfo.getUsername().replace(" ", "")
                 + "/post/" +  postInfo.getPost_id()
@@ -179,6 +178,8 @@ public abstract class Methods extends MainActivity {
         View sheetView = LayoutInflater.from(mContext).inflate(R.layout.adapter_sheet_post_options_share,
                 mContext.findViewById(R.id.main_container_sheet_options_share));
         TextView close = sheetView.findViewById(R.id.hide_share_options_post);
+
+        sheetView.findViewById(R.id.card_hold_to_close_post_share_option).setElevation(0);
 
 
         final String SHARE_URL = body;
@@ -235,42 +236,44 @@ public abstract class Methods extends MainActivity {
     }
 
     public static void LoadFollowersAndFollowing(@NonNull Context context, final int base){
-        if(base == 0){
-            AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , MyPrefs.getUserInformation(context).getAccount_id(), AsyncLikes_Posts.NOT_NOTIFY);
-            //noinspection unchecked
-            async.execute();
-            AsyncLikes_Posts_Comment posts_comment = new AsyncLikes_Posts_Comment((Activity) context , MyPrefs.getUserInformation(context).getAccount_id());
-            //noinspection unchecked
-            posts_comment.execute();
-        }
+        if(MyPrefs.getUserInformation(context).getAccount_id() != DtoAccount.ACCOUNT_DISABLE){
+            if(base == 0){
+                AsyncLikes_Posts async = new AsyncLikes_Posts((Activity) context , MyPrefs.getUserInformation(context).getAccount_id(), AsyncLikes_Posts.NOT_NOTIFY);
+                //noinspection unchecked
+                async.execute();
+                AsyncLikes_Posts_Comment posts_comment = new AsyncLikes_Posts_Comment((Activity) context , MyPrefs.getUserInformation(context).getAccount_id());
+                //noinspection unchecked
+                posts_comment.execute();
+            }
 
-        if(base != 999){
-            final Retrofit retrofitUser = GetRetrofitBuilder();
-            SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-            final DtoAccount account = new DtoAccount();
-            account.setAccount_id_cry(sp.getString("pref_account_id", null));
-            AccountServices services = retrofitUser.create(AccountServices.class);
-            Call<DtoAccount> call = services.get_followers_following(account);
-            call.enqueue(new Callback<DtoAccount>() {
-                @Override
-                public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
-                    if(response.code() == 200 && response.body() != null){
-                        final DtoAccount info = new DtoAccount();
-                        final long id = MyPrefs.getUserInformation(context).getAccount_id();
-                        if(id > DtoAccount.ACCOUNT_DISABLE){
-                            info.setAccount_id(id);
-                            info.setFollowers(response.body().getFollowers());
-                            info.setFollowing(response.body().getFollowing());
-                            DaoAccount daoAccount = new DaoAccount(context);
-                            long lines = daoAccount.Register_Followers_Following(info);
-                            if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
-                            else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+            if(base != 999){
+                final Retrofit retrofitUser = GetRetrofitBuilder();
+                SharedPreferences sp = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+                final DtoAccount account = new DtoAccount();
+                account.setAccount_id_cry(sp.getString("pref_account_id", null));
+                AccountServices services = retrofitUser.create(AccountServices.class);
+                Call<DtoAccount> call = services.get_followers_following(account);
+                call.enqueue(new Callback<DtoAccount>() {
+                    @Override
+                    public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
+                        if(response.code() == 200 && response.body() != null){
+                            final DtoAccount info = new DtoAccount();
+                            final long id = MyPrefs.getUserInformation(context).getAccount_id();
+                            if(id > DtoAccount.ACCOUNT_DISABLE){
+                                info.setAccount_id(id);
+                                info.setFollowers(response.body().getFollowers());
+                                info.setFollowing(response.body().getFollowing());
+                                DaoAccount daoAccount = new DaoAccount(context);
+                                long lines = daoAccount.Register_Followers_Following(info);
+                                if(lines > 0) Log.d("LocalDataBase", "Followers and Following Update");
+                                else Log.d("LocalDataBase", "Followers and Following is NOT Update");
+                            }
                         }
                     }
-                }
-                @Override
-                public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
-            });
+                    @Override
+                    public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+                });
+            }
         }
     }
 
@@ -342,7 +345,7 @@ public abstract class Methods extends MainActivity {
             if(status.equals(OFFLINE))
                 hashMap.put("last_seen", formattedDate);
             hashMap.put("status_chat", status);
-            hashMap.put("verification_level", EncryptHelper.encrypt(MyPrefs.getUserInformation(context).getVerification_level()));
+            hashMap.put("verification_level", EncryptHelper.encrypt(String.valueOf(getUserLevel(context))));
 
             reference.updateChildren(hashMap);
         }
@@ -354,6 +357,20 @@ public abstract class Methods extends MainActivity {
         }catch (Exception ex){
             return String.valueOf(month);
         }
+    }
+
+    public static long getUserLevel(Context context){
+       try {
+           return Long.parseLong(MyPrefs.getUserInformation(context).getVerification_level());
+       }catch (Exception ex){
+           return DtoAccount.NORMAL_ACCOUNT;
+       }
+    }
+
+    static final int min = 35;
+    static final int max = 100;
+    public static int getRandomAmount(){
+        return (int) Math.floor(Math.random()*(max-min+1)+min);
     }
 
     public static final String NO_ONE = "noOne";

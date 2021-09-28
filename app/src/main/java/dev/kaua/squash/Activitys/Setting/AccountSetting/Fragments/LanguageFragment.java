@@ -24,7 +24,6 @@ import dev.kaua.squash.R;
 @SuppressLint("StaticFieldLeak")
 public class LanguageFragment extends Fragment {
     private RecyclerView languages_RecyclerView;
-    TextView txt_options_list;
     private static View view;
     static Activity activity;
 
@@ -40,7 +39,6 @@ public class LanguageFragment extends Fragment {
         activity = requireActivity();
         languages_RecyclerView = view.findViewById(R.id.language_list_account_setting);
         languages_RecyclerView.setLayoutManager(new LinearLayoutManager(activity));
-        txt_options_list = view.findViewById(R.id.textView);
 
         GenerateLangList();
     }

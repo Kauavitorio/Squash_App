@@ -14,6 +14,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import dev.kaua.squash.Activitys.Setting.AccountSetting.ChangeSingleInfoActivity;
+import dev.kaua.squash.Activitys.Setting.SettingActivity;
 import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;

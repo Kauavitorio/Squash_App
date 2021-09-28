@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activitys.Setting.AccountSetting.ChangeSingleInfoActivity">
+
+    <!-- Header -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+
+        <!-- Arrow Back -->
+        <ImageView
+            android:id="@+id/btn_back_change_single_info"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_back_black"
+            tools:ignore="ContentDescription" />
+
+        <!-- Change Title -->
+        <TextView
+            android:id="@+id/txt_change_single_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/btn_back_change_single_info"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            tools:text="@string/app_name" />
+
+    </RelativeLayout>
+
+    <!-- Phone Change -->
+    <LinearLayout
+        android:id="@+id/container_phone_change"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="gone"
+        android:padding="15dp">
+
+        <!-- Text Enter Your Phone Number -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:text="@string/enter_your_phone_number"/>
+
+        <!-- EditText Phone Number -->
+        <EditText
+            android:id="@+id/edit_phone_number_change_single"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:layout_marginTop="10dp"
+            android:inputType="phone"
+            android:layout_gravity="center"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:minWidth="200dp"
+            android:textAlignment="center"
+            android:hint="@string/phone_number"
+            android:background="@drawable/custom_edit_chat"
+            tools:ignore="Autofill" />
+
+        <!-- Submit Phone Number -->
+        <Button
+            android:id="@+id/btn_change_phone_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_button_disable_next"
+            android:text="@string/next"
+            android:layout_gravity="center"
+            android:minWidth="230dp"
+            android:layout_marginTop="13dp"
+            android:textColor="@color/white"/>
+
+    </LinearLayout>
+
+    <!-- Birthday Change -->
+    <LinearLayout
+        android:id="@+id/container_birthday_change"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:padding="15dp">
+
+        <!-- Text Enter Your Birthday date -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:text="@string/enter_your_birthday_date"/>
+
+        <!-- EditText Birthday -->
+        <EditText
+            android:id="@+id/edit_birthday_change_single"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp"
+            android:minHeight="50dp"
+            android:minWidth="100dp"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:background="@drawable/custom_edit_chat"
+            android:focusable="false"
+            android:hint="@string/date_of_birth"
+            android:inputType="date"
+            android:textColor="@color/black"
+            android:textColorHint="@color/hint"
+            tools:ignore="Autofill" />
+
+        <!-- Text date error -->
+        <TextView
+            android:id="@+id/txt_age_error_change"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="15sp"
+            android:layout_marginTop="5dp"
+            android:textColor="@android:color/holo_red_light"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:text="@string/minimum_age_to_use_the_platform"/>
+
+        <!-- Submit Phone Number -->
+        <Button
+            android:id="@+id/btn_change_birthday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_button_disable_next"
+            android:text="@string/next"
+            android:layout_gravity="center"
+            android:minWidth="230dp"
+            android:layout_marginTop="13dp"
+            android:textColor="@color/white"/>
+
+    </LinearLayout>
+
+</LinearLayout>

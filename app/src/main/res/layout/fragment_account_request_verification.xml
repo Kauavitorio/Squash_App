@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Verification Form -->
+    <LinearLayout
+        android:id="@+id/verification_from_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <!-- Body -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- Main Container No Verified -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Apply Title -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="21sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/apply_for_verification"/>
+
+                <!-- Header Text -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/hint"
+                    android:textSize="14sp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:layout_marginTop="5dp"
+                    android:textAlignment="center"
+                    android:text="@string/request_verification_desc"/>
+
+                <!-- Form Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp"
+                    android:layout_marginTop="15dp">
+
+                    <!-- Step 1 Container -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        tools:visibility="gone">
+
+                        <!-- Text Step 1 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/black"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/step_1_confirm_authenticity"/>
+
+                        <!-- Text Step 1 Description -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="15sp"
+                            android:textColor="@color/hint"
+                            android:layout_marginTop="3dp"
+                            android:text="@string/step_1_confirm_authenticity_desc"/>
+
+                        <!-- Edit Username -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/username_tl_verification_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:maxWidth="320dp"
+                            android:minWidth="320dp"
+                            app:counterTextColor="@color/hint"
+                            app:hintTextColor="@color/hint">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_username_verification_form"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:backgroundTint="@color/hint"
+                                android:hint="@string/username"
+                                android:inputType="textPersonName|textCapSentences"
+                                android:maxLength="20"
+                                android:enabled="false"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/hint" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Edit Birthday -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/birthday_tl_verification_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:maxWidth="320dp"
+                            android:minWidth="320dp"
+                            app:counterTextColor="@color/hint"
+                            app:hintTextColor="@color/hint">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_birthday_verification_form"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:backgroundTint="@color/hint"
+                                android:hint="@string/birthday"
+                                android:enabled="false"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/hint" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Edit Full Name -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/fullName_tl_verification_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:maxWidth="320dp"
+                            android:minWidth="320dp"
+                            app:counterTextColor="@color/hint"
+                            app:hintTextColor="@color/hint">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_FullName_verification_form"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:backgroundTint="@color/hint"
+                                android:hint="@string/full_name"
+                                tools:text="Kaua Vitorio da Silva Lima"
+                                android:inputType="textPersonName|textMultiLine|textCapWords"
+                                android:minHeight="50dp"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/hint" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Document Selector -->
+                        <LinearLayout
+                            android:id="@+id/select_document_verification_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="35dp"
+                            android:orientation="horizontal">
+
+                            <!-- Selected Document -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <!-- Document Selected -->
+                                <TextView
+                                    android:id="@+id/txt_title_document_type_verification_form"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="@string/document_type"
+                                    android:textColor="@color/hint"
+                                    android:textSize="17sp"
+                                    tools:textSize="14sp"/>
+
+                                <!-- Document Selected -->
+                                <TextView
+                                    android:id="@+id/txt_selected_document_type_verification_form"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:visibility="gone"
+                                    tools:visibility="visible"
+                                    tools:text="@string/document_type"
+                                    android:textColor="@color/black"
+                                    android:textSize="17sp"/>
+
+                            </LinearLayout>
+
+                            <!-- Arrow Selector -->
+                            <ImageView
+                                android:id="@+id/img_select_document_type_verification_form"
+                                android:layout_width="40dp"
+                                android:layout_height="16dp"
+                                android:rotation="180"
+                                android:layout_gravity="center"
+                                android:src="@drawable/slidearrow"
+                                tools:ignore="ContentDescription" />
+
+                        </LinearLayout>
+
+                        <!-- Choose File -->
+                        <Button
+                            android:id="@+id/btn_choose_file_verification_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:text="@string/choose_file"
+                            android:layout_gravity="center"
+                            android:minWidth="230dp"
+                            android:visibility="visible"
+                            tools:visibility="gone"
+                            android:enabled="false"
+                            android:background="@drawable/btn_simple_disable"
+                            android:layout_marginTop="10dp"
+                            android:textColor="@color/black"/>
+
+                        <!-- Selected File Info -->
+                        <LinearLayout
+                            android:id="@+id/selected_document_container_verification_from"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="5dp"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+
+                            <!-- File Title -->
+                            <TextView
+                                android:id="@+id/txt_document_title_verification_form"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                tools:text="Document xyx.png"
+                                android:layout_weight="1"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"/>
+
+                            <!-- File Title -->
+                            <TextView
+                                android:id="@+id/txt_remove_document_file_verification_form"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/remove"
+                                android:textSize="17sp"
+                                android:textColor="@color/base_color"/>
+
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Step 2 Container -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="20dp">
+
+                        <!-- Text Step 2 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/black"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/step_2_confirm_notability"/>
+
+                        <!-- Text Step 2 Description -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="15sp"
+                            android:textColor="@color/hint"
+                            android:layout_marginTop="3dp"
+                            android:text="@string/step_2_confirm_notability_desc"/>
+
+                        <!-- Edit Audience -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/audience_tl_verification_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:maxWidth="320dp"
+                            android:minWidth="320dp"
+                            app:counterTextColor="@color/hint"
+                            app:hintTextColor="@color/hint">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_audience_verification_form"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:backgroundTint="@color/hint"
+                                android:hint="@string/audience"
+                                tools:text="Youtube and Instagram"
+                                android:inputType="textMultiLine|textCapWords"
+                                android:minHeight="40dp"
+                                android:textSize="17sp"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/hint" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Text Audience Description -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textColor="@color/hint"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/audience_description"/>
+
+                    </LinearLayout>
+
+                    <!-- Links Container -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="20dp">
+
+                        <!-- Text Links -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/black"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/links_optional"/>
+
+                        <!-- Text Links Description -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="15sp"
+                            android:textColor="@color/hint"
+                            android:layout_marginTop="3dp"
+                            android:text="@string/links_verification_form_desc"/>
+
+                        <!-- Text Link 1 Title -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:layout_marginTop="15dp"
+                            android:textColor="@color/black"
+                            android:text="@string/link_1"/>
+
+                        <!-- Edit Link 1 -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/link_1_tl_verification_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="320dp"
+                            android:minWidth="320dp"
+                            app:counterTextColor="@color/hint"
+                            app:hintTextColor="@color/hint">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_link_1_verification_form"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:backgroundTint="@color/hint"
+                                android:hint="@string/url"
+                                android:inputType="textUri"
+                                android:minHeight="30dp"
+                                android:textSize="17sp"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/hint" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Text Link 2 Title -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:layout_marginTop="15dp"
+                            android:textColor="@color/black"
+                            android:text="@string/link_2"/>
+
+                        <!-- Edit Link 2 -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/link_2_tl_verification_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="320dp"
+                            android:minWidth="320dp"
+                            app:counterTextColor="@color/hint"
+                            app:hintTextColor="@color/hint">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_link_2_verification_form"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:backgroundTint="@color/hint"
+                                android:hint="@string/url"
+                                android:inputType="textUri"
+                                android:minHeight="30dp"
+                                android:textSize="17sp"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/hint" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Text Link 3 Title -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:layout_marginTop="15dp"
+                            android:textColor="@color/black"
+                            android:text="@string/link_3"/>
+
+                        <!-- Edit Link 3 -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/link_3_tl_verification_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="320dp"
+                            android:minWidth="320dp"
+                            app:counterTextColor="@color/hint"
+                            app:hintTextColor="@color/hint">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_link_3_verification_form"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:backgroundTint="@color/hint"
+                                android:hint="@string/url"
+                                android:inputType="textUri"
+                                android:minHeight="30dp"
+                                android:textSize="17sp"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/hint" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <!-- Submit Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <!-- Btn Submit -->
+            <Button
+                android:id="@+id/btn_submit_verification_from"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:text="@string/submit"
+                android:layout_gravity="center"
+                android:minWidth="230dp"
+                android:enabled="false"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/background_button_follow_disable"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="3dp"
+                android:textColor="@color/white"/>
+
+            <!-- Text Date User Info -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/we_use_info_verification_from_desc"
+                android:textSize="14sp"
+                android:textAlignment="center"
+                android:textColor="@color/hint"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Your account is already verified -->
+    <RelativeLayout
+        android:id="@+id/already_verified"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        tools:visibility="gone">
+
+        <!-- Verified Anim -->
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/anim_already_verified"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_centerVertical="true"
+            app:lottie_loop="true"
+            app:lottie_autoPlay="true"
+            app:lottie_rawRes="@raw/anim_verification_account" />
+
+        <!-- Text Verified Warning -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:layout_marginTop="10dp"
+            android:maxWidth="200dp"
+            android:textAlignment="center"
+            android:text="@string/your_account_is_already_verified"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/anim_already_verified"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

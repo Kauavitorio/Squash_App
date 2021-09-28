@@ -2,16 +2,13 @@ package dev.kaua.squash.Fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,8 +18,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -73,14 +68,13 @@ public class MainFragment extends Fragment {
     private ImageView btn_compose_main;
     private CircleImageView icon_ProfileUser_main;
     private static CardView card_msg_notRead_main, have_notification;
-    private LinearLayout header_main;
     private static Activity instance;
     private static ConstraintLayout loadingPanel;
-    private final Handler timer = new Handler();
     DatabaseReference reference;
     FirebaseUser firebaseUser;
     private static DaoSystem daoSystem;
     private static final String TAG = "MAIN_FRAGMENT_LOG";
+    private static DaoAccount db_account;
 
     private View view;
     private static DtoAccount account;
@@ -91,9 +85,9 @@ public class MainFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_activity_main, container, false);
         Ids(view);
 
-        if(account.getProfile_image() != null)
+        /*if(account.getProfile_image() != null)
             Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .into(icon_ProfileUser_main);
+                .into(icon_ProfileUser_main);*/
 
         btn_create_new_story_main.setOnClickListener(v -> StoryClick());
         btn_compose_main.setOnClickListener(v -> MainActivity.getInstance().CallComposePost());
@@ -116,8 +110,8 @@ public class MainFragment extends Fragment {
         if (visible) {
             if(getContext() != null){
                 Check_Notification();
-                DaoAccount db = new DaoAccount(getContext());
-                DtoAccount account_follow = db.get_followers_following(account.getAccount_id());
+                if(db_account == null) db_account = new DaoAccount(getContext());
+                final DtoAccount account_follow = db_account.get_followers_following(account.getAccount_id());
                 if(account_follow.getFollowing() != null && following != Long.parseLong(account_follow.getFollowing())) {
                     following = Long.parseLong(account_follow.getFollowing());
                     RefreshRecycler();
@@ -229,7 +223,6 @@ public class MainFragment extends Fragment {
         btn_create_new_story_main = view.findViewById(R.id.btn_create_new_story_main);
         card_msg_notRead_main = view.findViewById(R.id.card_msg_notRead_main);
         btn_compose_main = view.findViewById(R.id.btn_compose_main);
-        header_main = view.findViewById(R.id.header_main);
         recyclerView_Posts = view.findViewById(R.id.recyclerView_Posts);
         recyclerView_Posts.setLayoutManager(new LinearLayoutManager(getActivity()));
         RefreshRecycler();

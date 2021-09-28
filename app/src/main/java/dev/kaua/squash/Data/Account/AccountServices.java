@@ -4,45 +4,53 @@ import dev.kaua.squash.Data.Post.DtoPost;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface AccountServices {
+    String ROTE = "user";
 
-    @POST("user/register")
+    @POST(ROTE + "/register")
     Call<DtoAccount> registerUser (@Body DtoAccount account);
 
-    @POST("user/edit")
+    @POST(ROTE + "/edit")
     Call<DtoAccount> edit (@Body DtoAccount account);
 
-    @POST("user/search/from/username")
+    @POST(ROTE + "/search/from/username")
     Call<DtoPost> search_with_username (@Body DtoAccount account);
 
-    @POST("user/login-new")
-    Call<DtoAccount> login (@Body DtoAccount account);
+    @POST(ROTE + "/login-new")
+    Call<DtoAccount> login (@Body DtoAccount account,  @Query("token") String token);
 
-    @POST("user/info/user")
+    @POST(ROTE + "/info/user")
     Call<DtoAccount> getUserInfo (@Body DtoAccount account);
 
-    @POST("user/action/get-followers-following")
+    @POST(ROTE + "/action/get-followers-following")
     Call<DtoAccount> get_followers_following (@Body DtoAccount account);
 
-    @POST("user/action/follow")
+    @POST(ROTE + "/action/follow")
     Call<DtoAccount> follow_a_user (@Body DtoAccount account);
 
-    @POST("user/action/un-follow")
+    @POST(ROTE + "/action/un-follow")
     Call<DtoAccount> un_follow_a_user (@Body DtoAccount account);
 
-    @POST("user/action/check-username")
+    @POST(ROTE + "/action/check-username")
     Call<DtoAccount> check_username (@Body DtoAccount account);
 
-    @POST("user/action/request/forgot-password")
+    @POST(ROTE + "/action/request/forgot-password")
     Call<DtoAccount> forgot_password (@Body DtoAccount account);
 
-    @POST("user/action/change-password")
+    @POST(ROTE + "/action/change-password")
     Call<DtoAccount> change_password (@Body DtoAccount account);
 
-    @POST("user/action/check/validation-code")
+    @POST(ROTE + "/action/check/validation-code")
     Call<DtoAccount> check_validation_code (@Body DtoAccount account);
 
-    @POST("user/report/user/")
+    @POST(ROTE + "/report/user/")
     Call<DtoAccount> report_an_user (@Body DtoAccount account);
+
+    @POST(ROTE + "/action/update/base/info/")
+    Call<DtoAccount> update_base_info (@Body DtoAccount account);
+
+    @POST(ROTE + "/action/request/verification/")
+    Call<DtoVerification> request_verification (@Body DtoVerification verification);
 }

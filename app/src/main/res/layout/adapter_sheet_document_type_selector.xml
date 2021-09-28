@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sheet_document_selector"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:orientation="vertical"
+    android:background="@drawable/background_sheet_base_dark"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Main Text -->
+    <TextView
+        android:id="@+id/txt_short_by"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxWidth="350dp"
+        android:text="@string/document_type"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="19sp" />
+
+    <!-- RG -->
+    <CheckBox
+        android:id="@+id/document_rg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:button="@drawable/custom_round_checkbox"
+        android:text="@string/general_registry_rg"
+        android:textSize="17sp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/white"
+        android:layoutDirection="rtl"/>
+
+    <!-- Passport -->
+    <CheckBox
+        android:id="@+id/document_passport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:button="@drawable/custom_round_checkbox"
+        android:text="@string/passport"
+        android:textSize="17sp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/white"
+        android:layoutDirection="rtl"/>
+
+    <!-- Driver's license -->
+    <CheckBox
+        android:id="@+id/document_drivers_license"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:button="@drawable/custom_round_checkbox"
+        android:text="@string/drivers_license"
+        android:textSize="17sp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/white"
+        android:layoutDirection="rtl"/>
+
+    <!-- Recent utility bill -->
+    <CheckBox
+        android:id="@+id/document_bill"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:button="@drawable/custom_round_checkbox"
+        android:text="@string/recent_utility_bill"
+        android:textSize="17sp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/white"
+        android:layoutDirection="rtl"/>
+
+    <!-- Article of incorporation -->
+    <CheckBox
+        android:id="@+id/document_incorporation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:button="@drawable/custom_round_checkbox"
+        android:text="@string/article_of_incorporation"
+        android:textSize="17sp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/white"
+        android:layoutDirection="rtl"/>
+
+</LinearLayout>

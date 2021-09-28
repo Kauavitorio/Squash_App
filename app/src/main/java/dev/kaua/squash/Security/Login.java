@@ -94,7 +94,7 @@ public abstract class Login extends SignInActivity{
         Log.d(TAG, "Current date => "+ formattedDate);
 
         String encrypt_password = EncryptHelper.encrypt(EncryptHelper.encrypt(password));
-        String placed = Methods.shuffle(Methods.RandomCharacters(40));
+        String placed = Methods.shuffle(Methods.RandomCharacters(Methods.getRandomAmount()));
         String ip = ConnectionHelper.getIp(context);
         ip =  Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
                 .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9") + placed;
@@ -104,7 +104,7 @@ public abstract class Login extends SignInActivity{
                 EncryptHelper.encrypt("0-river-reliable"), EncryptHelper.encrypt(formattedDate), 0, EncryptHelper.encrypt(placed),
                 ip);
         AccountServices login_service = retrofitUser.create(AccountServices.class);
-        Call<DtoAccount> call = login_service.login(account);
+        Call<DtoAccount> call = login_service.login(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
         call.enqueue(new Callback<DtoAccount>() {
             @Override
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
@@ -148,7 +148,7 @@ public abstract class Login extends SignInActivity{
 
                         //  Getting Followers and Followings
                         Methods.LoadFollowersAndFollowing(context, 0);
-                        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow((Activity) context, account.getAccount_id());
+                        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow((Activity) context);
                         //noinspection unchecked
                         asyncUser_follow.execute();
 
@@ -244,7 +244,7 @@ public abstract class Login extends SignInActivity{
         Log.d(TAG, "Debug => "+ Debug.isDebuggerConnected());
 
         String encrypt_password = EncryptHelper.encrypt(EncryptHelper.encrypt(password));
-        String placed = Methods.shuffle(Methods.RandomCharacters(30));
+        String placed = Methods.shuffle(Methods.RandomCharacters(Methods.getRandomAmount()));
         String ip = ConnectionHelper.getIp(context);
         ip =  placed + Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
                 .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9");
@@ -253,7 +253,7 @@ public abstract class Login extends SignInActivity{
                 EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))),
                 EncryptHelper.encrypt(placed), EncryptHelper.encrypt(formattedDate), 0, EncryptHelper.encrypt(placed), ip);
         AccountServices login_service = retrofitUser.create(AccountServices.class);
-        Call<DtoAccount> call = login_service.login(account);
+        Call<DtoAccount> call = login_service.login(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
         call.enqueue(new Callback<DtoAccount>() {
             @Override
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {

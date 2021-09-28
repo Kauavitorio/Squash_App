@@ -46,11 +46,18 @@
         android:layout_centerVertical="true"/>
 
     <!-- User recyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_following"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/container_filter_followings"/>
+        android:layout_below="@+id/container_filter_followings">
+
+        <!-- User recyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_following"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Text ArraySize -->
     <TextView

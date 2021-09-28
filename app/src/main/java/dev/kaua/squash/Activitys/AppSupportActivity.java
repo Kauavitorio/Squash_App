@@ -185,7 +185,8 @@ public class AppSupportActivity extends AppCompatActivity {
             btnShareApp_support.startAnimation(AnimationUtils.loadAnimation(this, R.anim.click_anim));
             Intent myIntent = new Intent(Intent.ACTION_SEND);
             myIntent.setType("text/plain");
-            String body = getString(R.string.text_share_app) + "\n\nGoogle Play link: " + Methods.GOOGLE_PLAY_APP_LINK_SHORT;
+            String body = getString(R.string.text_share_app, MyPrefs.getUserInformation(this).getUsername())
+                    + "\n\nGoogle Play link: " + Methods.GOOGLE_PLAY_APP_LINK_SHORT;
             myIntent.putExtra(Intent.EXTRA_TEXT, body);
             startActivity(Intent.createChooser(myIntent, getString(R.string.share_using)));
 

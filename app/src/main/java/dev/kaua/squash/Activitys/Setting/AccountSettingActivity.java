@@ -14,6 +14,7 @@ import java.util.Objects;
 import dev.kaua.squash.Activitys.Setting.AccountSetting.Fragments.AboutYourAccountFragment;
 import dev.kaua.squash.Activitys.Setting.AccountSetting.Fragments.LanguageFragment;
 import dev.kaua.squash.Activitys.Setting.AccountSetting.Fragments.PersonalInformationFragment;
+import dev.kaua.squash.Activitys.Setting.AccountSetting.Fragments.RequestVerificationFragment;
 import dev.kaua.squash.Activitys.Setting.AccountSetting.Fragments.YourActivityFragment;
 import dev.kaua.squash.Activitys.Setting.AccountSetting.OptionsFragment;
 import dev.kaua.squash.R;
@@ -64,7 +65,7 @@ public class AccountSettingActivity extends AppCompatActivity {
 
     public static AccountSettingActivity getInstance(){ return instance; }
 
-    void LoadOptions() {
+    public void LoadOptions() {
         if(request != FRAGMENT_PRESENT){
             if(request == ACTIVITY) LoadYourActivity();
             else {
@@ -96,6 +97,12 @@ public class AccountSettingActivity extends AppCompatActivity {
         FRAGMENT_PRESENT = OptionsFragment.LANGUAGE;
         txt_title.setText(getString(R.string.language));
         LoadFragment(new LanguageFragment());
+    }
+
+    public void LoadVerification(){
+        FRAGMENT_PRESENT = OptionsFragment.REQUEST_VERIFICATION;
+        txt_title.setText(getString(R.string.request_verification));
+        LoadFragment(new RequestVerificationFragment());
     }
 
     public void LoadYourActivity(){

@@ -42,12 +42,50 @@
 
             </LinearLayout>
 
+            <!-- Follow and Invite Friends -->
+            <LinearLayout
+                android:id="@+id/btn_follow_and_invite"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:minHeight="42dp"
+                android:layout_marginTop="10dp"
+                android:visibility="visible"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Setting Image -->
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_follow_invite"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Setting Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/follow_and_invite_friends"/>
+
+            </LinearLayout>
+
+            <!-- Dividing line -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_marginStart="30dp"
+                android:layout_height="1dp"
+                android:visibility="visible"
+                android:background="@color/dividing_line_settings"/>
+
             <!-- My Account -->
             <LinearLayout
                 android:id="@+id/btn_account_setting"
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
-                android:layout_marginTop="10dp"
                 android:minHeight="42dp"
                 android:visibility="visible"
                 android:layout_height="wrap_content"
@@ -117,44 +155,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="30dp"
-                android:visibility="gone"
-                android:background="@color/dividing_line_settings"/>
-
-            <!-- Privacy and Security -->
-            <LinearLayout
-                android:id="@+id/btn_privacy"
-                android:layout_width="match_parent"
-                android:orientation="horizontal"
-                android:minHeight="42dp"
-                android:visibility="gone"
-                android:layout_height="wrap_content"
-                tools:ignore="UseCompoundDrawables">
-
-                <!-- Setting Image -->
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_not_secure_lock"
-                    tools:ignore="ContentDescription" />
-
-                <!-- Setting Text -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textColor="@color/white"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/privacy_and_security"/>
-
-            </LinearLayout>
-
-            <!-- Dividing line -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_marginStart="30dp"
-                android:layout_height="1dp"
                 android:visibility="gone"
                 android:background="@color/dividing_line_settings"/>
 

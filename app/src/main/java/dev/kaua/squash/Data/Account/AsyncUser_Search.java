@@ -18,7 +18,6 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.JsonHandler;
 import dev.kaua.squash.Tools.Methods;
-import dev.kaua.squash.Tools.MyPrefs;
 
 @SuppressWarnings({"rawtypes", "deprecation", "unchecked"})
 @SuppressLint("StaticFieldLeak")
@@ -41,12 +40,12 @@ public class AsyncUser_Search extends AsyncTask {
     protected Object doInBackground(Object[] objects) {
         String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "user/action/search");
         try {
+            final long user_level = Methods.getUserLevel(context);
             JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("Search");
             for (int i = 0; i < jsonArray.length() ; i++) {
                 DtoAccount account = new DtoAccount();
-                if(Integer.parseInt(MyPrefs.getUserInformation(context).getVerification_level()) != 2 &&
-                jsonArray.getJSONObject(i).getLong("active") > DtoAccount.ACCOUNT_DISABLE || Integer.parseInt(MyPrefs.getUserInformation(context).getVerification_level()) == 2){
+                if(user_level == DtoAccount.ACCOUNT_IS_ADM || jsonArray.getJSONObject(i).getLong("active") > DtoAccount.ACCOUNT_DISABLE){
                     account.setAccount_id_cry(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("account_id_cry")));
                     account.setName_user(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("name_user")));
                     account.setUsername(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("username")));
