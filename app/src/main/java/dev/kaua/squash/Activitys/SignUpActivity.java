@@ -1,7 +1,9 @@
 package dev.kaua.squash.Activitys;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -53,6 +55,7 @@ import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
+import dev.kaua.squash.Security.GoogleAuthHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
@@ -100,6 +103,16 @@ public class SignUpActivity extends AppCompatActivity {
 
     final Retrofit retrofitUser = Methods.GetRetrofitBuilder();
 
+    private static final String TAG = "signUP_TAG";
+    public static final String ERROR_CODE_TAG = "error_code";
+    public static final String NAME_USER_TAG = "name_user";
+    public static final String EMAIL_TAG = "email_user";
+    public static final String PHONE_TAG = "phone_user";
+    public static final String BIRTH_TAG = "date_birth";
+    public static final String PASSWORD_TAG = "password";
+    public static final String AGE_TAG = "age";
+    public static final String GOOGLE_ID_TAG = "googleID_USER";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,15 +120,22 @@ public class SignUpActivity extends AppCompatActivity {
         Ids();
         RunEditTextErrors();
         checking_password_have_minimum_characters();
-        Bundle bundle = getIntent().getExtras();
+        final Bundle bundle = getIntent().getExtras();
+        Log.d(TAG, GoogleAuthHelper.isGoogleLogin(this) + "");
         if(bundle != null){
-            CheckErrorCode(bundle.getInt("error_code"));
-            edit_name.setText(bundle.getString("name_user"));
-            edit_email.setText(bundle.getString("email_user"));
-            edit_phone.setText(bundle.getString("phone_user"));
-            edit_bornDate.setText(bundle.getString("date_birth"));
-            edit_password.setText(bundle.getString("password"));
-            age_user = bundle.getInt("age");
+            if(GoogleAuthHelper.getGoogleId() != null && GoogleAuthHelper.getGoogleId().length() > 3 && bundle.getInt(ERROR_CODE_TAG) == 0){
+                edit_name.setText(GoogleAuthHelper.GOOGLE_NAME);
+                edit_email.setText(GoogleAuthHelper.GOOGLE_EMAIL);
+                edit_email.setEnabled(false);
+            }else{
+                CheckErrorCode(bundle.getInt(ERROR_CODE_TAG));
+                edit_name.setText(bundle.getString(NAME_USER_TAG));
+                edit_email.setText(bundle.getString(EMAIL_TAG));
+                edit_phone.setText(bundle.getString(PHONE_TAG));
+                edit_bornDate.setText(bundle.getString(BIRTH_TAG));
+                edit_password.setText(bundle.getString(PASSWORD_TAG));
+                age_user = bundle.getInt(AGE_TAG);
+            }
         }
 
         //  Creating Calendar
@@ -161,8 +181,7 @@ public class SignUpActivity extends AppCompatActivity {
                 else{
                     loadingDialog.startLoading();
                     timerHandler.postDelayed(() -> {
-                        Intent i = new Intent(this, TermsAccountActivity.class);
-                        startActivity(i);
+                        startActivity(new Intent(this, TermsAccountActivity.class));
                         loadingDialog.dismissDialog();
                     }, 300);
                 }
@@ -196,19 +215,19 @@ public class SignUpActivity extends AppCompatActivity {
             else joined_date = day + "/" + month + "/" + year;
 
             // User information storage on your Dto
-            DtoAccount account = new DtoAccount();
+            final DtoAccount account = new DtoAccount();
             account.setName_user(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_name.getText()).toString())));
             account.setEmail(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_email.getText()).toString().replace(" ", ""))));
             account.setPhone_user(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_phone.getText()).toString())));
             account.setPassword(EncryptHelper.encrypt(edit_password.getText().toString()));
             account.setBorn_date(EncryptHelper.encrypt(Methods.RemoveSpace(Objects.requireNonNull(edit_bornDate.getText()).toString())));
             account.setJoined_date(EncryptHelper.encrypt(joined_date));
-            String device_login = Build.BRAND + ", " + Build.MODEL;
+            final String device_login = Build.BRAND + ", " + Build.MODEL;
             account.setLogin_info(EncryptHelper.encrypt(device_login));
             account.setBio_user(EncryptHelper.encrypt(getString(R.string.default_bio)));
 
             // Generate token to user can be logged in firebase services
-            String token = Methods.RandomCharacters(45);
+            final String token = Methods.RandomCharacters(50);
             account.setToken(EncryptHelper.encrypt(token));
 
             //  Register User in Firebase
@@ -218,89 +237,20 @@ public class SignUpActivity extends AppCompatActivity {
 
             mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(this);
 
-            AccountServices services = retrofitUser.create(AccountServices.class);
-            Call<DtoAccount> call = services.registerUser(account);
+            final AccountServices services = retrofitUser.create(AccountServices.class);
+            Call<DtoAccount> call;
+            if(GoogleAuthHelper.isGoogleLogin(this)) {
+                account.setProfile_image(EncryptHelper.encrypt(GoogleAuthHelper.GOOGLE_PHOTO));
+                account.setGoogle_auth(EncryptHelper.encrypt(GoogleAuthHelper.GOOGLE_ID));
+                call = services.registerUserGoogle(account);
+            }else
+                call = services.registerUser(account);
+
             call.enqueue(new Callback<DtoAccount>() {
                 @Override
                 public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                     if(response.code() == 201){
-                        mAuth.createUserWithEmailAndPassword(EncryptHelper.decrypt(account.getEmail()), token)
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        loadingDialog.dismissDialog();
-
-                                        Privacy_PolicyCheck();
-
-                                        // Sign in success, now go to register user into API
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        Log.w("Auth", "OK" + user);
-
-                                        String userId = user.getUid();
-
-                                        //  Creating analytic for sign up event
-                                        Bundle bundle_Analytics = new Bundle();
-                                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, userId);
-                                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
-                                        bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
-                                        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle_Analytics);
-
-                                        Calendar c = Calendar.getInstance();
-                                        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
-                                        String formattedDate = df_time.format(c.getTime());
-
-                                        //  Register new user on Firebase Database
-                                        reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
-                                        HashMap<String, String> hashMap = new HashMap<>();
-                                        hashMap.put("id", userId);
-                                        assert response.body() != null;
-                                        hashMap.put("username", EncryptHelper.decrypt(response.body().getUsername()));
-                                        hashMap.put("name_user", edit_name.getText().toString());
-                                        hashMap.put("search", EncryptHelper.decrypt(response.body().getUsername()));
-                                        hashMap.put("account_id_cry", response.body().getAccount_id_cry());
-                                        hashMap.put("imageURL", "default");
-                                        hashMap.put("status_chat", "offline");
-                                        hashMap.put("last_seen", formattedDate);
-                                        hashMap.put("typingTo", "noOne");
-
-                                        DtoAccount follow = new DtoAccount();
-                                        follow.setAccount_id_cry(response.body().getAccount_id_cry());
-                                        follow.setAccount_id_following(EncryptHelper.encrypt("25"));
-                                        AccountServices services = retrofitUser.create(AccountServices.class);
-                                        Call<DtoAccount> call_follow = services.follow_a_user(follow);
-                                        call_follow.enqueue(new Callback<DtoAccount>() {
-                                            @Override
-                                            public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {}
-                                            @Override
-                                            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
-                                        });
-
-                                        reference.setValue(hashMap).addOnCompleteListener(task1 -> {
-                                            if(task1.isSuccessful()) Log.d("User", "Register in Realtime database Successful");
-                                        });
-
-                                        //  User has been created so now go to the Email Validation
-                                        Intent i = new Intent(SignUpActivity.this, ValidateEmailActivity.class);
-                                        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
-                                        mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
-                                        SharedPreferences.Editor editor = mPrefs.edit();
-                                        editor.putString("pref_account_id", response.body().getAccount_id_cry());
-                                        editor.putString("pref_email", EncryptHelper.encrypt(edit_email.getText().toString()));
-                                        editor.putString("pref_password", EncryptHelper.encrypt(edit_password.getText().toString()));
-                                        editor.apply();
-                                        i.putExtra("account_id", EncryptHelper.decrypt(response.body().getAccount_id_cry()));
-                                        i.putExtra("email_user", edit_email.getText().toString());
-                                        i.putExtra("password", edit_password.getText().toString());
-                                        i.putExtra("type_validate", 0);
-                                        ActivityCompat.startActivity(SignUpActivity.this, i, activityOptionsCompat.toBundle());
-                                        finish();
-
-                                    } else {
-                                        loadingDialog.dismissDialog();
-                                        //  Email is already used
-                                        ReloadPage(401);
-                                        Log.d("Auth", "Error " + task.getException());
-                                    }
-                                });
+                        FirebaseRegister(response, account, token);
                     }else if(response.code() == 401)
                         //  Email is already used
                         ReloadPage(401);
@@ -321,6 +271,86 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void FirebaseRegister(@NonNull Response<DtoAccount> response, DtoAccount account, String token) {
+        mAuth.createUserWithEmailAndPassword(EncryptHelper.decrypt(account.getEmail()), token)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        loadingDialog.dismissDialog();
+
+                        Privacy_PolicyCheck();
+
+                        // Sign in success, now go to register user into API
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        Log.w("Auth", "OK" + user);
+
+                        String userId = user.getUid();
+
+                        //  Creating analytic for sign up event
+                        Bundle bundle_Analytics = new Bundle();
+                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, userId);
+                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
+                        bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+                        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle_Analytics);
+
+                        Calendar c = Calendar.getInstance();
+                        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
+                        String formattedDate = df_time.format(c.getTime());
+
+                        //  Register new user on Firebase Database
+                        reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
+                        HashMap<String, String> hashMap = new HashMap<>();
+                        hashMap.put("id", userId);
+                        assert response.body() != null;
+                        hashMap.put("username", EncryptHelper.decrypt(response.body().getUsername()));
+                        hashMap.put("name_user", edit_name.getText().toString());
+                        hashMap.put("search", EncryptHelper.decrypt(response.body().getUsername()));
+                        hashMap.put("account_id_cry", response.body().getAccount_id_cry());
+                        hashMap.put("imageURL", "default");
+                        hashMap.put("status_chat", "offline");
+                        hashMap.put("last_seen", formattedDate);
+                        hashMap.put("typingTo", "noOne");
+
+                        DtoAccount follow = new DtoAccount();
+                        follow.setAccount_id_cry(response.body().getAccount_id_cry());
+                        follow.setAccount_id_following(EncryptHelper.encrypt("25"));
+                        AccountServices services = retrofitUser.create(AccountServices.class);
+                        Call<DtoAccount> call_follow = services.follow_a_user(follow);
+                        call_follow.enqueue(new Callback<DtoAccount>() {
+                            @Override
+                            public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {}
+                            @Override
+                            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+                        });
+
+                        reference.setValue(hashMap).addOnCompleteListener(task1 -> {
+                            if(task1.isSuccessful()) Log.d("User", "Register in Realtime database Successful");
+                        });
+
+                        //  User has been created so now go to the Email Validation
+                        final Intent i = new Intent(SignUpActivity.this, ValidateEmailActivity.class);
+                        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
+                        mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = mPrefs.edit();
+                        editor.putString("pref_account_id", response.body().getAccount_id_cry());
+                        editor.putString("pref_email", EncryptHelper.encrypt(edit_email.getText().toString()));
+                        editor.putString("pref_password", EncryptHelper.encrypt(edit_password.getText().toString()));
+                        editor.apply();
+                        i.putExtra("account_id", EncryptHelper.decrypt(response.body().getAccount_id_cry()));
+                        i.putExtra("email_user", edit_email.getText().toString());
+                        i.putExtra("password", edit_password.getText().toString());
+                        i.putExtra("type_validate", 0);
+                        ActivityCompat.startActivity(SignUpActivity.this, i, activityOptionsCompat.toBundle());
+                        finish();
+
+                    } else {
+                        loadingDialog.dismissDialog();
+                        //  Email is already used
+                        ReloadPage(401);
+                        Log.d("Auth", "Error " + task.getException());
+                    }
+                });
     }
 
     //  Method to get last version of Privacy Policy
@@ -361,16 +391,16 @@ public class SignUpActivity extends AppCompatActivity {
 
     // Method to reload Pag when register get error
     private void ReloadPage(int error_code){
-        loadingDialog.dismissDialog();
-        Intent goTo_SignUp = new Intent(this, SignUpActivity.class);
-        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
-        goTo_SignUp.putExtra("error_code", error_code);
-        goTo_SignUp.putExtra("name_user", Objects.requireNonNull(edit_name.getText()).toString());
-        goTo_SignUp.putExtra("email_user", Objects.requireNonNull(edit_email.getText()).toString());
-        goTo_SignUp.putExtra("phone_user", Objects.requireNonNull(edit_phone.getText()).toString());
-        goTo_SignUp.putExtra("date_birth", Objects.requireNonNull(edit_bornDate.getText()).toString());
-        goTo_SignUp.putExtra("password", Objects.requireNonNull(edit_password.getText()).toString());
-        goTo_SignUp.putExtra("age", age_user);
+        if(loadingDialog != null) loadingDialog.dismissDialog();
+        final Intent goTo_SignUp = new Intent(this, SignUpActivity.class);
+        final ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(),R.anim.move_to_left_go, R.anim.move_to_right_go);
+        goTo_SignUp.putExtra(ERROR_CODE_TAG, error_code);
+        goTo_SignUp.putExtra(NAME_USER_TAG, Objects.requireNonNull(edit_name.getText()).toString());
+        goTo_SignUp.putExtra(EMAIL_TAG, Objects.requireNonNull(edit_email.getText()).toString());
+        goTo_SignUp.putExtra(PHONE_TAG, Objects.requireNonNull(edit_phone.getText()).toString());
+        goTo_SignUp.putExtra(BIRTH_TAG, Objects.requireNonNull(edit_bornDate.getText()).toString());
+        goTo_SignUp.putExtra(PASSWORD_TAG, Objects.requireNonNull(edit_password.getText()).toString());
+        goTo_SignUp.putExtra(AGE_TAG, age_user);
         ActivityCompat.startActivity(this, goTo_SignUp, activityOptionsCompat.toBundle());
         finish();
     }
@@ -572,9 +602,31 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void Back_to_intro() {
-        Intent goTo_intro = new Intent(this, IntroActivity.class);
-        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_right_back, R.anim.move_to_right_go);
-        ActivityCompat.startActivity(this, goTo_intro, activityOptionsCompat.toBundle());
+        if(!GoogleAuthHelper.isGoogleLogin(this)) GoToIntro();
+        else{
+            final AlertDialog.Builder alert = new AlertDialog.Builder(this)
+            .setTitle(getString(R.string.cancel_registration))
+            .setMessage(getString(R.string.cancel_your_registration))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
+                final LoadingDialog loadingDialog = new LoadingDialog(SignUpActivity.this);
+                loadingDialog.startLoading();
+                GoogleAuthHelper.getGoogleSignInClient(SignUpActivity.this).signOut()
+                        .addOnCompleteListener(SignUpActivity.this, task -> {
+                            loadingDialog.dismissDialog();
+                            GoogleAuthHelper.ResetVariable();
+                            GoToIntro();
+                        });
+            }).setNeutralButton(getString(R.string.no), null);
+            final Dialog mDialog = alert.create();
+            mDialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
+            mDialog.show();
+        }
+    }
+
+    void GoToIntro(){
+        final ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_right_back, R.anim.move_to_right_go);
+        ActivityCompat.startActivity(this, new Intent(this, IntroActivity.class), activityOptionsCompat.toBundle());
         finish();
     }
 }

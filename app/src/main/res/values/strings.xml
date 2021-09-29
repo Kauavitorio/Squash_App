@@ -329,4 +329,9 @@
     <string name="invite_friends_by_choose">Invite Friends by…</string>
     <string name="whatsapp_have_not_been_installed">Whatsapp have not been installed.</string>
     <string name="invited_you_to_join_squash">%1$s invited you to join Squash!</string>
+    <string name="signIn_with_Squash">Sign in with Squash</string>
+    <string name="cancel_registration">Cancel Registration</string>
+    <string name="cancel_your_registration">Do you really want to cancel your registration? This results in the loss of all data in the fields entered.</string>
+    <string name="our_servers_fail_to_communicate_with_google_servers">Our servers fail to communicate with Google servers. Try again later.</string>
+    <string name="need_to_select_your_Google_account">Need to select your google account.</string>
 </resources>

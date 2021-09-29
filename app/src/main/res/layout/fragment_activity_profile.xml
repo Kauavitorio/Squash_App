@@ -92,26 +92,6 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <!-- Btn Add new Story -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/btn_plus_story_profile"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        app:cardBackgroundColor="@color/base_color"
-                        app:cardCornerRadius="10dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <!-- Img Add Icon -->
-                        <ImageView
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_add"
-                            tools:ignore="ContentDescription,TooDeepLayout" />
-
-                    </androidx.cardview.widget.CardView>
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- Text Name User -->

@@ -16,12 +16,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,7 +35,6 @@ import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Activitys.ShareContentActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
-import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;
@@ -236,7 +233,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
             if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
                 holder.verification_ic.setVisibility(View.VISIBLE);
                 int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level())));
-                if (verified == DtoAccount.ACCOUNT_IS_ADM)
+                if (verified == DtoAccount.ACCOUNT_IS_STAFF)
                     holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
                 else
                     holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));

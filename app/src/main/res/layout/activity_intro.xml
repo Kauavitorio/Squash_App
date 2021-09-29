@@ -44,41 +44,40 @@
             tools:ignore="ContentDescription" />
 
         <!-- CardView btn Sign In -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <Button
             android:id="@+id/btn_login_intro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="44dp"
             android:minWidth="218dp"
+            android:text="@string/signIn_with_Squash"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:background="@drawable/background_btn_login_intro"
             android:layout_marginTop="25dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline_intro_app">
+            app:layout_constraintTop_toTopOf="@+id/guideline_intro_app"/>
 
-            <!-- Text Create Account -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/login"
-                android:textAlignment="center"
-                android:textAllCaps="true"
-                android:textColor="@color/white"
-                android:textSize="19sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <!-- Sign in With Google Button -->
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_google_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:circularflow_radiusInDP="100dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_login_intro" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+        <!-- Text or -->
         <TextView
             android:id="@+id/txt_or_intro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"
             android:text="@string/or"
             android:textAllCaps="true"
@@ -87,7 +86,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_login_intro" />
+            app:layout_constraintTop_toBottomOf="@+id/sign_in_google_button" />
 
         <!-- CardView btn Sign Up -->
         <androidx.cardview.widget.CardView
@@ -96,7 +95,7 @@
             android:layout_height="wrap_content"
             android:minWidth="218dp"
             android:minHeight="44dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="7dp"
             app:cardBackgroundColor="@color/base_color"
             app:cardCornerRadius="22dp"
             app:layout_constraintEnd_toEndOf="parent"

@@ -176,6 +176,7 @@ public class MessageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
+        setContentView(R.layout.activity_message);
         Ids();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -339,13 +340,15 @@ public class MessageActivity extends AppCompatActivity {
                 }else txt_isOnline_chat.setVisibility(View.GONE);
             }
 
-            if(user_im_chat.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level()))) > 0){
-                verification_ic.setVisibility(View.VISIBLE);
-                int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(user_im_chat.getVerification_level())));
-                if (verified == 2)
-                    verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
-                else
-                    verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
+            if(user_im_chat.getVerification_level() != null){
+                final int verified = Methods.parseUserLevel(EncryptHelper.decrypt(user_im_chat.getVerification_level()));
+                if(verified > DtoAccount.NORMAL_ACCOUNT){
+                    verification_ic.setVisibility(View.VISIBLE);
+                    if (verified == DtoAccount.ACCOUNT_IS_STAFF)
+                        verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
+                    else
+                        verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
+                }else verification_ic.setVisibility(View.GONE);
             }else verification_ic.setVisibility(View.GONE);
         }
     }

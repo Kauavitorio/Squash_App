@@ -140,17 +140,14 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     public void onBindViewHolder(@NonNull MyHolderPosts holder, int position) {
         final DtoPost postInfo = mPostList.get(position);
 
-        int valor = position % 2;
-        if(valor == 0){
-            //imprima é par
-            holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_left));
-        }
-        else if(valor == 1){
-            // imprima é impar
-            holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_right));
-        }
-
         if(LayoutType == DtoPost.NORMAL_POST){
+
+            final int valor = position % 2;
+            if(valor == 0)
+                holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_left));
+            else if(valor == 1)
+                holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_right));
+
             LoadBaseInformation(holder, postInfo, position, CAN_NOT_ANIME);
             LoadMentions(holder);
 
@@ -426,12 +423,12 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             final long verified = Methods.getUserLevel(mContext);
             if(mPostList.get(position).getAccount_id() != null &&
                     Long.parseLong(mPostList.get(position).getAccount_id()) == Long.parseLong(String.valueOf(user.getAccount_id()))
-            || verified == DtoAccount.ACCOUNT_IS_ADM){
+            || verified == DtoAccount.ACCOUNT_IS_STAFF){
                 holder.btn_actions.setVisibility(View.VISIBLE);
                 holder.btn_actions.setOnClickListener(v -> {
                     DtoPost dtoPost = new DtoPost();
                     final String user_id;
-                    if(verified == DtoAccount.ACCOUNT_IS_ADM && Long.parseLong(mPostList.get(position).getAccount_id()) != user.getAccount_id())
+                    if(verified == DtoAccount.ACCOUNT_IS_STAFF && Long.parseLong(mPostList.get(position).getAccount_id()) != user.getAccount_id())
                         user_id = mPostList.get(position).getAccount_id();
                     else user_id = String.valueOf(user.getAccount_id());
                     dtoPost.setAccount_id(EncryptHelper.encrypt(user_id));

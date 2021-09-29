@@ -34,6 +34,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.FollowAccountHelper;
+import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.Warnings;
 
@@ -59,7 +60,7 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public void onBindViewHolder(@NonNull @NotNull Followers_FollowingAdapter.ViewHolder holder, int position) {
-        DtoAccount account = mAccounts.get(position);
+        final DtoAccount account = mAccounts.get(position);
         if(account != null){
             try{
                 holder.user_name.setText(EncryptHelper.decrypt(account.getUsername()));
@@ -122,8 +123,8 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
 
                 if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
                     holder.verification_ic.setVisibility(View.VISIBLE);
-                    int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level())));
-                    if (verified == 2)
+                    final int verified = Methods.parseUserLevel(EncryptHelper.decrypt(account.getVerification_level()));
+                    if (verified == DtoAccount.ACCOUNT_IS_STAFF)
                         holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
                     else
                         holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));

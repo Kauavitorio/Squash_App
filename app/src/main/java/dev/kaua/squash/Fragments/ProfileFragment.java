@@ -28,7 +28,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -95,7 +94,6 @@ public class ProfileFragment extends Fragment {
     private static Button btn_follow_following_profile, btn_go_chat_profile, btn_contact_info_profile;
     private RelativeLayout noPost_profile;
     private LinearLayout container_following_profile, container_followers_profile;
-    private CardView btn_plus_story_profile;
     private ImageView btn_qr_code, btn_menu_profile;
     private String username;
     private RecyclerView recyclerView_Posts_profile;
@@ -126,7 +124,7 @@ public class ProfileFragment extends Fragment {
             String follow = getString(R.string.follow);
             String following = getString(R.string.following);
             String edit_profile = getString(R.string.edit_profile);
-            int actual = Integer.parseInt(txt_amount_followers_profile.getText().toString());
+            int actual = Methods.parseUserLevel(txt_amount_followers_profile.getText().toString());
             if(btn_follow_following_profile.getText().toString().equals(follow)){
                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
                 btn_follow_following_profile.setText(requireContext().getString(R.string.following));
@@ -216,7 +214,6 @@ public class ProfileFragment extends Fragment {
                         if(ConnectionHelper.isOnline(getContext())){
                             LoadingDialog loadingDialog = new LoadingDialog(requireActivity());
                             loadingDialog.startLoading();
-                            btn_plus_story_profile.setVisibility(View.GONE);
                             DtoAccount account = new DtoAccount();
                             account_another_user = Long.parseLong(bundle.getString("account_id"));
                             account.setAccount_id_cry(EncryptHelper.encrypt(bundle.getString("account_id")));
@@ -235,7 +232,7 @@ public class ProfileFragment extends Fragment {
                                         if(response.body() != null){
                                             active_level = response.body().getActive();
                                             if(active_level > DtoAccount.ACCOUNT_DISABLE
-                                                    || Integer.parseInt(MyPrefs.getUserInformation(requireContext()).getVerification_level()) == 2){
+                                                    || Methods.getUserLevel(requireActivity()) == DtoAccount.ACCOUNT_IS_STAFF){
                                                 Glide.with(requireActivity()).load(EncryptHelper.decrypt(response.body().getProfile_image())).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                                         .into(ic_ProfileUser_profile);
                                                 user_image = EncryptHelper.decrypt(response.body().getProfile_image());
@@ -261,9 +258,9 @@ public class ProfileFragment extends Fragment {
                                                 btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
                                                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
 
-                                                final int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getVerification_level())));
-                                                if(verified != 0){
-                                                    if (verified == 2)
+                                                final int verified = Methods.parseUserLevel(EncryptHelper.decrypt(response.body().getVerification_level()));
+                                                if(verified != DtoAccount.NORMAL_ACCOUNT){
+                                                    if (verified == DtoAccount.ACCOUNT_IS_STAFF)
                                                         ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_employee_account));
                                                     else
                                                         ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
@@ -332,9 +329,12 @@ public class ProfileFragment extends Fragment {
         btn_contact_info_profile.setVisibility(View.GONE);
         if(account != null && account.getType_acc() != null){
             try {
-                final int type_acc = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getType_acc())));
+                final int type_acc;
+                final String acc_value = EncryptHelper.decrypt(account.getType_acc());
+                if(acc_value == null) type_acc = DtoAccount.ACCOUNT_DISABLE;
+                else type_acc = Integer.parseInt(acc_value);
                 if(type_acc == DtoAccount.BUSINESS_ACCOUNT
-                        || Methods.getUserLevel(requireContext()) == DtoAccount.ACCOUNT_IS_ADM){
+                        || Methods.getUserLevel(requireContext()) == DtoAccount.ACCOUNT_IS_STAFF){
                     btn_contact_info_profile.setVisibility(View.VISIBLE);
                     btn_contact_info_profile.setOnClickListener(v -> {
                         DtoAccount contact_account = new DtoAccount();
@@ -365,7 +365,6 @@ public class ProfileFragment extends Fragment {
     public void GetUserInfo(Activity activity) {
         ic_account_badge_profile.setVisibility(View.GONE);
         btn_go_chat_profile.setVisibility(View.GONE);
-        btn_plus_story_profile.setVisibility(View.VISIBLE);
         DtoAccount user = MyPrefs.getUserInformation(requireContext());
         account_id = user.getAccount_id();
         account.setAccount_id(account_id);
@@ -387,7 +386,7 @@ public class ProfileFragment extends Fragment {
 
         final long verified = Methods.getUserLevel(activity);
         if(verified != DtoAccount.NORMAL_ACCOUNT){
-            if (verified == DtoAccount.ACCOUNT_IS_ADM)
+            if (verified == DtoAccount.ACCOUNT_IS_STAFF)
                 ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_employee_account));
             else
                 ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
@@ -522,7 +521,6 @@ public class ProfileFragment extends Fragment {
         posts_size = view.findViewById(R.id.txt_posts_size_amount_profile);
         btn_go_chat_profile = view.findViewById(R.id.btn_go_chat_profile);
         btn_contact_info_profile = view.findViewById(R.id.btn_contact_info_profile);
-        btn_plus_story_profile = view.findViewById(R.id.btn_plus_story_profile);
         btn_qr_code = view.findViewById(R.id.btn_qr_code_profile);
         txt_joined = view.findViewById(R.id.txt_joined);
         recyclerView_Posts_profile = view.findViewById(R.id.recyclerView_Posts_profile);
