@@ -30,14 +30,13 @@ public class LoadingDialog {
     @SuppressLint("InflateParams")
     public void  startLoading(){
         try {
-            Handler timer = new Handler();
             dialog = new Dialog(activity);
             dialog.setCancelable(false);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.setContentView(R.layout.adapter_custom_loading);
             LottieAnimationView progressBarDialog = dialog.findViewById(R.id.progressBarDialog);
 
-            timer.postDelayed(() -> progressBarDialog.setSpeed((float) 2.5),6000);
+            new Handler().postDelayed(() -> progressBarDialog.setSpeed((float) 2.5),6000);
 
             dialog.show();
         }catch (Exception ex){
@@ -46,6 +45,6 @@ public class LoadingDialog {
     }
 
    public void dismissDialog(){
-        dialog.dismiss();
+        if(dialog != null) dialog.dismiss();
     }
 }

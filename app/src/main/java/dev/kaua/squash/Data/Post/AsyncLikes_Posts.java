@@ -37,18 +37,21 @@ public class AsyncLikes_Posts extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "post/list/likes?account_id=" + EncryptHelper.encrypt(account_id + "")
-                .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9") + "&key="
-                + Methods.RandomCharactersWithoutSpecials(9));
+        final String json = JsonHandler.getJson( Methods.BASE_URL_HTTPS + "post/list/likes?id=" + account_id + "&key="
+                + Methods.RandomCharactersWithoutSpecials(5));
         try {
-            JSONObject jsonObject = new JSONObject(json);
+            final JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("Search");
             if(jsonArray.length() > 0)
             for (int i = 0; i < jsonArray.length() ; i++) {
-                DtoPost post = new DtoPost();
-                post.setPost_id(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("post_id")));
-                post.setAccount_id(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("account_id")));
-                arrayListDto.add(post);
+                final String post_id = EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("post_id"));
+                final String account_id = EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("account_id"));
+                if(post_id != null && account_id != null){
+                    final DtoPost post = new DtoPost();
+                    post.setPost_id(post_id);
+                    post.setAccount_id(account_id);
+                    arrayListDto.add(post);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,8 +64,7 @@ public class AsyncLikes_Posts extends AsyncTask {
     @Override
     protected void onPostExecute(Object arrayListDto) {
         super.onPostExecute(arrayListDto);
-        DaoPosts daoPosts = new DaoPosts(context);
-        daoPosts.Register_Likes((ArrayList<DtoPost>) arrayListDto);
+        new DaoPosts(context).Register_Likes((ArrayList<DtoPost>) arrayListDto);
         if(position != NOT_NOTIFY)
             try {
                 Posts_Adapters.getInstance().NotifyChanged(position);

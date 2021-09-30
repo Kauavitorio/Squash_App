@@ -164,7 +164,7 @@ public abstract class Methods extends MainActivity {
         Intent myIntent = new Intent(Intent.ACTION_SEND);
         myIntent.setType("text/plain");
         final String search_from;
-        if(getUserLevel(mContext) == DtoAccount.ACCOUNT_IS_ADM) search_from = "STAFF";
+        if(getUserLevel(mContext) == DtoAccount.ACCOUNT_IS_STAFF) search_from = "STAFF";
         else search_from = Methods.RandomCharactersWithoutSpecials(3);
         String body = Methods.BASE_URL_HTTPS + "share/" + postInfo.getUsername().replace(" ", "")
                 + "/post/" +  postInfo.getPost_id()
@@ -365,6 +365,15 @@ public abstract class Methods extends MainActivity {
        }catch (Exception ex){
            return DtoAccount.NORMAL_ACCOUNT;
        }
+    }
+
+    public static int parseUserLevel(String value){
+        try {
+            if(value == null) return DtoAccount.NORMAL_ACCOUNT;
+            else return Integer.parseInt(value);
+        }catch (Exception ex){
+            return DtoAccount.NORMAL_ACCOUNT;
+        }
     }
 
     static final int min = 35;

@@ -34,18 +34,21 @@ public class AsyncLikes_Posts_Comment extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "post/list/likes/comment?account_id=" + EncryptHelper.encrypt(account_id + "")
-                .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9") + "&key="
+        String json =  JsonHandler.getJson( Methods.BASE_URL_HTTPS + "post/list/likes/comment?id=" + account_id + "&key="
                 + Methods.RandomCharactersWithoutSpecials(9));
         try {
-            JSONObject jsonObject = new JSONObject(json);
+            final JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("Search");
             if(jsonArray.length() > 0)
             for (int i = 0; i < jsonArray.length() ; i++) {
-                DtoPost post = new DtoPost();
-                post.setComment_id(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("comment_id")));
-                post.setAccount_id(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("account_id")));
-                arrayListDto.add(post);
+                final String comment_id = EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("comment_id"));
+                final String account_id = EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("account_id"));
+                if(comment_id != null && account_id != null){
+                    DtoPost post = new DtoPost();
+                    post.setComment_id(comment_id);
+                    post.setAccount_id(account_id);
+                    arrayListDto.add(post);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,8 +61,7 @@ public class AsyncLikes_Posts_Comment extends AsyncTask {
     @Override
     protected void onPostExecute(Object arrayListDto) {
         super.onPostExecute(arrayListDto);
-        DaoPosts daoPosts = new DaoPosts(context);
-        daoPosts.Register_Likes_Comments((ArrayList<DtoPost>) arrayListDto);
+        new DaoPosts(context).Register_Likes_Comments((ArrayList<DtoPost>) arrayListDto);
     }
 }
 

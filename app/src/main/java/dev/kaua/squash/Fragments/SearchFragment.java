@@ -89,8 +89,8 @@ public class SearchFragment extends Fragment {
 
     final List<DtoAccount> mAccounts = new ArrayList<>();
     public void LoadSearch() {
-        DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference().child(myFirebaseHelper.USERS_REFERENCE);
-        ref.addValueEventListener(new ValueEventListener() {
+        myFirebaseHelper.getFirebaseDatabase().getReference().child(myFirebaseHelper.USERS_REFERENCE)
+                .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot datasnapshot) {
                 mAccounts.clear();

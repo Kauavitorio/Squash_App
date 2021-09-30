@@ -306,4 +306,9 @@
     <string name="invite_friends_by_choose">Convide amigos por…</string>
     <string name="whatsapp_have_not_been_installed">Whatsapp não foi instalado.</string>
     <string name="invited_you_to_join_squash">%1$s convidou você para entrar no Squash!</string>
+    <string name="signIn_with_Squash">Entrar com Squash</string>
+    <string name="cancel_registration">Cancelar Cadastro</string>
+    <string name="cancel_your_registration">Tem certeza de que deseja cancelar seu registro? Isso resulta na perda de todos os dados nos campos inseridos.</string>
+    <string name="our_servers_fail_to_communicate_with_google_servers">Os nossos servidores apresentam uma falha de comunicação com os servidores do Google. Tentar novamente mais tarde.</string>
+    <string name="need_to_select_your_Google_account">Necessário selecionar sua conta do Google.</string>
 </resources>

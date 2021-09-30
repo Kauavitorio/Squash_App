@@ -58,7 +58,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-
 /**
  *  Copyright (c) 2021 Kauã Vitório
  *  Official repository https://github.com/Kauavitorio/Squash_App
@@ -94,7 +93,7 @@ public abstract class Login extends SignInActivity{
         Log.d(TAG, "Current date => "+ formattedDate);
 
         String encrypt_password = EncryptHelper.encrypt(EncryptHelper.encrypt(password));
-        String placed = Methods.shuffle(Methods.RandomCharacters(Methods.getRandomAmount()));
+        final String placed = Methods.shuffle(Methods.RandomCharacters(Methods.getRandomAmount()));
         String ip = ConnectionHelper.getIp(context);
         ip =  Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
                 .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9") + placed;
@@ -103,8 +102,11 @@ public abstract class Login extends SignInActivity{
                 EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))),
                 EncryptHelper.encrypt("0-river-reliable"), EncryptHelper.encrypt(formattedDate), 0, EncryptHelper.encrypt(placed),
                 ip);
-        AccountServices login_service = retrofitUser.create(AccountServices.class);
-        Call<DtoAccount> call = login_service.login(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
+        final AccountServices login_service = retrofitUser.create(AccountServices.class);
+        Call<DtoAccount> call;
+        if(!GoogleAuthHelper.isGoogleLogin(context)) call = login_service.login(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
+        else
+            call = login_service.login_with_Google(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
         call.enqueue(new Callback<DtoAccount>() {
             @Override
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
@@ -115,7 +117,7 @@ public abstract class Login extends SignInActivity{
                     //  Clear all prefs before login user
                     mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
-                    
+
                     if(response.body() != null && response.body().getActive() > DtoAccount.ACCOUNT_DISABLE){
                         try {
                             txt_login_title.setText(context.getString(R.string.welcome));
@@ -177,10 +179,9 @@ public abstract class Login extends SignInActivity{
 
                                     //  Go To main
                                     new Handler().postDelayed(() -> {
-                                        Intent i = new Intent(context, MainActivity.class);
+                                        final Intent i = new Intent(context, MainActivity.class);
                                         i.putExtra("shared", 0);
-                                        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_left_go, R.anim.move_to_right_go);
-                                        ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
+                                        ActivityCompat.startActivity(context, i, ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_left_go, R.anim.move_to_right_go).toBundle());
                                         ((Activity) context).finish();
                                         try {
                                             new Handler().postDelayed(() -> loadingDialog.dismissDialog(), 300);
@@ -252,8 +253,10 @@ public abstract class Login extends SignInActivity{
         DtoAccount account = new DtoAccount(EncryptHelper.encrypt(login_method), encrypt_password,
                 EncryptHelper.encrypt(device_login.substring(0,1).toUpperCase().concat(device_login.substring(1))),
                 EncryptHelper.encrypt(placed), EncryptHelper.encrypt(formattedDate), 0, EncryptHelper.encrypt(placed), ip);
-        AccountServices login_service = retrofitUser.create(AccountServices.class);
-        Call<DtoAccount> call = login_service.login(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
+        final AccountServices login_service = retrofitUser.create(AccountServices.class);
+        Call<DtoAccount> call;
+        if(!GoogleAuthHelper.isGoogleLogin(context)) call = login_service.login(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
+        else call = login_service.login_with_Google(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
         call.enqueue(new Callback<DtoAccount>() {
             @Override
             public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
@@ -264,8 +267,7 @@ public abstract class Login extends SignInActivity{
                         //  Clear all prefs before login user
                         mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
 
-                        DaoNotification daoNotification = new DaoNotification(context);
-                        daoNotification.Register_User(myFirebaseHelper.getFirebaseUser().getUid());
+                        new DaoNotification(context).Register_User(myFirebaseHelper.getFirebaseUser().getUid());
 
                         if(response.body().getActive() > DtoAccount.ACCOUNT_DISABLE){
 
@@ -389,6 +391,10 @@ public abstract class Login extends SignInActivity{
         clearApplicationData(context); // Clear app cache and data
 
         MyPrefs.logOut(context); // Remove all preferences on app
+
+        if(GoogleAuthHelper.isGoogleLogin(context))
+            GoogleAuthHelper.getGoogleSignInClient(context).signOut()
+                .addOnCompleteListener((Activity) context, task -> GoogleAuthHelper.ResetVariable());
 
         timer.postDelayed(() -> {
             loadingDialog.dismissDialog();

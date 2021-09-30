@@ -45,7 +45,7 @@ public class AsyncUser_Search extends AsyncTask {
             JSONArray jsonArray = jsonObject.getJSONArray("Search");
             for (int i = 0; i < jsonArray.length() ; i++) {
                 DtoAccount account = new DtoAccount();
-                if(user_level == DtoAccount.ACCOUNT_IS_ADM || jsonArray.getJSONObject(i).getLong("active") > DtoAccount.ACCOUNT_DISABLE){
+                if(user_level == DtoAccount.ACCOUNT_IS_STAFF || jsonArray.getJSONObject(i).getLong("active") > DtoAccount.ACCOUNT_DISABLE){
                     account.setAccount_id_cry(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("account_id_cry")));
                     account.setName_user(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("name_user")));
                     account.setUsername(EncryptHelper.decrypt(jsonArray.getJSONObject(i).getString("username")));

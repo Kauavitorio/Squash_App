@@ -12,14 +12,23 @@ public interface AccountServices {
     @POST(ROTE + "/register")
     Call<DtoAccount> registerUser (@Body DtoAccount account);
 
+    @POST(ROTE + "/register/google")
+    Call<DtoAccount> registerUserGoogle (@Body DtoAccount account);
+
     @POST(ROTE + "/edit")
     Call<DtoAccount> edit (@Body DtoAccount account);
+
+    @POST(ROTE + "/account/active/google")
+    Call<DtoAccount> active_google_login (@Body DtoAccount account);
 
     @POST(ROTE + "/search/from/username")
     Call<DtoPost> search_with_username (@Body DtoAccount account);
 
     @POST(ROTE + "/login-new")
     Call<DtoAccount> login (@Body DtoAccount account,  @Query("token") String token);
+
+    @POST(ROTE + "/login-google")
+    Call<DtoAccount> login_with_Google (@Body DtoAccount account,  @Query("token") String token);
 
     @POST(ROTE + "/info/user")
     Call<DtoAccount> getUserInfo (@Body DtoAccount account);
@@ -53,4 +62,7 @@ public interface AccountServices {
 
     @POST(ROTE + "/action/request/verification/")
     Call<DtoVerification> request_verification (@Body DtoVerification verification);
+
+    @POST(ROTE + "/account/test/google")
+    Call<DtoAccount> test_google_account (@Body DtoAccount account);
 }
