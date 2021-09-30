@@ -72,4 +72,9 @@
         <item name="android:windowExitAnimation">@anim/slide_right_to_left</item>
     </style>
 
+    <style name="CropTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/base_color</item>
+        <item name="colorPrimaryDark">@color/base_color</item>
+        <item name="android:windowBackground">@color/base_color</item>
+    </style>
 </resources>

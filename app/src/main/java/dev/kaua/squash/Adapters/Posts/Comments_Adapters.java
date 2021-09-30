@@ -1,4 +1,4 @@
-package dev.kaua.squash.Adapters;
+package dev.kaua.squash.Adapters.Posts;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

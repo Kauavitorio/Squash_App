@@ -2,7 +2,6 @@ package dev.kaua.squash.Data.Post;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +16,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import dev.kaua.squash.Adapters.Posts_Adapters;
+import dev.kaua.squash.Adapters.Posts.Posts_Adapters;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.JsonHandler;

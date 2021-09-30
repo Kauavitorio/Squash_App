@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Objects;
 
 import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Adapters.Posts_Adapters;
-import dev.kaua.squash.Adapters.SearchItemArrayAdapter;
+import dev.kaua.squash.Adapters.Posts.Posts_Adapters;
+import dev.kaua.squash.Adapters.User.SearchItemArrayAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Firebase.myFirebaseHelper;

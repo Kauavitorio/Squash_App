@@ -10,12 +10,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Adapters.NotificationAdapter;
+import dev.kaua.squash.Adapters.Notification.NotificationAdapter;
 import dev.kaua.squash.LocalDataBase.Notification.DaoNotification;
 import dev.kaua.squash.R;
 

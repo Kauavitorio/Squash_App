@@ -34,6 +34,12 @@
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Activitys.Story.StoryActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activitys.Story.AddStoryActivity"
+            android:exported="true" />
+        <activity
             android:name=".Activitys.Setting.FollowAndInvite.FollowAndInviteActivity"
             android:exported="true" />
         <activity
@@ -64,7 +70,7 @@
             android:name=".Activitys.ProfileInfoActivity"
             android:exported="true" />
         <activity
-            android:name=".Adapters.CaptureAct"
+            android:name=".Adapters.User.CaptureAct"
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"
             android:windowSoftInputMode="stateAlwaysHidden" />

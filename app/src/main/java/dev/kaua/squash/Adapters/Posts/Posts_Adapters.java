@@ -1,4 +1,4 @@
-package dev.kaua.squash.Adapters;
+package dev.kaua.squash.Adapters.Posts;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -474,7 +474,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                                                                             try {
                                                                                 if(img_list.getPost_images().get(i) != null){
                                                                                     firebaseStorage = myFirebaseHelper.getFirebaseStorageInstance();
-                                                                                    StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(img_list.getPost_images().get(i))));
+                                                                                    final StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(img_list.getPost_images().get(i))));
                                                                                     photoRef.delete().addOnSuccessListener(aVoid -> {
                                                                                         // File deleted successfully
                                                                                         Log.d(TAG, "onSuccess: deleted file");

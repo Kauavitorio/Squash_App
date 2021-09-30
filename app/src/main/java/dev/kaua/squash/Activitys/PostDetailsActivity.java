@@ -54,7 +54,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Adapters.ViewPagerAdapterImages;
+import dev.kaua.squash.Adapters.Posts.ViewPagerAdapterImages;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncComments_Posts;
 import dev.kaua.squash.Data.Post.DtoPost;

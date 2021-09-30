@@ -28,18 +28,21 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Adapters.Story.StoryAdapter;
 import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
+import dev.kaua.squash.Data.Stories.DtoStory;
 import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
+import dev.kaua.squash.LocalDataBase.DaoFollowing;
 import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.LocalDataBase.Notification.DaoNotification;
 import dev.kaua.squash.Notifications.Data;
@@ -48,7 +51,6 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ShortCutsHelper;
-import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
 
 /**
@@ -62,11 +64,10 @@ import dev.kaua.squash.Tools.Warnings;
 @SuppressLint("StaticFieldLeak")
 public class MainFragment extends Fragment {
     //private static SwipeRefreshLayout swipe_main;
-    private ConstraintLayout btn_create_new_story_main, btn_notifications_click;
+    private ConstraintLayout btn_notifications_click;
     private static RecyclerView recyclerView_Posts;
     private static ShortCutsHelper shortCutsHelper;
     private ImageView btn_compose_main;
-    private CircleImageView icon_ProfileUser_main;
     private static CardView card_msg_notRead_main, have_notification;
     private static Activity instance;
     private static ConstraintLayout loadingPanel;
@@ -75,9 +76,12 @@ public class MainFragment extends Fragment {
     private static DaoSystem daoSystem;
     private static final String TAG = "MAIN_FRAGMENT_LOG";
     private static DaoAccount db_account;
+    private RecyclerView recyclerView_Story;
+    private StoryAdapter storyAdapter;
+    private List<DtoStory> storyList = new ArrayList<>();
 
     private View view;
-    private static DtoAccount account;
+    private static DtoAccount account = new DtoAccount();
 
     @Nullable
     @Override
@@ -85,11 +89,7 @@ public class MainFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_activity_main, container, false);
         Ids(view);
 
-        /*if(account.getProfile_image() != null)
-            Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .into(icon_ProfileUser_main);*/
 
-        btn_create_new_story_main.setOnClickListener(v -> StoryClick());
         btn_compose_main.setOnClickListener(v -> MainActivity.getInstance().CallComposePost());
 
         //loadMsgNotRead();
@@ -173,9 +173,6 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void StoryClick() {
-        ToastHelper.toast(requireActivity(), getString(R.string.under_development), 0);
-    }
 
     static DaoNotification daoNotification;
     public static void Check_Notification(){
@@ -219,14 +216,65 @@ public class MainFragment extends Fragment {
         loadingPanel = view.findViewById(R.id.loadingPanel);
         btn_notifications_click = view.findViewById(R.id.btn_notifications_click);
         have_notification = view.findViewById(R.id.have_notification);
-        icon_ProfileUser_main = view.findViewById(R.id.icon_ProfileUser_main);
-        btn_create_new_story_main = view.findViewById(R.id.btn_create_new_story_main);
         card_msg_notRead_main = view.findViewById(R.id.card_msg_notRead_main);
         btn_compose_main = view.findViewById(R.id.btn_compose_main);
         recyclerView_Posts = view.findViewById(R.id.recyclerView_Posts);
+
         recyclerView_Posts.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        storyAdapter = new StoryAdapter(getContext(), storyList);
+        recyclerView_Story = view.findViewById(R.id.recyclerView_Story);
+        recyclerView_Story.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        recyclerView_Story.setLayoutManager(linearLayoutManager);
+        recyclerView_Story.setAdapter(storyAdapter);
+
+
         RefreshRecycler();
+        readStory();
         Check_Notification();
         shortCutsHelper.launchShortcuts();
+    }
+
+    private void readStory(){
+        final DaoFollowing daoFollowing = new DaoFollowing(instance);
+        final List<String> followingList = daoFollowing.get_followingLIST(instance);
+        if(ConnectionHelper.isOnline(instance)){
+            myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.STORY_REFERENCE)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot datasnapshot) {
+                            if(!instance.isDestroyed() && !instance.isFinishing()){
+                                long timeCurrent = System.currentTimeMillis();
+                                storyList.clear();
+                                storyList.add(new DtoStory("", 0, 0, "", String.valueOf(MyPrefs.getUserInformation(instance).getAccount_id())));
+
+                                for(String id: followingList){
+                                    int countStory = 0;
+                                    DtoStory story = null;
+                                    for (DataSnapshot snapshot: datasnapshot.child(id).getChildren()){
+                                        story = snapshot.getValue(DtoStory.class);
+                                        if(story != null){
+                                            if(timeCurrent > story.getTimeStart() && timeCurrent < story.getTimeEnd())
+                                                countStory++;
+                                            story.setSeen(snapshot.child(myFirebaseHelper.STORY_VIEWS)
+                                                    .child(String.valueOf(MyPrefs.getUserInformation(instance).getAccount_id())).exists());
+                                        }
+                                    }
+
+                                    if(countStory > 0){
+                                        storyList.add(story);
+                                    }
+                                }
+                                storyAdapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+        }
     }
 }

@@ -9,15 +9,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
-
-import dev.kaua.squash.Data.Account.DtoAccount;
-
 public class DaoSystem extends SQLiteOpenHelper {
     private final String TABLE = "TBL_SYSTEM_INFO";
 
     public DaoSystem(@Nullable Context context) {
-        super(context, "DB_SYSTEM_INFO", null, 16);
+        super(context, "DB_SYSTEM_INFO", null, 18);
     }
 
     @Override

@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import dev.kaua.squash.Adapters.Posts_Adapters;
+import dev.kaua.squash.Adapters.Posts.Posts_Adapters;
 import dev.kaua.squash.LocalDataBase.DaoPosts;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.JsonHandler;

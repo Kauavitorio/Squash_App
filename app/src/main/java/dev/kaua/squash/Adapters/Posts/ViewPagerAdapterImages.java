@@ -1,11 +1,10 @@
-package dev.kaua.squash.Adapters;
+package dev.kaua.squash.Adapters.Posts;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,14 +96,14 @@ public class ViewPagerAdapterImages extends PagerAdapter {
                     .load(EncryptHelper.decrypt(images.get(position)))
                     .into(new CustomTarget<Bitmap>() {
                         @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
                             RoundedBitmapDrawable img = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
                             img.setCornerRadius(25);
                             imageView.setImageDrawable(img);
                         }
 
                         @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                        public void onLoadCleared(Drawable placeholder) {
                         }
                     });
 

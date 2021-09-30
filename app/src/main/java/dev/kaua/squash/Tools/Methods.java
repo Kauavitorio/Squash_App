@@ -11,11 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -214,27 +209,6 @@ public abstract class Methods extends MainActivity {
         bottomSheetDialog.show();
     }
 
-    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
-                .getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final int color = 0xff424242;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        final RectF rectF = new RectF(rect);
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        canvas.drawRoundRect(rectF, (float) pixels, (float) pixels, paint);
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        return output;
-    }
-
     public static void LoadFollowersAndFollowing(@NonNull Context context, final int base){
         if(MyPrefs.getUserInformation(context).getAccount_id() != DtoAccount.ACCOUNT_DISABLE){
             if(base == 0){
@@ -290,20 +264,25 @@ public abstract class Methods extends MainActivity {
     }
 
     public static String NumberTrick(final long value) {
-        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
-        if (value == Long.MIN_VALUE) return NumberTrick(Long.MIN_VALUE + 1);
-        if (value < 0) return "-" + NumberTrick(-value);
-        if (value < 1000) return Long.toString(value); //deal with easy case
+        try {
+            //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+            if (value == Long.MIN_VALUE) return NumberTrick(Long.MIN_VALUE + 1);
+            if (value < 0) return "-" + NumberTrick(-value);
+            if (value < 1000) return Long.toString(value); //deal with easy case
 
-        Map.Entry<Long, String> e = suffixes.floorEntry(value);
-        //noinspection ConstantConditions
-        Long divideBy = e.getKey();
-        String suffix = e.getValue();
+            Map.Entry<Long, String> e = suffixes.floorEntry(value);
+            //noinspection ConstantConditions
+            Long divideBy = e.getKey();
+            String suffix = e.getValue();
 
-        long truncated = value / (divideBy / 10); //the number part of the output times 10
-        //noinspection IntegerDivisionInFloatingPointContext
-        boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
-        return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
+            long truncated = value / (divideBy / 10); //the number part of the output times 10
+            //noinspection IntegerDivisionInFloatingPointContext
+            boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
+            return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
+        }catch (Exception ex){
+            Log.d(TAG, ex.getMessage());
+            return Long.toString(value);
+        }
     }
 
     protected static void makeLinkClickable(Context context, SpannableStringBuilder strBuilder, final URLSpan span)
@@ -322,11 +301,11 @@ public abstract class Methods extends MainActivity {
     }
 
     public static void browseTo(Context context, @NonNull String url){
-        if (!url.startsWith("http://") && !url.startsWith("https://")) url = "http://" + url;
-        Intent i = new Intent(context, WebActivity.class);
+        if (!url.startsWith("http://") && !url.startsWith("https://")) url = "https://" + url;
+        final Intent i = new Intent(context, WebActivity.class);
         i.setData(Uri.parse(url));
-        ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_right_back, R.anim.move_to_right_go);
-        ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
+        ActivityCompat.startActivity(context, i
+                , ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_right_back, R.anim.move_to_right_go).toBundle());
     }
 
     public static final String ONLINE = "online";
@@ -396,27 +375,30 @@ public abstract class Methods extends MainActivity {
     }
 
     //  Method to load last seen
-    public static String loadLastSeen(Context context, String get_date_time){
-        Calendar c = Calendar.getInstance();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
-        String formattedDate = df_time.format(c.getTime());
+    @SuppressLint("SimpleDateFormat")
+    private static final SimpleDateFormat df_time = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
+    public static String loadLastSeen(final Context context, final String get_date_time){
+        final Calendar c = Calendar.getInstance();
+        final String formattedDate = df_time.format(c.getTime());
         try {
-            String[] splitDate = formattedDate.split("/");
-            String[] splitTime = formattedDate.split(" ");
-            String[] splitDateGet = get_date_time.split("/");
-            int day = Integer.parseInt(splitDate[0]) - Integer.parseInt(splitDateGet[0]);
-            String year = splitDate[2].substring(0, 4);
-            String yearGET = splitDateGet[2].substring(0, 4);
-            if(splitDate[0].equals(splitDateGet[0]) && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET)){
-                String time_GET = splitDateGet[2].substring(4, 10);
-                myTimeHelper now = myTimeHelper.now();
-                myTimeHelper now_GET = myTimeHelper.parse(time_GET.replace(" ", ""));
-                if(showTimeAgo(now_GET, now + "", context).contains("00")) return context.getString(R.string.just_now);
-                else return showTimeAgo(now_GET, now + "", context);
-            }
-            else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET))
-                return context.getString(R.string.yesterday) + " " + splitTime[1];
-            else return get_date_time;
+            if(get_date_time.length() > 0){
+                final String[] splitDate = formattedDate.split("/");
+                final String[] splitTime = formattedDate.split(" ");
+                final String[] splitDateGet = get_date_time.split("/");
+                final int day = Integer.parseInt(splitDate[0]) - Integer.parseInt(splitDateGet[0]);
+                final String year = splitDate[2].substring(0, 4);
+                final String yearGET = splitDateGet[2].substring(0, 4);
+                if(splitDate[0].equals(splitDateGet[0]) && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET)){
+                    String time_GET = splitDateGet[2].substring(4, 10);
+                    myTimeHelper now = myTimeHelper.now();
+                    myTimeHelper now_GET = myTimeHelper.parse(time_GET.replace(" ", ""));
+                    if(showTimeAgo(now_GET, now + "", context).contains("00")) return context.getString(R.string.just_now);
+                    else return showTimeAgo(now_GET, now + "", context);
+                }
+                else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET))
+                    return context.getString(R.string.yesterday) + " " + splitTime[1];
+                else return get_date_time;
+            }else return get_date_time;
         }catch (Exception ex){
             Log.d("LastSeen", ex.toString());
             return get_date_time;
@@ -424,8 +406,7 @@ public abstract class Methods extends MainActivity {
     }
 
     public static String loadLastSeenUser(Context context, String get_date_time){
-        Calendar c = Calendar.getInstance();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
+        final Calendar c = Calendar.getInstance();
         String formattedDate = df_time.format(c.getTime());
         try {
             String[] splitDate = formattedDate.split("/");

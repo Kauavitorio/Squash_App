@@ -5,4 +5,5 @@
     <dimen name="action_bar_height">56</dimen>
     <dimen name="post_actions_texts">14sp</dimen>
     <dimen name="post_content_text">16sp</dimen>
+    <dimen name="story_text_username">13sp</dimen>
 </resources>

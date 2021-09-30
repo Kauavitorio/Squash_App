@@ -16,6 +16,8 @@ public class myFirebaseHelper {
     public static final String MEDIAS_REFERENCE = "Medias";
     public static final String AUDIOS_REFERENCE = "Audios";
     public static final String USERS_REFERENCE = "Users";
+    public static final String STORY_REFERENCE = "Story";
+    public static final String STORY_VIEWS = "views";
     public static final String VERIFICATION_REFERENCE = "Verification";
     public static final String POINTS_REFERENCE = "Points";
     public static final String PROFILE_REFERENCE = "Profile";

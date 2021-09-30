@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import dev.kaua.squash.Adapters.SearchItemArrayAdapter;
+import dev.kaua.squash.Adapters.User.SearchItemArrayAdapter;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.JsonHandler;

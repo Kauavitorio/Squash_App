@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import dev.kaua.squash.Adapters.Followers_FollowingAdapter;
+import dev.kaua.squash.Adapters.User.Followers_FollowingAdapter;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.JsonHandler;
 import dev.kaua.squash.Tools.Methods;

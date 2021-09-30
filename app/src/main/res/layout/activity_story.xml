@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    tools:context=".Activitys.Story.StoryActivity">
+
+    <!-- Story Image -->
+    <ImageView
+        android:id="@+id/story_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/background_intro" />
+
+    <!-- Loading Story -->
+    <ProgressBar
+        android:id="@+id/loading_story"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
+
+    <!-- Control Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <!-- Reverse View -->
+        <View
+            android:id="@+id/reverse"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"/>
+
+        <!-- Skip View -->
+        <View
+            android:id="@+id/skip"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+    <!-- Stories Progress -->
+    <jp.shts.android.storiesprogressview.StoriesProgressView
+        android:id="@+id/stories"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_gravity="top"
+        android:layout_marginTop="8dp"/>
+
+    <!-- User Info Container -->
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/stories"
+        android:layout_margin="10dp">
+
+        <!-- User Profile Image -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/story_photo_view"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_centerVertical="true" />
+
+        <!-- UserName -->
+        <TextView
+            android:id="@+id/story_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/username"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:layout_toEndOf="@+id/story_photo_view"
+            android:textColor="@color/white"/>
+
+        <!-- Circle Upload Time -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/circle_story_time"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_marginTop="3dp"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="@color/tab_indicator_gray"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/story_username"/>
+
+        <!-- Upload Time -->
+        <TextView
+            android:id="@+id/story_uploadTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="24h ago"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:layout_toEndOf="@+id/circle_story_time"
+            android:textColor="@color/tab_indicator_gray"/>
+        
+    </RelativeLayout>
+
+    <!-- Views Container -->
+    <LinearLayout
+        android:id="@+id/r_seen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@color/transparent_black"
+        android:padding="3dp"
+        android:layout_margin="10dp">
+
+        <!-- Eye Icon -->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_story_view"
+            tools:ignore="ContentDescription" />
+
+        <!-- View Amount -->
+        <TextView
+            android:id="@+id/seen_number_story"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="10K"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+    <!-- Delete Story -->
+    <ImageView
+        android:id="@+id/story_delete"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_story_delete"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:padding="3dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@color/transparent_black"
+        tools:ignore="ContentDescription" />
+
+</RelativeLayout>

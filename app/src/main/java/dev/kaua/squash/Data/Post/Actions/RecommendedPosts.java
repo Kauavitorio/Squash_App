@@ -1,7 +1,6 @@
 package dev.kaua.squash.Data.Post.Actions;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
 
-import dev.kaua.squash.Adapters.Posts_Adapters;
+import dev.kaua.squash.Adapters.Posts.Posts_Adapters;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Firebase.myFirebaseHelper;

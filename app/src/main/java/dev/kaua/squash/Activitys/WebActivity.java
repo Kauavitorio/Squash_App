@@ -37,7 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
 
-import dev.kaua.squash.Adapters.ProgressBarAnimation;
+import dev.kaua.squash.Adapters.User.ProgressBarAnimation;
 import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.LocalDataBase.DaoBrowser;
 import dev.kaua.squash.R;

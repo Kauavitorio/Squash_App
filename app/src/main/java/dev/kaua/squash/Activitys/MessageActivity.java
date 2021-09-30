@@ -65,7 +65,7 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Adapters.AudioRecorder;
+import dev.kaua.squash.Adapters.Chat.AudioRecorder;
 import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
 import dev.kaua.squash.Adapters.Chat.MessageAdapter;
 import dev.kaua.squash.Adapters.Chat.SwipeReply;

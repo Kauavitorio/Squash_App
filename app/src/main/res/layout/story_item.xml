@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="4dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/story_photo"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        app:civ_border_width="2dp"
+        tools:src="@mipmap/ic_launcher"
+        android:layout_gravity="center"
+        app:civ_border_color="@color/base_color"/>
+
+    <!-- Story Photo Seen -->
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/story_photo_seen"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        app:civ_border_width="2dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:src="@mipmap/ic_launcher"
+        android:layout_gravity="center"
+        app:civ_border_color="@color/custom_toast"/>
+
+    <!-- User Name Text -->
+    <TextView
+        android:id="@+id/story_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="@dimen/story_text_username"
+        android:maxLines="1"
+        android:textColor="@color/black"
+        tools:text="@string/app_name"/>
+
+</LinearLayout>

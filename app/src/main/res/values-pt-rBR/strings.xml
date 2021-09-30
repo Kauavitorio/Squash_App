@@ -311,4 +311,7 @@
     <string name="cancel_your_registration">Tem certeza de que deseja cancelar seu registro? Isso resulta na perda de todos os dados nos campos inseridos.</string>
     <string name="our_servers_fail_to_communicate_with_google_servers">Os nossos servidores apresentam uma falha de comunicação com os servidores do Google. Tentar novamente mais tarde.</string>
     <string name="need_to_select_your_Google_account">Necessário selecionar sua conta do Google.</string>
+    <string name="deleted">Excluído!</string>
+    <string name="unable_to_get_the_image_from_your_device">Não foi possível pegar a imagem do seu dispositivo, tente novamente mais tarde.</string>
+    <string name="there_was_a_problem_registering_your_story">Ocorreu um problema ao registrar seu Story.</string>
 </resources>

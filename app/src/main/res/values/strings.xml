@@ -334,4 +334,8 @@
     <string name="cancel_your_registration">Do you really want to cancel your registration? This results in the loss of all data in the fields entered.</string>
     <string name="our_servers_fail_to_communicate_with_google_servers">Our servers fail to communicate with Google servers. Try again later.</string>
     <string name="need_to_select_your_Google_account">Need to select your google account.</string>
+    <string name="add_story" translatable="false">Add Story</string>
+    <string name="deleted">Deleted!</string>
+    <string name="unable_to_get_the_image_from_your_device">Unable to get the image from your device, please try again later.</string>
+    <string name="there_was_a_problem_registering_your_story">There was a problem registering your Story.</string>
 </resources>

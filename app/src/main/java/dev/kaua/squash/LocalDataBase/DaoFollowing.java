@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 
 import dev.kaua.squash.Data.Account.DtoAccount;
+import dev.kaua.squash.Tools.MyPrefs;
 
 public class DaoFollowing extends SQLiteOpenHelper {
     private final String TABLE = "TBL_USER_FOLLOWING";
@@ -75,9 +76,23 @@ public class DaoFollowing extends SQLiteOpenHelper {
         return list;
     }
 
+    public ArrayList<String> get_followingLIST(Context context){
+        String command = "SELECT * FROM " + TABLE + " WHERE account_id = ?";
+        String[] params = {String.valueOf(MyPrefs.getUserInformation(context).getAccount_id())};
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        ArrayList<String> list = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            if(cursor.getString(2) != null){
+                list.add(cursor.getString(2));
+            }
+        }
+        return list;
+    }
+
     public boolean check_if_follow(long account_id, long account_id_following){
         String command = "SELECT * FROM " + TABLE + " WHERE account_id = ? and account_id_following = ?";
-        String[] params = {account_id + "", account_id_following + ""};
+        String[] params = {String.valueOf(account_id), String.valueOf(account_id_following)};
         @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
         return cursor.moveToNext();
     }

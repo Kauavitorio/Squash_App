@@ -1,6 +1,7 @@
 package dev.kaua.squash.Data.Account;
 
 public class DtoAccount implements Comparable<DtoAccount>{
+    public static final String ACCOUNT_ID_CRY = "account_id_cry";
     public static final int ACCOUNT_ACTIVE = 2;
     public static final int BUSINESS_ACCOUNT = 1;
     public static final int ACCOUNT_RESTRICTION = 1;
