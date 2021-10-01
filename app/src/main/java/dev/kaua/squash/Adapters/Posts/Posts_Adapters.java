@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -84,54 +83,57 @@ import retrofit2.Retrofit;
 
 @SuppressLint({"UseCompatLoadingForDrawables", "StaticFieldLeak", "SetTextI18n"})
 public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolderPosts> {
+    private static final String TAG = "POSTS_ADAPTER";
+    public static final boolean CAN_ANIME = true;
+    public static final boolean CAN_NOT_ANIME = false;
     ArrayList<DtoPost> mPostList;
     static Activity mContext;
     static DaoPosts daoPosts;
     private static BottomSheetDialog bottomSheetDialog;
     private final Animation myAnim;
-    FirebaseStorage firebaseStorage;
+    private FirebaseStorage firebaseStorage;
     private static FirebaseAnalytics mFirebaseAnalytics;
     private static Posts_Adapters instance;
-    private static DtoAccount user;
-    public static final boolean CAN_ANIME = true;
-    public static final boolean CAN_NOT_ANIME = false;
-    private static final String TAG = "POSTS_ADAPTER";
+    private static DtoAccount mUser;
     private static int LayoutType;
     static final int min = 0;
+    boolean loadAd;
     static int max;
+    int ad_counter;
     private static final DtoPost post_ad = new DtoPost(DtoPost.AD_POST);
-
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
-    public Posts_Adapters(ArrayList<DtoPost> ArrayList, Activity mContext) {
+    public Posts_Adapters(ArrayList<DtoPost> ArrayList, Activity mContext, boolean loadAd) {
+        this.loadAd = loadAd;
+
+        //  Generate Ad post position
         max = ArrayList.size();
-        final int ad_counter = (int) Math.floor(Math.random() * (max - min + 1) + min);
-        if(ConnectionHelper.isOnline(mContext)) ArrayList.add(ad_counter, post_ad);
+        ad_counter = (int) Math.floor(Math.random() * (max - min + 1) + min);
+
+        //  Check if post display request can show AD
+        if(this.loadAd)
+            //  For each post request just can show max of one AD
+            if(ConnectionHelper.isOnline(mContext)) ArrayList.add(ad_counter, post_ad);
+
         this.mPostList = ArrayList;
         instance = this;
         Posts_Adapters.mContext = mContext;
         daoPosts = new DaoPosts(mContext);
         myAnim = AnimationUtils.loadAnimation(mContext,R.anim.click_anim);
         mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(mContext);
-        user = MyPrefs.getUserInformation(mContext);
+        mUser = MyPrefs.getUserInformation(mContext);
     }
 
     @NonNull
     @Override
     public MyHolderPosts onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutType = viewType;
-        Context context = parent.getContext();
-        View view;
-        if(LayoutType == DtoPost.NORMAL_POST){
-            view = LayoutInflater.from(context).inflate(R.layout.adapter_posts, parent, false);
-            return new MyHolderPosts(view);
-        }else if(LayoutType == DtoPost.AD_POST){
-            view = LayoutInflater.from(context).inflate(R.layout.adapter_ad_post, parent, false);
-            return new MyHolderPosts(view);
-        } else{
-            view = LayoutInflater.from(context).inflate(R.layout.adapter_posts, parent, false);
-            return new MyHolderPosts(view);
-        }
+        if(LayoutType == DtoPost.NORMAL_POST)
+            return new MyHolderPosts(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_posts, parent, false));
+        else if(LayoutType == DtoPost.AD_POST)
+            return new MyHolderPosts(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_ad_post, parent, false));
+        else
+            return new MyHolderPosts(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_posts, parent, false));
     }
 
     @SuppressWarnings("RegExpRedundantEscape")
@@ -220,11 +222,15 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                                     finalPost.setUsername(EncryptHelper.decrypt(post.getUsername()));
                                     finalPost.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
 
-                                    if(Long.parseLong(finalPost.getPost_likes()) != Long.parseLong(mPostList.get(PostPosition).getPost_likes()))
-                                        LoadBaseInformation(holder, finalPost, PostPosition, CAN_ANIME);
-                                    else LoadBaseInformation(holder, finalPost, PostPosition, CAN_NOT_ANIME);
+                                    try {
+                                        if(hasIndex(PostPosition)){
+                                            if(Long.parseLong(finalPost.getPost_likes()) != Long.parseLong(mPostList.get(PostPosition).getPost_likes()))
+                                                LoadBaseInformation(holder, finalPost, PostPosition, CAN_ANIME);
+                                            else LoadBaseInformation(holder, finalPost, PostPosition, CAN_NOT_ANIME);
 
-                                    mPostList.get(PostPosition).setPost_likes(finalPost.getPost_likes());
+                                            mPostList.get(PostPosition).setPost_likes(finalPost.getPost_likes());
+                                        }
+                                    }catch (Exception ignore){}
 
                                     LoadMentions(holder);
 
@@ -250,8 +256,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                         final AdView adView = new AdView(mContext);
                         adView.setAdSize(new AdSize(300, 200));
                         adView.setAdUnitId(mContext.getString(R.string.main_banner));
-                        AdRequest adRequest = new AdRequest.Builder().build();
-                        adView.loadAd(adRequest);
+                        adView.loadAd(new AdRequest.Builder().build());
                         holder.adView_post.addView(adView);
                     }catch (Exception ignore){}
                 }
@@ -261,6 +266,9 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     @Override
     public int getItemViewType(int position) {
+        if(!mPostList.contains(post_ad) && loadAd)
+            mPostList.add(ad_counter, post_ad);
+
         if(mPostList.get(position).getPost_type() == DtoPost.NORMAL_POST)
             return DtoPost.NORMAL_POST;
         else if(mPostList.get(position).getPost_type() == DtoPost.AD_POST)
@@ -323,7 +331,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                 Methods.browseTo(mContext, url);
                 return true;
             }
-
             return false;
         }));
     }
@@ -336,17 +343,26 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                 holder.ic_account_badge.setImageDrawable(mContext.getDrawable(Methods.loadUserImageLevel(level)));
             }else holder.ic_account_badge.setVisibility(View.GONE);
 
-            if(!mPostList.get(position).isProfile_img_load() ||  !postInfo.getProfile_image().equals(mPostList.get(position).getProfile_image())){
-                mPostList.get(position).setProfile_image(postInfo.getProfile_image());
-                mPostList.get(position).setProfile_img_load(true);
-                Glide.with(mContext).load(postInfo.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                        .into(holder.icon_user_profile_post);
+            if(hasIndex(position)){
+                if(!mPostList.get(position).isProfile_img_load() ||  !postInfo.getProfile_image().equals(mPostList.get(position).getProfile_image())){
+                    mPostList.get(position).setProfile_image(postInfo.getProfile_image());
+                    mPostList.get(position).setProfile_img_load(true);
+                    try {
+                        if(!mContext.isDestroyed() && !mContext.isFinishing())
+                            Glide.with(mContext).load(postInfo.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                    .into(holder.icon_user_profile_post);
+                    }catch (Exception ignore){}
+                }
+
+                holder.txt_date_time_post.setText(LastSeenRefactor(position));
             }
 
             holder.txt_name_user_post.setText(postInfo.getName_user());
             holder.txt_username_post.setText( "@" + postInfo.getUsername());
             if(postInfo.getPost_content() != null)
-                holder.txt_post_content.setText(postInfo.getPost_content().trim());
+                if(postInfo.getPost_content().trim().replace(" ", "").length() > 0)
+                    holder.txt_post_content.setText(postInfo.getPost_content().trim());
+                else holder.txt_post_content.setVisibility(View.GONE);
 
             //  Check Posts Likes Amount
             if(Long.parseLong(postInfo.getPost_likes()) != 0){
@@ -362,23 +378,31 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
 
             if(CAN_ANIMATE) holder.txt_likes_post.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.slide_up));
-            holder.txt_date_time_post.setText(LastSeenRefactor(position));
         }
     }
 
     private void LoadMentions(@NonNull MyHolderPosts holder) {
+
+        //  Pattern for all @ in user post
         new PatternEditableBuilder().
                 addPattern(Pattern.compile("@(\\w+)"), mContext.getColor(R.color.base_color),
                         text -> Methods.Profile_From_USERNAME(mContext, text)).into(holder.txt_post_content);
 
-        HelpSquashPattern(holder, "Ajudar o Squash");
-        HelpSquashPattern(holder, "Ajudar o squash");
-        HelpSquashPattern(holder, "ajudar o Squash");
-        HelpSquashPattern(holder, "ajudar o squash");
-        HelpSquashPattern(holder, "Help Squash");
-        HelpSquashPattern(holder, "Help squash");
-        HelpSquashPattern(holder, "help Squash");
-        HelpSquashPattern(holder, "help squash");
+
+        if(holder.txt_post_content.getText().toString().toLowerCase()
+                .contains("Ajudar o Squash".toLowerCase()) ||
+                holder.txt_post_content.getText().toString().toLowerCase()
+                        .contains("Help Squash".toLowerCase())){
+            HelpSquashPattern(holder, "Ajudar o Squash");
+            HelpSquashPattern(holder, "Ajudar o squash");
+            HelpSquashPattern(holder, "ajudar o Squash");
+            HelpSquashPattern(holder, "ajudar o squash");
+            HelpSquashPattern(holder, "Help Squash");
+            HelpSquashPattern(holder, "Help squash");
+            HelpSquashPattern(holder, "help Squash");
+            HelpSquashPattern(holder, "help squash");
+        }
+
         new PatternEditableBuilder().addPattern(Pattern.compile(mContext.getString(R.string.squash_shop)),
                 mContext.getColor(R.color.base_color),
                         text -> {
@@ -396,7 +420,9 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     }
 
     private String LastSeenRefactor(final int position) {
-        String date = mPostList.get(position).getPost_date();
+        String date = "";
+        if(hasIndex(position))
+            date = mPostList.get(position).getPost_date();
         try{
             final String[] split_date = date.split("/");
             if(split_date.length >= 5){
@@ -421,202 +447,211 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     private void EnableActions(final MyHolderPosts holder, int position) {
         try{
-            final long verified = Methods.getUserLevel(mContext);
-            if(mPostList.get(position).getAccount_id() != null &&
-                    Long.parseLong(mPostList.get(position).getAccount_id()) == Long.parseLong(String.valueOf(user.getAccount_id()))
-            || verified == DtoAccount.ACCOUNT_IS_STAFF){
-                holder.btn_actions.setVisibility(View.VISIBLE);
-                holder.btn_actions.setOnClickListener(v -> {
-                    DtoPost dtoPost = new DtoPost();
-                    final String user_id;
-                    if(verified == DtoAccount.ACCOUNT_IS_STAFF && Long.parseLong(mPostList.get(position).getAccount_id()) != user.getAccount_id())
-                        user_id = mPostList.get(position).getAccount_id();
-                    else user_id = String.valueOf(user.getAccount_id());
-                    dtoPost.setAccount_id(EncryptHelper.encrypt(user_id));
-                    dtoPost.setPost_id(EncryptHelper.encrypt(mPostList.get(position).getPost_id()));
-                    dtoPost.setDelete_by(EncryptHelper.encrypt("byUser"));
-                    bottomSheetDialog = new BottomSheetDialog(mContext, R.style.BottomSheetTheme);
-                    bottomSheetDialog.setCancelable(true);
-                    //  Creating View for SheetMenu
-                    View sheetView = LayoutInflater.from(mContext).inflate(R.layout.adapter_sheet_menu_post_action,
-                            mContext.findViewById(R.id.sheet_menu_post_action));
+            if(hasIndex(position)){
+                final long verified = Methods.getUserLevel(mContext);
+                if(mPostList.get(position).getAccount_id() != null &&
+                        Long.parseLong(mPostList.get(position).getAccount_id()) == Long.parseLong(String.valueOf(mUser.getAccount_id()))
+                        || verified == DtoAccount.ACCOUNT_IS_STAFF){
+                    holder.btn_actions.setVisibility(View.VISIBLE);
+                    holder.btn_actions.setOnClickListener(v -> {
+                        DtoPost dtoPost = new DtoPost();
+                        final String user_id;
+                        if(verified == DtoAccount.ACCOUNT_IS_STAFF && Long.parseLong(mPostList.get(position).getAccount_id()) != mUser.getAccount_id())
+                            user_id = mPostList.get(position).getAccount_id();
+                        else user_id = String.valueOf(mUser.getAccount_id());
+                        dtoPost.setAccount_id(EncryptHelper.encrypt(user_id));
+                        dtoPost.setPost_id(EncryptHelper.encrypt(mPostList.get(position).getPost_id()));
+                        dtoPost.setDelete_by(EncryptHelper.encrypt("byUser"));
+                        bottomSheetDialog = new BottomSheetDialog(mContext, R.style.BottomSheetTheme);
+                        bottomSheetDialog.setCancelable(true);
+                        //  Creating View for SheetMenu
+                        View sheetView = LayoutInflater.from(mContext).inflate(R.layout.adapter_sheet_menu_post_action,
+                                mContext.findViewById(R.id.sheet_menu_post_action));
 
-                    sheetView.findViewById(R.id.btn_delete_post).setOnClickListener(v1 -> {
-                        AlertDialog.Builder alert = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle)
-                                .setTitle(mContext.getString(R.string.delete_post))
-                                .setMessage(mContext.getString(R.string.delete_post_message))
-                                .setPositiveButton(mContext.getString(R.string.yes), (dialog, which) -> {
-                                    if(ConnectionHelper.isOnline(mContext)){
-                                        dialog.dismiss();
-                                        if(verified == 2 &&  Long.parseLong(mPostList.get(position).getAccount_id()) != user.getAccount_id()){
-                                            Intent i = new Intent(mContext, DeletePostReportActivity.class);
-                                            i.putExtra("post_id", mPostList.get(position).getPost_id());
-                                            i.putExtra("user_id", user_id);
-                                            mContext.startActivity(i);
-                                        }else{
-                                            try {
-                                                PostServices services = retrofit.create(PostServices.class);
-                                                Call<DtoPost> call = services.delete_post(dtoPost);
+                        sheetView.findViewById(R.id.btn_delete_post).setOnClickListener(v1 -> {
+                            AlertDialog.Builder alert = new AlertDialog.Builder(mContext, R.style.MyAlertDialogStyle)
+                                    .setTitle(mContext.getString(R.string.delete_post))
+                                    .setMessage(mContext.getString(R.string.delete_post_message))
+                                    .setPositiveButton(mContext.getString(R.string.yes), (dialog, which) -> {
+                                        if(ConnectionHelper.isOnline(mContext)){
+                                            dialog.dismiss();
+                                            if(verified == 2 &&  Long.parseLong(mPostList.get(position).getAccount_id()) != mUser.getAccount_id()){
+                                                Intent i = new Intent(mContext, DeletePostReportActivity.class);
+                                                i.putExtra("post_id", mPostList.get(position).getPost_id());
+                                                i.putExtra("user_id", user_id);
+                                                mContext.startActivity(i);
+                                            }else{
+                                                try {
+                                                    PostServices services = retrofit.create(PostServices.class);
+                                                    Call<DtoPost> call = services.delete_post(dtoPost);
 
-                                                LoadingDialog loadingDialog = new LoadingDialog(mContext);
-                                                loadingDialog.startLoading();
+                                                    LoadingDialog loadingDialog = new LoadingDialog(mContext);
+                                                    loadingDialog.startLoading();
 
-                                                //  Delete post in api
-                                                call.enqueue(new Callback<DtoPost>() {
-                                                    @Override
-                                                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                                                        loadingDialog.dismissDialog();
-                                                        if(response.code() == 200){
-                                                            try{
-                                                                if(mPostList.size() > 0 && mPostList.size() >= position){
-                                                                    DtoPost img_list = daoPosts.get_post_img(Long.parseLong(mPostList.get(position).getPost_id()));
-                                                                    if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0){
-                                                                        for (int i = 0; i < img_list.getPost_images().size(); i++){
-                                                                            try {
-                                                                                if(img_list.getPost_images().get(i) != null){
-                                                                                    firebaseStorage = myFirebaseHelper.getFirebaseStorageInstance();
-                                                                                    final StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(img_list.getPost_images().get(i))));
-                                                                                    photoRef.delete().addOnSuccessListener(aVoid -> {
-                                                                                        // File deleted successfully
-                                                                                        Log.d(TAG, "onSuccess: deleted file");
-                                                                                    }).addOnFailureListener(exception -> {
-                                                                                        // Uh-oh, an error occurred!
-                                                                                        Log.d(TAG, "onFailure: did not delete file");
-                                                                                    });
+                                                    //  Delete post in api
+                                                    call.enqueue(new Callback<DtoPost>() {
+                                                        @Override
+                                                        public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
+                                                            loadingDialog.dismissDialog();
+                                                            if(response.code() == 200){
+                                                                try{
+                                                                    if(mPostList.size() > 0 && mPostList.size() >= position){
+                                                                        DtoPost img_list = daoPosts.get_post_img(Long.parseLong(mPostList.get(position).getPost_id()));
+                                                                        if(img_list.getPost_images() != null && img_list.getPost_images().size() > 0){
+                                                                            for (int i = 0; i < img_list.getPost_images().size(); i++){
+                                                                                try {
+                                                                                    if(img_list.getPost_images().get(i) != null){
+                                                                                        firebaseStorage = myFirebaseHelper.getFirebaseStorageInstance();
+                                                                                        final StorageReference photoRef = firebaseStorage.getReferenceFromUrl(Objects.requireNonNull(EncryptHelper.decrypt(img_list.getPost_images().get(i))));
+                                                                                        photoRef.delete().addOnSuccessListener(aVoid -> {
+                                                                                            // File deleted successfully
+                                                                                            Log.d(TAG, "onSuccess: deleted file");
+                                                                                        }).addOnFailureListener(exception -> {
+                                                                                            // Uh-oh, an error occurred!
+                                                                                            Log.d(TAG, "onFailure: did not delete file");
+                                                                                        });
+                                                                                    }
+                                                                                }catch (Exception ex){
+                                                                                    Log.d(TAG, "onFailure: " + ex.toString());
                                                                                 }
-                                                                            }catch (Exception ex){
-                                                                                Log.d(TAG, "onFailure: " + ex.toString());
                                                                             }
                                                                         }
+                                                                        MainFragment.RefreshRecycler();
                                                                     }
-                                                                    MainFragment.RefreshRecycler();
+                                                                }catch (Exception ex){
+                                                                    Log.d(TAG, ex.toString());
                                                                 }
-                                                            }catch (Exception ex){
-                                                                Log.d(TAG, ex.toString());
-                                                            }
-                                                        }else
-                                                            Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_DELETE_ACTION);
+                                                            }else
+                                                                Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_DELETE_ACTION);
 
 
-                                                        LoadingDialog loadingDialog1 = new LoadingDialog(mContext);
-                                                        new Handler().postDelayed(() -> {
-                                                            loadingDialog1.startLoading();
-                                                            DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-                                                            Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
-                                                                    .equalTo(EncryptHelper.encrypt(mPostList.get(position).getPost_id()));
+                                                            LoadingDialog loadingDialog1 = new LoadingDialog(mContext);
+                                                            new Handler().postDelayed(() -> {
+                                                                loadingDialog1.startLoading();
+                                                                DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                                                                Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
+                                                                        .equalTo(EncryptHelper.encrypt(mPostList.get(position).getPost_id()));
 
-                                                            //  Delete post in firebase
-                                                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                @Override
-                                                                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                                                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                                                                        Log.d(TAG, "Remove -> " + appleSnapshot.getRef());
-                                                                        appleSnapshot.getRef().removeValue();
+                                                                //  Delete post in firebase
+                                                                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                                                                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                                                            Log.d(TAG, "Remove -> " + appleSnapshot.getRef());
+                                                                            appleSnapshot.getRef().removeValue();
+                                                                            new Handler().postDelayed(loadingDialog1::dismissDialog, 500);
+                                                                        }
+                                                                    }
+                                                                    @Override
+                                                                    public void onCancelled(@NotNull DatabaseError databaseError) {
+                                                                        Log.e(TAG, "onCancelled", databaseError.toException());
                                                                         new Handler().postDelayed(loadingDialog1::dismissDialog, 500);
                                                                     }
-                                                                }
-                                                                @Override
-                                                                public void onCancelled(@NotNull DatabaseError databaseError) {
-                                                                    Log.e(TAG, "onCancelled", databaseError.toException());
-                                                                    new Handler().postDelayed(loadingDialog1::dismissDialog, 500);
-                                                                }
-                                                            });
-                                                        }, 500);
-                                                    }
+                                                                });
+                                                            }, 500);
+                                                        }
 
-                                                    @Override
-                                                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
-                                                        loadingDialog.dismissDialog();
-                                                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_DELETE_ACTION);
-                                                    }
-                                                });
-                                            }catch (Exception ex){
-                                                Log.d(TAG, ex.toString());
+                                                        @Override
+                                                        public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                                                            loadingDialog.dismissDialog();
+                                                            Warnings.showWeHaveAProblem(mContext, ErrorHelper.POST_DELETE_ACTION);
+                                                        }
+                                                    });
+                                                }catch (Exception ex){
+                                                    Log.d(TAG, ex.toString());
+                                                }
                                             }
-                                        }
-                                    }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
-                                })
-                                .setNeutralButton(mContext.getString(R.string.no), (dialogInterface, i) -> dialogInterface.dismiss());
-                        Dialog mDialog = alert.create();
-                        mDialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
-                        mDialog.show();
-                        bottomSheetDialog.dismiss();
+                                        }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), 0);
+                                    })
+                                    .setNeutralButton(mContext.getString(R.string.no), (dialogInterface, i) -> dialogInterface.dismiss());
+                            Dialog mDialog = alert.create();
+                            mDialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
+                            mDialog.show();
+                            bottomSheetDialog.dismiss();
+                        });
+
+                        sheetView.findViewById(R.id.btn_cancel_actions).setOnClickListener(v1 -> bottomSheetDialog.dismiss());
+
+                        bottomSheetDialog.setContentView(sheetView);
+                        bottomSheetDialog.show();
                     });
-
-                    sheetView.findViewById(R.id.btn_cancel_actions).setOnClickListener(v1 -> bottomSheetDialog.dismiss());
-
-                    bottomSheetDialog.setContentView(sheetView);
-                    bottomSheetDialog.show();
-                });
-            }else holder.btn_actions.setVisibility(View.GONE);
+                }else holder.btn_actions.setVisibility(View.GONE);
+            }
         }catch (Exception ex){
-            Log.w("POST_ADAPTER", ex.toString());
+            Log.w(TAG, ex.toString());
             holder.btn_actions.setVisibility(View.GONE);
         }
     }
 
     private void Check_Like(@NotNull MyHolderPosts holder, int position) {
-        boolean result_like = daoPosts.get_A_Like(Long.parseLong(mPostList.get(position).getPost_id()), user.getAccount_id());
-        if(result_like) holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
-        else holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
+        if(hasIndex(position)){
+            try {
+                boolean result_like = daoPosts.get_A_Like(Long.parseLong(mPostList.get(position).getPost_id()), mUser.getAccount_id());
+                if(result_like) holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
+                else holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
+            }catch (Exception ignore){}
+        }
+    }
+
+    public boolean hasIndex(long index){
+        return index < mPostList.size();
     }
 
     private void Like_Un_Like_A_Post(@NotNull MyHolderPosts holder, long position, String post_id) {
         if(ConnectionHelper.isOnline(mContext)){
+            if(hasIndex(position)){
+                boolean result_like = daoPosts.get_A_Like(Long.parseLong(post_id), mUser.getAccount_id());
+                long like_now = Long.parseLong(mPostList.get((int) position).getPost_likes());
+                if(result_like) {
+                    holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
+                    like_now--;
+                    daoPosts.delete_like(Long.parseLong(post_id), mUser.getAccount_id());
+                }else{
+                    holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
+                    like_now++;
+                    daoPosts.Register_A_Like(Long.parseLong(post_id), mUser.getAccount_id());
+                }
+                if(like_now >= 0){
+                    mPostList.get((int) position).setPost_likes(String.valueOf(like_now));
 
-            boolean result_like = daoPosts.get_A_Like(Long.parseLong(post_id), user.getAccount_id());
-            long like_now = Long.parseLong(mPostList.get((int) position).getPost_likes());
-            Log.d(TAG, like_now + " <- Base Like");
-            if(result_like) {
-                holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.ic_heart));
-                like_now--;
-                daoPosts.delete_like(Long.parseLong(post_id), user.getAccount_id());
-            }else{
-                holder.img_heart_like.setImageDrawable(mContext.getDrawable(R.drawable.red_heart));
-                like_now++;
-                daoPosts.Register_A_Like(Long.parseLong(post_id), user.getAccount_id());
-            }
-            if(like_now >= 0){
-                mPostList.get((int) position).setPost_likes(String.valueOf(like_now));
-                Log.d(TAG, like_now + " <- Final Like");
+                    //  Set posts like in firebase
+                    Query applesQuery = myFirebaseHelper.getFirebaseDatabase().getReference()
+                            .child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
+                            .equalTo(EncryptHelper.encrypt(post_id));
 
-                //  Set posts like in firebase
-                Query applesQuery = myFirebaseHelper.getFirebaseDatabase().getReference()
-                        .child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("post_id")
-                        .equalTo(EncryptHelper.encrypt(post_id));
-
-                final long finalLike_now = like_now;
-                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("post_likes", EncryptHelper.encrypt(String.valueOf(finalLike_now)));
-                            appleSnapshot.getRef().updateChildren(hashMap);
+                    final long finalLike_now = like_now;
+                    applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("post_likes", EncryptHelper.encrypt(String.valueOf(finalLike_now)));
+                                appleSnapshot.getRef().updateChildren(hashMap);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NotNull DatabaseError databaseError) {
-                        Log.e("PostsAdapter", "onCancelled", databaseError.toException());
-                    }
-                });
+                        @Override
+                        public void onCancelled(@NotNull DatabaseError databaseError) {
+                            Log.e(TAG, "onCancelled", databaseError.toException());
+                        }
+                    });
 
-                //  Do Like or Un Like
-                DtoPost dtoPost = new DtoPost();
-                dtoPost.setPost_id(EncryptHelper.encrypt(post_id));
-                dtoPost.setAccount_id_cry(EncryptHelper.encrypt( String.valueOf(user.getAccount_id())));
-                PostServices services = retrofit.create(PostServices.class);
-                Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
-                call.enqueue(new Callback<DtoPost>() {
-                    @Override
-                    public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {}
-                    @Override
-                    public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
-                        ToastHelper.toast(mContext, mContext.getString(R.string.problem_performing_this_action), ToastHelper.SHORT_DURATION);
-                        notifyItemChanged((int) position);
-                    }
-                });
+                    //  Do Like or Un Like
+                    DtoPost dtoPost = new DtoPost();
+                    dtoPost.setPost_id(EncryptHelper.encrypt(post_id));
+                    dtoPost.setAccount_id_cry(EncryptHelper.encrypt( String.valueOf(mUser.getAccount_id())));
+                    PostServices services = retrofit.create(PostServices.class);
+                    Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
+                    call.enqueue(new Callback<DtoPost>() {
+                        @Override
+                        public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {}
+                        @Override
+                        public void onFailure(@NotNull Call<DtoPost> call, @NotNull Throwable t) {
+                            ToastHelper.toast(mContext, mContext.getString(R.string.problem_performing_this_action), ToastHelper.SHORT_DURATION);
+                            notifyItemChanged((int) position);
+                        }
+                    });
+                }
             }
         }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
     }

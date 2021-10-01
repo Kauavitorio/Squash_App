@@ -83,29 +83,33 @@ public class ViewPagerAdapterImages extends PagerAdapter {
             // referencing the image view from the adapter_images_post.xml file
             ImageView imageView = itemView.findViewById(R.id.imageViewMain);
 
-            // setting the image in the imageView
-            Glide.with(context)
-                    .asBitmap()
-                    .apply(myOptions)
-                    .load(EncryptHelper.decrypt(images.get(position)))
-                    .into(imageView);
+            try{
+                // setting the image in the imageView
+                Glide.with(context)
+                        .asBitmap()
+                        .apply(myOptions)
+                        .load(EncryptHelper.decrypt(images.get(position)))
+                        .into(imageView);
 
-            Glide.with(context)
-                    .asBitmap()
-                    .apply(myOptions)
-                    .load(EncryptHelper.decrypt(images.get(position)))
-                    .into(new CustomTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
-                            RoundedBitmapDrawable img = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                            img.setCornerRadius(25);
-                            imageView.setImageDrawable(img);
-                        }
+                Glide.with(context)
+                        .asBitmap()
+                        .apply(myOptions)
+                        .load(EncryptHelper.decrypt(images.get(position)))
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                                RoundedBitmapDrawable img = RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                                img.setCornerRadius(25);
+                                imageView.setImageDrawable(img);
+                            }
 
-                        @Override
-                        public void onLoadCleared(Drawable placeholder) {
-                        }
-                    });
+                            @Override
+                            public void onLoadCleared(Drawable placeholder) {
+                            }
+                        });
+            }catch (Exception ex){
+                itemView.setVisibility(View.GONE);
+            }
 
             imageView.setOnClickListener(v -> CreateImageViewIntent(postInfo, images.get(position), imageView));
 

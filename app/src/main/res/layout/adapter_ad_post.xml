@@ -113,6 +113,17 @@
                         android:textColor="@color/hint"
                         android:textSize="@dimen/post_content_textAD" />
 
+                    <!-- Ic Rocket -->
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_below="@+id/container_user_info_post"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_toEndOf="@+id/txt_post_contentAD"
+                        android:src="@drawable/ic_rocket"
+                        tools:ignore="ContentDescription" />
+
                     <!-- Container Post Body -->
                     <!-- Message Body -->
                     <LinearLayout

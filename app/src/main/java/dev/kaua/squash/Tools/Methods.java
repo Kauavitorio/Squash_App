@@ -94,7 +94,7 @@ public abstract class Methods extends MainActivity {
     public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
     public static final String DOMAIN_SHORT_DYNAMIC_LINKS = "https://squashc.com/url/";
-    public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.;])[A-Za-z\\d@$!%*#?&.;]{8,}$";
+    public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?_&.;])[A-Za-z\\d@$!%*#_?&.;]{8,}$";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;
     private static long account_id_hold;
@@ -406,8 +406,9 @@ public abstract class Methods extends MainActivity {
         }
     }
 
-    public static String loadLastSeenUser(Context context, String get_date_time){
+    public static String loadLastSeenUser(final Context context, String get_date_time){
         final Calendar c = Calendar.getInstance();
+        if(get_date_time == null) get_date_time = "";
         String formattedDate = df_time.format(c.getTime());
         try {
             String[] splitDate = formattedDate.split("/");
@@ -572,15 +573,15 @@ public abstract class Methods extends MainActivity {
     }
 
 
-    public static void Profile_From_USERNAME(Activity mContext, String text) {
+    public static void Profile_From_USERNAME(final Activity mContext, String text) {
         if(ConnectionHelper.isOnline(mContext)){
-            DtoAccount account = new DtoAccount();
+            final DtoAccount account = new DtoAccount();
             account.setUsername(text.replace("@", ""));
-            AccountServices services = GetRetrofitBuilder().create(AccountServices.class);
-            Call<DtoPost> call = services.search_with_username(account);
-            LoadingDialog loadingDialog = new LoadingDialog(mContext);
+            final LoadingDialog loadingDialog = new LoadingDialog(mContext);
             loadingDialog.startLoading();
-            call.enqueue(new Callback<DtoPost>() {
+            GetRetrofitBuilder().create(AccountServices.class)
+                    .search_with_username(account)
+                    .enqueue(new Callback<DtoPost>() {
                 @Override
                 public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
                     loadingDialog.dismissDialog();

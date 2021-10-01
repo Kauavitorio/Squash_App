@@ -345,9 +345,9 @@ public class PostDetailsActivity extends AppCompatActivity {
                     });
 
                     //  Do Like or Un Like
-                    DtoPost dtoPost = new DtoPost();
-                    dtoPost.setPost_id(EncryptHelper.encrypt(post_id + ""));
-                    dtoPost.setAccount_id_cry(EncryptHelper.encrypt(user.getAccount_id() + ""));
+                    final DtoPost dtoPost = new DtoPost();
+                    dtoPost.setPost_id(EncryptHelper.encrypt(String.valueOf(post_id)));
+                    dtoPost.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(user.getAccount_id())));
                     PostServices services = retrofit.create(PostServices.class);
                     Call<DtoPost> call = services.like_Un_Like_A_Post(dtoPost);
                     call.enqueue(new Callback<DtoPost>() {
