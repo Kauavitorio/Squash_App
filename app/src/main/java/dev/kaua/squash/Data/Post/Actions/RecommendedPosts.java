@@ -46,7 +46,6 @@ public class RecommendedPosts extends MainFragment {
     private static boolean loaded = false;
     private static DatabaseReference reference_posts;
     static ArrayList<DtoPost> arraylist_base = new ArrayList<>();
-    public static final String BASE_POST_ID = "99999";
 
     //  Method to get RecommendedPosts
     public static void getFeedPosts(@NonNull Activity context, @NonNull RecyclerView recyclerView, ConstraintLayout loadingPanel){
@@ -55,10 +54,10 @@ public class RecommendedPosts extends MainFragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(25);
         if(recyclerView.getLayoutManager() != null) recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
-        DaoPosts daoPosts = new DaoPosts(context);
+        final DaoPosts daoPosts = new DaoPosts(context);
 
         Posts_Adapters posts_adapters;
-        ArrayList<DtoPost> listPostDB = daoPosts.get_post();
+        final ArrayList<DtoPost> listPostDB = daoPosts.get_post();
         posts_adapters = new Posts_Adapters(listPostDB, context);
         SetInRecycler(posts_adapters, recyclerView);
 
@@ -69,10 +68,10 @@ public class RecommendedPosts extends MainFragment {
             reference_posts.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot datasnapshot) {
-                    if(!context.isDestroyed() && !context.isFinishing()){
+                    if(!context.isDestroyed() && !context.isFinishing()) {
                         arraylist_base.clear();
                         for(DataSnapshot snapshot: datasnapshot.getChildren()){
-                            DtoPost post = snapshot.getValue(DtoPost.class);
+                            final DtoPost post = snapshot.getValue(DtoPost.class);
                             if(post != null  && post.getActive() > DtoAccount.ACCOUNT_DISABLE){
                                 if(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))) == MyPrefs.getUserInformation(context).getAccount_id()||
                                         daoFollowing.check_if_follow(MyPrefs.getUserInformation(context).getAccount_id(),
@@ -117,8 +116,6 @@ public class RecommendedPosts extends MainFragment {
             Posts_Adapters posts_adapters;
             ArrayList<DtoPost> listPostDB = daoPosts.get_post();
             if (listPostDB.size() > 0) {
-                Log.d(TAG, "Sizes 01 -> " + arraylist_base.size());
-                Log.d(TAG, "Sizes 02 -> " + SaveList.size());
                 if(ConnectionHelper.isOnline(mContext) && loaded){
                     if(arraylist_base.size() != SaveList.size()){
                         SaveList.clear();

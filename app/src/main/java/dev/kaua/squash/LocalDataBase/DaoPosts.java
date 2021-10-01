@@ -93,7 +93,7 @@ public class DaoPosts extends SQLiteOpenHelper {
         int size = Math.min(post.size(), 100);
         for (int i = 0; i < size; i++){
             if(post.get(i).getPost_type() == DtoPost.NORMAL_POST){
-                ContentValues values = new ContentValues();
+                final ContentValues values = new ContentValues();
                 values.put("post_id", Long.parseLong(Objects.requireNonNull(post.get(i).getPost_id())));
                 values.put("account_id", Long.parseLong(Objects.requireNonNull(post.get(i).getAccount_id())));
                 values.put("verification_level", post.get(i).getVerification_level());

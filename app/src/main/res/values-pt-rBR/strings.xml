@@ -317,4 +317,5 @@
     <string name="delete_story">Excluir Story</string>
     <string name="do_you_really_want_to_delete_this_story_desc">Você realmente deseja deletar este Story?\nIsso resultará na perda das visualizações e não será possível recuperar o Story novamente.</string>
     <string name="no_views_yet">Ainda sem visualizações.</string>
+    <string name="sponsored_post">Post patrocinado</string>
 </resources>

@@ -97,16 +97,16 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     public static final boolean CAN_NOT_ANIME = false;
     private static final String TAG = "POSTS_ADAPTER";
     private static int LayoutType;
+    static final int min = 0;
+    static int max;
+    private static final DtoPost post_ad = new DtoPost(DtoPost.AD_POST);
 
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
     public Posts_Adapters(ArrayList<DtoPost> ArrayList, Activity mContext) {
-        /*DtoPost post_ad = new DtoPost();
-        post_ad.setPost_type(DtoPost.AD_POST);
-        ArrayList<DtoPost> mPostListAD = new ArrayList<>();
-        mPostListAD.add(post_ad);
-        mPostListAD.addAll(ArrayList);
-        this.mPostList = mPostListAD;*/
+        max = ArrayList.size();
+        final int ad_counter = (int) Math.floor(Math.random() * (max - min + 1) + min);
+        if(ConnectionHelper.isOnline(mContext)) ArrayList.add(ad_counter, post_ad);
         this.mPostList = ArrayList;
         instance = this;
         Posts_Adapters.mContext = mContext;
@@ -242,15 +242,19 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
             }
+            
         }else if(LayoutType == DtoPost.AD_POST){
             if(ConnectionHelper.isOnline(mContext)){
-                AdView adView = new AdView(mContext);
-                AdSize adSize = new AdSize(300, 200);
-                adView.setAdSize(adSize);
-                adView.setAdUnitId(mContext.getString(R.string.main_banner));
-                AdRequest adRequest = new AdRequest.Builder().build();
-                adView.loadAd(adRequest);
-                holder.adView_post.addView(adView);
+                if(holder.adView_post != null){
+                    try {
+                        final AdView adView = new AdView(mContext);
+                        adView.setAdSize(new AdSize(300, 200));
+                        adView.setAdUnitId(mContext.getString(R.string.main_banner));
+                        AdRequest adRequest = new AdRequest.Builder().build();
+                        adView.loadAd(adRequest);
+                        holder.adView_post.addView(adView);
+                    }catch (Exception ignore){}
+                }
             }
         }
     }

@@ -341,4 +341,5 @@
     <string name="delete_story">Delete Story</string>
     <string name="do_you_really_want_to_delete_this_story_desc">Do you really want to delete this Story?\nThis will result in loss of views and it will not be possible to get back the Story again.</string>
     <string name="no_views_yet">No views yet.</string>
+    <string name="sponsored_post">Sponsored post</string>
 </resources>

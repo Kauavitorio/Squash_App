@@ -16,16 +16,129 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
-        <com.google.android.gms.ads.AdView
-            xmlns:ads="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/adView_post"
+        <!-- Body -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            ads:adSize="BANNER"
-            ads:adUnitId="@string/main_banner"/>
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent">
+
+            <!-- Image User Profile -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!-- User Profile Image -->
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/icon_user_profile_postAD"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:src="@mipmap/ic_launcher"
+                    app:civ_border_color="@color/base_color"
+                    app:civ_border_width="0dp"/>
+
+            </LinearLayout>
+
+            <!-- Body Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/container_post_adapter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="5dp"
+                    tools:ignore="UselessParent">
+
+                    <!-- Container User Profile Image -->
+                    <LinearLayout
+                        android:id="@+id/container_user_info_post"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:orientation="horizontal"
+                        tools:ignore="UselessParent">
+
+                        <!-- UserName -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLength="25"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:text="@string/app_name" />
+
+                        <!-- Badge Account -->
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginTop="2dp"
+                            android:src="@drawable/ic_verified_account"
+                            tools:ignore="ContentDescription" />
+
+                        <!-- User Username -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginBottom="2dp"
+                            android:maxLength="23"
+                            android:textColor="@color/hint"
+                            android:textSize="13sp"
+                            android:text="@string/app_name" />
+
+                    </LinearLayout>
+
+                    <!-- Text Post Content -->
+                    <TextView
+                        android:id="@+id/txt_post_contentAD"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/container_user_info_post"
+                        android:layout_alignParentStart="true"
+                        android:text="@string/sponsored_post"
+                        android:textColor="@color/hint"
+                        android:textSize="@dimen/post_content_textAD" />
+
+                    <!-- Container Post Body -->
+                    <!-- Message Body -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:orientation="vertical"
+                        android:layout_below="@+id/txt_post_contentAD">
+
+                        <com.google.android.gms.ads.AdView
+                            xmlns:ads="http://schemas.android.com/apk/res-auto"
+                            android:id="@+id/adView_post"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            ads:adSize="BANNER"
+                            android:layout_marginTop="3dp"
+                            ads:adUnitId="@string/main_banner"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 
