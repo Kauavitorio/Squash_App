@@ -115,6 +115,7 @@ public class MainFragment extends Fragment {
                 if(account_follow.getFollowing() != null && following != Long.parseLong(account_follow.getFollowing())) {
                     following = Long.parseLong(account_follow.getFollowing());
                     RefreshRecycler();
+                    readStory();
                 }
             }
         }
@@ -228,7 +229,6 @@ public class MainFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView_Story.setLayoutManager(linearLayoutManager);
         recyclerView_Story.setAdapter(storyAdapter);
-
 
         RefreshRecycler();
         readStory();

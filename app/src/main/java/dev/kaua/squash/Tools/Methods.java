@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -601,6 +602,15 @@ public abstract class Methods extends MainActivity {
                 }
             });
         }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
+    }
+
+    public static int loadUserImageLevel(long level) {
+        if (level == DtoAccount.VERIFY_ACCOUNT)
+            return R.drawable.ic_verified_account;
+        else if(level == DtoAccount.ACCOUNT_IS_STAFF)
+            return R.drawable.ic_verified_employee_account;
+        else
+            return R.drawable.ic_verified_account;
     }
 
     // This method can be used in the future

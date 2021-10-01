@@ -12,6 +12,7 @@ public class DtoStory {
     private String userName;
     private boolean seen;
     private String uploadTime;
+    private String userLevel;
 
     public DtoStory(String imageUrl, long timeStart, long timeEnd, String storyId, String userId) {
         this.imageUrl = imageUrl;
@@ -22,6 +23,14 @@ public class DtoStory {
     }
 
     public DtoStory(){}
+
+    public String getUserLevel() {
+        return userLevel;
+    }
+
+    public void setUserLevel(String userLevel) {
+        this.userLevel = userLevel;
+    }
 
     public String getUserName() {
         return userName;

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activitys.Story.StoryViewsActivity">
+
+    <!-- Story Info -->
+    <LinearLayout
+        android:id="@+id/story_info_views"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_header_main"
+        android:padding="10dp">
+
+        <!-- Views Amount -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Eye Icon -->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_story_view"
+                tools:ignore="ContentDescription" />
+
+            <!-- View Amount -->
+            <TextView
+                android:id="@+id/seen_number_story_views"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="10K"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <!-- No Views -->
+    <TextView
+        android:id="@+id/txt_no_views_yet_story"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/no_views_yet"
+        android:textColor="@color/black"
+        android:textSize="17sp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:textAlignment="center"
+        android:layout_centerInParent="true"/>
+
+    <!-- Loading -->
+    <ProgressBar
+        android:id="@+id/loading_bar_views_stories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <!-- Views recyclerView -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/story_info_views"
+        android:layout_marginTop="3dp">
+
+        <!-- Views Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- User recyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_views_stories"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

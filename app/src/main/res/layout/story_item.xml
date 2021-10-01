@@ -21,12 +21,12 @@
         android:id="@+id/story_photo_seen"
         android:layout_width="65dp"
         android:layout_height="65dp"
-        app:civ_border_width="2dp"
+        app:civ_border_width="3dp"
         android:visibility="gone"
         tools:visibility="visible"
         tools:src="@mipmap/ic_launcher"
         android:layout_gravity="center"
-        app:civ_border_color="@color/custom_toast"/>
+        app:civ_border_color="@color/background_chat_left"/>
 
     <!-- User Name Text -->
     <TextView
@@ -36,7 +36,8 @@
         android:layout_gravity="center"
         android:textSize="@dimen/story_text_username"
         android:maxLines="1"
+        android:maxLength="18"
         android:textColor="@color/black"
-        tools:text="@string/app_name"/>
+        tools:text="systemstrengtht..."/>
 
 </LinearLayout>

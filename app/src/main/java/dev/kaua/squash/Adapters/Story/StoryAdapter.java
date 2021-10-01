@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -31,6 +33,7 @@ import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.MyPrefs;
 
+@SuppressLint("SetTextI18n")
 public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> {
     private static final int BASE_POS = 0;
     private static final String TAG = "STORY_ADAPTER";
@@ -61,7 +64,9 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
         userInfo(holder, story.getUserId(), position);
 
         if(position != BASE_POS)
-            if(holder.story_username != null) holder.story_username.setText(story.getUserName());
+            if(holder.story_username != null) {
+                SetUserName(holder.story_username, story.getUserName());
+            }
 
         if(holder.getAdapterPosition() != BASE_POS){
             if(story.isSeen()){
@@ -78,17 +83,27 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
         }
 
         holder.itemView.setOnClickListener(v -> {
+            holder.itemView.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.click_anim));
             if(holder.getAdapterPosition() == BASE_POS){
                 myStory(holder.addStory_text, holder.story_plus, true);
             }else{
-                Intent i = new Intent(mContext, StoryActivity.class);
+                final Intent i = new Intent(mContext, StoryActivity.class);
                 i.putExtra(StoryActivity.USER_ID_TAG, story.getUserId());
-                i.putExtra(StoryActivity.USERNAME_TAG, holder.story_username.getText());
+                i.putExtra(StoryActivity.USERNAME_TAG, story.getUserName());
                 i.putExtra(StoryActivity.USER_PHOTO_TAG, story.getUserPhoto());
                 i.putExtra(StoryActivity.UPLOAD_TIME_TAG, story.getUploadTime());
+                i.putExtra(StoryActivity.USER_LEVEL_TAG, story.getUserLevel());
                 mContext.startActivity(i);
             }
         });
+
+    }
+
+    void SetUserName(TextView textView, String username){
+        if(username.length() <= 15)
+            textView.setText(username);
+        else
+            textView.setText(username.substring(0, 13) + "...");
 
     }
 
@@ -98,7 +113,8 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public CircleImageView story_photo, story_plus, story_photo_seen;
+        public CircleImageView story_photo, story_photo_seen;
+        public CardView story_plus;
         public TextView story_username,  addStory_text;
 
         public ViewHolder(@NonNull View itemView) {
@@ -132,8 +148,9 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
                             Glide.with(mContext).load(account.getImageURL()).into(viewHolder.story_photo);
                             if(pos != BASE_POS){
                                 mStory.get(pos).setUserPhoto(account.getImageURL());
+                                mStory.get(pos).setUserLevel(EncryptHelper.decrypt(account.getVerification_level()));
                                 Glide.with(mContext).load(account.getImageURL()).into(viewHolder.story_photo_seen);
-                                viewHolder.story_username.setText(account.getUsername());
+                                SetUserName(viewHolder.story_username, account.getUsername());
                             }
                         }
                     }
@@ -146,7 +163,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
         }
     }
 
-    private void myStory(TextView textView, CircleImageView imageView, boolean click){
+    private void myStory(TextView textView, CardView imageView, boolean click){
         myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.STORY_REFERENCE)
                 .child(String.valueOf(MyPrefs.getUserInformation(mContext).getAccount_id())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -172,6 +189,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
                             i.putExtra(StoryActivity.USER_ID_TAG, String.valueOf(MyPrefs.getUserInformation(mContext).getAccount_id()));
                             i.putExtra(StoryActivity.USERNAME_TAG, MyPrefs.getUserInformation(mContext).getUsername());
                             i.putExtra(StoryActivity.USER_PHOTO_TAG, MyPrefs.getUserInformation(mContext).getProfile_image());
+                            i.putExtra(StoryActivity.USER_LEVEL_TAG, MyPrefs.getUserInformation(mContext).getVerification_level());
                             if(finalStory.getUploadTime() != null)
                                 i.putExtra(StoryActivity.UPLOAD_TIME_TAG, finalStory.getUploadTime());
                             else

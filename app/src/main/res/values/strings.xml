@@ -338,4 +338,7 @@
     <string name="deleted">Deleted!</string>
     <string name="unable_to_get_the_image_from_your_device">Unable to get the image from your device, please try again later.</string>
     <string name="there_was_a_problem_registering_your_story">There was a problem registering your Story.</string>
+    <string name="delete_story">Delete Story</string>
+    <string name="do_you_really_want_to_delete_this_story_desc">Do you really want to delete this Story?\nThis will result in loss of views and it will not be possible to get back the Story again.</string>
+    <string name="no_views_yet">No views yet.</string>
 </resources>

@@ -328,11 +328,8 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         if(postInfo.getVerification_level() != null){
             if(Integer.parseInt(postInfo.getVerification_level()) != DtoAccount.NORMAL_ACCOUNT){
                 holder.ic_account_badge.setVisibility(View.VISIBLE);
-                if (Integer.parseInt(postInfo.getVerification_level()) == DtoAccount.VERIFY_ACCOUNT)
-                    holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
-                else
-                    holder.ic_account_badge.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
-
+                final long level = Methods.parseUserLevel(postInfo.getVerification_level());
+                holder.ic_account_badge.setImageDrawable(mContext.getDrawable(Methods.loadUserImageLevel(level)));
             }else holder.ic_account_badge.setVisibility(View.GONE);
 
             if(!mPostList.get(position).isProfile_img_load() ||  !postInfo.getProfile_image().equals(mPostList.get(position).getProfile_image())){

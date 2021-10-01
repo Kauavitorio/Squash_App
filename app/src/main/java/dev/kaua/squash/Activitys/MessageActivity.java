@@ -343,11 +343,8 @@ public class MessageActivity extends AppCompatActivity {
             if(user_im_chat.getVerification_level() != null){
                 final int verified = Methods.parseUserLevel(EncryptHelper.decrypt(user_im_chat.getVerification_level()));
                 if(verified > DtoAccount.NORMAL_ACCOUNT){
+                    verification_ic.setImageDrawable(getDrawable(Methods.loadUserImageLevel(verified)));
                     verification_ic.setVisibility(View.VISIBLE);
-                    if (verified == DtoAccount.ACCOUNT_IS_STAFF)
-                        verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
-                    else
-                        verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
                 }else verification_ic.setVisibility(View.GONE);
             }else verification_ic.setVisibility(View.GONE);
         }

@@ -57,7 +57,7 @@
 
     <!-- User Info Container -->
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/stories"
         android:layout_margin="10dp">
@@ -74,24 +74,26 @@
             android:id="@+id/story_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="@string/username"
+            tools:text="squash"
             android:textStyle="bold"
             android:textSize="16sp"
+            android:maxLength="30"
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
             android:layout_toEndOf="@+id/story_photo_view"
             android:textColor="@color/white"/>
 
-        <!-- Circle Upload Time -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/circle_story_time"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
-            android:layout_marginTop="3dp"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="@color/tab_indicator_gray"
+        <!-- Badge Account -->
+        <ImageView
+            android:id="@+id/ic_account_badge_story"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/story_username"/>
+            android:layout_toEndOf="@+id/story_username"
+            android:src="@drawable/ic_verified_account"
+            tools:ignore="ContentDescription" />
 
         <!-- Upload Time -->
         <TextView
@@ -100,10 +102,10 @@
             android:layout_height="wrap_content"
             tools:text="24h ago"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:layout_centerVertical="true"
-            android:layout_margin="5dp"
-            android:layout_toEndOf="@+id/circle_story_time"
+            android:layout_margin="3dp"
+            android:layout_toEndOf="@+id/ic_account_badge_story"
             android:textColor="@color/tab_indicator_gray"/>
         
     </RelativeLayout>

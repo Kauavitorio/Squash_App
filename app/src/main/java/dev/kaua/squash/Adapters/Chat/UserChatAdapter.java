@@ -170,7 +170,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         holder.itemView.setOnClickListener(v -> {
             try {
                 holder.itemView.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.click_anim));
-                Intent intent = new Intent(mContext, MessageActivity.class);
+                final Intent intent = new Intent(mContext, MessageActivity.class);
                 intent.putExtra(MessageActivity.USER_ID, account.getId());
                 intent.putExtra(MessageActivity.CHAT_ID, account.getChat_id());
                 if(share){
@@ -230,13 +230,10 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     @SuppressLint("UseCompatLoadingForDrawables")
     private void CheckVerification(DtoAccount account, @NonNull ViewHolder holder) {
         if(!mContext.isDestroyed()){
-            if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
+            final long level = Methods.parseUserLevel(EncryptHelper.decrypt(account.getVerification_level()));
+            if(level > DtoAccount.NORMAL_ACCOUNT){
+                holder.verification_ic.setImageDrawable(mContext.getDrawable(Methods.loadUserImageLevel(level)));
                 holder.verification_ic.setVisibility(View.VISIBLE);
-                int verified = Integer.parseInt(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level())));
-                if (verified == DtoAccount.ACCOUNT_IS_STAFF)
-                    holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
-                else
-                    holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
             }else holder.verification_ic.setVisibility(View.GONE);
         }
     }
