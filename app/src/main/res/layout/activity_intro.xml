@@ -21,7 +21,7 @@
             android:id="@+id/textView_intro_title"
             android:layout_width="244dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:text="@string/intro_description"
             android:textAlignment="center"
             android:textAllCaps="true"
@@ -32,6 +32,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Squash Logo -->
         <ImageView
             android:id="@+id/ic_logo_intro"
             android:layout_width="match_parent"
@@ -131,7 +132,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.57" />
+            app:layout_constraintGuide_percent="0.55" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

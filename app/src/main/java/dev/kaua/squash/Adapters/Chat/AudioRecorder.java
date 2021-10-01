@@ -1,4 +1,4 @@
-package dev.kaua.squash.Adapters;
+package dev.kaua.squash.Adapters.Chat;
 
 import java.io.File;
 import java.io.IOException;

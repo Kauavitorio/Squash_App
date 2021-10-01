@@ -15,7 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.charset.StandardCharsets;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Adapters.CaptureAct;
+import dev.kaua.squash.Adapters.User.CaptureAct;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;

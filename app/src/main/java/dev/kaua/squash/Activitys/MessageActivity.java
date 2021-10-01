@@ -65,7 +65,7 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Adapters.AudioRecorder;
+import dev.kaua.squash.Adapters.Chat.AudioRecorder;
 import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
 import dev.kaua.squash.Adapters.Chat.MessageAdapter;
 import dev.kaua.squash.Adapters.Chat.SwipeReply;
@@ -343,11 +343,8 @@ public class MessageActivity extends AppCompatActivity {
             if(user_im_chat.getVerification_level() != null){
                 final int verified = Methods.parseUserLevel(EncryptHelper.decrypt(user_im_chat.getVerification_level()));
                 if(verified > DtoAccount.NORMAL_ACCOUNT){
+                    verification_ic.setImageDrawable(getDrawable(Methods.loadUserImageLevel(verified)));
                     verification_ic.setVisibility(View.VISIBLE);
-                    if (verified == DtoAccount.ACCOUNT_IS_STAFF)
-                        verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_employee_account));
-                    else
-                        verification_ic.setImageDrawable(getDrawable(R.drawable.ic_verified_account));
                 }else verification_ic.setVisibility(View.GONE);
             }else verification_ic.setVisibility(View.GONE);
         }

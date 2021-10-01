@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.davemorrissey.labs.subscaleview.ImageSource;
@@ -68,6 +69,7 @@ public class ViewMediaActivity extends AppCompatActivity {
         Glide.with(this)
                 .asBitmap()
                 .load(image_url)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {

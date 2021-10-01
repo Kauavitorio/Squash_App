@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,14 +62,14 @@ public class LinksAdapter extends RecyclerView.Adapter<LinksAdapter.ViewHolder> 
                     .load(website.getWebSite_Image())
                     .into(new CustomTarget<Bitmap>() {
                         @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
                             RoundedBitmapDrawable img = RoundedBitmapDrawableFactory.create(mContext.getResources(), resource);
                             img.setCornerRadius(25);
                             holder.link_image.setImageDrawable(img);
                         }
 
                         @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                        public void onLoadCleared( Drawable placeholder) {
                         }
                     });
 

@@ -1,4 +1,4 @@
-package dev.kaua.squash.Adapters;
+package dev.kaua.squash.Adapters.User;
 
 import androidx.annotation.NonNull;
 

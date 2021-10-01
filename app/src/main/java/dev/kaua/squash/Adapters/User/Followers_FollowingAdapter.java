@@ -1,4 +1,4 @@
-package dev.kaua.squash.Adapters;
+package dev.kaua.squash.Adapters.User;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -23,7 +23,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activitys.MainActivity;
@@ -79,7 +78,7 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
                         MainActivity.getInstance().GetBundleProfile(bundle);
                         MainActivity.getInstance().CallProfile();
                         ProfileFragment.getInstance().LoadAnotherUser();
-                        ((Activity)mContext).finish();
+                        mContext.finish();
                     }catch (Exception exception){
                         Warnings.showWeHaveAProblem(mContext, ErrorHelper.FOLLOWING_FOLLOWERS_CLICK);
                     }
@@ -121,13 +120,10 @@ public class Followers_FollowingAdapter extends RecyclerView.Adapter<Followers_F
 
                 }else holder.container_follow_adapter_user.setVisibility(View.GONE);
 
-                if(account.getVerification_level() != null && Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(account.getVerification_level()))) > 0){
+                final long level = Methods.parseUserLevel(EncryptHelper.decrypt(account.getVerification_level()));
+                if(level > DtoAccount.NORMAL_ACCOUNT){
+                    holder.verification_ic.setImageDrawable(mContext.getDrawable(Methods.loadUserImageLevel(level)));
                     holder.verification_ic.setVisibility(View.VISIBLE);
-                    final int verified = Methods.parseUserLevel(EncryptHelper.decrypt(account.getVerification_level()));
-                    if (verified == DtoAccount.ACCOUNT_IS_STAFF)
-                        holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_employee_account));
-                    else
-                        holder.verification_ic.setImageDrawable(mContext.getDrawable(R.drawable.ic_verified_account));
                 }else holder.verification_ic.setVisibility(View.GONE);
 
                 holder.img_status.setVisibility(View.GONE);

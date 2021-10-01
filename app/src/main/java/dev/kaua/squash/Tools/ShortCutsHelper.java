@@ -9,8 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
 
 import androidx.annotation.RequiresApi;
 
@@ -71,7 +70,7 @@ public class ShortCutsHelper extends ContextWrapper {
                 .load(MyPrefs.getUserInformation(getApplicationContext()).getProfile_image())
                 .into(new CustomTarget<Bitmap>() {
                     @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                    public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
                         ShortcutInfo mShortcutProfile = CreateShortCut(CreateIntent(PROFILE), getString(R.string.view_profile),
                                 getString(R.string.view_profile), R.drawable.pumpkin_default_image, PROFILE, resource);
                         shortcutInfoList.add(mShortcutProfile);
@@ -80,7 +79,7 @@ public class ShortCutsHelper extends ContextWrapper {
                         mShortcutManager.setDynamicShortcuts(shortcutInfoList);
                     }
                     @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {}
+                    public void onLoadCleared(Drawable placeholder) {}
                 });
     }
 

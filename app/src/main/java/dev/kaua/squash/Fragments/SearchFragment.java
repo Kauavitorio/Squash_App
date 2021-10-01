@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Objects;
 
 import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Adapters.Posts_Adapters;
-import dev.kaua.squash.Adapters.SearchItemArrayAdapter;
+import dev.kaua.squash.Adapters.Posts.Posts_Adapters;
+import dev.kaua.squash.Adapters.User.SearchItemArrayAdapter;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
@@ -222,7 +222,7 @@ public class SearchFragment extends Fragment {
                 currentSize = finalFeedList.size();
                 Collections.shuffle(finalFeedList);
                 Log.d("FeedNotFollow", "Loaded -> " + currentSize);
-                posts_adapters = new Posts_Adapters((ArrayList<DtoPost>) finalFeedList, getActivity());
+                posts_adapters = new Posts_Adapters((ArrayList<DtoPost>) finalFeedList, getActivity(), true);
                 if(finalFeedList.size() > 0) posts_adapters.notifyItemRangeChanged(0, finalFeedList.size()-1);
                 if (finalFeedList.size() <= 0){
                     swipe_post_feed.setVisibility(View.GONE);

@@ -165,10 +165,12 @@ public class ChatsFragment extends Fragment {
                                 DtoAccount account = snapshot.getValue(DtoAccount.class);
                                 if(account != null && account.getId() != null && account.getName_user() != null && account.getName_user().length() > 0){
                                     for(Chatslist chatList : ChatList_List){
-                                        if(account.getId().equals(chatList.getId()) && chatList.getChat_id() != null &&
-                                                !account.getId().equals(myFirebaseHelper.getFirebaseUser().getUid())){
-                                            account.setChat_id(chatList.getChat_id());
-                                            First_List_Accounts.add(account);
+                                        if(myFirebaseHelper.getFirebaseAuth().getUid() != null){
+                                            if(account.getId().equals(chatList.getId()) && chatList.getChat_id() != null &&
+                                                    !account.getId().equals(myFirebaseHelper.getFirebaseUser().getUid())){
+                                                account.setChat_id(chatList.getChat_id());
+                                                First_List_Accounts.add(account);
+                                            }
                                         }
                                     }
                                 }

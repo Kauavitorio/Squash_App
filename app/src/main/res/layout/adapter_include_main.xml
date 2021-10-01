@@ -14,95 +14,8 @@
         android:layout_height="match_parent"
         tools:ignore="UselessParent">
 
-        <!-- Header Story -->
-        <LinearLayout
-            android:id="@+id/header_main"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:orientation="vertical"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <!-- Main Container -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="UselessParent">
-
-                <!-- Container User Story's -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btn_create_new_story_main"
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <!-- Img User Story -->
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/icon_ProfileUser_main"
-                        android:layout_width="55dp"
-                        android:layout_height="55dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_profile_default"
-                        app:civ_border_color="@color/base_color"
-                        app:civ_border_width="1dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <!-- Btn Add new Story -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        app:cardBackgroundColor="@color/base_color"
-                        app:cardCornerRadius="10dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <!-- Img Add Icon -->
-                        <ImageView
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_add"
-                            tools:ignore="ContentDescription,TooDeepLayout" />
-
-
-                    </androidx.cardview.widget.CardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <!-- Container Another Story's -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <!-- Recycler View Story's -->
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycler_another_story"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/loadingPanel"
-            android:layout_below="@+id/header_main"
             android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -165,15 +78,61 @@
         <!-- Posts -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/header_main"
-            android:layout_marginTop="2dp">
+            android:layout_height="match_parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView_Posts"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="visible"/>
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!-- Header Story -->
+                <LinearLayout
+                    android:id="@+id/header_main"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <!-- Main Container -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="UselessParent">
+
+                        <!-- Container Another Story's -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="5dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <!-- Recycler View Story's -->
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/recyclerView_Story"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView_Posts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:visibility="visible"/>
+
+            </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
 

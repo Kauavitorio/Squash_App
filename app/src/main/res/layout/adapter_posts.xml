@@ -61,7 +61,7 @@
                 android:layout_height="45dp"
                 tools:src="@drawable/ic_logo"
                 app:civ_border_color="@color/base_color"
-                app:civ_border_width="1dp"/>
+                app:civ_border_width="0dp"/>
 
             <!-- Ic Arrow Down -->
             <ImageView

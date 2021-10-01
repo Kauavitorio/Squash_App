@@ -259,14 +259,11 @@ public class ProfileFragment extends Fragment {
                                                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
 
                                                 final int verified = Methods.parseUserLevel(EncryptHelper.decrypt(response.body().getVerification_level()));
-                                                if(verified != DtoAccount.NORMAL_ACCOUNT){
-                                                    if (verified == DtoAccount.ACCOUNT_IS_STAFF)
-                                                        ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_employee_account));
-                                                    else
-                                                        ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
+                                                if(verified > DtoAccount.NORMAL_ACCOUNT){
+                                                    ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(Methods.loadUserImageLevel(verified)));
                                                     ic_account_badge_profile.setVisibility(View.VISIBLE);
                                                     BangedAnimation();
-                                                }
+                                                }else ic_account_badge_profile.setVisibility(View.GONE);
 
                                                 btn_menu_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_menu_profile_dot));
                                                 btn_menu_profile.setOnClickListener(v -> Warnings.Sheet_Menu_Profile(requireActivity(), username, account_another_user));
@@ -385,14 +382,11 @@ public class ProfileFragment extends Fragment {
         }
 
         final long verified = Methods.getUserLevel(activity);
-        if(verified != DtoAccount.NORMAL_ACCOUNT){
-            if (verified == DtoAccount.ACCOUNT_IS_STAFF)
-                ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_employee_account));
-            else
-                ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_verified_account));
+        if(verified > DtoAccount.NORMAL_ACCOUNT){
+            ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(Methods.loadUserImageLevel(verified)));
             ic_account_badge_profile.setVisibility(View.VISIBLE);
             BangedAnimation();
-        }
+        }else ic_account_badge_profile.setVisibility(View.GONE);
 
         Glide.with(requireActivity()).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(ic_ProfileUser_profile);

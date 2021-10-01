@@ -17,6 +17,12 @@ public class DtoPost implements Comparable<DtoPost>{
         return posts;
     }
 
+    public DtoPost (int type){
+        this.post_type = type;
+    }
+
+    public DtoPost(){}
+
     private String post_id;
     private int post_type;
     private boolean image_loaded;

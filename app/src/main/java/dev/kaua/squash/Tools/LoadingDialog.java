@@ -45,6 +45,8 @@ public class LoadingDialog {
     }
 
    public void dismissDialog(){
-        if(dialog != null) dialog.dismiss();
+        try {
+            if(dialog != null) dialog.dismiss();
+        }catch (Exception ignore){}
     }
 }

@@ -18,8 +18,6 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 
-import java.util.Locale;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.R;
@@ -27,6 +25,7 @@ import dev.kaua.squash.Security.Localization;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 
+@SuppressLint("StaticFieldLeak")
 public class AboutYourAccountFragment extends Fragment {
     private static final String TAG = "ABOUT_ACCOUNT_LOG";
     TextView username_user, joined_user, based_in_user, account_type_user, account_level_user;
@@ -72,18 +71,17 @@ public class AboutYourAccountFragment extends Fragment {
         if(account_type > DtoAccount.NORMAL_ACCOUNT) account_type_user.setText(getString(R.string.business_account));
         else account_type_user.setText(getString(R.string.personal_account));
 
-        final int verification_type = Integer.parseInt(account.getVerification_level());
-        if(verification_type == DtoAccount.NORMAL_ACCOUNT){
+        final long verification_type = Methods.parseUserLevel(account.getVerification_level());
+        if(verification_type > DtoAccount.NORMAL_ACCOUNT){
+            ic_account_badge_user.setImageDrawable(requireContext().getDrawable(Methods.loadUserImageLevel(verification_type)));
+            ic_account_badge_user.setVisibility(View.VISIBLE);
+            if(verification_type == DtoAccount.VERIFY_ACCOUNT)
+                account_level_user.setText(getString(R.string.your_account_is_verified_accounts_group));
+            else
+                account_level_user.setText(getString(R.string.your_account_is_employee_accounts_group));
+        }else {
             ic_account_badge_user.setVisibility(View.GONE);
             account_level_user.setText(getString(R.string.your_account_is_common_accounts_group));
-        }else if(verification_type == DtoAccount.VERIFY_ACCOUNT){
-            ic_account_badge_user.setVisibility(View.VISIBLE);
-            ic_account_badge_user.setImageDrawable(requireContext().getDrawable(R.drawable.ic_verified_account));
-            account_level_user.setText(getString(R.string.your_account_is_verified_accounts_group));
-        }else{
-            ic_account_badge_user.setVisibility(View.VISIBLE);
-            ic_account_badge_user.setImageDrawable(requireContext().getDrawable(R.drawable.ic_verified_employee_account));
-            account_level_user.setText(getString(R.string.your_account_is_employee_accounts_group));
         }
 
         new Handler().postDelayed(() -> {
