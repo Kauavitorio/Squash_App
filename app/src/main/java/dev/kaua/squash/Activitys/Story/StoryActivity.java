@@ -52,6 +52,7 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
     public static final String USER_PHOTO_TAG = "user_photo_tag";
     public static final String UPLOAD_TIME_TAG = "uploadTime_tag";
     public static final String USER_LEVEL_TAG = "user_level_tag";
+    public static final String FIRST_STORY = "first_story_tag";
 
     int counter = 0;
     long pressTime = 0L;
@@ -98,7 +99,6 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
         setContentView(R.layout.activity_story);
         getWindow().setStatusBarColor(getColor(R.color.black));
         getWindow().setNavigationBarColor(getColor(R.color.black));
-
         storiesProgressView = findViewById(R.id.stories);
         image = findViewById(R.id.story_image);
         story_photo = findViewById(R.id.story_photo_view);
@@ -279,16 +279,29 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
                                     }
                                 }
 
-                                storiesProgressView.setStoriesCount(images.size());
-                                storiesProgressView.setStoryDuration(STORY_DURATION);
-                                storiesProgressView.setStoriesListener(StoryActivity.this);
-                                storiesProgressView.startStories(counter);
-                                LoadStory(images.get(counter));
-                                loading_story.setVisibility(View.GONE);
-                                image.setVisibility(View.VISIBLE);
+                                if(!MyPrefs.getUserInformation(StoryActivity.this).isStory_tutorial()){
+                                    final Intent i = new Intent(StoryActivity.this, StoryPresentationActivity.class);
+                                    i.putExtra(FIRST_STORY, images.get(counter));
+                                    i.putExtra(USER_ID_TAG, userId);
+                                    i.putExtra(UPLOAD_TIME_TAG, getIntent().getStringExtra(UPLOAD_TIME_TAG));
+                                    i.putExtra(USERNAME_TAG, getIntent().getStringExtra(USERNAME_TAG));
+                                    i.putExtra(USER_PHOTO_TAG, getIntent().getStringExtra(USER_PHOTO_TAG));
+                                    i.putExtra(USER_LEVEL_TAG, getIntent().getStringExtra(USER_LEVEL_TAG));
+                                    startActivity(i);
+                                    finish();
+                                }else {
+                                    storiesProgressView.setStoriesCount(images.size());
+                                    storiesProgressView.setStoryDuration(STORY_DURATION);
+                                    storiesProgressView.setStoriesListener(StoryActivity.this);
+                                    storiesProgressView.startStories(counter);
+                                    LoadStory(images.get(counter));
+                                    loading_story.setVisibility(View.GONE);
+                                    image.setVisibility(View.VISIBLE);
+                                    storiesProgressView.pause();
 
-                                addView(storiesId.get(counter));
-                                seenNumber(storiesId.get(counter));
+                                    addView(storiesId.get(counter));
+                                    seenNumber(storiesId.get(counter));
+                                }
                             }
                         }
                         @Override

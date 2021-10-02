@@ -92,6 +92,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="visible"
+                    android:layout_marginBottom="1dp"
                     app:layout_constraintBottom_toBottomOf="parent">
 
                     <!-- Main Container -->
@@ -124,6 +125,12 @@
                     </LinearLayout>
 
                 </LinearLayout>
+
+                <!-- Dividing line -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/dividing_line_main"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerView_Posts"

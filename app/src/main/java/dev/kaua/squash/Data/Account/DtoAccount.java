@@ -10,7 +10,7 @@ public class DtoAccount implements Comparable<DtoAccount>{
     public static final int NORMAL_ACCOUNT = 0;
     public static final int VERIFY_ACCOUNT = 1;
     private long account_id, id_user, verify, status, active, ad_points;
-    private boolean support_visit;
+    private boolean support_visit, story_tutorial;
     private String account_id_cry, id_user_cry, google_auth;
     private String name_user, username, email, phone_user, password, verify_id;
     private String banner_user, profile_image, bio_user, url_user, following, followers, born_date, joined_date;
@@ -43,6 +43,14 @@ public class DtoAccount implements Comparable<DtoAccount>{
         this.last_seen = last_seen;
         this.verification_level = verification_level;
         this.active = active;
+    }
+
+    public boolean isStory_tutorial() {
+        return story_tutorial;
+    }
+
+    public void setStory_tutorial(boolean story_tutorial) {
+        this.story_tutorial = story_tutorial;
     }
 
     public String getGoogle_auth() {

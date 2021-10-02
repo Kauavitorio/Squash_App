@@ -112,7 +112,7 @@ public class RecommendedPosts extends MainFragment {
 
     static ArrayList<DtoPost> FinalList = new ArrayList<>();
     static long list_size = 0;
-    static Posts_Adapters posts_adapters = null;
+    public static Posts_Adapters posts_adapters = null;
     @SuppressLint("NotifyDataSetChanged")
     private static void LoadPostsFromLocal(Activity mContext, RecyclerView recyclerView, ConstraintLayout loadingPanel, @NonNull DaoPosts daoPosts) {
         try {
@@ -128,7 +128,10 @@ public class RecommendedPosts extends MainFragment {
                 if(list_size != FinalList.size()){
                     Log.d(TAG, String.valueOf(FinalList.size()));
                     list_size = FinalList.size();
-                    if(posts_adapters == null) posts_adapters = new Posts_Adapters(FinalList, mContext, true);
+                    if(posts_adapters == null) {
+                        posts_adapters = new Posts_Adapters(FinalList, mContext, true);
+                        Log.d("MAIN_FRAGMENT_LOG", "Set New Post Adapter");
+                    }
                     SetInRecycler(posts_adapters, recyclerView);
                     posts_adapters.notifyDataSetChanged();
                 }

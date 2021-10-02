@@ -78,7 +78,7 @@ public class MainFragment extends Fragment {
     private static DaoAccount db_account;
     private RecyclerView recyclerView_Story;
     private StoryAdapter storyAdapter;
-    private List<DtoStory> storyList = new ArrayList<>();
+    private final List<DtoStory> storyList = new ArrayList<>();
 
     private View view;
     private static DtoAccount account = new DtoAccount();
@@ -148,7 +148,7 @@ public class MainFragment extends Fragment {
         if(ConnectionHelper.isOnline(getContext())){
             int currentVersionCode = BuildConfig.VERSION_CODE;
 
-            reference = myFirebaseHelper.getFirebaseDatabase().getReference("System");
+            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.SYSTEM_REFERENCE);
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -164,6 +164,11 @@ public class MainFragment extends Fragment {
 
                                     if(daoSystem.getPrivacyPolicy() < system.getPrivacy_policy())
                                         Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
+
+                                     MyPrefs.setStoryTutorial(getContext(),
+                                             snapshot.child(myFirebaseHelper.STORY_TUTORIAL_REFERENCE)
+                                             .child(String.valueOf(MyPrefs.getUserInformation(getContext()).getAccount_id()))
+                                             .exists());
                                 }
                             }
                         }
@@ -173,7 +178,6 @@ public class MainFragment extends Fragment {
             });
         }
     }
-
 
     static DaoNotification daoNotification;
     public static void Check_Notification(){
@@ -200,6 +204,8 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        RecommendedPosts.posts_adapters = null;
+        Log.d(TAG, "Set Null Post Adapter");
         super.onDestroy();
     }
 
@@ -242,6 +248,7 @@ public class MainFragment extends Fragment {
         if(ConnectionHelper.isOnline(instance)){
             myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.STORY_REFERENCE)
                     .addValueEventListener(new ValueEventListener() {
+                        @SuppressLint("NotifyDataSetChanged")
                         @Override
                         public void onDataChange(@NonNull DataSnapshot datasnapshot) {
                             if(!instance.isDestroyed() && !instance.isFinishing()){
@@ -262,18 +269,14 @@ public class MainFragment extends Fragment {
                                         }
                                     }
 
-                                    if(countStory > 0){
+                                    if(countStory > 0)
                                         storyList.add(story);
-                                    }
                                 }
                                 storyAdapter.notifyDataSetChanged();
                             }
                         }
-
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
+                        public void onCancelled(@NonNull DatabaseError error) {}
                     });
         }
     }

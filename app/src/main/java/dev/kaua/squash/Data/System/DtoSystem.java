@@ -1,6 +1,7 @@
 package dev.kaua.squash.Data.System;
 
 public class DtoSystem {
+    public static final String Squash_Privacy_Policy = "Squash_Privacy_Policy";
     long versionCode, needUpdate, apiRunning, privacy_policy;
     String versionName;
     String title, link, date_time, webSite_Image, link_display;
@@ -18,6 +19,10 @@ public class DtoSystem {
         this.link = link;
         this.date_time = date_time;
         this.webSite_Image = webSite_Image;
+    }
+
+    public DtoSystem(String title){
+        this.title = title;
     }
 
     public DtoSystem(){}

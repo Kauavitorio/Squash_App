@@ -342,4 +342,15 @@
     <string name="do_you_really_want_to_delete_this_story_desc">Do you really want to delete this Story?\nThis will result in loss of views and it will not be possible to get back the Story again.</string>
     <string name="no_views_yet">No views yet.</string>
     <string name="sponsored_post">Sponsored post</string>
+    <string name="go_forward">Go forward</string>
+    <string name="tap_the_screen">Tap the screen</string>
+    <string name="pause" translatable="false">Pause</string>
+    <string name="press_and_hold">Press and hold</string>
+    <string name="tap_the_left_edge">Tap the left edge</string>
+    <string name="go_back">Go back</string>
+    <string name="watching_stories">Watching Stories</string>
+    <string name="you_can_use_these_gestures_control">You can use these gestures to control playback.</string>
+    <string name="tap_here_to_keep_watching">Tap here to keep Watching</string>
+    <string name="camera_and_storage_permission_required">Camera and Storage Permission required for this function.</string>
+    <string name="go_to_setting_story_perm_request">Camera and stored storage permission for this function.\nGo to settings and enable permissions</string>
 </resources>

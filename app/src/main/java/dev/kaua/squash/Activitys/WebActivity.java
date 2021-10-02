@@ -95,8 +95,14 @@ public class WebActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
 
                 SetUrlLink(url);
-                if(view.getTitle().contains("Squash_Privacy_Policy"))
+                if(view.getTitle().contains(DtoSystem.Squash_Privacy_Policy)) {
                     status_web.setText(getString(R.string.squash_privacy_policy));
+
+                    DtoSystem link = new DtoSystem(DtoSystem.Squash_Privacy_Policy);
+                    daoBrowser.InsertLink(link, WebActivity.this);
+                    FIRST_LOAD = false;
+                }
+
                 else{
                     String web_title = view.getTitle();
                     if(web_title.length() > 40)
@@ -251,7 +257,6 @@ public class WebActivity extends AppCompatActivity {
             @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd/MM/yyyy");
             String formattedDate = df_date.format(Calendar.getInstance().getTime());
             if(websiteTitle != null){
-                FIRST_LOAD = true;
                 Log.e("Property", "Insert -> " +  websiteTitle);
                 DtoSystem link = new DtoSystem(websiteTitle, url_active, formattedDate,
                         ImgUrl);
@@ -260,5 +265,12 @@ public class WebActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        FIRST_LOAD = true;
+        Log.d("MAIN_FRAGMENT_LOG", "Reset FIRST_LOAD");
+        super.onDestroy();
     }
 }
