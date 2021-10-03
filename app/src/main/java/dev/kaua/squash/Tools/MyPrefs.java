@@ -39,7 +39,6 @@ public abstract class MyPrefs {
         account.setEmail(EncryptHelper.decrypt(sp.getString("pref_email", null)));
         account.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
         account.setBanner_user(EncryptHelper.decrypt(sp.getString("pref_banner_user", null)));
-        account.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
         account.setProfile_image(EncryptHelper.decrypt(sp.getString("pref_profile_image", null)));
         account.setBio_user(EncryptHelper.decrypt(sp.getString("pref_bio_user", null)));
         account.setUrl_user(EncryptHelper.decrypt(sp.getString("pref_url_user", null)));

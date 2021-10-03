@@ -68,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:maxWidth="200dp"
-                    tools:text="Squahs App"
+                    tools:text="Squash App"
                     android:textColor="@color/black"
                     android:textSize="18sp" />
 

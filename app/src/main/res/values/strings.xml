@@ -353,4 +353,5 @@
     <string name="tap_here_to_keep_watching">Tap here to keep Watching</string>
     <string name="camera_and_storage_permission_required">Camera and Storage Permission required for this function.</string>
     <string name="go_to_setting_story_perm_request">Camera and stored storage permission for this function.\nGo to settings and enable permissions</string>
+    <string name="your_doogle_account_has_been_linked_squash">Your Google account has been linked with your Squash account.</string>
 </resources>
