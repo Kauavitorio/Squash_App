@@ -268,7 +268,7 @@ public class ProfileFragment extends Fragment {
                                                 if(verified > DtoAccount.NORMAL_ACCOUNT){
                                                     ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(Methods.loadUserImageLevel(verified)));
                                                     ic_account_badge_profile.setVisibility(View.VISIBLE);
-                                                    BangedAnimation();
+                                                    BangedAnimation(verified);
                                                 }else ic_account_badge_profile.setVisibility(View.GONE);
 
                                                 final DtoAccount accountStory = new DtoAccount();
@@ -400,7 +400,7 @@ public class ProfileFragment extends Fragment {
         if(verified > DtoAccount.NORMAL_ACCOUNT){
             ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(Methods.loadUserImageLevel(verified)));
             ic_account_badge_profile.setVisibility(View.VISIBLE);
-            BangedAnimation();
+            BangedAnimation(verified);
         }else ic_account_badge_profile.setVisibility(View.GONE);
 
         Glide.with(requireActivity()).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
@@ -572,21 +572,26 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    void BangedAnimation(){
-        final ObjectAnimator oa1 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 1f, 0f);
-        final ObjectAnimator oa2 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 0f, 1f);
-        oa1.setInterpolator(new DecelerateInterpolator());
-        oa2.setInterpolator(new AccelerateDecelerateInterpolator());
-        oa1.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                oa2.start();
-            }
-        });
-        oa1.setDuration(1500);
-        oa2.setDuration(1500);
-        oa1.start();
+    void BangedAnimation(long level){
+        if(level == DtoAccount.ACCOUNT_IS_STAFF){
+            final ObjectAnimator oa1 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 1f, 0f);
+            final ObjectAnimator oa2 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 0f, 1f);
+            oa1.setInterpolator(new DecelerateInterpolator());
+            oa2.setInterpolator(new AccelerateDecelerateInterpolator());
+            oa1.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    oa2.start();
+                }
+            });
+            oa1.setDuration(1500);
+            oa2.setDuration(1500);
+            oa1.start();
+        }else if(level == DtoAccount.VERIFY_ACCOUNT){
+            ic_account_badge_profile.startAnimation(AnimationUtils.loadAnimation(requireContext() ,R.anim.clockwise_ani));
+        }
+
     }
 
     void SearchStory(long userId, final DtoAccount account){
