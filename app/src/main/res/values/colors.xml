@@ -11,6 +11,7 @@
     <color name="status_off">#bfbfbf</color>
     <color name="tab_indicator_gray">#A8C0C0C0</color>
     <color name="dividing_line_settings">#1AFFFFFF</color>
+    <color name="dividing_line_main">#1A000000</color>
     <color name="background_setting">#0B1929</color>
     <color name="black">#FF000000</color>
     <color name="transparent_black">#66100804</color>

@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import java.net.URL;
 import java.util.ArrayList;
 
-import dev.kaua.squash.Activitys.WebActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
@@ -22,7 +21,7 @@ public class DaoBrowser extends SQLiteOpenHelper {
     private final String TABLE = "TBL_BROWSER";
 
     public DaoBrowser(@Nullable Context context) {
-        super(context, "DB_BROWSER", null, 7);
+        super(context, "DB_BROWSER", null, 8);
     }
 
     @Override
@@ -38,7 +37,7 @@ public class DaoBrowser extends SQLiteOpenHelper {
                 "link String," +
                 "link_display String," +
                 "date_time String," +
-                "webSite_Image String not null)";
+                "webSite_Image String)";
 
         db.execSQL(command);
     }
@@ -60,7 +59,7 @@ public class DaoBrowser extends SQLiteOpenHelper {
                     && myFirebaseHelper.getFirebaseAuth().getUid() != null)
             if(info.getTitle() != null && info.getDate_time() != null && info.getLink() != null
             && info.getLink().length() > 5){
-                ContentValues values = new ContentValues();
+                final ContentValues values = new ContentValues();
                 values.put("id", (getLinks().size() +1));
                 values.put("title", info.getTitle());
                 values.put("link", info.getLink());
@@ -69,6 +68,12 @@ public class DaoBrowser extends SQLiteOpenHelper {
                 values.put("date_time", info.getDate_time());
                 values.put("webSite_Image", info.getWebSite_Image());
                 getWritableDatabase().insert(TABLE, null, values);
+            }else{
+                if(info.getTitle() != null && info.getTitle().equals(DtoSystem.Squash_Privacy_Policy)){
+                    final ContentValues values = new ContentValues();
+                    values.put("title", info.getTitle());
+                    getWritableDatabase().insert(TABLE, null, values);
+                }
             }
         }catch (Exception ignore){}
     }

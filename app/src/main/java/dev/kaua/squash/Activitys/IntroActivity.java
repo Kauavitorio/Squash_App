@@ -176,6 +176,9 @@ public class IntroActivity extends AppCompatActivity {
                                             .addOnCompleteListener((Activity) IntroActivity.this, task -> GoogleAuthHelper.ResetVariable());
                                 }
                                 else{
+                                    ToastHelper.toast(IntroActivity.this,
+                                            getString(R.string.your_doogle_account_has_been_linked_squash),
+                                            ToastHelper.LONG_DURATION);
                                     if(GoogleAuthHelper.isGoogleLogin(IntroActivity.this))
                                         Login.DoLogin(IntroActivity.this,
                                                 Objects.requireNonNull(GoogleSignIn.getLastSignedInAccount(IntroActivity.this)).getEmail(), "");

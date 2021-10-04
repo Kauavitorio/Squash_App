@@ -266,8 +266,12 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     @Override
     public int getItemViewType(int position) {
-        if(!mPostList.contains(post_ad) && loadAd)
-            mPostList.add(ad_counter, post_ad);
+        try {
+            if(!mPostList.contains(post_ad) && loadAd)
+                mPostList.add(ad_counter, post_ad);
+        }catch (Exception ex){
+            Log.d(TAG, ex.getMessage());
+        }
 
         if(mPostList.get(position).getPost_type() == DtoPost.NORMAL_POST)
             return DtoPost.NORMAL_POST;

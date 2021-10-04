@@ -329,13 +329,16 @@ public class Warnings {
 
         if(id == MyPrefs.getUserInformation(context).getAccount_id()){
             sheetView.findViewById(R.id.btn_report_profile).setVisibility(View.GONE);
-            sheetView.findViewById(R.id.btn_options_profile).setVisibility(View.GONE);
             sheetView.findViewById(R.id.btn_your_activity_profile).setVisibility(View.VISIBLE);
         }else{
             sheetView.findViewById(R.id.btn_report_profile).setVisibility(View.VISIBLE);
-            sheetView.findViewById(R.id.btn_options_profile).setVisibility(View.VISIBLE);
             sheetView.findViewById(R.id.btn_your_activity_profile).setVisibility(View.GONE);
         }
+
+        if(Methods.getUserLevel(context) == DtoAccount.ACCOUNT_IS_STAFF)
+            sheetView.findViewById(R.id.btn_options_profile).setVisibility(View.VISIBLE);
+        else
+            sheetView.findViewById(R.id.btn_options_profile).setVisibility(View.GONE);
 
         // Setting Click
         sheetView.findViewById(R.id.btn_setting_profile).setOnClickListener(v -> {

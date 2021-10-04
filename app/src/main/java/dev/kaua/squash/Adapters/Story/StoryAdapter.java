@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
@@ -42,6 +43,9 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     private final DtoAccount mAccount;
     private final List<DtoStory> mStory;
 
+    // Allows to remember the last item shown on screen
+    private int lastPosition = -1;
+
     public StoryAdapter(Context mContext, List<DtoStory> mStory) {
         this.mContext = mContext;
         this.mStory = mStory;
@@ -51,11 +55,10 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if(viewType == BASE_POS){
+        if(viewType == BASE_POS)
             return new ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.add_story_item, parent, false));
-        }else{
+        else
             return new ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.story_item, parent, false));
-        }
     }
 
     @Override
@@ -97,6 +100,9 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
             }
         });
 
+        // Here you apply the animation when the view is bound
+        setAnimation(holder.itemView, position);
+
     }
 
     void SetUserName(TextView textView, String username){
@@ -133,6 +139,17 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     public int getItemViewType(int position) {
         if(position == BASE_POS) return BASE_POS;
         return START_POS;
+    }
+
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 
     private void userInfo(ViewHolder viewHolder, String userId, int pos){

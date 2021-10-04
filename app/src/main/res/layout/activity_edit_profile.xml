@@ -90,12 +90,10 @@
                 <!-- Img User Story -->
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/ic_edit_ProfileUser"
-                    android:layout_width="93dp"
-                    android:layout_height="93dp"
+                    android:layout_width="95dp"
+                    android:layout_height="95dp"
                     android:layout_gravity="center"
                     tools:src="@drawable/ic_logo"
-                    app:civ_border_color="@color/base_color"
-                    app:civ_border_width="1dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

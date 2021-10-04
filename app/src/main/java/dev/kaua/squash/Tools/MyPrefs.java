@@ -39,7 +39,6 @@ public abstract class MyPrefs {
         account.setEmail(EncryptHelper.decrypt(sp.getString("pref_email", null)));
         account.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
         account.setBanner_user(EncryptHelper.decrypt(sp.getString("pref_banner_user", null)));
-        account.setPhone_user(EncryptHelper.decrypt(sp.getString("pref_phone_user", null)));
         account.setProfile_image(EncryptHelper.decrypt(sp.getString("pref_profile_image", null)));
         account.setBio_user(EncryptHelper.decrypt(sp.getString("pref_bio_user", null)));
         account.setUrl_user(EncryptHelper.decrypt(sp.getString("pref_url_user", null)));
@@ -54,6 +53,7 @@ public abstract class MyPrefs {
         account.setVerification_level(account_level);
         account.setAd_points(sp.getLong("pref_ad_points", 0));
         account.setSupport_visit(sp.getBoolean("pref_support_visit", false));
+        account.setStory_tutorial(sp.getBoolean("pref_story_tutorial", false));
         account.setActive(sp.getLong("pref_active", DtoAccount.ACCOUNT_ACTIVE));
         String type_acc = EncryptHelper.decrypt(sp.getString("pref_type_acc", null));
         if(type_acc == null) type_acc = String.valueOf(DtoAccount.NORMAL_ACCOUNT);
@@ -162,5 +162,14 @@ public abstract class MyPrefs {
     public static String getCurrentUser(Context context){
         sp = context.getSharedPreferences(MyPrefs.PREFS_NOTIFICATION, MODE_PRIVATE);
         return sp.getString(CURRENT_USER, NONE_USER);
+    }
+
+    public static void setStoryTutorial(Context context, boolean status) {
+        sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
+
+        //  Add Request prefs
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean("pref_story_tutorial", status);
+        editor.apply();
     }
 }

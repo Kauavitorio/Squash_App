@@ -42,6 +42,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -51,10 +52,12 @@ import dev.kaua.squash.Activitys.MainActivity;
 import dev.kaua.squash.Activitys.MessageActivity;
 import dev.kaua.squash.Activitys.ProfileInfoActivity;
 import dev.kaua.squash.Activitys.QrCodeActivity;
+import dev.kaua.squash.Activitys.Story.StoryActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.Actions.RecommendedPosts;
+import dev.kaua.squash.Data.Stories.DtoStory;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoAccount;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;
@@ -104,6 +107,8 @@ public class ProfileFragment extends Fragment {
     public static long account_another_user = 0, account_id, warn_id, active_level;
     private static int control;
     public static String user_image;
+    private static List<DtoStory> storyList;
+    private static DaoFollowing daoFollowing;
 
     static final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
@@ -198,6 +203,7 @@ public class ProfileFragment extends Fragment {
             , posts_size, account);}
 
     public void LoadAnotherUser(){
+        ic_ProfileUser_profile.setEnabled(false);
         btn_go_chat_profile.setVisibility(View.GONE);
         ic_account_badge_profile.setVisibility(View.GONE);
         Methods.LoadFollowersAndFollowing(requireContext(), 1);
@@ -262,8 +268,16 @@ public class ProfileFragment extends Fragment {
                                                 if(verified > DtoAccount.NORMAL_ACCOUNT){
                                                     ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(Methods.loadUserImageLevel(verified)));
                                                     ic_account_badge_profile.setVisibility(View.VISIBLE);
-                                                    BangedAnimation();
+                                                    BangedAnimation(verified);
                                                 }else ic_account_badge_profile.setVisibility(View.GONE);
+
+                                                final DtoAccount accountStory = new DtoAccount();
+                                                accountStory.setAccount_id(account_another_user);
+                                                accountStory.setUsername(EncryptHelper.decrypt(response.body().getUsername()));
+                                                accountStory.setProfile_image(EncryptHelper.decrypt(response.body().getProfile_image()));
+                                                accountStory.setVerification_level(EncryptHelper.decrypt(response.body().getVerification_level()));
+
+                                                SearchStory(accountStory.getAccount_id(), accountStory);
 
                                                 btn_menu_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_menu_profile_dot));
                                                 btn_menu_profile.setOnClickListener(v -> Warnings.Sheet_Menu_Profile(requireActivity(), username, account_another_user));
@@ -273,9 +287,7 @@ public class ProfileFragment extends Fragment {
                                                 RecommendedPosts.getUsersPosts(requireActivity(), recyclerView_Posts_profile, noPost_profile
                                                         , posts_size, search_account);
 
-
-                                                DaoFollowing daoFollowing = new DaoFollowing(getContext());
-                                                ArrayList<DtoAccount> accounts = daoFollowing.get_followers_following(account_id, Long.parseLong(bundle.getString("account_id")));
+                                                final ArrayList<DtoAccount> accounts = daoFollowing.get_followers_following(account_id, Long.parseLong(bundle.getString("account_id")));
                                                 if(accounts.size() > 0){
                                                     btn_go_chat_profile.setVisibility(View.VISIBLE);
                                                     btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
@@ -360,9 +372,10 @@ public class ProfileFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     public void GetUserInfo(Activity activity) {
+        ic_ProfileUser_profile.setEnabled(false);
         ic_account_badge_profile.setVisibility(View.GONE);
         btn_go_chat_profile.setVisibility(View.GONE);
-        DtoAccount user = MyPrefs.getUserInformation(requireContext());
+        final DtoAccount user = MyPrefs.getUserInformation(requireContext());
         account_id = user.getAccount_id();
         account.setAccount_id(account_id);
         account.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(account_id)));
@@ -370,6 +383,8 @@ public class ProfileFragment extends Fragment {
 
         btn_menu_profile.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_arrow_down_simple));
         btn_menu_profile.setOnClickListener(v -> Warnings.Sheet_Menu_Profile(requireActivity(), username, account_id));
+
+        SearchStory(user.getAccount_id(), user);
 
         DaoAccount db = new DaoAccount(activity);
         DtoAccount account_follow = db.get_followers_following(account_id);
@@ -385,7 +400,7 @@ public class ProfileFragment extends Fragment {
         if(verified > DtoAccount.NORMAL_ACCOUNT){
             ic_account_badge_profile.setImageDrawable(requireActivity().getDrawable(Methods.loadUserImageLevel(verified)));
             ic_account_badge_profile.setVisibility(View.VISIBLE);
-            BangedAnimation();
+            BangedAnimation(verified);
         }else ic_account_badge_profile.setVisibility(View.GONE);
 
         Glide.with(requireActivity()).load(user.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
@@ -425,14 +440,10 @@ public class ProfileFragment extends Fragment {
             }else ToastHelper.toast(requireActivity(), getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
         });
 
-        String followings, followers;
+        String followings = "0", followers = "0";
         if(account_follow != null && account_follow.getFollowing() != null){
             followings = Methods.NumberTrick(Long.parseLong(account_follow.getFollowing()));
             followers = Methods.NumberTrick(Long.parseLong(account_follow.getFollowers()));
-        }
-        else{
-            followings = "0";
-            followers = "0";
         }
 
         EnableOptions(account_id);
@@ -443,7 +454,6 @@ public class ProfileFragment extends Fragment {
 
     void EnableOptions(long id){
         warn_id = id;
-        setHasOptionsMenu(false);
     }
 
     public static String UID_USER_WARN = null;
@@ -511,6 +521,7 @@ public class ProfileFragment extends Fragment {
         instance = this;
         myAnim = AnimationUtils.loadAnimation(requireContext() ,R.anim.click_anim);
         account = MyPrefs.getUserInformation(requireContext());
+        daoFollowing = new DaoFollowing(requireContext());
         btn_menu_profile = view.findViewById(R.id.btn_menu_profile);
         posts_size = view.findViewById(R.id.txt_posts_size_amount_profile);
         btn_go_chat_profile = view.findViewById(R.id.btn_go_chat_profile);
@@ -561,21 +572,101 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    void BangedAnimation(){
-        final ObjectAnimator oa1 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 1f, 0f);
-        final ObjectAnimator oa2 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 0f, 1f);
-        oa1.setInterpolator(new DecelerateInterpolator());
-        oa2.setInterpolator(new AccelerateDecelerateInterpolator());
-        oa1.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                oa2.start();
-            }
-        });
-        oa1.setDuration(1500);
-        oa2.setDuration(1500);
-        oa1.start();
+    void BangedAnimation(long level){
+        if(level == DtoAccount.ACCOUNT_IS_STAFF){
+            final ObjectAnimator oa1 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 1f, 0f);
+            final ObjectAnimator oa2 = ObjectAnimator.ofFloat(ic_account_badge_profile, "scaleX", 0f, 1f);
+            oa1.setInterpolator(new DecelerateInterpolator());
+            oa2.setInterpolator(new AccelerateDecelerateInterpolator());
+            oa1.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    oa2.start();
+                }
+            });
+            oa1.setDuration(1500);
+            oa2.setDuration(1500);
+            oa1.start();
+        }else if(level == DtoAccount.VERIFY_ACCOUNT)
+            ic_account_badge_profile.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.banged_anim));
+    }
+
+    void SearchStory(long userId, final DtoAccount account){
+        if(ic_ProfileUser_profile != null) {
+            ic_ProfileUser_profile.setEnabled(false);
+            ic_ProfileUser_profile.setBorderWidth(0);
+        }
+        if(storyList == null) storyList = new ArrayList<>();
+        if(getContext() != null && getActivity() != null &&
+                ConnectionHelper.isOnline(requireContext())){
+            myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.STORY_REFERENCE).child(String.valueOf(userId))
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @SuppressLint("NotifyDataSetChanged")
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot datasnapshot) {
+                            storyList.clear();
+                            long timeCurrent = System.currentTimeMillis();
+
+                            DtoStory story;
+                            for (DataSnapshot snapshot: datasnapshot.getChildren()){
+                                int countStory = 0;
+                                story = snapshot.getValue(DtoStory.class);
+                                if(story != null){
+                                    if(timeCurrent > story.getTimeStart() && timeCurrent < story.getTimeEnd())
+                                        countStory++;
+                                    story.setSeen(snapshot.child(myFirebaseHelper.STORY_VIEWS)
+                                            .child(String.valueOf(MyPrefs.getUserInformation(requireContext())
+                                                    .getAccount_id())).exists());
+                                }
+                                if(countStory > 0)
+                                    storyList.add(story);
+                            }
+
+                            if(storyList.size() > 0){
+                                final DtoStory lastStory = storyList.get(storyList.size() - 1);
+
+                                if(lastStory != null){
+                                    ic_ProfileUser_profile.setEnabled(true);
+                                    ic_ProfileUser_profile.setBorderWidth(9);
+                                    if(!lastStory.isSeen() && !lastStory.getUserId()
+                                            .equals(String.valueOf(MyPrefs.getUserInformation(requireContext()).getAccount_id()))){
+                                        ic_ProfileUser_profile.setBorderColor(requireContext()
+                                                .getColor(R.color.cards_background));
+                                    }else{
+                                        ic_ProfileUser_profile.setBorderColor(requireContext()
+                                                .getColor(R.color.setting_icons));
+                                    }
+
+                                    ic_ProfileUser_profile.setOnClickListener(v -> {
+                                        ic_ProfileUser_profile.startAnimation(AnimationUtils
+                                                .loadAnimation(requireContext(),R.anim.click_anim));
+                                        final Intent i = new Intent(requireActivity(), StoryActivity.class);
+                                        i.putExtra(StoryActivity.USER_ID_TAG, lastStory.getUserId());
+                                        i.putExtra(StoryActivity.USERNAME_TAG, account.getUsername());
+                                        i.putExtra(StoryActivity.USER_PHOTO_TAG, account.getProfile_image());
+                                        i.putExtra(StoryActivity.UPLOAD_TIME_TAG, lastStory.getUploadTime());
+                                        i.putExtra(StoryActivity.USER_LEVEL_TAG, account.getVerification_level());
+                                        startActivity(i);
+                                    });
+                                }
+
+                            }else{
+                                ic_ProfileUser_profile.setEnabled(false);
+                                ic_ProfileUser_profile.setBorderWidth(0);
+                            }
+
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        storyList = null;
+        super.onDestroy();
     }
 
     @Override

@@ -28,25 +28,23 @@ public class LoadingDialog {
     }
 
     @SuppressLint("InflateParams")
-    public void  startLoading(){
+    public void startLoading(){
         try {
             dialog = new Dialog(activity);
             dialog.setCancelable(false);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.setContentView(R.layout.adapter_custom_loading);
-            LottieAnimationView progressBarDialog = dialog.findViewById(R.id.progressBarDialog);
-
+            final LottieAnimationView progressBarDialog = dialog.findViewById(R.id.progressBarDialog);
             new Handler().postDelayed(() -> progressBarDialog.setSpeed((float) 2.5),6000);
-
             dialog.show();
-        }catch (Exception ex){
+        } catch (Exception ex){
             ToastHelper.toast(activity, ex.getMessage(), ToastHelper.SHORT_DURATION);
         }
     }
 
    public void dismissDialog(){
         try {
-            if(dialog != null) dialog.dismiss();
+            if(dialog != null && dialog.isShowing()) dialog.dismiss();
         }catch (Exception ignore){}
     }
 }
