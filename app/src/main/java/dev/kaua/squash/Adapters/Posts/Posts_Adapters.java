@@ -104,7 +104,7 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
     public Posts_Adapters(ArrayList<DtoPost> ArrayList, Activity mContext, boolean loadAd) {
-        this.loadAd = false;
+        this.loadAd = loadAd;
 
         //  Generate Ad post position
         max = ArrayList.size();

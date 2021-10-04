@@ -588,10 +588,8 @@ public class ProfileFragment extends Fragment {
             oa1.setDuration(1500);
             oa2.setDuration(1500);
             oa1.start();
-        }else if(level == DtoAccount.VERIFY_ACCOUNT){
-            ic_account_badge_profile.startAnimation(AnimationUtils.loadAnimation(requireContext() ,R.anim.clockwise_ani));
-        }
-
+        }else if(level == DtoAccount.VERIFY_ACCOUNT)
+            ic_account_badge_profile.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.banged_anim));
     }
 
     void SearchStory(long userId, final DtoAccount account){
