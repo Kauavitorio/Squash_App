@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Activities.MainActivity;
 import dev.kaua.squash.R;
 
 public class ShortCutsHelper extends ContextWrapper {

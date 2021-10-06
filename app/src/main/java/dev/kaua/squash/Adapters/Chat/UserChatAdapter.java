@@ -28,12 +28,11 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Activitys.MessageActivity;
-import dev.kaua.squash.Activitys.ShareContentActivity;
+import dev.kaua.squash.Activities.MainActivity;
+import dev.kaua.squash.Activities.MessageActivity;
+import dev.kaua.squash.Activities.ShareContentActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;

@@ -8,7 +8,7 @@
     android:fillViewport="true"
     android:scrollbarSize="1dp"
     android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
-    tools:context=".Activitys.TermsAccountActivity">
+    tools:context=".Activities.TermsAccountActivity">
 
     <!-- Header -->
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Activities.MainActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.LocalDataBase.DaoFollowing;

@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Activities.MainActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts_Comment;

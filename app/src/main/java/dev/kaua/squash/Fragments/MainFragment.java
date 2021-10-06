@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import dev.kaua.squash.Activitys.MainActivity;
+import dev.kaua.squash.Activities.MainActivity;
 import dev.kaua.squash.Adapters.Story.StoryAdapter;
 import dev.kaua.squash.BuildConfig;
 import dev.kaua.squash.Data.Account.DtoAccount;

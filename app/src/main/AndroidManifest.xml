@@ -34,46 +34,46 @@
         android:theme="@style/Theme.Squash"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".Activitys.Story.StoryPresentationActivity"
+            android:name=".Activities.Story.StoryPresentationActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.Story.StoryViewsActivity"
+            android:name=".Activities.Story.StoryViewsActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.Story.StoryActivity"
+            android:name=".Activities.Story.StoryActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.Story.AddStoryActivity"
+            android:name=".Activities.Story.AddStoryActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.Setting.FollowAndInvite.FollowAndInviteActivity"
+            android:name=".Activities.Setting.FollowAndInvite.FollowAndInviteActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.Setting.AccountSetting.ChangeSingleInfoActivity"
+            android:name=".Activities.Setting.AccountSetting.ChangeSingleInfoActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.SquashShop.SquashShopActivity"
+            android:name=".Activities.SquashShop.SquashShopActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.AppSupportActivity"
+            android:name=".Activities.AppSupportActivity"
             android:exported="true" />
         <activity
             android:name=".Notifications.NotificationActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.WarnTheUserActivity"
+            android:name=".Activities.WarnTheUserActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.Setting.AccountSettingActivity"
+            android:name=".Activities.Setting.AccountSettingActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.Background.BG_DemonstrationActivity"
+            android:name=".Activities.Background.BG_DemonstrationActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.Background.BackgroundActivity"
+            android:name=".Activities.Background.BackgroundActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.ProfileInfoActivity"
+            android:name=".Activities.ProfileInfoActivity"
             android:exported="true" />
         <activity
             android:name=".Adapters.User.CaptureAct"
@@ -81,26 +81,26 @@
             android:stateNotNeeded="true"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".Activitys.QrCodeActivity"
+            android:name=".Activities.QrCodeActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.DeletePostReportActivity"
+            android:name=".Activities.DeletePostReportActivity"
             android:exported="true" /> <!-- Image Crop Activity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".Activitys.PrivacyPolicyUpdateActivity"
+            android:name=".Activities.PrivacyPolicyUpdateActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.ViewMediaActivity"
+            android:name=".Activities.ViewMediaActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.ForgotPasswordActivity"
+            android:name=".Activities.ForgotPasswordActivity"
             android:exported="true" />
         <activity
-            android:name=".Activitys.Setting.ConnectionUsageActivity"
+            android:name=".Activities.Setting.ConnectionUsageActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
@@ -108,21 +108,21 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activitys.ShareContentActivity" />
-        <activity android:name=".Activitys.Setting.SettingActivity" />
-        <activity android:name=".Activitys.WebActivity" />
-        <activity android:name=".Activitys.PostDetailsActivity" />
-        <activity android:name=".Activitys.EditProfileActivity" />
-        <activity android:name=".Activitys.ComposeActivity" />
-        <activity android:name=".Activitys.MessageActivity" />
-        <activity android:name=".Activitys.SignInActivity" />
-        <activity android:name=".Activitys.IntroActivity" />
-        <activity android:name=".Activitys.SignUpActivity" />
-        <activity android:name=".Activitys.MainActivity" />
-        <activity android:name=".Activitys.ValidateEmailActivity" />
-        <activity android:name=".Activitys.TermsAccountActivity" />
+        <activity android:name=".Activities.ShareContentActivity" />
+        <activity android:name=".Activities.Setting.SettingActivity" />
+        <activity android:name=".Activities.WebActivity" />
+        <activity android:name=".Activities.PostDetailsActivity" />
+        <activity android:name=".Activities.EditProfileActivity" />
+        <activity android:name=".Activities.ComposeActivity" />
+        <activity android:name=".Activities.MessageActivity" />
+        <activity android:name=".Activities.SignInActivity" />
+        <activity android:name=".Activities.IntroActivity" />
+        <activity android:name=".Activities.SignUpActivity" />
+        <activity android:name=".Activities.MainActivity" />
+        <activity android:name=".Activities.ValidateEmailActivity" />
+        <activity android:name=".Activities.TermsAccountActivity" />
         <activity
-            android:name=".Activitys.SplashActivity"
+            android:name=".Activities.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

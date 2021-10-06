@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:scrollbarSize="1dp"
     android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
-    tools:context=".Activitys.PrivacyPolicyUpdateActivity">
+    tools:context=".Activities.PrivacyPolicyUpdateActivity">
 
     <!-- Container -->
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -53,11 +53,11 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Activitys.AppSupportActivity;
-import dev.kaua.squash.Activitys.DeletePostReportActivity;
-import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Activitys.PostDetailsActivity;
-import dev.kaua.squash.Activitys.SquashShop.SquashShopActivity;
+import dev.kaua.squash.Activities.AppSupportActivity;
+import dev.kaua.squash.Activities.DeletePostReportActivity;
+import dev.kaua.squash.Activities.MainActivity;
+import dev.kaua.squash.Activities.PostDetailsActivity;
+import dev.kaua.squash.Activities.SquashShop.SquashShopActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
@@ -144,11 +144,13 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
         if(LayoutType == DtoPost.NORMAL_POST){
 
-            final int valor = position % 2;
-            if(valor == 0)
-                holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_left));
-            else if(valor == 1)
-                holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_right));
+            if(holder.main_container != null){
+                final int valor = position % 2;
+                if(valor == 0)
+                    holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_left));
+                else if(valor == 1)
+                    holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_right));
+            }
 
             LoadBaseInformation(holder, postInfo, position, CAN_NOT_ANIME);
             LoadMentions(holder);

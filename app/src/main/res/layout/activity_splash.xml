@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/base_color"
     android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen"
-    tools:context=".Activitys.SplashActivity">
+    tools:context=".Activities.SplashActivity">
 
     <!-- Image Logo -->
     <ImageView
