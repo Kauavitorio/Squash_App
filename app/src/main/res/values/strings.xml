@@ -56,7 +56,7 @@
     <string name="account_will_not_be_validated_leave">If you leave this page your account will not be validated and you will not be able to login.\nReally want to leave?</string>
     <string name="email_or_username">E-mail or username.</string>
     <string name="login_to_squash">Log in to Squash.</string>
-    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="forgot_your_password">Esqueceu sua senha?</string>
     <string name="login_or_password_invalid">Login or password invalid.</string>
     <string name="squash_corporation">Squash Corporation</string>
     <string name="your_story">Your Story</string>
@@ -353,5 +353,5 @@
     <string name="tap_here_to_keep_watching">Tap here to keep Watching</string>
     <string name="camera_and_storage_permission_required">Camera and Storage Permission required for this function.</string>
     <string name="go_to_setting_story_perm_request">Camera and stored storage permission for this function.\nGo to settings and enable permissions</string>
-    <string name="your_doogle_account_has_been_linked_squash">Your Google account has been linked with your Squash account.</string>
+    <string name="your_google_account_has_been_linked_squash">Your Google account has been linked with your Squash account.</string>
 </resources>

@@ -111,9 +111,9 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         ad_counter = (int) Math.floor(Math.random() * (max - min + 1) + min);
 
         //  Check if post display request can show AD
-        if(this.loadAd)
+        /*if(this.loadAd)
             //  For each post request just can show max of one AD
-            if(ConnectionHelper.isOnline(mContext)) ArrayList.add(ad_counter, post_ad);
+            if(ConnectionHelper.isOnline(mContext)) ArrayList.add(ad_counter, post_ad);*/
 
         this.mPostList = ArrayList;
         instance = this;
@@ -268,12 +268,12 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     @Override
     public int getItemViewType(int position) {
-        try {
+        /*try {
             if(!mPostList.contains(post_ad) && loadAd)
                 mPostList.add(ad_counter, post_ad);
         }catch (Exception ex){
             Log.d(TAG, ex.getMessage());
-        }
+        }*/
 
         if(mPostList.get(position).getPost_type() == DtoPost.NORMAL_POST)
             return DtoPost.NORMAL_POST;

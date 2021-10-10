@@ -10,6 +10,7 @@
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_button_follow.xml" value="0.290625" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_button_follow_disable.xml" value="0.25833333333333336" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_button_following.xml" value="0.290625" />
+        <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_common_top.xml" value="0.25833333333333336" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_fill.xml" value="0.26944444444444443" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_header_main.xml" value="0.2547945205479452" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_left_msg.xml" value="0.2712962962962963" />
@@ -74,6 +75,7 @@
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/activity_story_views.xml" value="0.2439814814814815" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/activity_terms_account.xml" value="0.22592592592592592" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/activity_user_report.xml" value="0.2439814814814815" />
+        <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/activity_validate_email.xml" value="0.2439814814814815" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/activity_view_media.xml" value="0.2" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/activity_warn_the_user.xml" value="0.2439814814814815" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/activity_web.xml" value="0.21944444444444444" />
@@ -100,6 +102,7 @@
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_document_type_selector.xml" value="0.2439814814814815" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_media_action.xml" value="0.2406392694063927" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_menu_base.xml" value="0.24722222222222223" />
+        <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_menu_did_not_receive_email.xml" value="0.2406392694063927" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_menu_post_action.xml" value="0.21944444444444444" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_post_options_share.xml" value="0.2439814814814815" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/layout/adapter_sheet_sort_by.xml" value="0.2439814814814815" />

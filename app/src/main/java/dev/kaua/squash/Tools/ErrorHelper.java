@@ -33,6 +33,7 @@ public abstract class ErrorHelper {
     public static final String FOLLOWING_SHOW_LIST = "30";
     public static final String LOGIN_ACTION = "31";
     public static final String LOGIN_ACTION_PASSWORD_EMAIL_WARNING = "32";
+    public static final String LOGIN_ACTION_RE_CREATE_FIREBASE = "32/S";
     public static final String LOAD_FEED_POSTS = "33";
     public static final String WARN_USER_WITHOUT_ID = "34";
     public static final String WARN_USER_SERVER_ERROR = "35";
