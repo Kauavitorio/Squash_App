@@ -7,7 +7,7 @@
     android:background="#e6e6e6"
     android:orientation="vertical"
     android:id="@+id/message_activity"
-    tools:context=".Activities.MessageActivity">
+    tools:context=".Activities.Chat.MessageActivity">
 
     <!-- Background System -->
     <ImageView

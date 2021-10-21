@@ -26,7 +26,7 @@ import com.bumptech.glide.request.transition.Transition;
 import java.util.List;
 import java.util.Objects;
 
-import dev.kaua.squash.Activities.ViewMediaActivity;
+import dev.kaua.squash.Activities.Medias.ViewMediaActivity;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;

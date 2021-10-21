@@ -47,10 +47,10 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Activities.EditProfileActivity;
+import dev.kaua.squash.Activities.Profile.EditProfileActivity;
 import dev.kaua.squash.Activities.MainActivity;
-import dev.kaua.squash.Activities.MessageActivity;
-import dev.kaua.squash.Activities.ProfileInfoActivity;
+import dev.kaua.squash.Activities.Chat.MessageActivity;
+import dev.kaua.squash.Activities.Profile.ProfileInfoActivity;
 import dev.kaua.squash.Activities.QrCodeActivity;
 import dev.kaua.squash.Activities.Story.StoryActivity;
 import dev.kaua.squash.Data.Account.AccountServices;

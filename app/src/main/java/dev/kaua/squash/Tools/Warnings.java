@@ -31,11 +31,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
-import dev.kaua.squash.Activities.PrivacyPolicyUpdateActivity;
+import dev.kaua.squash.Activities.Auth.PrivacyPolicyUpdateActivity;
 import dev.kaua.squash.Activities.Setting.AccountSettingActivity;
 import dev.kaua.squash.Activities.Setting.SettingActivity;
-import dev.kaua.squash.Activities.SignInActivity;
-import dev.kaua.squash.Activities.WarnTheUserActivity;
+import dev.kaua.squash.Activities.Auth.SignInActivity;
+import dev.kaua.squash.Activities.Admin.WarnTheUserActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Validation.ValidationServices;
 import dev.kaua.squash.Firebase.myFirebaseHelper;

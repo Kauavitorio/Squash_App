@@ -23,7 +23,7 @@ import java.util.Calendar;
 import java.util.Map;
 
 import dev.kaua.squash.Activities.MainActivity;
-import dev.kaua.squash.Activities.MessageActivity;
+import dev.kaua.squash.Activities.Chat.MessageActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;

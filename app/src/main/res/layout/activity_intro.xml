@@ -9,7 +9,7 @@
     android:fillViewport="true"
     android:background="@drawable/background_intro"
     android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
-    tools:context=".Activities.IntroActivity">
+    tools:context=".Activities.Auth.IntroActivity">
 
     <!-- Container -->
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -53,7 +53,7 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import dev.kaua.squash.Activities.MainActivity;
-import dev.kaua.squash.Activities.WebActivity;
+import dev.kaua.squash.Activities.Medias.WebActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.AsyncLikes_Posts;

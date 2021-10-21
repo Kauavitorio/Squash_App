@@ -49,8 +49,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import dev.kaua.squash.Activities.MessageActivity;
-import dev.kaua.squash.Activities.ViewMediaActivity;
+import dev.kaua.squash.Activities.Chat.MessageActivity;
+import dev.kaua.squash.Activities.Medias.ViewMediaActivity;
 import dev.kaua.squash.Data.Message.DtoMessage;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;

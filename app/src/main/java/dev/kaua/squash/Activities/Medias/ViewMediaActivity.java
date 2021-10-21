@@ -1,4 +1,4 @@
-package dev.kaua.squash.Activities;
+package dev.kaua.squash.Activities.Medias;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

@@ -20,7 +20,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.Objects;
 
-import dev.kaua.squash.Activities.MessageActivity;
+import dev.kaua.squash.Activities.Chat.MessageActivity;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.R;

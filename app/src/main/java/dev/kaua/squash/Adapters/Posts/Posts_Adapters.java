@@ -54,9 +54,9 @@ import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activities.AppSupportActivity;
-import dev.kaua.squash.Activities.DeletePostReportActivity;
+import dev.kaua.squash.Activities.Admin.DeletePostReportActivity;
 import dev.kaua.squash.Activities.MainActivity;
-import dev.kaua.squash.Activities.PostDetailsActivity;
+import dev.kaua.squash.Activities.Posts.PostDetailsActivity;
 import dev.kaua.squash.Activities.SquashShop.SquashShopActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;

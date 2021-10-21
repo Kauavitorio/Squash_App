@@ -33,9 +33,9 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import dev.kaua.squash.Activities.MainActivity;
-import dev.kaua.squash.Activities.SignInActivity;
+import dev.kaua.squash.Activities.Auth.SignInActivity;
 import dev.kaua.squash.Activities.SplashActivity;
-import dev.kaua.squash.Activities.ValidateEmailActivity;
+import dev.kaua.squash.Activities.Auth.ValidateEmailActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;

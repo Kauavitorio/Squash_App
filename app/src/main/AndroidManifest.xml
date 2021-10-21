@@ -52,16 +52,13 @@
             android:name=".Activities.Setting.AccountSetting.ChangeSingleInfoActivity"
             android:exported="true" />
         <activity
-            android:name=".Activities.SquashShop.SquashShopActivity"
-            android:exported="true" />
-        <activity
             android:name=".Activities.AppSupportActivity"
             android:exported="true" />
         <activity
             android:name=".Notifications.NotificationActivity"
             android:exported="true" />
         <activity
-            android:name=".Activities.WarnTheUserActivity"
+            android:name=".Activities.Admin.WarnTheUserActivity"
             android:exported="true" />
         <activity
             android:name=".Activities.Setting.AccountSettingActivity"
@@ -73,7 +70,7 @@
             android:name=".Activities.Background.BackgroundActivity"
             android:exported="true" />
         <activity
-            android:name=".Activities.ProfileInfoActivity"
+            android:name=".Activities.Profile.ProfileInfoActivity"
             android:exported="true" />
         <activity
             android:name=".Adapters.User.CaptureAct"
@@ -84,20 +81,20 @@
             android:name=".Activities.QrCodeActivity"
             android:exported="true" />
         <activity
-            android:name=".Activities.DeletePostReportActivity"
+            android:name=".Activities.Admin.DeletePostReportActivity"
             android:exported="true" /> <!-- Image Crop Activity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".Activities.PrivacyPolicyUpdateActivity"
+            android:name=".Activities.Auth.PrivacyPolicyUpdateActivity"
             android:exported="true" />
         <activity
-            android:name=".Activities.ViewMediaActivity"
+            android:name=".Activities.Medias.ViewMediaActivity"
             android:exported="true" />
         <activity
-            android:name=".Activities.ForgotPasswordActivity"
+            android:name=".Activities.Auth.ForgotPasswordActivity"
             android:exported="true" />
         <activity
             android:name=".Activities.Setting.ConnectionUsageActivity"
@@ -108,19 +105,19 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.ShareContentActivity" />
+        <activity android:name=".Activities.Chat.ShareContentActivity" />
         <activity android:name=".Activities.Setting.SettingActivity" />
-        <activity android:name=".Activities.WebActivity" />
-        <activity android:name=".Activities.PostDetailsActivity" />
-        <activity android:name=".Activities.EditProfileActivity" />
-        <activity android:name=".Activities.ComposeActivity" />
-        <activity android:name=".Activities.MessageActivity" />
-        <activity android:name=".Activities.SignInActivity" />
-        <activity android:name=".Activities.IntroActivity" />
-        <activity android:name=".Activities.SignUpActivity" />
+        <activity android:name=".Activities.Medias.WebActivity" />
+        <activity android:name=".Activities.Posts.PostDetailsActivity" />
+        <activity android:name=".Activities.Profile.EditProfileActivity" />
+        <activity android:name=".Activities.Posts.ComposeActivity" />
+        <activity android:name=".Activities.Chat.MessageActivity" />
+        <activity android:name=".Activities.Auth.SignInActivity" />
+        <activity android:name=".Activities.Auth.IntroActivity" />
+        <activity android:name=".Activities.Auth.SignUpActivity" />
         <activity android:name=".Activities.MainActivity" />
-        <activity android:name=".Activities.ValidateEmailActivity" />
-        <activity android:name=".Activities.TermsAccountActivity" />
+        <activity android:name=".Activities.Auth.ValidateEmailActivity" />
+        <activity android:name=".Activities.Auth.TermsAccountActivity" />
         <activity
             android:name=".Activities.SplashActivity"
             android:exported="true">

@@ -14,6 +14,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import dev.kaua.squash.Activities.Auth.IntroActivity;
+import dev.kaua.squash.Activities.Auth.SignInActivity;
+import dev.kaua.squash.Activities.Auth.ValidateEmailActivity;
+import dev.kaua.squash.Activities.Posts.PostDetailsActivity;
 import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;

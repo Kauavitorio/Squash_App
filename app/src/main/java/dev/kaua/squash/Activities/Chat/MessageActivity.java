@@ -1,4 +1,4 @@
-package dev.kaua.squash.Activities;
+package dev.kaua.squash.Activities.Chat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -65,6 +65,7 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Activities.MainActivity;
 import dev.kaua.squash.Adapters.Chat.AudioRecorder;
 import dev.kaua.squash.Adapters.Chat.BackgroundHelper;
 import dev.kaua.squash.Adapters.Chat.MessageAdapter;

@@ -1,6 +1,6 @@
 package dev.kaua.squash.Activities;
 
-import static dev.kaua.squash.Activities.MessageActivity.OPEN_CAMERA;
+import static dev.kaua.squash.Activities.Chat.MessageActivity.OPEN_CAMERA;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;

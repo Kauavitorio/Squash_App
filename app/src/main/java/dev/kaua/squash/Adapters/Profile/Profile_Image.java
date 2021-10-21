@@ -15,7 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
-import dev.kaua.squash.Activities.EditProfileActivity;
+import dev.kaua.squash.Activities.Profile.EditProfileActivity;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.CompressImage;

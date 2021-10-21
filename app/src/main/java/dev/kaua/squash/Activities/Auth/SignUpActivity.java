@@ -1,4 +1,4 @@
-package dev.kaua.squash.Activities;
+package dev.kaua.squash.Activities.Auth;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;

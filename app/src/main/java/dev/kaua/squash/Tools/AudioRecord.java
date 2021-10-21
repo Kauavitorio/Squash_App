@@ -9,7 +9,7 @@ import android.widget.FrameLayout;
 
 import androidx.core.content.ContextCompat;
 
-import dev.kaua.squash.Activities.MessageActivity;
+import dev.kaua.squash.Activities.Chat.MessageActivity;
 import dev.kaua.squash.Adapters.Chat.ViewProxy;
 
 public class AudioRecord extends MessageActivity {

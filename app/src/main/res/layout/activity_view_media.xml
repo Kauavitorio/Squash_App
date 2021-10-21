@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/background_setting"
-    tools:context=".Activities.ViewMediaActivity">
+    tools:context=".Activities.Medias.ViewMediaActivity">
 
     <!-- Image View -->
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
