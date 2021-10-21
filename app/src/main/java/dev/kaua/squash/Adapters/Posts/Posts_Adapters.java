@@ -53,11 +53,11 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Activitys.AppSupportActivity;
-import dev.kaua.squash.Activitys.DeletePostReportActivity;
-import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Activitys.PostDetailsActivity;
-import dev.kaua.squash.Activitys.SquashShop.SquashShopActivity;
+import dev.kaua.squash.Activities.AppSupportActivity;
+import dev.kaua.squash.Activities.DeletePostReportActivity;
+import dev.kaua.squash.Activities.MainActivity;
+import dev.kaua.squash.Activities.PostDetailsActivity;
+import dev.kaua.squash.Activities.SquashShop.SquashShopActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
@@ -111,9 +111,9 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         ad_counter = (int) Math.floor(Math.random() * (max - min + 1) + min);
 
         //  Check if post display request can show AD
-        if(this.loadAd)
+        /*if(this.loadAd)
             //  For each post request just can show max of one AD
-            if(ConnectionHelper.isOnline(mContext)) ArrayList.add(ad_counter, post_ad);
+            if(ConnectionHelper.isOnline(mContext)) ArrayList.add(ad_counter, post_ad);*/
 
         this.mPostList = ArrayList;
         instance = this;
@@ -144,11 +144,13 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
         if(LayoutType == DtoPost.NORMAL_POST){
 
-            final int valor = position % 2;
-            if(valor == 0)
-                holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_left));
-            else if(valor == 1)
-                holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_right));
+            if(holder.main_container != null){
+                final int valor = position % 2;
+                if(valor == 0)
+                    holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_left));
+                else if(valor == 1)
+                    holder.main_container.setBackground(mContext.getDrawable(R.drawable.background_post_right));
+            }
 
             LoadBaseInformation(holder, postInfo, position, CAN_NOT_ANIME);
             LoadMentions(holder);
@@ -266,12 +268,12 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     @Override
     public int getItemViewType(int position) {
-        try {
+        /*try {
             if(!mPostList.contains(post_ad) && loadAd)
                 mPostList.add(ad_counter, post_ad);
         }catch (Exception ex){
             Log.d(TAG, ex.getMessage());
-        }
+        }*/
 
         if(mPostList.get(position).getPost_type() == DtoPost.NORMAL_POST)
             return DtoPost.NORMAL_POST;

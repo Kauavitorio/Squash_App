@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="5dp"
-    tools:context=".Activitys.Setting.FollowAndInvite.FollowAndInviteActivity">
+    tools:context=".Activities.Setting.FollowAndInvite.FollowAndInviteActivity">
 
     <!-- Invite in WhatsApp -->
     <LinearLayout

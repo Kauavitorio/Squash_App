@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/background_setting"
-    tools:context=".Activitys.Setting.ConnectionUsageActivity">
+    tools:context=".Activities.Setting.ConnectionUsageActivity">
 
     <!-- Header -->
     <com.google.android.material.appbar.AppBarLayout

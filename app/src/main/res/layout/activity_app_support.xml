@@ -7,7 +7,7 @@
     android:fillViewport="true"
     android:orientation="vertical"
     android:animateLayoutChanges="true"
-    tools:context=".Activitys.AppSupportActivity">
+    tools:context=".Activities.AppSupportActivity">
 
     <!-- Toolbar Header -->
     <androidx.appcompat.widget.Toolbar

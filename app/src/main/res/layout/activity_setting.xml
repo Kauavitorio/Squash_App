@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Activitys.Setting.SettingActivity">
+    tools:context=".Activities.Setting.SettingActivity">
 
     <!-- Header -->
     <com.google.android.material.appbar.AppBarLayout

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Activitys.Setting.AccountSettingActivity">
+    tools:context=".Activities.Setting.AccountSettingActivity">
 
     <!-- Header -->
     <androidx.appcompat.widget.Toolbar

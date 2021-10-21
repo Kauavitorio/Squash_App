@@ -40,7 +40,7 @@ public class EncryptHelper {
 
     private static byte[] encrypt(byte[] data) {
         try {
-            Cipher cipher = Cipher.getInstance(StorageKeys.ALGORITHM);
+            final Cipher cipher = Cipher.getInstance(StorageKeys.ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, getEncryptionKey());
             return cipher.doFinal(data);
         } catch (Exception e) {
@@ -89,7 +89,8 @@ public class EncryptHelper {
 
     private static Key getEncryptionKey() {
         try {
-            return new SecretKeySpec(MessageDigest.getInstance("MD5").digest(StorageKeys.KEY_BYTES), "AES");
+            return new SecretKeySpec(MessageDigest.getInstance(StorageKeys.ALGORITHM_DIGEST)
+                    .digest(StorageKeys.getKeyBytesSocial()), StorageKeys.ALGORITHM_TAG);
         } catch (NoSuchAlgorithmException e) {
             throw new Error("failed to get encryption key", e);
         }

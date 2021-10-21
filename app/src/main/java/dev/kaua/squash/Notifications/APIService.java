@@ -10,7 +10,7 @@ public interface APIService {
     @Headers({
 
             "Content-Type:application/json",
-            "Authorization:key=" + StorageKeys.NOTIFICATION_KEY
+            "Authorization:key=" + StorageKeys.NOTIFICATION_KEY_SOCIAL
     })
 
     @POST("fcm/send")

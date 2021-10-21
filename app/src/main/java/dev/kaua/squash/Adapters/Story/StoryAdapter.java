@@ -25,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Activitys.Story.AddStoryActivity;
-import dev.kaua.squash.Activitys.Story.StoryActivity;
+import dev.kaua.squash.Activities.Story.AddStoryActivity;
+import dev.kaua.squash.Activities.Story.StoryActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Stories.DtoStory;
 import dev.kaua.squash.Firebase.myFirebaseHelper;

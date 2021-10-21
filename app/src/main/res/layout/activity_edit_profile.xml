@@ -10,7 +10,7 @@
     android:scrollbarSize="1dp"
     android:theme="@style/EditsLoginAndSignUp"
     android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
-    tools:context=".Activitys.EditProfileActivity">
+    tools:context=".Activities.EditProfileActivity">
 
     <!-- Main Container -->
     <RelativeLayout

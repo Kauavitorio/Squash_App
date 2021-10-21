@@ -7,18 +7,13 @@ import androidx.annotation.NonNull;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
-import dev.kaua.squash.Activitys.PostDetailsActivity;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
-import dev.kaua.squash.R;
-import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.Methods;
-import dev.kaua.squash.Tools.Warnings;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

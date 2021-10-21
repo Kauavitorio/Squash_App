@@ -17,6 +17,7 @@ import androidx.core.app.ActivityOptionsCompat;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,10 +32,10 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Objects;
 
-import dev.kaua.squash.Activitys.MainActivity;
-import dev.kaua.squash.Activitys.SignInActivity;
-import dev.kaua.squash.Activitys.SplashActivity;
-import dev.kaua.squash.Activitys.ValidateEmailActivity;
+import dev.kaua.squash.Activities.MainActivity;
+import dev.kaua.squash.Activities.SignInActivity;
+import dev.kaua.squash.Activities.SplashActivity;
+import dev.kaua.squash.Activities.ValidateEmailActivity;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
@@ -65,11 +66,14 @@ import retrofit2.Retrofit;
  *  @author Kaua Vitorio
  **/
 
+@SuppressLint("SimpleDateFormat")
 public abstract class Login extends SignInActivity{
     @SuppressLint("StaticFieldLeak")
     private static LoadingDialog loadingDialog;
     private static FirebaseAuth mAuth;
     private final static String TAG = "LOGIN_ACTIONS";
+    private static final SimpleDateFormat df = new SimpleDateFormat("MMMM dd");
+    private static final SimpleDateFormat df_time = new SimpleDateFormat("HH:mm a z");
 
     //  Set preferences
     private static SharedPreferences mPrefs;
@@ -78,8 +82,8 @@ public abstract class Login extends SignInActivity{
 
     static final Retrofit retrofitUser = Methods.GetRetrofitBuilder();
 
-    public static void DoLogin(Context context, String login_method, String password){
-        loadingDialog = new LoadingDialog((Activity) context);
+    public static void DoLogin(Context mContext, String login_method, String password){
+        loadingDialog = new LoadingDialog((Activity) mContext);
         loadingDialog.startLoading();
 
         //  Getting user mobile information and date time
@@ -87,14 +91,12 @@ public abstract class Login extends SignInActivity{
         Calendar c = Calendar.getInstance();
         Log.d(TAG, "Current time => "+c.getTime());
 
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("MMMM dd");
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("HH:mm a z");
         String formattedDate = df.format(c.getTime()) + " at " + df_time.format(c.getTime());
         Log.d(TAG, "Current date => "+ formattedDate);
 
         String encrypt_password = EncryptHelper.encrypt(EncryptHelper.encrypt(password));
         final String placed = Methods.shuffle(Methods.RandomCharacters(Methods.getRandomAmount()));
-        String ip = ConnectionHelper.getIp(context);
+        String ip = ConnectionHelper.getIp(mContext);
         ip =  Objects.requireNonNull(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(EncryptHelper.encrypt(ip)))))
                 .replace("+", "XXXX7").replace("/", "XXXX1").replace("==", "XXXX9") + placed;
         encrypt_password = placed + encrypt_password;
@@ -104,7 +106,7 @@ public abstract class Login extends SignInActivity{
                 ip);
         final AccountServices login_service = retrofitUser.create(AccountServices.class);
         Call<DtoAccount> call;
-        if(!GoogleAuthHelper.isGoogleLogin(context)) call = login_service.login(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
+        if(!GoogleAuthHelper.isGoogleLogin(mContext)) call = login_service.login(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
         else
             call = login_service.login_with_Google(account, Methods.RandomCharactersWithoutSpecials(Methods.getRandomAmount()));
         call.enqueue(new Callback<DtoAccount>() {
@@ -115,12 +117,12 @@ public abstract class Login extends SignInActivity{
                     loadingDialog.dismissDialog();
                     new Handler().postDelayed(() -> loadingDialog.startLoading(), 100);
                     //  Clear all prefs before login user
-                    mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+                    mPrefs = mContext.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
 
                     if(response.body() != null && response.body().getActive() > DtoAccount.ACCOUNT_DISABLE){
                         try {
-                            txt_login_title.setText(context.getString(R.string.welcome));
+                            txt_login_title.setText(mContext.getString(R.string.welcome));
                         }catch (Exception ex){
                             Log.d(TAG, ex.toString());
                         }
@@ -149,8 +151,8 @@ public abstract class Login extends SignInActivity{
                         editor.apply();
 
                         //  Getting Followers and Followings
-                        Methods.LoadFollowersAndFollowing(context, 0);
-                        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow((Activity) context);
+                        Methods.LoadFollowersAndFollowing(mContext, 0);
+                        AsyncUser_Follow asyncUser_follow = new AsyncUser_Follow((Activity) mContext);
                         //noinspection unchecked
                         asyncUser_follow.execute();
 
@@ -159,72 +161,129 @@ public abstract class Login extends SignInActivity{
                         mAuth.signOut();
 
                         //  Init Analytics
-                        mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(context);
+                        mFirebaseAnalytics = myFirebaseHelper.getFirebaseAnalytics(mContext);
 
                         //  Login user in firebase to get user instance
                         mAuth.signInWithEmailAndPassword(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail())), Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
                                 .addOnCompleteListener(task -> {
-                                    Log.d(TAG, "Login Ok");
-                                    Log.d(TAG, "User " + mAuth.getUid());
+                                    if(task.isSuccessful()){
+                                        Log.d(TAG, "Login Ok");
+                                        Log.d(TAG, "User " + mAuth.getUid());
 
-                                    DaoNotification daoNotification = new DaoNotification(context);
-                                    daoNotification.Register_User(mAuth.getUid());
+                                        DaoNotification daoNotification = new DaoNotification(mContext);
+                                        daoNotification.Register_User(mAuth.getUid());
 
-                                    //  Creating analytic for login event
-                                    Bundle bundle_Analytics = new Bundle();
-                                    bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, mAuth.getUid());
-                                    bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
-                                    bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
-                                    mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle_Analytics);
+                                        //  Creating analytic for login event
+                                        Bundle bundle_Analytics = new Bundle();
+                                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_ID, mAuth.getUid());
+                                        bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(response.body().getUsername()));
+                                        bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+                                        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle_Analytics);
 
-                                    //  Go To main
-                                    new Handler().postDelayed(() -> {
-                                        final Intent i = new Intent(context, MainActivity.class);
-                                        i.putExtra("shared", 0);
-                                        ActivityCompat.startActivity(context, i, ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_left_go, R.anim.move_to_right_go).toBundle());
-                                        ((Activity) context).finish();
-                                        try {
-                                            new Handler().postDelayed(() -> loadingDialog.dismissDialog(), 300);
-                                        }catch (Exception ex){
-                                            Log.d(TAG, ex.toString());
-                                        }
-                                    }, 1000);
+                                        //  Go To main
+                                        new Handler().postDelayed(() -> {
+                                            final Intent i = new Intent(mContext, MainActivity.class);
+                                            i.putExtra("shared", 0);
+                                            ActivityCompat.startActivity(mContext, i, ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go).toBundle());
+                                            ((Activity) mContext).finish();
+                                            try {
+                                                new Handler().postDelayed(() -> loadingDialog.dismissDialog(), 300);
+                                            }catch (Exception ex){
+                                                Log.d(TAG, ex.toString());
+                                            }
+                                        }, 1000);
+
+                                    }else {
+                                        Log.d(TAG, "Recreate user account in Firebase");
+                                        final String emailAp = Objects.requireNonNull(EncryptHelper.decrypt(response.body().getEmail()));
+                                        mAuth.createUserWithEmailAndPassword(emailAp, Objects.requireNonNull(EncryptHelper.decrypt(response.body().getToken())))
+                                                .addOnCompleteListener(task1 -> {
+                                                    if(task1.isSuccessful()){
+
+                                                        FirebaseUser user = mAuth.getCurrentUser();
+                                                        Log.w("Auth", "OK" + user);
+
+                                                        String userId = user.getUid();
+
+                                                        Calendar c = Calendar.getInstance();
+                                                        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
+                                                        String formattedDate = df_time.format(c.getTime());
+
+                                                        //  Register new user on Firebase Database
+                                                        reference = myFirebaseHelper.getFirebaseDatabase().getReference("Users").child(userId);
+                                                        HashMap<String, String> hashMap = new HashMap<>();
+                                                        hashMap.put("id", userId);
+                                                        assert response.body() != null;
+                                                        hashMap.put("username", EncryptHelper.decrypt(response.body().getUsername()));
+                                                        hashMap.put("name_user", EncryptHelper.decrypt(response.body().getName_user()));
+                                                        hashMap.put("search", EncryptHelper.decrypt(response.body().getUsername()));
+                                                        hashMap.put("account_id_cry", response.body().getAccount_id_cry());
+                                                        hashMap.put("imageURL", "default");
+                                                        hashMap.put("status_chat", "offline");
+                                                        hashMap.put("last_seen", formattedDate);
+                                                        hashMap.put("typingTo", "noOne");
+
+                                                        final DtoAccount follow = new DtoAccount();
+                                                        follow.setAccount_id_cry(response.body().getAccount_id_cry());
+                                                        follow.setAccount_id_following(EncryptHelper.encrypt("25"));
+                                                        AccountServices services = retrofitUser.create(AccountServices.class);
+                                                        Call<DtoAccount> call_follow = services.follow_a_user(follow);
+                                                        call_follow.enqueue(new Callback<DtoAccount>() {
+                                                            @Override
+                                                            public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {}
+                                                            @Override
+                                                            public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {}
+                                                        });
+
+                                                        reference.setValue(hashMap).addOnCompleteListener(task2 -> {
+                                                            loadingDialog.dismissDialog();
+                                                            if(task2.isSuccessful()) {
+                                                                Log.d("User", "Register in Realtime database Successful");
+                                                                DoLogin(mContext, emailAp, password);
+                                                            }else Warnings.showWeHaveAProblem(mContext, ErrorHelper.LOGIN_ACTION_RE_CREATE_FIREBASE);
+                                                        });
+                                                    }else{
+                                                        loadingDialog.dismissDialog();
+                                                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.LOGIN_ACTION_RE_CREATE_FIREBASE);
+                                                    }
+                                                });
+                                    }
                                 });
-                    }else LogOut(context, LOGOUT_STATUS_WITHOUT_FLAG, DISABLE_ACCOUNT);
+                    }else LogOut(mContext, LOGOUT_STATUS_WITHOUT_FLAG, DISABLE_ACCOUNT);
 
                 }else if(response.code() == 206){
                     Log.d(TAG, "Email not validated");
                     loadingDialog.dismissDialog();
-                    mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+                    mPrefs = mContext.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
-                    Intent i = new Intent(context, ValidateEmailActivity.class);
-                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context,R.anim.move_to_left_go, R.anim.move_to_right_go);
+                    Intent i = new Intent(mContext, ValidateEmailActivity.class);
+                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext,R.anim.move_to_left_go, R.anim.move_to_right_go);
                     //noinspection ConstantConditions
                     i.putExtra(ValidateEmailActivity.ACCOUNT_ID_ID, EncryptHelper.decrypt(response.body().getAccount_id_cry()));
                     i.putExtra(ValidateEmailActivity.LOGIN_METHOD_ID, login_method);
                     i.putExtra(ValidateEmailActivity.PASSWORD_ID, password);
                     i.putExtra(ValidateEmailActivity.TYPE_VALIDATE_ID, 1);
-                    ActivityCompat.startActivity(context, i, activityOptionsCompat.toBundle());
-                    ((Activity) context).finish();
+                    ActivityCompat.startActivity(mContext, i, activityOptionsCompat.toBundle());
+                    ((Activity) mContext).finish();
                 }else if(response.code() == 401) {
                     loadingDialog.dismissDialog();
-                    mPrefs = context.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
+                    mPrefs = mContext.getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
                     mPrefs.edit().clear().apply();
                     try {
                         SignInActivity.getInstance().Invalid_email_or_password();
                     }catch (Exception ex){
-                        Warnings.showWeHaveAProblem(context, ErrorHelper.LOGIN_ACTION_PASSWORD_EMAIL_WARNING);
+                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.LOGIN_ACTION_PASSWORD_EMAIL_WARNING);
                     }
                 }
                 else {
                     loadingDialog.dismissDialog();
-                    Warnings.showWeHaveAProblem(context, ErrorHelper.LOGIN_ACTION);
+                    Warnings.showWeHaveAProblem(mContext, ErrorHelper.LOGIN_ACTION);
                 }
             }
             @Override
             public void onFailure(@NotNull Call<DtoAccount> call, @NotNull Throwable t) {
                 loadingDialog.dismissDialog();
-                Warnings.showWeHaveAProblem(context, ErrorHelper.LOGIN_ACTION);
+                Warnings.showWeHaveAProblem(mContext, ErrorHelper.LOGIN_ACTION);
             }
         });
     }

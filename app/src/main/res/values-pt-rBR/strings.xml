@@ -32,14 +32,14 @@
     <string name="account_was_created" >Sua conta Squash foi criada com sucesso. Para prosseguir com o aplicativo, é necessário confirmar o seu e-mail. Enviamos um email com uma explicação de como ativar sua conta.</string>
     <string name="email_is_already_used">Esse email já foi usado em outra conta, por favor alterar o email informado.</string>
     <string name="phone_is_already_used">Esse número de celular já está em uso, por favor alterar o número informado.</string>
-    <string name="bad_username">O nome de usuário especificado, não é adequado, por favor alterar o nome de usuário.  </string>
+    <string name="bad_username">O nome de usuário especificado, não é adequado, por favor alterar o nome de usuário.</string>
     <string name="weHaveAProblem">Os servidores apresentam falhas provisórias, por favor tente iniciar o app novamente mais tarde.</string>
-    <string name="default_bio">Olá, sou novo(a) aqui no Squash.</string>
+    <string name="default_bio">Olá, sou novo(a) aqui na Squash.</string>
     <string name="we_sent_you_a_code">Nós lhe enviamos um código</string>
     <string name="the_code_has_been_sent">O código foi enviado para <b>%1$s</b>, digite-o abaixo para verificar sua conta.</string>
     <string name="the_code_has_been_sent_no_email">Quando esta conta foi criada, um e-mail de verificação foi enviado, mas a conta não foi validada porque o código não foi inserido no campo abaixo, por favor insira o código de validação na caixa abaixo.</string>
     <string name="validation_code">Código de validação</string>
-    <string name="did_not_receive_email">Não recebeu email?</string>
+    <string name="did_not_receive_email">Não recebeu o email?</string>
     <string name="resend_code">Reenviar código</string>
     <string name="resend_code_desc">Caso não tenha obtido o código de validacão em seu email basta clicar no botão <font color='#10ace0'>reenviar código</font> para recerber o código.</string>
     <string name="the_validation_code_is_invalid">O código de validação é inválido.</string>
@@ -328,5 +328,5 @@
     <string name="tap_here_to_keep_watching">Toque aqui para continuar assistindo</string>
     <string name="camera_and_storage_permission_required">Câmera e permissão de armazenamento necessários para esta função.</string>
     <string name="go_to_setting_story_perm_request">Câmera e permissão de armazenamento armazenado para esta função.\nVá para as configurações e habilite as permissões</string>
-    <string name="your_doogle_account_has_been_linked_squash">Sua conta do Google foi vinculada à sua conta do Squash.</string>
+    <string name="your_google_account_has_been_linked_squash">Sua conta do Google foi vinculada à sua conta do Squash.</string>
 </resources>
