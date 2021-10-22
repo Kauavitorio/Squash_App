@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import dev.kaua.squash.R;
+import dev.kaua.squash.Tools.CapturePhotoUtils;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
@@ -84,10 +85,8 @@ public class ViewMediaActivity extends AppCompatActivity {
         download_btn.setOnClickListener(v -> {
             if(image_bitmap != null) {
                 download_btn.playAnimation();
-                Methods.SaveImage(this, image_bitmap, chat_id, receive_time[0] + receive_time[1] +
-                        receive_time[2].replace(" ", "").replace(":", "").substring(0, 8));
-
-                new Handler().postDelayed(() -> ToastHelper.toast(this, getString(R.string.image_downloaded_successfully), 0), 3500);
+                CapturePhotoUtils.insertImage(getContentResolver(), image_bitmap, chat_id, "");
+                new Handler().postDelayed(() -> ToastHelper.toast(this, getString(R.string.image_downloaded_successfully), 0), 3200);
             }
             else {
                 download_btn.setAnimation(R.raw.error);
@@ -100,7 +99,7 @@ public class ViewMediaActivity extends AppCompatActivity {
 
     private void Ids() {
         getWindow().setStatusBarColor(getColor(R.color.base_color));
-        imageView = (SubsamplingScaleImageView)findViewById(R.id.img_view_media);
+        imageView = findViewById(R.id.img_view_media);
         btn_back_view_media = findViewById(R.id.btn_back_view_media);
         txt_sent_date = findViewById(R.id.txt_sent_date);
         txt_sent_on = findViewById(R.id.txt_sent_on);
