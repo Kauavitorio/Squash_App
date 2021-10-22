@@ -488,13 +488,15 @@ public abstract class Login extends SignInActivity{
     }
 
     public static void clearApplicationData(@NonNull Context context) {
-        File cacheDirectory = context.getCacheDir();
-        File applicationDirectory = new File(Objects.requireNonNull(cacheDirectory.getParent()));
-        if (applicationDirectory.exists()) {
-            String[] fileNames = applicationDirectory.list();
-            if(fileNames != null)
-            for (String fileName : fileNames) {
-                if (!fileName.equals("lib")) deleteFile(new File(applicationDirectory, fileName));
+        final File cacheDirectory = context.getCacheDir();
+        if(cacheDirectory != null && cacheDirectory.getParent() != null){
+            final File applicationDirectory = new File(cacheDirectory.getParent());
+            if (applicationDirectory.exists()) {
+                String[] fileNames = applicationDirectory.list();
+                if(fileNames != null)
+                    for (String fileName : fileNames) {
+                        if (!fileName.equals("lib")) deleteFile(new File(applicationDirectory, fileName));
+                    }
             }
         }
     }
@@ -502,7 +504,7 @@ public abstract class Login extends SignInActivity{
         boolean deletedAll = true;
         if (file != null) {
             if (file.isDirectory()) {
-                String[] children = file.list();
+                final String[] children = file.list();
                 if(children != null)
                     for (String child : children) {
                         deletedAll = deleteFile(new File(file, child)) && deletedAll;

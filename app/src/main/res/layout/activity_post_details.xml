@@ -119,9 +119,9 @@
                 android:layout_below="@+id/txt_date_time_post_details"
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@+id/icon_user_profile_post_details"
-                tools:text="@string/receive_email_terms"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="@string/receive_email_terms" />
 
             <!-- Container Post Body -->
             <LinearLayout

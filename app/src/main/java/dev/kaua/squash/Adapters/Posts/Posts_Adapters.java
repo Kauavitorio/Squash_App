@@ -28,6 +28,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -57,7 +58,6 @@ import dev.kaua.squash.Activities.AppSupportActivity;
 import dev.kaua.squash.Activities.Admin.DeletePostReportActivity;
 import dev.kaua.squash.Activities.MainActivity;
 import dev.kaua.squash.Activities.Posts.PostDetailsActivity;
-import dev.kaua.squash.Activities.SquashShop.SquashShopActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.Data.Post.PostServices;
@@ -100,8 +100,12 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
     boolean loadAd;
     static int max;
     int ad_counter;
-    private static final DtoPost post_ad = new DtoPost(DtoPost.AD_POST);
     final Retrofit retrofit = Methods.GetRetrofitBuilder();
+
+    //  Image Config
+    final RequestOptions myOptions = new RequestOptions()
+            .fitCenter() // or centerCrop
+            .override(100, 100);
 
     public Posts_Adapters(ArrayList<DtoPost> ArrayList, Activity mContext, boolean loadAd) {
         this.loadAd = loadAd;
@@ -109,11 +113,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         //  Generate Ad post position
         max = ArrayList.size();
         ad_counter = (int) Math.floor(Math.random() * (max - min + 1) + min);
-
-        //  Check if post display request can show AD
-        /*if(this.loadAd)
-            //  For each post request just can show max of one AD
-            if(ConnectionHelper.isOnline(mContext)) ArrayList.add(ad_counter, post_ad);*/
 
         this.mPostList = ArrayList;
         instance = this;
@@ -268,13 +267,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
 
     @Override
     public int getItemViewType(int position) {
-        /*try {
-            if(!mPostList.contains(post_ad) && loadAd)
-                mPostList.add(ad_counter, post_ad);
-        }catch (Exception ex){
-            Log.d(TAG, ex.getMessage());
-        }*/
-
         if(mPostList.get(position).getPost_type() == DtoPost.NORMAL_POST)
             return DtoPost.NORMAL_POST;
         else if(mPostList.get(position).getPost_type() == DtoPost.AD_POST)
@@ -355,7 +347,9 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                     mPostList.get(position).setProfile_img_load(true);
                     try {
                         if(!mContext.isDestroyed() && !mContext.isFinishing())
-                            Glide.with(mContext).load(postInfo.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                            Glide.with(mContext).asBitmap()
+                                    .apply(myOptions).load(postInfo.getProfile_image())
+                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                     .into(holder.icon_user_profile_post);
                     }catch (Exception ignore){}
                 }
@@ -408,13 +402,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             HelpSquashPattern(holder, "help Squash");
             HelpSquashPattern(holder, "help squash");
         }
-
-        new PatternEditableBuilder().addPattern(Pattern.compile(mContext.getString(R.string.squash_shop)),
-                mContext.getColor(R.color.base_color),
-                        text -> {
-                            Intent intent = new Intent(mContext, SquashShopActivity.class);
-                            mContext.startActivity(intent);
-                        }).into(holder.txt_post_content);
     }
 
     private void HelpSquashPattern(@NonNull MyHolderPosts holder, String s) {

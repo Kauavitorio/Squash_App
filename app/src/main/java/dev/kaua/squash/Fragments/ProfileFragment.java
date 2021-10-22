@@ -53,6 +53,7 @@ import dev.kaua.squash.Activities.Chat.MessageActivity;
 import dev.kaua.squash.Activities.Profile.ProfileInfoActivity;
 import dev.kaua.squash.Activities.QrCodeActivity;
 import dev.kaua.squash.Activities.Story.StoryActivity;
+import dev.kaua.squash.Adapters.Profile.Profile_Image;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
@@ -652,8 +653,13 @@ public class ProfileFragment extends Fragment {
                                 }
 
                             }else{
-                                ic_ProfileUser_profile.setEnabled(false);
+                                ic_ProfileUser_profile.setEnabled(true);
                                 ic_ProfileUser_profile.setBorderWidth(0);
+
+                                ic_ProfileUser_profile.setOnClickListener(v -> {
+                                    Profile_Image.showUserProfile(requireActivity(),
+                                            account.getProfile_image(), account.getUsername());
+                                });
                             }
 
                         }
