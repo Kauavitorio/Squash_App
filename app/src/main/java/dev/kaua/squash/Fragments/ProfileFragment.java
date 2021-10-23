@@ -359,8 +359,9 @@ public class ProfileFragment extends Fragment {
     }
 
     private String LoadJoined(final String date) {
-        String format_date = date;
-        if(date != null){
+        Log.d(TAG, "Date -> " + date);
+        String format_date = Methods.parseTestDate(date, Methods.JOINED_DATE_MASK);
+        if(format_date != null){
             try {
                 String[] split_date = format_date.split("/");
                 format_date = Methods.getMonth(Integer.parseInt(split_date[1])) + " " + split_date[2];

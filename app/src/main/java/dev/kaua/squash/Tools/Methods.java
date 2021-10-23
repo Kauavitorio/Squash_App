@@ -11,10 +11,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Vibrator;
 import android.text.SpannableStringBuilder;
 import android.text.style.ClickableSpan;
@@ -37,13 +35,12 @@ import com.google.firebase.database.DatabaseReference;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,9 +80,6 @@ public abstract class Methods extends MainActivity {
     //  Base API URL
     private static final String TAG = "METHODS_LOG";
     public static final String SQUASH_ORIGINAL_USERNAME = "squash";
-    public static final String REWARDED_AD_ID = "ca-app-pub-5161149668539506/2830793531";
-    public static final String INTERSTICIAL_AD_ID = "ca-app-pub-5161149668539506/3847296073";
-    public static final long VERIFY_AD_GOAL = 20000;
     public static final String PAYPAL_DONATE = "https://www.paypal.com/donate?hosted_button_id=PRKZAKGHHKA7S";
     public static final String GOOGLE_PLAY_APP_LINK = "https://play.google.com/store/apps/details?id=dev.kaua.squash";
     public static final String GOOGLE_PLAY_APP_LINK_SHORT = "https://squashc.com/url/app";
@@ -361,8 +355,10 @@ public abstract class Methods extends MainActivity {
         return (int) Math.floor(Math.random()*(max-min+1)+min);
     }
 
-    public static final String NO_ONE = "noOne";
     //  Method to update typing status for chat system
+    public static final String NO_ONE = "noOne";
+    public static final String NO_USER = "noUserChat";
+    public static String current_typing = NO_USER;
     public static void typingTo_chat_Status(String typing){
         firebaseUser = null;
         reference = null;
@@ -371,17 +367,23 @@ public abstract class Methods extends MainActivity {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("typingTo", typing);
 
-        reference.updateChildren(hashMap);
+        if(!current_typing.equals(typing)) {
+            current_typing = typing;
+            reference.updateChildren(hashMap);
+        }
     }
 
     //  Method to load last seen
     @SuppressLint("SimpleDateFormat")
-    private static final SimpleDateFormat df_time = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
-    public static String loadLastSeen(final Context context, final String get_date_time){
-        final Calendar c = Calendar.getInstance();
-        final String formattedDate = df_time.format(c.getTime());
+    public static String loadLastSeen(final Context context, String get_date_time){
+        final String formattedDate = parseTestDate(String.valueOf(System.currentTimeMillis())
+                , DEFAULT_MASK);
         try {
             if(get_date_time.length() > 0){
+
+                if(!get_date_time.contains("/"))
+                    get_date_time = parseTestDate(get_date_time, DEFAULT_MASK);
+
                 final String[] splitDate = formattedDate.split("/");
                 final String[] splitTime = formattedDate.split(" ");
                 final String[] splitDateGet = get_date_time.split("/");
@@ -392,8 +394,8 @@ public abstract class Methods extends MainActivity {
                     String time_GET = splitDateGet[2].substring(4, 10);
                     myTimeHelper now = myTimeHelper.now();
                     myTimeHelper now_GET = myTimeHelper.parse(time_GET.replace(" ", ""));
-                    if(showTimeAgo(now_GET, now + "", context).contains("00")) return context.getString(R.string.just_now);
-                    else return showTimeAgo(now_GET, now + "", context);
+                    if(showTimeAgo(now_GET, String.valueOf(now), context).contains("00")) return context.getString(R.string.just_now);
+                    else return showTimeAgo(now_GET, String.valueOf(now), context);
                 }
                 else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET))
                     return context.getString(R.string.yesterday) + " " + splitTime[1];
@@ -406,9 +408,13 @@ public abstract class Methods extends MainActivity {
     }
 
     public static String loadLastSeenUser(final Context context, String get_date_time){
-        final Calendar c = Calendar.getInstance();
         if(get_date_time == null) get_date_time = "";
-        String formattedDate = df_time.format(c.getTime());
+
+        if(!get_date_time.contains("/"))
+            get_date_time = parseTestDate(get_date_time, DEFAULT_MASK);
+
+        String formattedDate = parseTestDate(String.valueOf(System.currentTimeMillis())
+                , DEFAULT_MASK);
         try {
             String[] splitDate = formattedDate.split("/");
             String[] splitTime = formattedDate.split(" ");
@@ -420,7 +426,10 @@ public abstract class Methods extends MainActivity {
                 String time_GET = splitDateGet[2].substring(4, 10);
                 myTimeHelper now = myTimeHelper.now();
                 myTimeHelper now_GET = myTimeHelper.parse(time_GET.replace(" ", ""));
-                return context.getString(R.string.today) + " "  + showTimeAgo(now_GET, now + "", context);
+                if(showTimeAgo(now_GET, String.valueOf(now), context).contains("00"))
+                    return context.getString(R.string.just_now);
+
+                return context.getString(R.string.today) + " "  + showTimeAgo(now_GET,  String.valueOf(now), context);
             }
             else if(day == 1 && splitDate[1].equals(splitDateGet[1]) && year.equals(yearGET))
                 return context.getString(R.string.yesterday) + " " + splitTime[1];
@@ -429,6 +438,17 @@ public abstract class Methods extends MainActivity {
             Log.d("LastSeen", ex.toString());
             return get_date_time;
         }
+    }
+
+    public static final String DEFAULT_MASK = "dd/MM/yyyy HH:mm a";
+    public static final String JOINED_DATE_MASK = "dd/MM/yyyy";
+    @SuppressLint("SimpleDateFormat")
+    public static String parseTestDate(String date, final String MASK){
+        try {
+            if(date != null && !date.contains("/"))
+                date = new SimpleDateFormat(MASK).format(new Date(Long.parseLong(date)));
+        }catch (Exception ignore){}
+        return date;
     }
 
     public static String shuffle(@NonNull String s) {

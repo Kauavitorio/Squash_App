@@ -200,6 +200,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
 
     private void CheckUserStatus(DtoAccount account, @NonNull ViewHolder holder) {
         if(!mContext.isDestroyed()){
+            Log.d("USER_AD_LOG", account.getLast_seen() + "");
             final boolean isChat = account.getStatus_chat() != null && account.getStatus_chat().equals(Methods.ONLINE);
             holder.img_status.setVisibility(View.VISIBLE);
 

@@ -1119,7 +1119,10 @@ public class MessageActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         reference = null;
+        chat_id = null;
+        userId = null;
+        Methods.current_typing = Methods.NO_USER;
+        super.onDestroy();
     }
 }

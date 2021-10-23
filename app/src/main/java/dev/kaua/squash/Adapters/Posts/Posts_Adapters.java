@@ -412,11 +412,16 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                 }).into(holder.txt_post_content);
     }
 
+    @SuppressLint("SimpleDateFormat")
     private String LastSeenRefactor(final int position) {
         String date = "";
         if(hasIndex(position))
             date = mPostList.get(position).getPost_date();
+
         try{
+            if(!date.contains("/"))
+                date = Methods.parseTestDate(date, Methods.DEFAULT_MASK);
+
             final String[] split_date = date.split("/");
             if(split_date.length >= 5){
                 @SuppressLint("SimpleDateFormat") Date date_change = new SimpleDateFormat("MMMM").parse(split_date[1]);
