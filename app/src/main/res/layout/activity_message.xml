@@ -90,10 +90,11 @@
                         <!-- Image Verification Level -->
                         <ImageView
                             android:id="@+id/verification_ic_message"
-                            android:layout_width="20dp"
+                            android:layout_width="17dp"
                             android:layout_height="match_parent"
                             android:layout_marginStart="5dp"
                             android:visibility="gone"
+                            tools:visibility="visible"
                             android:src="@drawable/ic_verified_account"
                             tools:ignore="ContentDescription" />
 

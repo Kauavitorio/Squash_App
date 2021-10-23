@@ -236,7 +236,7 @@
     <string name="new_post">New Post</string>
     <string name="squash_profile">Squash Profile</string>
     <string name="delete_this_conversation">Delete this conversation</string>
-    <string name="do_you_really_want_to_delete_this_conversation">Do you really want to delete this conversation from your list? Messages will not be deleted.</string>
+    <string name="do_you_really_want_to_delete_this_conversation">Do you really want to delete this conversation from your list? Messages can be deleted if the other user deletes your conversation too.</string>
     <string name="help_squash">Help Squash</string>
     <string name="make_donate">Make Donate</string>
     <string name="support_types">Support Types</string>

@@ -165,8 +165,8 @@ public class DaoChat extends SQLiteOpenHelper {
     }
 
     public void REGISTER_CHAT(List<DtoMessage> messages, String chat_id){
-        if(messages != null && messages.size() > 0){
-            getWritableDatabase().delete(TABLE_CHAT,"chat_id=?",new String[]{chat_id});
+        if(messages != null && messages.size() > 0 && chat_id != null){
+            getWritableDatabase().delete(TABLE_CHAT,"chat_id=?", new String[]{chat_id});
             for(int i = 1; i < messages.size(); i++){
                 if(messages.get(i).getId_msg() != null){
                     ContentValues values = new ContentValues();
@@ -191,28 +191,47 @@ public class DaoChat extends SQLiteOpenHelper {
     }
 
     public List<DtoMessage> get_CHAT(String chat_id){
-        String command = "SELECT * FROM " + TABLE_CHAT + " WHERE chat_id = ?";
-        String[] params = {chat_id};
-        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
         final List<DtoMessage> list = new ArrayList<>();
+        if(chat_id != null){
+            String command = "SELECT * FROM " + TABLE_CHAT + " WHERE chat_id = ?";
+            String[] params = {chat_id};
+            @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
 
-        if (cursor.moveToFirst()){
-            do{
-                DtoMessage message = new DtoMessage();
-                message.setId_msg(cursor.getString(0));
-                message.setIsSeen(cursor.getInt(1));
-                message.setMessage(cursor.getString(2));
-                message.setReceiver(cursor.getString(3));
-                message.setReply_content(cursor.getString(4));
-                message.setReply_from(cursor.getString(5));
-                message.setSender(cursor.getString(6));
-                message.setTime(cursor.getString(7));
-                message.setMedia(Collections.singletonList(cursor.getString(8)));
-                list.add(message);
-            }while(cursor.moveToNext());
+            if (cursor.moveToFirst()){
+                do{
+                    DtoMessage message = new DtoMessage();
+                    message.setId_msg(cursor.getString(0));
+                    message.setIsSeen(cursor.getInt(1));
+                    message.setMessage(cursor.getString(2));
+                    message.setReceiver(cursor.getString(3));
+                    message.setReply_content(cursor.getString(4));
+                    message.setReply_from(cursor.getString(5));
+                    message.setSender(cursor.getString(6));
+                    message.setTime(cursor.getString(7));
+                    message.setMedia(Collections.singletonList(cursor.getString(8)));
+                    list.add(message);
+                }while(cursor.moveToNext());
+            }
         }
         return list;
     }
+
+    public void setChatId(String chat_id, final String useId){
+        String command = "SELECT * FROM " + TABLE_CHAT_LIST + " WHERE  id = ?";
+        String[] params = {useId};
+        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
+        if(cursor.moveToFirst()){
+            if(cursor.getString(11) == null){
+                ContentValues values = new ContentValues();
+                values.put("chat_id", chat_id);
+
+                String where = "id=?";
+
+                getWritableDatabase().update(TABLE_CHAT_LIST, values, where, params);
+            }
+        }
+    }
+
 
     public boolean test_has_chat(String user_id){
         String command = "SELECT * FROM " + TABLE_CHAT + " WHERE receiver = ?";

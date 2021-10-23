@@ -222,7 +222,7 @@
     <string name="new_post">Nova postagem</string>
     <string name="squash_profile">Perfil Squash</string>
     <string name="delete_this_conversation">Excluir esta conversa</string>
-    <string name="do_you_really_want_to_delete_this_conversation">Deseja realmente excluir essa conversa de sua lista? As mensagens não seram deletadas.</string>
+    <string name="do_you_really_want_to_delete_this_conversation">Tem certeza de que deseja excluir esta conversa da sua lista? As mensagens podem ser excluídas se o outro usuário excluir a sua conversa também.</string>
     <string name="help_squash">Ajudar o Squash</string>
     <string name="make_donate">Faça uma doação</string>
     <string name="support_types">Tipos de Suporte</string>

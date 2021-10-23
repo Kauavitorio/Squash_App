@@ -35,6 +35,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -73,7 +75,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public static final int MSG_TYPE_START = -1;
     private final MessageActivity mContext;
     private static List<DtoMessage> mMessages;
-    private final String imageURL;
     private final String chat_Username;
     private final String myUsername;
     private final String chat_id;
@@ -87,22 +88,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private static int LayoutType;
     FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
 
-    public MessageAdapter(MessageActivity mContext, List<DtoMessage> mMessages, String imageURL, RecyclerView recycler_view_msg
+    public MessageAdapter(MessageActivity mContext, List<DtoMessage> mMessages, RecyclerView recycler_view_msg
     , String myUsername, String chat_Username, String chat_id){
         this.mContext = mContext;
         MessageAdapter.mMessages = mMessages;
-        this.imageURL = imageURL;
         this.chat_Username = chat_Username;
         this.myUsername = myUsername;
         this.recycler_view_msg = recycler_view_msg;
         this.chat_id = chat_id;
         this.daoChat = new DaoChat(mContext);
         myAnim = AnimationUtils.loadAnimation(mContext, R.anim.click_anim);
-        checkMessagesSize();
-    }
-
-    private void checkMessagesSize() {
-        MessageActivity.ShowOrNot_noMessage(mMessages.size() <= 0);
     }
 
     @NonNull
@@ -185,7 +180,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     viewHolder.msg_chat_item.setOnLongClickListener(v -> {
                         if(viewHolder.container_msg != null) viewHolder.container_msg.startAnimation(myAnim);
                         if(viewHolder.voicePlayerView != null) viewHolder.voicePlayerView.startAnimation(myAnim);
-                        message_Action(fUser.getUid(), viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
+                        message_Action(fUser.getUid(), viewHolder.getAdapterPosition(), message.getId_msg());
                         return false;
                     });
                 }
@@ -303,9 +298,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             if(message.getSender().equals(fUser.getUid())){
                 viewHolder.message_container.setPadding(2, 2, 20, 2);
                 if(position == mMessages.size() - 1){
-                    DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-                    Query seen_last = ref.child(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).orderByChild(DtoMessage.ID_MSG).equalTo(message.getId_msg());
-                    seen_last.addValueEventListener(new ValueEventListener() {
+                    myFirebaseHelper.getFirebaseDatabase().getReference().child(myFirebaseHelper.CHATS_REFERENCE)
+                            .child(EncryptHelper.decrypt(chat_id)).orderByChild(DtoMessage.ID_MSG).equalTo(message.getId_msg())
+                            .addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if(!mContext.isDestroyed() && !mContext.isFinishing()){
@@ -321,16 +316,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {}
                     });
-                }
+                }else if(viewHolder.img_seen != null)
+                    viewHolder.img_seen.setVisibility(View.GONE);
+
             }else if(viewHolder.img_seen != null) viewHolder.img_seen.setVisibility(View.GONE);
             if(message.getTime() != null){
-                String[] time = EncryptHelper.decrypt(message.getTime()).replace("-", "/").split("/");
-                viewHolder.msgTime_chat_item.setText(time[2].substring(4));
+                viewHolder.msgTime_chat_item.setText(Methods.loadMsgTime(EncryptHelper.decrypt(message.getTime())));
             }
             viewHolder.message_container.setOnLongClickListener(v -> {
                 if(viewHolder.container_msg != null) viewHolder.container_msg.startAnimation(myAnim);
                 if(viewHolder.voicePlayerView != null) viewHolder.voicePlayerView.startAnimation(myAnim);
-                message_Action(fUser.getUid(), viewHolder.getAdapterPosition(), mMessages.get(viewHolder.getAdapterPosition()).getId_msg());
+                message_Action(fUser.getUid(), viewHolder.getAdapterPosition(), message.getId_msg());
                 return false;
             });
         }
@@ -367,36 +363,34 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.yes),
                     (dialog, which) -> {
                         if(ConnectionHelper.isOnline(mContext)){
-                            DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-                            Query applesQuery = ref.child(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).orderByChild(DtoMessage.ID_MSG).equalTo(id_msg);
-
-                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                                        appleSnapshot.getRef().removeValue();
+                            if(!id_msg.contains("-")){
+                                DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
+                                Query applesQuery = ref.child(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).orderByChild(DtoMessage.ID_MSG).equalTo(id_msg);
+                                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                            appleSnapshot.getRef().removeValue();
+                                        }
+                                        removeFileIfExist(position, id_msg);
                                     }
-                                    firebaseStorage = FirebaseStorage.getInstance();
-                                    if(mMessages != null && mMessages.get(position).getMedia() != null && mMessages.get(position).getMedia().get(0) != null && !mMessages.get(position).getMedia().get(0).equals("")){
-                                        StorageReference photoRef = firebaseStorage.getReferenceFromUrl(mMessages.get(position).getMedia().get(0));
-                                        photoRef.delete().addOnSuccessListener(aVoid -> {
-                                            // File deleted successfully
-                                            Log.d("DeleteMessage", "onSuccess: deleted file");
-                                        }).addOnFailureListener(exception -> {
-                                            // Uh-oh, an error occurred!
-                                            Log.d("DeleteMessage", "onFailure: did not delete file");
-                                        });
+                                    @Override
+                                    public void onCancelled(@NotNull DatabaseError databaseError) {
+                                        Log.e("DeleteMessage", "onCancelled", databaseError.toException());
                                     }
-                                    daoChat.delete_message(id_msg);
-                                    mMessages.remove(position);
-                                    notifyItemRemoved(position);
-                                }
-
-                                @Override
-                                public void onCancelled(@NotNull DatabaseError databaseError) {
-                                    Log.e("DeleteMessage", "onCancelled", databaseError.toException());
-                                }
-                            });
+                                });
+                            }else{
+                                myFirebaseHelper.getFirebaseDatabase()
+                                        .getReference(myFirebaseHelper.CHATS_REFERENCE).child(EncryptHelper.decrypt(chat_id)).child(id_msg)
+                                        .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            removeFileIfExist(position, id_msg);
+                                        }
+                                    }
+                                });
+                            }
                             dialog.dismiss();
                         }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
                     });
@@ -416,6 +410,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         });
 
         myDialog.show();
+    }
+
+    private void removeFileIfExist(int position, String id_msg) {
+        firebaseStorage = FirebaseStorage.getInstance();
+        if(hasIndex(position) && mMessages != null && mMessages.get(position).getMedia() != null && mMessages.get(position).getMedia().get(0) != null && !mMessages.get(position).getMedia().get(0).equals("")){
+            StorageReference photoRef = firebaseStorage.getReferenceFromUrl(mMessages.get(position).getMedia().get(0));
+            photoRef.delete().addOnSuccessListener(aVoid -> {
+                // File deleted successfully
+                Log.d("DeleteMessage", "onSuccess: deleted file");
+            }).addOnFailureListener(exception -> {
+                // Uh-oh, an error occurred!
+                Log.d("DeleteMessage", "onFailure: did not delete file");
+            });
+        }
+        daoChat.delete_message(id_msg);
+        mMessages.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    private boolean hasIndex(long index){
+        return index < mMessages.size();
     }
 
     public static int getSize(){
@@ -496,7 +511,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             else
                 return MSG_TYPE_RIGHT;
         }
-        else if(message.getSender().equals("base_start"))
+        else if(message.getSender().equals("base_start") || message.getSender().equals("BASE"))
             return MSG_TYPE_START;
         else {
             if(message.getMedia() != null && message.getMedia() != null && message.getMedia().size() > 0

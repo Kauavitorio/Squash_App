@@ -55,7 +55,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -124,12 +123,12 @@ public class MessageActivity extends AppCompatActivity {
     private ConstraintLayout reply_layout;
     private ImageView cancelButton;
     private static ValueEventListener seenListener;
-    public static DtoAccount user_im_chat;
+    public static DtoAccount user_im_chat = new DtoAccount();
     private static final String[] permissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
     public static final String[] PERMISSION_audio = { Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE };
     public static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
-    public static FirebaseUser fUser;
+    public static FirebaseUser fUser = myFirebaseHelper.getFirebaseUser();
 
     private static DaoChat chatDB;
     private static DatabaseReference reference;
@@ -176,7 +175,6 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_message);
         setContentView(R.layout.activity_message);
         Ids();
 
@@ -314,7 +312,7 @@ public class MessageActivity extends AppCompatActivity {
 
     private void LoadAnotherUserInfo() {
         if(user_im_chat != null && user_im_chat.getId() != null){
-            LoadAdapter(""); // First Load on adapter
+            LoadAdapter(); // First Load on adapter
 
             txt_user_name.setText(user_im_chat.getName_user());
             if(another_user_image != null && !another_user_image.equals(user_im_chat.getImageURL())){
@@ -499,7 +497,6 @@ public class MessageActivity extends AppCompatActivity {
                         if(chatList.getId().equals(userId)){
                             if(chatList.getChat_id() != null){
                                 if(!chatList.getChat_id().equals(EncryptHelper.decrypt(chat_id))) {
-                                    Log.d(TAG, chatList.getChat_id());
                                     UpdateChat_Id(chatList.getChat_id());
                                 }
                             }
@@ -516,7 +513,6 @@ public class MessageActivity extends AppCompatActivity {
                                         if(chatList.getId().equals(fUser.getUid())){
                                             if(chatList.getChat_id() != null){
                                                 if(!chatList.getChat_id().equals(EncryptHelper.decrypt(chat_id))) {
-                                                    Log.d(TAG, chatList.getChat_id());
                                                     UpdateChat_Id(chatList.getChat_id());
                                                 }
                                             }
@@ -535,11 +531,35 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     void GenerateChatID() {
-        if(chat_id == null){
-            String first_sequence = Methods.RandomCharactersWithoutSpecials(20);
-            String second_sequence = Methods.RandomCharactersWithoutSpecials(5);
-            chat_id = "CHATID" + fUser.getUid() + first_sequence + userId + second_sequence + "SQUASH";
-            chat_id = EncryptHelper.encrypt(Methods.shuffle(chat_id));
+        if(chat_id == null && ConnectionHelper.isOnline(this)){
+            myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE)
+                    .child(userId)
+                    .child(fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(!snapshot.exists()){
+                        final String chatId = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHATS_REFERENCE).push().getKey();
+                        if(chatId != null){
+                            sendMessage(myFirebaseHelper.getFirebaseUser().getUid(), userId, "BASE");
+                            UpdateChat_Id(EncryptHelper.encrypt(chatId));
+                        }
+                    }else{
+                        if(instance != null && !instance.isFinishing() && !instance.isDestroyed()){
+                            Chatslist chatList = snapshot.getValue(Chatslist.class);
+                            if(chatList != null)
+                                if(chatList.getId().equals(fUser.getUid())){
+                                    if(chatList.getChat_id() != null){
+                                        if(!chatList.getChat_id().equals(EncryptHelper.decrypt(chat_id))) {
+                                            UpdateChat_Id(chatList.getChat_id());
+                                        }
+                                    }
+                                }
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {}
+            });
         }
     }
 
@@ -624,107 +644,109 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
-    static SimpleDateFormat df_time;
-    static SimpleDateFormat df_time_id;
     static DatabaseReference reference_message;
     @SuppressLint("SimpleDateFormat")
     void sendMessage(String sender, String receiver, String message){
-        c = Calendar.getInstance();
-        if(df_time == null) df_time = new SimpleDateFormat("dd-MM-yyyy HH:mm a");
-        if(df_time_id == null) df_time_id = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
-        final String formattedDate = df_time.format(c.getTime());
-        final String formattedDate_id = df_time_id.format(c.getTime());
-        String id_msg = Methods.shuffle(Methods.RandomCharactersWithoutSpecials(8) + formattedDate_id.replace("-","")
-                .replace(" ","").replace(":","") + Methods.shuffle(fUser.getUid()));
+        if(chat_id != null){
 
-        if(reference_message == null) reference_message = myFirebaseHelper.getFirebaseDatabase().getReference();
-        final DtoMessage new_message = new DtoMessage();
+            final String formattedDate = String.valueOf(System.currentTimeMillis());
 
-        final HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(DtoMessage.SENDER, sender);
-        hashMap.put(DtoMessage.RECEIVER, receiver);
-        hashMap.put(DtoMessage.ID_MSG, id_msg);
-        new_message.setId_msg(id_msg);
-        new_message.setSender(sender);
-        new_message.setReceiver(receiver);
-        if(message_to_reply != null && message_to_reply.length() > 0) {
-            hashMap.put(DtoMessage.REPLY_FROM, reply_from);
-            hashMap.put(DtoMessage.REPLY_CONTENT, EncryptHelper.encrypt(message_to_reply));
-            new_message.setReply_from(reply_from);
-            new_message.setReply_content(EncryptHelper.encrypt(message_to_reply));
-        }
-        else{
-            hashMap.put(DtoMessage.REPLY_FROM, DtoMessage.NO_ONE);
-            hashMap.put(DtoMessage.REPLY_CONTENT, DtoMessage.EMPTY);
-            new_message.setReply_from(DtoMessage.NO_ONE);
-            new_message.setReply_content(DtoMessage.EMPTY);
-        }
-        hashMap.put(DtoMessage.MESSAGE, EncryptHelper.encrypt(message.trim()));
-        hashMap.put(DtoMessage.IS_SEEN, DtoMessage.NOT_SEEN);
-        hashMap.put(DtoMessage.TIME, EncryptHelper.encrypt(formattedDate));
-        hashMap.put(DtoMessage.MEDIA, medias_pin);
-        new_message.setMessage(EncryptHelper.encrypt(message.trim()));
-        new_message.setIsSeen(DtoMessage.NOT_SEEN);
-        new_message.setTime(EncryptHelper.encrypt(formattedDate));
-        new_message.setMedia(medias_pin);
+            if(reference_message == null) reference_message = myFirebaseHelper.getFirebaseDatabase().getReference();
+            final DtoMessage new_message = new DtoMessage();
 
-        reference_message.child(myFirebaseHelper.CHATS_REFERENCE).child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id))).push().setValue(hashMap);
-
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
-        chatDB.UPDATE_A_CHAT(user_im_chat, 1);
-
-        //  add User to chat fragment
-        final DatabaseReference chatRef = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE)
-                .child(fUser.getUid())
-                .child(userId);
-
-        final DatabaseReference chatRefANOTHER_USER = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE)
-                .child(userId)
-                .child(fUser.getUid());
-
-        chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if(!snapshot.exists()){
-                    chatRef.child("id").setValue(userId);
-                    chatRef.child(DtoMessage.CHAT_ID).setValue(chat_id);
-                }
+            final HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put(DtoMessage.SENDER, sender);
+            hashMap.put(DtoMessage.RECEIVER, receiver);
+            new_message.setSender(sender);
+            new_message.setReceiver(receiver);
+            if(message_to_reply != null && message_to_reply.length() > 0) {
+                hashMap.put(DtoMessage.REPLY_FROM, reply_from);
+                hashMap.put(DtoMessage.REPLY_CONTENT, EncryptHelper.encrypt(message_to_reply));
+                new_message.setReply_from(reply_from);
+                new_message.setReply_content(EncryptHelper.encrypt(message_to_reply));
             }
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
-        chatRefANOTHER_USER.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if(!snapshot.exists()){
-                    chatRefANOTHER_USER.child("id").setValue(fUser.getUid());
-                    chatRefANOTHER_USER.child(DtoMessage.CHAT_ID).setValue(chat_id);
-                }
+            else{
+                hashMap.put(DtoMessage.REPLY_FROM, DtoMessage.NO_ONE);
+                hashMap.put(DtoMessage.REPLY_CONTENT, DtoMessage.EMPTY);
+                new_message.setReply_from(DtoMessage.NO_ONE);
+                new_message.setReply_content(DtoMessage.EMPTY);
             }
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {}
-        });
+            hashMap.put(DtoMessage.MESSAGE, EncryptHelper.encrypt(message.trim()));
+            hashMap.put(DtoMessage.IS_SEEN, DtoMessage.NOT_SEEN);
 
-        if(medias_pin != null && medias_pin.size() > 0){
-            String extension = medias_pin.get(0).substring(medias_pin.get(0).lastIndexOf("."));
-            if(extension.startsWith(".3gp")) message = getString(R.string.audio) + " (" + AudioCurrentTime + ")";
-            else message = getString(R.string.media);
-            medias_pin.clear();
+            // Future update
+            // EncryptHelper.encrypt(String.valueOf(System.currentTimeMillis()))
+            hashMap.put(DtoMessage.TIME, EncryptHelper.encrypt(formattedDate));
+
+            hashMap.put(DtoMessage.MEDIA, medias_pin);
+            new_message.setMessage(EncryptHelper.encrypt(message.trim()));
+            new_message.setIsSeen(DtoMessage.NOT_SEEN);
+            new_message.setTime(EncryptHelper.encrypt(formattedDate));
+            new_message.setMedia(medias_pin);
+
+            String msgKey =  reference_message.child(myFirebaseHelper.CHATS_REFERENCE).child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id))).push().getKey();
+            if(msgKey != null){
+                hashMap.put(DtoMessage.ID_MSG, msgKey);
+                new_message.setId_msg(msgKey);
+                reference_message.child(myFirebaseHelper.CHATS_REFERENCE).child(Objects.requireNonNull(EncryptHelper.decrypt(chat_id)))
+                        .child(msgKey).setValue(hashMap);
+            }
+
+            user_im_chat.setLast_chat(String.valueOf(System.currentTimeMillis()));
+            chatDB.UPDATE_A_CHAT(user_im_chat, 1);
+
+            //  add User to chat fragment
+            final DatabaseReference chatRef = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE)
+                    .child(fUser.getUid())
+                    .child(userId);
+
+            final DatabaseReference chatRefANOTHER_USER = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.CHAT_LIST_REFERENCE)
+                    .child(userId)
+                    .child(fUser.getUid());
+
+            chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    if(!snapshot.exists()){
+                        chatRef.child("id").setValue(userId);
+                        chatRef.child(DtoMessage.CHAT_ID).setValue(chat_id);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            });
+            chatRefANOTHER_USER.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    if(!snapshot.exists()){
+                        chatRefANOTHER_USER.child("id").setValue(fUser.getUid());
+                        chatRefANOTHER_USER.child(DtoMessage.CHAT_ID).setValue(chat_id);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+            });
+
+            if(medias_pin != null && medias_pin.size() > 0){
+                String extension = medias_pin.get(0).substring(medias_pin.get(0).lastIndexOf("."));
+                if(extension.startsWith(".3gp")) message = getString(R.string.audio) + " (" + AudioCurrentTime + ")";
+                else message = getString(R.string.media);
+                medias_pin.clear();
+            }
+
+            if(notify && !message.equals("BASE")) sendNotification(receiver, MyPrefs.getUserInformation(this).getUsername(), message, EncryptHelper.decrypt(chat_id));
+            notify = false;
+
+            text_send.setText("");
+
+            try {
+                ChatsFragment.getInstance().chatList();
+            }catch (Exception exception){
+                Log.d(TAG, "Cant load list");
+            }
+            recycler_view_msg.smoothScrollToPosition(recycler_view_msg.getBottom());
+            hideReplayLayout();
         }
-
-        if(notify) sendNotification(receiver, MyPrefs.getUserInformation(this).getUsername(), message, EncryptHelper.decrypt(chat_id));
-        notify = false;
-
-        text_send.setText("");
-
-        try {
-            ChatsFragment.getInstance().chatList();
-        }catch (Exception exception){
-            Log.d(TAG, "Cant load list");
-        }
-        recycler_view_msg.smoothScrollToPosition(recycler_view_msg.getBottom());
-        hideReplayLayout();
     }
 
     private void sendNotification(String receiver, String username, String message, String chat_id){
@@ -763,14 +785,12 @@ public class MessageActivity extends AppCompatActivity {
 
     public static void UpdateChat_Id(String id){
         chat_id = id;
-        readMessage(fUser.getUid(), userId, user_im_chat.getImageURL());
-        //new Handler().postDelayed(() -> readMessage(fUser.getUid(), userId, user_im_chat.getImageURL()), 500);
+        readMessage(fUser.getUid(), userId);
     }
 
     static boolean can_animate = true;
     static boolean seen_load = true;
-    final static List<DtoMessage> mMessageFinal = new ArrayList<>();
-    private static void readMessage(String myID, String userId, String imageURl){
+    private static void readMessage(String myID, String userId){
         mMessage = new ArrayList<>();
         if(ConnectionHelper.isOnline(instance)){
             String id = EncryptHelper.decrypt(chat_id);
@@ -791,7 +811,7 @@ public class MessageActivity extends AppCompatActivity {
                                             mMessage.add(message);
                                         }
                             }
-                            InsertMessagesInAdapter(imageURl);
+                            InsertMessagesInAdapter();
 
                             if(seen_load) {
                                 seen_load= false;
@@ -805,24 +825,19 @@ public class MessageActivity extends AppCompatActivity {
                     }
                 });
             }
-        }else LoadAdapter(imageURl);
+        }else LoadAdapter();
     }
 
-    private static Calendar c;
     private static Parcelable recyclerViewState;
-    private static void InsertMessagesInAdapter(String imageURl) {
-        c = Calendar.getInstance();
+    private static void InsertMessagesInAdapter() {
         if(recycler_view_msg.getLayoutManager() != null) recyclerViewState = recycler_view_msg.getLayoutManager().onSaveInstanceState();
         if(mMessage.size() > 1){
             if(!instance.isDestroyed() && !instance.isFinishing()){
-                Log.d(TAG, "Local -> " + chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)).size());
-                Log.d(TAG, "New -> " + mMessage.size());
-                if(chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)).size() != mMessage.size()-1){
+                if(chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)).size() != mMessage.size()){
                     chatDB.REGISTER_CHAT(mMessage, EncryptHelper.decrypt(chat_id));
-                    new Handler().postDelayed(() -> LoadAdapter(imageURl), 200);
+                    new Handler().postDelayed(MessageActivity::LoadAdapter, 200);
 
-                    @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    user_im_chat.setLast_chat(df_time_last_chat.format(c.getTime()));
+                    user_im_chat.setLast_chat(String.valueOf(System.currentTimeMillis()));
                     chatDB.UPDATE_A_CHAT(user_im_chat, 1);
                 }
             }
@@ -830,11 +845,12 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     static final List<DtoMessage> LocalMessages = new ArrayList<>();
-    private static void LoadAdapter(String imageURl) {
-        if(mMessage != null){
-            can_animate = mMessage.size() != mMessageFinal.size();
-            mMessageFinal.clear();
-            mMessageFinal.addAll(mMessage);
+    static long currentMsgSize = 0;
+    @SuppressLint("NotifyDataSetChanged")
+    private static void LoadAdapter() {
+        if(mMessage != null && chat_id != null){
+            can_animate = mMessage.size() != currentMsgSize;
+            currentMsgSize = mMessage.size();
 
             final DtoMessage messageBase = new DtoMessage();
             messageBase.setSender("base_start");
@@ -843,10 +859,17 @@ public class MessageActivity extends AppCompatActivity {
             LocalMessages.addAll(chatDB.get_CHAT(EncryptHelper.decrypt(chat_id)));
 
             recycler_view_msg.setItemAnimator(null);
-            messageAdapter = new MessageAdapter(instance, LocalMessages, imageURl, recycler_view_msg,
-                    MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername(), chat_id);
-            messageAdapter.setHasStableIds(true);
-            recycler_view_msg.setAdapter(messageAdapter);
+            if(messageAdapter == null){
+                messageAdapter = new MessageAdapter(instance, LocalMessages, recycler_view_msg,
+                        MyPrefs.getUserInformation(instance).getUsername(), user_im_chat.getUsername(), chat_id);
+                messageAdapter.setHasStableIds(true);
+                recycler_view_msg.setAdapter(messageAdapter);
+            }else
+                messageAdapter.notifyDataSetChanged();
+
+            chatDB.setChatId(chat_id, userId);
+
+            ShowOrNot_noMessage(messageAdapter.getItemCount() <= 0);
             if(recyclerViewState != null && recycler_view_msg.getLayoutManager() != null) recycler_view_msg.getLayoutManager().onRestoreInstanceState(recyclerViewState);
         }
     }
@@ -956,7 +979,6 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
-    File file_upload_to_crop;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -1122,6 +1144,7 @@ public class MessageActivity extends AppCompatActivity {
         reference = null;
         chat_id = null;
         userId = null;
+        messageAdapter = null;
         Methods.current_typing = Methods.NO_USER;
         super.onDestroy();
     }

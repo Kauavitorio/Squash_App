@@ -440,7 +440,15 @@ public abstract class Methods extends MainActivity {
         }
     }
 
+    public static String loadMsgTime(final String time){
+        if(time.contains("-") || time.contains("/")){
+            return time.replace("-", "/").split("/")[2].substring(4);
+        }else
+            return parseTestDate(time, MSG_TIME_MASK);
+    }
+
     public static final String DEFAULT_MASK = "dd/MM/yyyy HH:mm a";
+    public static final String MSG_TIME_MASK = "HH:mm a";
     public static final String JOINED_DATE_MASK = "dd/MM/yyyy";
     @SuppressLint("SimpleDateFormat")
     public static String parseTestDate(String date, final String MASK){

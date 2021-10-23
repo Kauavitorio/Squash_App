@@ -133,7 +133,7 @@ public class ProfileFragment extends Fragment {
             int actual = Methods.parseUserLevel(txt_amount_followers_profile.getText().toString());
             if(btn_follow_following_profile.getText().toString().equals(follow)){
                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
-                btn_follow_following_profile.setText(requireContext().getString(R.string.following));
+                btn_follow_following_profile.setText(getString(R.string.following));
                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.black));
                 txt_amount_followers_profile.setText(String.valueOf((actual + 1)));
                 new Handler().postDelayed(() -> btn_go_chat_profile.setVisibility(View.VISIBLE), 1000);
@@ -141,7 +141,7 @@ public class ProfileFragment extends Fragment {
             }
             else if(btn_follow_following_profile.getText().toString().equals(following)){
                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_follow));
-                btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
+                btn_follow_following_profile.setText(getString(R.string.follow));
                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
                 txt_amount_followers_profile.setText(String.valueOf((actual - 1)));
                 btn_go_chat_profile.setVisibility(View.GONE);
@@ -262,7 +262,7 @@ public class ProfileFragment extends Fragment {
                                                     txt_amount_followers_profile.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowers())))));
                                                 }
                                                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_follow));
-                                                btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
+                                                btn_follow_following_profile.setText(getString(R.string.follow));
                                                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
 
                                                 final int verified = Methods.parseUserLevel(EncryptHelper.decrypt(response.body().getVerification_level()));
@@ -292,7 +292,7 @@ public class ProfileFragment extends Fragment {
                                                 if(accounts.size() > 0){
                                                     btn_go_chat_profile.setVisibility(View.VISIBLE);
                                                     btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
-                                                    btn_follow_following_profile.setText(requireContext().getString(R.string.following));
+                                                    btn_follow_following_profile.setText(getString(R.string.following));
                                                     btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.black));
                                                 }
                                                 MainActivity.getInstance().ResetBundleProfile();
@@ -359,7 +359,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private String LoadJoined(final String date) {
-        Log.d(TAG, "Date -> " + date);
         String format_date = Methods.parseTestDate(date, Methods.JOINED_DATE_MASK);
         if(format_date != null){
             try {
@@ -369,7 +368,7 @@ public class ProfileFragment extends Fragment {
                 Log.d(TAG, "Joined -> " + ex.toString());
             }
         }
-        return requireActivity().getString(R.string.joined) + " " + format_date;
+        return getString(R.string.joined) + " " + format_date;
     }
 
     @SuppressLint("SetTextI18n")
