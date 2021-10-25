@@ -36,6 +36,14 @@ public class LoadingDialog {
             dialog.setContentView(R.layout.adapter_custom_loading);
             final LottieAnimationView progressBarDialog = dialog.findViewById(R.id.progressBarDialog);
             new Handler().postDelayed(() -> progressBarDialog.setSpeed((float) 2.5),6000);
+
+            new Handler().postDelayed(() -> {
+                if(dialog != null && dialog.isShowing()){
+                    dialog.dismiss();
+                    Warnings.showWeHaveAProblem(activity, ErrorHelper.LOAD_SOME_FILE_ERROR);
+                }
+            }, 36000);
+
             dialog.show();
         } catch (Exception ex){
             ToastHelper.toast(activity, ex.getMessage(), ToastHelper.SHORT_DURATION);

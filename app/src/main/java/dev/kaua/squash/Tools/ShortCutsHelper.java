@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 
@@ -67,6 +68,9 @@ public class ShortCutsHelper extends ContextWrapper {
         //  ShortCut to go to profile
         Glide.with(this)
                 .asBitmap()
+                .apply(new RequestOptions()
+                        .fitCenter()
+                        .override(300, 300))
                 .load(MyPrefs.getUserInformation(getApplicationContext()).getProfile_image())
                 .into(new CustomTarget<Bitmap>() {
                     @Override
