@@ -1,4 +1,4 @@
-package dev.kaua.squash.Activities;
+package dev.kaua.squash.Activities.Auth;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -204,15 +204,7 @@ public class SignUpActivity extends AppCompatActivity {
             loadingDialog.startLoading();
 
             //  Getting joined date before send user information to API
-            Calendar cal = Calendar.getInstance();
-            int day = cal.get(Calendar.DATE);
-            int month = cal.get(Calendar.MONTH) + 1;
-            int year = cal.get(Calendar.YEAR);
-            String joined_date;
-            if(month < 10 && day < 10) joined_date = "0" + day + "/" + "0" + month + "/" + year;
-            else if (day < 10) joined_date = "0" + day + "/" + month + "/" + year;
-            else if (month < 10) joined_date = day + "/" + "0" + month + "/" + year;
-            else joined_date = day + "/" + month + "/" + year;
+            String joined_date = String.valueOf(System.currentTimeMillis());
 
             // User information storage on your Dto
             final DtoAccount account = new DtoAccount();

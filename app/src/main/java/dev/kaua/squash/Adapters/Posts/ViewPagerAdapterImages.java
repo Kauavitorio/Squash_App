@@ -26,7 +26,7 @@ import com.bumptech.glide.request.transition.Transition;
 import java.util.List;
 import java.util.Objects;
 
-import dev.kaua.squash.Activities.ViewMediaActivity;
+import dev.kaua.squash.Activities.Medias.ViewMediaActivity;
 import dev.kaua.squash.Data.Post.DtoPost;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -126,8 +126,7 @@ public class ViewPagerAdapterImages extends PagerAdapter {
             Intent intent = new Intent(context, ViewMediaActivity.class);
             intent.putExtra(ViewMediaActivity.IMAGE_URL_TAG, EncryptHelper.decrypt(url));
             intent.putExtra(ViewMediaActivity.RECEIVE_TIME_TAG, ViewMediaActivity.POST_TAG);
-            String id = post.getUsername() + "_ID" + post.getPost_id();
-            if (id.length() < 11) id += "posts_media";
+            String id = post.getPost_id() + "_ID_";
             intent.putExtra(ViewMediaActivity.CHAT_ID_TAG, id);
             ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(context, R.anim.move_to_left_go, R.anim.move_to_right_go);
             ActivityCompat.startActivity(context, intent, activityOptionsCompat.toBundle());

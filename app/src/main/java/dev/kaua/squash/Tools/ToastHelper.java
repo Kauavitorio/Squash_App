@@ -25,16 +25,18 @@ public abstract class ToastHelper {
 
     private static Toast toast_item;
     public static void toast(@NonNull Activity activity, String msg, int TIME){
-        LayoutInflater inflater = activity.getLayoutInflater();
-        View layout = inflater.inflate(R.layout.adapter_custom_toast, activity.findViewById(R.id.custom_toast_layout));
-        layout.setBackgroundDrawable(activity.getDrawable(R.drawable.background_custom_toast));
-        TextView tv = layout.findViewById(R.id.txt_custom_toast);
-        tv.setText(msg);
-        if(toast_item != null) toast_item.cancel();
-        toast_item = new Toast(activity.getApplicationContext());
-        toast_item.setGravity(Gravity.CENTER, 0, 0);
-        toast_item.setDuration(TIME);
-        toast_item.setView(layout);
-        toast_item.show();
+        try{
+            final LayoutInflater inflater = activity.getLayoutInflater();
+            final View layout = inflater.inflate(R.layout.adapter_custom_toast, activity.findViewById(R.id.custom_toast_layout));
+            layout.setBackgroundDrawable(activity.getDrawable(R.drawable.background_custom_toast));
+            TextView tv = layout.findViewById(R.id.txt_custom_toast);
+            tv.setText(msg);
+            if(toast_item != null) toast_item.cancel();
+            toast_item = new Toast(activity.getApplicationContext());
+            toast_item.setGravity(Gravity.CENTER, 0, 0);
+            toast_item.setDuration(TIME);
+            toast_item.setView(layout);
+            toast_item.show();
+        }catch (Exception ignore){}
     }
 }

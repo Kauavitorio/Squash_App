@@ -47,12 +47,13 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dev.kaua.squash.Activities.EditProfileActivity;
+import dev.kaua.squash.Activities.Profile.EditProfileActivity;
 import dev.kaua.squash.Activities.MainActivity;
-import dev.kaua.squash.Activities.MessageActivity;
-import dev.kaua.squash.Activities.ProfileInfoActivity;
+import dev.kaua.squash.Activities.Chat.MessageActivity;
+import dev.kaua.squash.Activities.Profile.ProfileInfoActivity;
 import dev.kaua.squash.Activities.QrCodeActivity;
 import dev.kaua.squash.Activities.Story.StoryActivity;
+import dev.kaua.squash.Adapters.Profile.Profile_Image;
 import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
@@ -132,7 +133,7 @@ public class ProfileFragment extends Fragment {
             int actual = Methods.parseUserLevel(txt_amount_followers_profile.getText().toString());
             if(btn_follow_following_profile.getText().toString().equals(follow)){
                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
-                btn_follow_following_profile.setText(requireContext().getString(R.string.following));
+                btn_follow_following_profile.setText(getString(R.string.following));
                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.black));
                 txt_amount_followers_profile.setText(String.valueOf((actual + 1)));
                 new Handler().postDelayed(() -> btn_go_chat_profile.setVisibility(View.VISIBLE), 1000);
@@ -140,7 +141,7 @@ public class ProfileFragment extends Fragment {
             }
             else if(btn_follow_following_profile.getText().toString().equals(following)){
                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_follow));
-                btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
+                btn_follow_following_profile.setText(getString(R.string.follow));
                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
                 txt_amount_followers_profile.setText(String.valueOf((actual - 1)));
                 btn_go_chat_profile.setVisibility(View.GONE);
@@ -261,7 +262,7 @@ public class ProfileFragment extends Fragment {
                                                     txt_amount_followers_profile.setText(Methods.NumberTrick(Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(response.body().getFollowers())))));
                                                 }
                                                 btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_follow));
-                                                btn_follow_following_profile.setText(requireContext().getString(R.string.follow));
+                                                btn_follow_following_profile.setText(getString(R.string.follow));
                                                 btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.white));
 
                                                 final int verified = Methods.parseUserLevel(EncryptHelper.decrypt(response.body().getVerification_level()));
@@ -291,7 +292,7 @@ public class ProfileFragment extends Fragment {
                                                 if(accounts.size() > 0){
                                                     btn_go_chat_profile.setVisibility(View.VISIBLE);
                                                     btn_follow_following_profile.setBackground(requireActivity().getDrawable(R.drawable.background_button_following));
-                                                    btn_follow_following_profile.setText(requireContext().getString(R.string.following));
+                                                    btn_follow_following_profile.setText(getString(R.string.following));
                                                     btn_follow_following_profile.setTextColor(requireActivity().getColor(R.color.black));
                                                 }
                                                 MainActivity.getInstance().ResetBundleProfile();
@@ -358,8 +359,8 @@ public class ProfileFragment extends Fragment {
     }
 
     private String LoadJoined(final String date) {
-        String format_date = date;
-        if(date != null){
+        String format_date = Methods.parseTestDate(date, Methods.JOINED_DATE_MASK);
+        if(format_date != null){
             try {
                 String[] split_date = format_date.split("/");
                 format_date = Methods.getMonth(Integer.parseInt(split_date[1])) + " " + split_date[2];
@@ -367,7 +368,7 @@ public class ProfileFragment extends Fragment {
                 Log.d(TAG, "Joined -> " + ex.toString());
             }
         }
-        return requireActivity().getString(R.string.joined) + " " + format_date;
+        return getString(R.string.joined) + " " + format_date;
     }
 
     @SuppressLint("SetTextI18n")
@@ -652,8 +653,13 @@ public class ProfileFragment extends Fragment {
                                 }
 
                             }else{
-                                ic_ProfileUser_profile.setEnabled(false);
+                                ic_ProfileUser_profile.setEnabled(true);
                                 ic_ProfileUser_profile.setBorderWidth(0);
+
+                                ic_ProfileUser_profile.setOnClickListener(v -> {
+                                    Profile_Image.showUserProfile(requireActivity(),
+                                            account.getProfile_image(), account.getUsername());
+                                });
                             }
 
                         }

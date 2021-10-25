@@ -7,7 +7,7 @@
     android:background="#e6e6e6"
     android:orientation="vertical"
     android:id="@+id/message_activity"
-    tools:context=".Activities.MessageActivity">
+    tools:context=".Activities.Chat.MessageActivity">
 
     <!-- Background System -->
     <ImageView
@@ -90,10 +90,11 @@
                         <!-- Image Verification Level -->
                         <ImageView
                             android:id="@+id/verification_ic_message"
-                            android:layout_width="20dp"
+                            android:layout_width="17dp"
                             android:layout_height="match_parent"
                             android:layout_marginStart="5dp"
                             android:visibility="gone"
+                            tools:visibility="visible"
                             android:src="@drawable/ic_verified_account"
                             tools:ignore="ContentDescription" />
 

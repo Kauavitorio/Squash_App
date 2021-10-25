@@ -1,4 +1,4 @@
-package dev.kaua.squash.Activities;
+package dev.kaua.squash.Activities.Auth;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

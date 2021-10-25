@@ -31,8 +31,8 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dev.kaua.squash.Activities.MainActivity;
-import dev.kaua.squash.Activities.MessageActivity;
-import dev.kaua.squash.Activities.ShareContentActivity;
+import dev.kaua.squash.Activities.Chat.MessageActivity;
+import dev.kaua.squash.Activities.Chat.ShareContentActivity;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.LocalDataBase.DaoChat;
@@ -200,6 +200,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
 
     private void CheckUserStatus(DtoAccount account, @NonNull ViewHolder holder) {
         if(!mContext.isDestroyed()){
+            Log.d("USER_AD_LOG", account.getLast_seen() + "");
             final boolean isChat = account.getStatus_chat() != null && account.getStatus_chat().equals(Methods.ONLINE);
             holder.img_status.setVisibility(View.VISIBLE);
 

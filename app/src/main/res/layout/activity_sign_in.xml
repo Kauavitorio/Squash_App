@@ -11,7 +11,7 @@
     android:theme="@style/EditsLoginAndSignUp"
     android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
     android:background="@color/base_color"
-    tools:context=".Activities.SignInActivity">
+    tools:context=".Activities.Auth.SignInActivity">
 
     <!-- Main Container -->
     <RelativeLayout

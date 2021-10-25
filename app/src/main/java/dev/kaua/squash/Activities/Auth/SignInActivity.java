@@ -1,4 +1,4 @@
-package dev.kaua.squash.Activities;
+package dev.kaua.squash.Activities.Auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import androidx.core.app.ActivityOptionsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import dev.kaua.squash.Activities.SplashActivity;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.Warnings;

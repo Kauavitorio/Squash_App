@@ -1,4 +1,4 @@
-package dev.kaua.squash.Activities;
+package dev.kaua.squash.Activities.Auth;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;

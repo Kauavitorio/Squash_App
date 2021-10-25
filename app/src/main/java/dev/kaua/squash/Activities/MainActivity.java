@@ -22,6 +22,8 @@ import com.google.android.play.core.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dev.kaua.squash.Activities.Chat.ShareContentActivity;
+import dev.kaua.squash.Activities.Posts.ComposeActivity;
 import dev.kaua.squash.Data.Account.AsyncUser_Follow;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.myFirebaseHelper;

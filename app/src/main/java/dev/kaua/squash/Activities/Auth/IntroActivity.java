@@ -1,10 +1,11 @@
-package dev.kaua.squash.Activities;
+package dev.kaua.squash.Activities.Auth;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -63,6 +64,9 @@ public class IntroActivity extends AppCompatActivity {
         Ids();
         getWindow().setStatusBarColor(getColor(R.color.header_intro_color));
         getWindow().setNavigationBarColor(getColor(R.color.bottom_intro_color));
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         //  Set create account btn click
         btn_create_account.setOnClickListener(v -> {

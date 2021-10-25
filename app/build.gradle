@@ -143,4 +143,7 @@ dependencies {
     // https://mvnrepository.com/artifact/io.github.url-detector/url-detector
     implementation 'io.github.url-detector:url-detector:0.1.23'
 
+    // Palette for images
+    implementation 'androidx.palette:palette:1.0.0'
+
 }

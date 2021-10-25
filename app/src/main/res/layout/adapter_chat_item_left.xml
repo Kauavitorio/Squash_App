@@ -24,14 +24,15 @@
         <!-- Container Reply info -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/container_reply"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="3dp"
             android:background="@drawable/background_replay_from_left"
-            android:minWidth="100dp"
+            android:minWidth="150dp"
             android:orientation="vertical"
             android:padding="4dp"
             android:visibility="gone"
+            tools:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/msg_chat_item"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -42,7 +43,7 @@
             <!-- Text Reply From -->
             <TextView
                 android:id="@+id/txt_reply_from"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginStart="5dp"
@@ -61,16 +62,18 @@
             <!-- Text Reply Content -->
             <TextView
                 android:id="@+id/reply_content"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
-                android:text="@string/app_name"
+                android:minWidth="150dp"
                 android:textColor="@color/hint"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txt_reply_from" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_reply_from"
+                tools:text="@string/desc_encrypted_message_chat" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -81,16 +84,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:layout_marginEnd="5dp"
             android:maxWidth="270dp"
             android:paddingStart="10dp"
             android:paddingEnd="5dp"
-            android:text="@string/desc_encrypted_message_chat"
+            tools:text="@string/app_name"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0" />

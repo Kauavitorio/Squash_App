@@ -1,4 +1,4 @@
-package dev.kaua.squash.Activities;
+package dev.kaua.squash.Activities.Posts;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -29,9 +29,7 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -94,17 +92,14 @@ public class ComposeActivity extends AppCompatActivity {
             if(post_image.size() > 0 || compose_text.length() > 0){
                 LoadingDialog loadingDialog = new LoadingDialog(this);
                 loadingDialog.startLoading();
-                Calendar c = Calendar.getInstance();
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("HH:mm a");
-                String date = df_date.format(c.getTime());
-                String time = df_time.format(c.getTime());
 
                 //  Set on DtoPost post information
                 final DtoPost post = new DtoPost();
                 post.setAccount_id(EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
-                post.setPost_time(EncryptHelper.encrypt(time));
-                post.setPost_date(EncryptHelper.encrypt(date));
+                post.setPost_time(EncryptHelper.encrypt(Methods.parseTestDate(String.valueOf(System.currentTimeMillis()),
+                        Methods.MSG_TIME_MASK)));
+                post.setPost_date(EncryptHelper.encrypt(Methods.parseTestDate(String.valueOf(System.currentTimeMillis()),
+                        Methods.DEFAULT_MASK)));
                 compose_text = compose_text.trim();
                 post.setPost_content(EncryptHelper.encrypt(compose_text));
                 post.setPost_topic(EncryptHelper.encrypt(""));
@@ -116,7 +111,6 @@ public class ComposeActivity extends AppCompatActivity {
                 call.enqueue(new Callback<DtoPost>() {
                     @Override
                     public void onResponse(@NotNull Call<DtoPost> call, @NotNull Response<DtoPost> response) {
-                        loadingDialog.dismissDialog();
                         if(response.code() == 201){
                             if(response.body() != null){
                                 final String post_id = response.body().getPost_id();
@@ -124,8 +118,10 @@ public class ComposeActivity extends AppCompatActivity {
                                 final HashMap<String, Object> hashMap = new HashMap<>();
                                 hashMap.put("post_id", post_id);
                                 hashMap.put("account_id", EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
-                                hashMap.put("post_time", EncryptHelper.encrypt(time));
-                                hashMap.put("post_date", EncryptHelper.encrypt(date));
+                                hashMap.put("post_time", EncryptHelper.encrypt(Methods.parseTestDate(String.valueOf(System.currentTimeMillis()),
+                                        Methods.MSG_TIME_MASK)));
+                                hashMap.put("post_date", EncryptHelper.encrypt(Methods.parseTestDate(String.valueOf(System.currentTimeMillis()),
+                                        Methods.DEFAULT_MASK)));
                                 hashMap.put("post_content", EncryptHelper.encrypt(finalCompose_text));
                                 hashMap.put("post_topic", EncryptHelper.encrypt(""));
                                 hashMap.put("post_images", post_image);
@@ -139,13 +135,17 @@ public class ComposeActivity extends AppCompatActivity {
                                 hashMap.put("active", MyPrefs.getUserInformation(ComposeActivity.this).getActive());
                                 myFirebaseHelper.getFirebaseDatabase().getReference()
                                         .child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD)
-                                        .push().setValue(hashMap);
-
-                                MainFragment.RefreshRecycler();
-                                ProfileFragment.getInstance().ReloadRecycler();
-                                finish();
+                                        .push().setValue(hashMap).addOnCompleteListener(task -> {
+                                            loadingDialog.dismissDialog();
+                                            MainFragment.RefreshRecycler();
+                                            ProfileFragment.getInstance().ReloadRecycler();
+                                            finish();
+                                        });
                             }
-                        }else Warnings.showWeHaveAProblem(ComposeActivity.this, ErrorHelper.NEW_POST_COMPOSE);
+                        }else {
+                            loadingDialog.dismissDialog();
+                            Warnings.showWeHaveAProblem(ComposeActivity.this, ErrorHelper.NEW_POST_COMPOSE);
+                        }
                     }
 
                     @Override

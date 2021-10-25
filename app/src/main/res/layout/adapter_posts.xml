@@ -122,7 +122,7 @@
                         android:layout_width="15dp"
                         android:layout_height="15dp"
                         android:layout_marginStart="2dp"
-                        android:layout_marginTop="2dp"
+                        android:layout_gravity="center"
                         android:src="@drawable/ic_verified_account"
                         tools:ignore="ContentDescription" />
 
@@ -161,7 +161,7 @@
                     android:layout_alignParentStart="true"
                     android:textColor="@color/black"
                     android:textSize="@dimen/post_content_text"
-                    tools:text="@string/setting" />
+                    tools:text="@string/ad_desc" />
 
                 <!-- Container Post Body -->
                 <!-- Message Body -->
