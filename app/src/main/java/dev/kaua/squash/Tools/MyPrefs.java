@@ -55,6 +55,7 @@ public abstract class MyPrefs {
         account.setSupport_visit(sp.getBoolean("pref_support_visit", false));
         account.setStory_tutorial(sp.getBoolean("pref_story_tutorial", false));
         account.setActive(sp.getLong("pref_active", DtoAccount.ACCOUNT_ACTIVE));
+        account.setPrivacyPolicy(sp.getLong("pref_privacyPolicy", DtoAccount.ACCOUNT_DISABLE));
         String type_acc = EncryptHelper.decrypt(sp.getString("pref_type_acc", null));
         if(type_acc == null) type_acc = String.valueOf(DtoAccount.NORMAL_ACCOUNT);
         account.setType_acc(type_acc);
@@ -62,14 +63,14 @@ public abstract class MyPrefs {
         return account;
     }
 
-    public static long SetAd_Point(@NonNull Context context, long points){
+    public static boolean setPrivacyPolicy(@NonNull Context context, long version){
         sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
 
         //  Add Request prefs
         SharedPreferences.Editor editor = sp.edit();
-        editor.putLong("pref_ad_points", points);
+        editor.putLong("pref_privacyPolicy", version);
         editor.apply();
-        return points;
+        return true;
     }
 
     public static void SetSupportVisit(@NonNull Context context){

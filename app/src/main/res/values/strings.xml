@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources [<!ENTITY privacy_policy "https://squashc.com/privacy/asset/Squash_Privacy_Policy_EN.pdf">]>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [<!ENTITY privacy_policy_direct "https://cloud.squashc.com/privacy/direct/">]>
 <resources>
 
     <!-- Natural Text -->
@@ -9,7 +10,7 @@
     <string name="or">Or</string><!-- End Natural Text -->
 
     <!-- Privacy Policy -->
-    <string name="privacy_policy_url">&privacy_policy;</string>
+    <string name="privacy_policy_url">https://cloud.squashc.com/privacy/</string>
 
     <!-- ADS -->
     <string name="main_banner" translatable="false">ca-app-pub-5161149668539506/1257131065</string>
@@ -160,9 +161,9 @@
     <string name="unable_to_download_the_image">Unable to download the image</string>
     <string name="image_downloaded_successfully">Image downloaded successfully</string>
     <string name="updating_its_terms_and_privacy_policy">Squash is updating its terms and privacy policy.</string>
-    <string name="key_updates_include_more_information_about">With this <font color='#FF6C26'><a href="&privacy_policy;">update</a></font>, we\'re providing more information in our terms and privacy policy, including how you can chat with businesses if you choose. This include:</string>
+    <string name="key_updates_include_more_information_about">With this <font color='#FF6C26'><a href="&privacy_policy_direct;">update</a></font>, we\'re providing more information in our terms and privacy policy, including how you can chat with businesses if you choose. This include:</string>
     <string name="services_and_how_we_process_your_data">1- More information about how Squash works; including how we process data and keep your account safe.</string>
-    <string name="please_accept_these_terms">Please accept these <font color='#FF6C26'><a href="&privacy_policy;">terms</a></font> to continue using Squash after this date. Learn about how we process your data in our updated <font color='#FF6C26'><a href="&privacy_policy;">privacy policy.</a></font></string>
+    <string name="please_accept_these_terms">Please accept these <font color='#FF6C26'><a href="&privacy_policy_direct;">terms</a></font> to continue using Squash after this date. Learn about how we process your data in our updated <font color='#FF6C26'><a href="&privacy_policy_direct;">privacy policy.</a></font></string>
     <string name="accept">Accept</string>
     <string name="network_usage">Network usage</string>
     <string name="usage">Usage</string>

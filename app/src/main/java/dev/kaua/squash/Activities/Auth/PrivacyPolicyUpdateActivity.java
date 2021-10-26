@@ -4,13 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
-import dev.kaua.squash.LocalDataBase.DaoSystem;
+import java.util.HashMap;
+
+import dev.kaua.squash.Firebase.myFirebaseHelper;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.LoadingDialog;
+import dev.kaua.squash.Tools.MyPrefs;
 
 public class PrivacyPolicyUpdateActivity extends AppCompatActivity {
     public static String PRIVACY_POLICY_TAG = "privacy_policy";
@@ -29,14 +31,22 @@ public class PrivacyPolicyUpdateActivity extends AppCompatActivity {
 
         btn_accept.setOnClickListener(v -> {
             accept = true;
-            DaoSystem daoSystem = new DaoSystem(this);
-            daoSystem.setPrivacyPolicy(version);
-            LoadingDialog loadingDialog = new LoadingDialog(this);
+
+            final HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("privacyPolicy", version);
+
+            final LoadingDialog loadingDialog = new LoadingDialog(this);
             loadingDialog.startLoading();
-            new Handler().postDelayed(() -> {
-                loadingDialog.dismissDialog();
-                finish();
-            }, 500);
+
+            myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.SYSTEM_REFERENCE)
+                    .child(myFirebaseHelper.PRIVACY_POLICY_VERSION_REFERENCE)
+                    .child(String.valueOf(MyPrefs.getUserInformation(this).getAccount_id()))
+                    .updateChildren(hashMap).addOnCompleteListener(task -> {
+                        if(MyPrefs.setPrivacyPolicy(PrivacyPolicyUpdateActivity.this, version)){
+                            loadingDialog.dismissDialog();
+                            finish();
+                        }
+                    });
         });
 
     }

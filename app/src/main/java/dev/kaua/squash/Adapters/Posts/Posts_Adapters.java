@@ -29,9 +29,6 @@ import androidx.viewpager.widget.ViewPager;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -129,8 +126,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         LayoutType = viewType;
         if(LayoutType == DtoPost.NORMAL_POST)
             return new MyHolderPosts(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_posts, parent, false));
-        else if(LayoutType == DtoPost.AD_POST)
-            return new MyHolderPosts(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_ad_post, parent, false));
         else
             return new MyHolderPosts(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_posts, parent, false));
     }
@@ -250,18 +245,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                 });
             }
             
-        }else if(LayoutType == DtoPost.AD_POST){
-            if(ConnectionHelper.isOnline(mContext)){
-                if(holder.adView_post != null){
-                    try {
-                        final AdView adView = new AdView(mContext);
-                        adView.setAdSize(new AdSize(300, 200));
-                        adView.setAdUnitId(mContext.getString(R.string.main_banner));
-                        adView.loadAd(new AdRequest.Builder().build());
-                        holder.adView_post.addView(adView);
-                    }catch (Exception ignore){}
-                }
-            }
         }
     }
 
@@ -671,7 +654,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
         RelativeLayout container_post_adapter;
         ViewPager img_view_paper;
         TabLayout tab_indicator_images;
-        AdView adView_post;
         LinearLayout main_container, btn_like_post, btn_share_post, btn_comment_post, suggestion_container;
 
         public MyHolderPosts(@NonNull View itemView) {
@@ -696,8 +678,6 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
                 img_view_paper = itemView.findViewById(R.id.img_view_paper);
                 tab_indicator_images = itemView.findViewById(R.id.tab_indicator_images);
                 main_container = itemView.findViewById(R.id.main_container_post_adapter);
-            }else{
-                adView_post = itemView.findViewById(R.id.adView_post);
             }
         }
     }
