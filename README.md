@@ -23,8 +23,8 @@ if there is a copy of this code without the indications of use of it, subject to
 
 * **Matheus Souza** - [Theus03](https://github.com/Theus03) - Designer
 
-<a href = "https://github.com/Kauavitorio/PalacePetz/graphs/contributors">
-  <img src = "https://contrib.rocks/image?repo=Kauavitorio/PalacePetz"/>
+<a href = "https://github.com/Kauavitorio/Squash_App/graphs/contributors">
+  <img src = "https://contrib.rocks/image?repo=Kauavitorio/Squash_App"/>
 </a>
 
 ## License
