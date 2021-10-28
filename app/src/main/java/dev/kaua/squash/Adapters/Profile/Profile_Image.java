@@ -111,7 +111,7 @@ public class Profile_Image extends EditProfileActivity {
                     Intent intent = new Intent(mContext, ViewMediaActivity.class);
                     intent.putExtra(ViewMediaActivity.IMAGE_URL_TAG, EncryptHelper.decrypt(imageUrl));
                     intent.putExtra(ViewMediaActivity.RECEIVE_TIME_TAG, ViewMediaActivity.POST_TAG);
-                    String id = userName + "_PROFILE_";
+                    String id = "IMG-" + userName + "-";
                     intent.putExtra(ViewMediaActivity.CHAT_ID_TAG, id);
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(mContext, R.anim.move_to_left_go, R.anim.move_to_right_go);
                     ActivityCompat.startActivity(mContext, intent, activityOptionsCompat.toBundle());

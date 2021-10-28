@@ -26,6 +26,7 @@ public class myFirebaseHelper {
     public static final String TOKENS_REFERENCE = "Tokens";
     public static final String CHAT_LIST_REFERENCE = "Chatslist";
     public static final String STORY_TUTORIAL_REFERENCE = "StoryTutorial";
+    public static final String PRIVACY_POLICY_VERSION_REFERENCE = "PrivacyPolicyVersion";
     public static final String SYSTEM_REFERENCE = "System";
     private static FirebaseAnalytics firebaseAnalytics;
     private static FirebaseAuth firebaseAuth;

@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
@@ -46,6 +47,7 @@ import dev.kaua.squash.Tools.Warnings;
 
 @SuppressLint({"SetJavaScriptEnabled", "UseCompatLoadingForDrawables"})
 public class WebActivity extends AppCompatActivity {
+    static final String TAG = "WebActivityLog";
     private WebView webView;
     private LinearProgressIndicator progressBar;
     private ImageView secure_status_web;
@@ -81,6 +83,24 @@ public class WebActivity extends AppCompatActivity {
 
         //  Check If page is loading or not
         webView.setWebViewClient(new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                final String URL = request.getUrl().toString();
+                if (URL.endsWith(".pdf")) {
+                    Log.d(TAG, URL);
+                    final Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(URL), "application/pdf");
+                    try {
+                        view.getContext().startActivity(intent);
+                    } catch (Exception e) {
+                        // User does not have a pdf viewer installed
+                        webView.loadUrl(DOCS_URL + URL);
+                    }
+                } else
+                    webView.loadUrl(URL);
+                return true;
+            }
+
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);

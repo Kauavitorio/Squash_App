@@ -158,16 +158,30 @@ public class MainFragment extends Fragment {
                                 DtoSystem system = snapshot.getValue(DtoSystem.class);
                                 if(system != null && system.getVersionName() != null){
                                     if(currentVersionCode < system.getVersionCode())
-                                        if(getContext() != null)
+                                        if(getContext() != null){
                                             if(MyPrefs.getUpdateRequest_Show(getContext()) == 0 || system.getNeedUpdate() == 1)
                                                 Warnings.showNeedUpdate(requireContext(), system.getVersionName(), system.getVersionCode(), (int) system.getNeedUpdate());
+                                        }
 
-                                    if(daoSystem.getPrivacyPolicy() < system.getPrivacy_policy())
-                                        Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
+                                    final DataSnapshot privacyVersionSnap = snapshot.child(myFirebaseHelper.PRIVACY_POLICY_VERSION_REFERENCE)
+                                                    .child(String.valueOf(MyPrefs.getUserInformation(getContext()).getAccount_id()));
+                                    if(privacyVersionSnap.exists()){
+                                        final DtoAccount dtoVersion = privacyVersionSnap.getValue(DtoAccount.class);
+                                        if(dtoVersion != null){
+                                            MyPrefs.setPrivacyPolicy(requireContext(), dtoVersion.getPrivacyPolicy());
 
-                                     MyPrefs.setStoryTutorial(getContext(),
+                                            if(MyPrefs.getUserInformation(requireContext()).getPrivacyPolicy() < system.getPrivacy_policy()
+                                                    && MyPrefs.getUserInformation(requireContext()).getPrivacyPolicy() < system.getPrivacy_policy())
+                                                Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
+                                        }
+                                    }else{
+                                        if(MyPrefs.getUserInformation(requireContext()).getPrivacyPolicy() < system.getPrivacy_policy())
+                                            Warnings.goToUpdateInPrivacyPolicy(getActivity(), system.getPrivacy_policy());
+                                    }
+
+                                     MyPrefs.setStoryTutorial(requireContext(),
                                              snapshot.child(myFirebaseHelper.STORY_TUTORIAL_REFERENCE)
-                                             .child(String.valueOf(MyPrefs.getUserInformation(getContext()).getAccount_id()))
+                                             .child(String.valueOf(MyPrefs.getUserInformation(requireContext()).getAccount_id()))
                                              .exists());
                                 }
                             }
@@ -214,7 +228,6 @@ public class MainFragment extends Fragment {
     private void Ids(View view) {
         instance = requireActivity();
         daoNotification = new DaoNotification(instance);
-        daoSystem = new DaoSystem(instance);
         shortCutsHelper = new ShortCutsHelper(instance);
         requireActivity().getWindow().setStatusBarColor(requireActivity().getColor(R.color.background_menu_sheet));
         requireActivity().getWindow().setNavigationBarColor(requireActivity().getColor(R.color.base_color));

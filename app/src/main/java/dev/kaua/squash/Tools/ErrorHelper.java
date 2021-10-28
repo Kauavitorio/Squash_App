@@ -1,6 +1,7 @@
 package dev.kaua.squash.Tools;
 
 public abstract class ErrorHelper {
+    public static final String LOAD_SOME_FILE_ERROR = "L-143";
     public static final String PROFILE_EDIT = "01";
     public static final String PROFILE_EDIT_IMAGE_UPLOAD = "02";
     public static final String PROFILE_EDIT_IMAGE_CROP = "03";

@@ -52,7 +52,6 @@ import dev.kaua.squash.Data.Account.AccountServices;
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Data.System.DtoSystem;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
-import dev.kaua.squash.LocalDataBase.DaoSystem;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Security.GoogleAuthHelper;
@@ -121,7 +120,6 @@ public class SignUpActivity extends AppCompatActivity {
         RunEditTextErrors();
         checking_password_have_minimum_characters();
         final Bundle bundle = getIntent().getExtras();
-        Log.d(TAG, GoogleAuthHelper.isGoogleLogin(this) + "");
         if(bundle != null){
             if(GoogleAuthHelper.getGoogleId() != null && GoogleAuthHelper.getGoogleId().length() > 3 && bundle.getInt(ERROR_CODE_TAG) == 0){
                 edit_name.setText(GoogleAuthHelper.GOOGLE_NAME);
@@ -271,8 +269,6 @@ public class SignUpActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         loadingDialog.dismissDialog();
 
-                        Privacy_PolicyCheck();
-
                         // Sign in success, now go to register user into API
                         FirebaseUser user = mAuth.getCurrentUser();
                         Log.w("Auth", "OK" + user);
@@ -286,12 +282,8 @@ public class SignUpActivity extends AppCompatActivity {
                         bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
                         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle_Analytics);
 
-                        Calendar c = Calendar.getInstance();
-                        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time = new SimpleDateFormat("dd MMMM yyyy HH:mm a");
-                        String formattedDate = df_time.format(c.getTime());
-
                         //  Register new user on Firebase Database
-                        reference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
+                        reference = FirebaseDatabase.getInstance().getReference(myFirebaseHelper.USERS_REFERENCE).child(userId);
                         HashMap<String, String> hashMap = new HashMap<>();
                         hashMap.put("id", userId);
                         assert response.body() != null;
@@ -301,7 +293,7 @@ public class SignUpActivity extends AppCompatActivity {
                         hashMap.put("account_id_cry", response.body().getAccount_id_cry());
                         hashMap.put("imageURL", "default");
                         hashMap.put("status_chat", "offline");
-                        hashMap.put("last_seen", formattedDate);
+                        hashMap.put("last_seen", String.valueOf(System.currentTimeMillis()));
                         hashMap.put("typingTo", "noOne");
 
                         DtoAccount follow = new DtoAccount();
@@ -319,6 +311,8 @@ public class SignUpActivity extends AppCompatActivity {
                         reference.setValue(hashMap).addOnCompleteListener(task1 -> {
                             if(task1.isSuccessful()) Log.d("User", "Register in Realtime database Successful");
                         });
+
+                        Privacy_PolicyCheck(Long.parseLong(EncryptHelper.decrypt(response.body().getAccount_id_cry())));
 
                         //  User has been created so now go to the Email Validation
                         final Intent i = new Intent(SignUpActivity.this, ValidateEmailActivity.class);
@@ -346,17 +340,23 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     //  Method to get last version of Privacy Policy
-    private void Privacy_PolicyCheck(){
+    private void Privacy_PolicyCheck(long userId){
         if(ConnectionHelper.isOnline(SignUpActivity.this)){
-            reference = myFirebaseHelper.getFirebaseDatabase().getReference("System");
-            reference.addValueEventListener(new ValueEventListener() {
+            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.SYSTEM_REFERENCE);
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(ConnectionHelper.isOnline(SignUpActivity.this)){
-                        DtoSystem system = snapshot.getValue(DtoSystem.class);
-                        if(system != null) {
-                            DaoSystem daoSystem = new DaoSystem(SignUpActivity.this);
-                            daoSystem.setPrivacyPolicy(system.getPrivacy_policy());
+                        final DtoSystem system = snapshot.getValue(DtoSystem.class);
+                        if(system != null && userId != DtoAccount.NORMAL_ACCOUNT) {
+
+                            final HashMap<String, Object> hashMapPrivacy = new HashMap<>();
+                            hashMapPrivacy.put("privacyPolicy", system.getPrivacy_policy());
+
+                            Log.d(TAG, userId + " <- Id");
+                            reference.child(myFirebaseHelper.PRIVACY_POLICY_VERSION_REFERENCE)
+                                    .child(String.valueOf(userId))
+                                    .updateChildren(hashMapPrivacy).addOnCompleteListener(task -> MyPrefs.setPrivacyPolicy(SignUpActivity.this, system.getPrivacy_policy()));
                         }
                     }
                 }

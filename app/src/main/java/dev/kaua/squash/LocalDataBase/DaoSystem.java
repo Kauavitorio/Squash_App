@@ -48,14 +48,6 @@ public class DaoSystem extends SQLiteOpenHelper {
         return cursor.moveToNext();
     }
 
-    public long getPrivacyPolicy(){
-        String command = "SELECT * FROM " + TABLE + " WHERE id_system = 1";
-        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, null);
-        if(cursor.moveToNext()){
-            return cursor.getLong(1);
-        }else return 0;
-    }
-
     public void setNeedResetAccount(String info){
         String command = "SELECT * FROM " + TABLE + " WHERE id_system = 1";
         @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, null);
@@ -68,22 +60,6 @@ public class DaoSystem extends SQLiteOpenHelper {
             values.put("id_system", 1);
             values.put("PrivacyPolicy", 0);
             values.put("need_reset", info);
-            getWritableDatabase().insert(TABLE, null, values);
-        }
-    }
-
-    public void setPrivacyPolicy(long version){
-        String command = "SELECT * FROM " + TABLE;
-        @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, null);
-        if(cursor.moveToNext()){
-
-            ContentValues values = new ContentValues();
-            values.put("PrivacyPolicy", version);
-            getWritableDatabase().update(TABLE, values, "id_system=?", new String[]{"1"});
-        }else{
-            ContentValues values = new ContentValues();
-            values.put("id_system", 1);
-            values.put("PrivacyPolicy", version);
             getWritableDatabase().insert(TABLE, null, values);
         }
     }
