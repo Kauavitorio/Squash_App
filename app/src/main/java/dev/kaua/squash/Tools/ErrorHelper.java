@@ -30,6 +30,7 @@ public abstract class ErrorHelper {
     public static final String BACKGROUND_HELPER_UPLOAD = "26";
     public static final String COMMENT_LIKE_ACTION = "27";
     public static final String FOLLOWING_FOLLOWERS_CLICK = "28";
+    public static final String PROFILE_NO_ID = "29-ID";
     public static final String PROFILE_IMAGE_UPLOAD = "29";
     public static final String FOLLOWING_SHOW_LIST = "30";
     public static final String LOGIN_ACTION = "31";

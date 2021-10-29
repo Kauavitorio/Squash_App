@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class UserPermissions {
     private static final String TAG = "PermissionsRequest";
+    public static final int PERMISSIONS_REQUEST = 4561;
 
     public static void validatePermissions(@NonNull String[] permissions, Activity activity, int requestCode){
         ArrayList<String> PermissionList = new ArrayList<>();

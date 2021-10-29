@@ -214,9 +214,14 @@ public class SearchFragment extends Fragment {
         if(arrayListDto.size() != finalFeedList.size() && getContext() != null && getActivity() != null){
             finalFeedList.clear();
             for (DtoPost post: arrayListDto){
-                if(!daoFollowing.check_if_follow(MyPrefs.getUserInformation(getContext()).getAccount_id(),
-                        Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id())))))
-                    finalFeedList.add(post);
+                try{
+                    String idToParse = EncryptHelper.decrypt(post.getAccount_id());
+                    if(idToParse == null) idToParse = "0";
+
+                    if(!daoFollowing.check_if_follow(MyPrefs.getUserInformation(getContext()).getAccount_id(),
+                            Long.parseLong(idToParse)))
+                        finalFeedList.add(post);
+                }catch (Exception ignore){}
             }
             if(currentSize != finalFeedList.size() && !getActivity().isFinishing() && !getActivity().isDestroyed()){
                 currentSize = finalFeedList.size();

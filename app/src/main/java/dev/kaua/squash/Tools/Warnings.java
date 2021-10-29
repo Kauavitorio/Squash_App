@@ -219,7 +219,7 @@ public class Warnings {
         Dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         btnOk_WeHaveAProblem = Dialog.findViewById(R.id.btnOk_WeHaveAProblem);
         Dialog.setCancelable(false);
-        ((TextView)Dialog.findViewById(R.id.error_title_problem_adapter)).setText(context.getString(R.string.error_code, ERROR_CODE));
+        ((TextView)Dialog.findViewById(R.id.base_error_title_problem_adapter)).setText(context.getString(R.string.error_code, ERROR_CODE));
 
         btnOk_WeHaveAProblem.setOnClickListener(v -> {
             btnOk_WeHaveAProblem.startAnimation(AnimationUtils.loadAnimation(context,R.anim.click_anim));
@@ -238,13 +238,30 @@ public class Warnings {
         Dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         btnOk_WeHaveAProblem = Dialog.findViewById(R.id.btnOk_WeHaveAProblem);
         Dialog.setCancelable(false);
-        ((TextView)Dialog.findViewById(R.id.error_title_problem_adapter)).setText(context.getString(R.string.suspended_account));
-        ((TextView)Dialog.findViewById(R.id.txt_wehaveAProblemAlert)).setText(context.getString(R.string.your_account_has_been_suspended));
+        ((TextView)Dialog.findViewById(R.id.base_error_title_problem_adapter)).setText(context.getString(R.string.suspended_account));
+        ((TextView)Dialog.findViewById(R.id.txt_base_err_adapter)).setText(context.getString(R.string.your_account_has_been_suspended));
 
         btnOk_WeHaveAProblem.setOnClickListener(v -> {
             btnOk_WeHaveAProblem.startAnimation(AnimationUtils.loadAnimation(context,R.anim.click_anim));
             Dialog.dismiss();
         });
+
+        Dialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
+        Dialog.show();
+    }
+
+    public static void showProfilePicUpdated(Context context){
+        Dialog = new Dialog(context);
+
+        TextView btnOk;
+        Dialog.setContentView(R.layout.adapter_wehaveaproblem);
+        Dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        btnOk = Dialog.findViewById(R.id.btnOk_WeHaveAProblem);
+        Dialog.setCancelable(false);
+        ((TextView)Dialog.findViewById(R.id.base_error_title_problem_adapter)).setText(context.getString(R.string.updated_photo));
+        ((TextView)Dialog.findViewById(R.id.txt_base_err_adapter)).setText(context.getString(R.string.updated_photo_desc_time));
+
+        btnOk.setOnClickListener(v -> Dialog.dismiss());
 
         Dialog.getWindow().getAttributes().windowAnimations = R.style.MyAlertDialogStyle;
         Dialog.show();

@@ -327,4 +327,6 @@
     <string name="camera_and_storage_permission_required">Câmera e permissão de armazenamento necessários para esta função.</string>
     <string name="go_to_setting_story_perm_request">Câmera e permissão de armazenamento armazenado para esta função.\nVá para as configurações e habilite as permissões</string>
     <string name="your_google_account_has_been_linked_squash">Sua conta do Google foi vinculada à sua conta do Squash.</string>
+    <string name="updated_photo">Foto Atualizada</string>
+    <string name="updated_photo_desc_time">Pode levar até 2 dias para que a imagem seja atualizada em toda a plataforma.</string>
 </resources>

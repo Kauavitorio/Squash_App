@@ -73,6 +73,15 @@ public abstract class MyPrefs {
         return true;
     }
 
+    public static void updateProfileImage(@NonNull Context context, String img){
+        sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
+
+        //  Add Request prefs
+        final SharedPreferences.Editor editor = sp.edit();
+        editor.putString("pref_profile_image", img);
+        editor.apply();
+    }
+
     public static void SetSupportVisit(@NonNull Context context){
         sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
 

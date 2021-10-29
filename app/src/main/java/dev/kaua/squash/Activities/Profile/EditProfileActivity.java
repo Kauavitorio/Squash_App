@@ -29,7 +29,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.yalantis.ucrop.UCrop;
@@ -120,15 +119,14 @@ public class EditProfileActivity extends AppCompatActivity {
 
                     loadingDialog = new LoadingDialog(this);
                     loadingDialog.startLoading();
-                    Call<DtoAccount> call = services.edit(newInfo);
-                    call.enqueue(new Callback<DtoAccount>() {
+                    services.edit(newInfo).enqueue(new Callback<DtoAccount>() {
                         @Override
                         public void onResponse(@NotNull Call<DtoAccount> call, @NotNull Response<DtoAccount> response) {
                             loadingDialog.dismissDialog();
                             if(response.code() == 200){
                                 btn_edit_profile.setEnabled(false);
 
-                                //  Clear all prefs before login user
+                                //  Get user prefs
                                 mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
 
                                 //  Add User prefs
@@ -155,11 +153,11 @@ public class EditProfileActivity extends AppCompatActivity {
                                 });
 
                                 //  Update all user posts
-                                Query applesQuery = myFirebaseHelper.getFirebaseDatabase().getReference()
+                                myFirebaseHelper.getFirebaseDatabase().getReference()
                                         .child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("account_id")
-                                        .equalTo(EncryptHelper.encrypt(MyPrefs.getUserInformation(EditProfileActivity.this).getAccount_id() + ""));
-
-                                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        .equalTo(EncryptHelper.encrypt(String.valueOf(MyPrefs.getUserInformation(EditProfileActivity.this)
+                                                .getAccount_id())))
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
                                         for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
@@ -279,7 +277,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void OpenGallery() {
-        UserPermissions.validatePermissions(permissions, this, 189);
+        UserPermissions.validatePermissions(permissions, this, UserPermissions.PERMISSIONS_REQUEST);
         int GalleryPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
             Intent openGallery = new Intent();
@@ -295,18 +293,6 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         loadingDialog = new LoadingDialog(this);
-        if(requestCode == 189){
-            UserPermissions.validatePermissions(permissions, this, 189);
-            int GalleryPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-            if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
-                Intent openGallery = new Intent();
-                openGallery.setType("image/*");
-                openGallery.setAction(Intent.ACTION_PICK);
-                //noinspection deprecation
-                startActivityForResult(Intent.createChooser(openGallery, getString(R.string.select_an_image)), PICK_IMAGE_REQUEST);
-            }
-        }
-
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null){
             Uri filePath = data.getData();
             LoadingDialog dialog = new LoadingDialog(this);
@@ -322,8 +308,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                 try {
-                                    @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date());
-                                    file_upload_to_crop = Methods.SaveImage(EditProfileActivity.this, resource, "user_profile_image", timeStamp);
+                                    file_upload_to_crop = new File(CapturePhotoUtils.insertImage(getContentResolver(), resource, "user_profile_image", "")));
                                     dialog.dismissDialog();
                                     UCrop.of(filePath, Uri.fromFile(file_upload_to_crop))
                                             .start(EditProfileActivity.this);
@@ -357,6 +342,19 @@ public class EditProfileActivity extends AppCompatActivity {
                     Log.d(TAG, cropError.toString());
             }
             Warnings.showWeHaveAProblem(this, ErrorHelper.PROFILE_EDIT_IMAGE_CROP);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == UserPermissions.PERMISSIONS_REQUEST){
+            if(grantResults.length > 0){
+                int GalleryPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                if (GalleryPermission == PackageManager.PERMISSION_GRANTED){
+                    OpenGallery();
+                }
+            }
         }
     }
 
