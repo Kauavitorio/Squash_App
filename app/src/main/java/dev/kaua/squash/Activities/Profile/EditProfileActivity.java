@@ -130,11 +130,11 @@ public class EditProfileActivity extends AppCompatActivity {
                                 mPrefs = getSharedPreferences(MyPrefs.PREFS_USER, MODE_PRIVATE);
 
                                 //  Add User prefs
+                                MyPrefs.updateProfileImage(EditProfileActivity.this, EncryptHelper.encrypt(new_image));
                                 SharedPreferences.Editor editor = mPrefs.edit();
                                 if(response.body() != null){
                                     editor.putString("pref_name_user", EncryptHelper.encrypt(edit_name.getText().toString()));
                                     editor.putString("pref_username", EncryptHelper.encrypt(edit_username.getText().toString()));
-                                    editor.putString("pref_profile_image", EncryptHelper.encrypt(new_image));
                                     editor.putString("pref_bio_user", EncryptHelper.encrypt(edit_bio.getText().toString()));
                                     editor.apply();
                                 }

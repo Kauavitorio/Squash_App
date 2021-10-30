@@ -15,6 +15,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
@@ -206,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
     public void getUserInformationAndLoadProfile(){
         account = MyPrefs.getUserInformation(this);
         Glide.with(this).load(account.getProfile_image()).diskCacheStrategy(DiskCacheStrategy.ALL)
+                .signature(new ObjectKey(account.getProfile_image()))
                 .into(btn_profile_main);
     }
 

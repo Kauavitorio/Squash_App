@@ -97,6 +97,7 @@ public class ComposeActivity extends AppCompatActivity {
 
                 //  Set on DtoPost post information
                 final DtoPost post = new DtoPost();
+                post.setAccId(EncryptHelper.encrypt(myFirebaseHelper.getFirebaseAuth().getUid()));
                 post.setAccount_id(EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
                 post.setPost_time(dateTimeLongStr);
                 post.setPost_date(dateTimeLongStr);
@@ -118,6 +119,7 @@ public class ComposeActivity extends AppCompatActivity {
                                 final HashMap<String, Object> hashMap = new HashMap<>();
                                 hashMap.put("post_id", post_id);
                                 hashMap.put("account_id", EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
+                                hashMap.put("accId", EncryptHelper.encrypt(myFirebaseHelper.getFirebaseAuth().getUid()));
                                 hashMap.put("post_time", dateTimeLongStr);
                                 hashMap.put("post_date", dateTimeLongStr);
                                 hashMap.put("post_content", EncryptHelper.encrypt(finalCompose_text));

@@ -16,17 +16,10 @@ import android.widget.TextView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
 import java.util.Objects;
 
 import dev.kaua.squash.Activities.Medias.ViewMediaActivity;
@@ -88,32 +81,15 @@ public class Profile_Image extends EditProfileActivity {
                                     loadingDialog.dismissDialog();
                                     new_image = uri.toString();
                                     Log.d("DEBUG_CHAT",  new_image);
-                                    Glide.with(mContext).load(new_image).diskCacheStrategy(DiskCacheStrategy.ALL)
-                                            .into(ic_edit_ProfileUser);
 
                                     if(!MyPrefs.getUserInformation(mContext).getProfile_image()
                                             .contains(myFirebaseHelper.USERS_REFERENCE)){
 
                                         MyPrefs.updateProfileImage(mContext, EncryptHelper.encrypt(new_image));
 
-                                        //  Update all user posts
-                                        final Query applesQuery = myFirebaseHelper.getFirebaseDatabase().getReference()
-                                                .child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("account_id")
-                                                .equalTo(EncryptHelper.encrypt(String.valueOf(MyPrefs.getUserInformation(mContext).getAccount_id())));
-                                        applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                                                for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                                                    final HashMap<String, Object> hashMap = new HashMap<>();
-                                                    hashMap.put("profile_image", EncryptHelper.encrypt(new_image));
-                                                    appleSnapshot.getRef().updateChildren(hashMap);
-                                                }
-                                            }
-                                            @Override
-                                            public void onCancelled(@NotNull DatabaseError databaseError) {
-                                                Log.e("EditProfile", "onCancelled", databaseError.toException());
-                                            }
-                                        });
+                                        Glide.with(mContext).load(new_image)
+                                                .signature(new ObjectKey(MyPrefs.getUserInformation(mContext).getProfile_image()))
+                                                .into(ic_edit_ProfileUser);
 
                                         new Handler().postDelayed(() -> {
                                             try {
@@ -121,6 +97,10 @@ public class Profile_Image extends EditProfileActivity {
                                                 Warnings.showProfilePicUpdated(mContext);
                                             }catch (Exception ignore){}
                                         }, 350);
+                                    }else{
+                                        Glide.with(mContext).load(new_image)
+                                                .signature(new ObjectKey(MyPrefs.getUserInformation(mContext).getProfile_image()))
+                                                .into(ic_edit_ProfileUser);
                                     }
                                 });
                             }else
@@ -168,5 +148,4 @@ public class Profile_Image extends EditProfileActivity {
             ToastHelper.toast(mContext, ex.getMessage(), ToastHelper.SHORT_DURATION);
         }
     }
-
 }
