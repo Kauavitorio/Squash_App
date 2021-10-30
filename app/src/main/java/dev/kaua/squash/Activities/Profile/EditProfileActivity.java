@@ -64,7 +64,7 @@ import retrofit2.Retrofit;
 
 @SuppressLint("StaticFieldLeak")
 public class EditProfileActivity extends AppCompatActivity {
-    private static final String TAG = "EditProfileLOG";
+    public static final String TAG = "EditProfileLOG";
     public static CircleImageView ic_edit_ProfileUser;
     TextInputEditText edit_name, edit_username, edit_bio;
     Button btn_edit_profile;

@@ -27,7 +27,7 @@ public class DaoPosts extends SQLiteOpenHelper {
 
 
     public DaoPosts(@Nullable Context context) {
-        super(context, "DB_POSTS", null, 6);
+        super(context, "DB_POSTS", null, 7);
     }
 
     @Override
@@ -50,7 +50,8 @@ public class DaoPosts extends SQLiteOpenHelper {
                 "post_likes varchar(400) not null," +
                 "post_images varchar(400)," +
                 "post_comments_amount varchar(400) not null," +
-                "post_topic varchar(500) not null)";
+                "post_topic varchar(500) not null," +
+                "accId varchar(400))";
 
         db.execSQL(command);
 
@@ -120,7 +121,7 @@ public class DaoPosts extends SQLiteOpenHelper {
                 else values.put("post_images", "NaN");
                 values.put("post_comments_amount", post.get(i).getPost_comments_amount());
                 values.put("post_topic", post.get(i).getPost_topic());
-                Log.d("InsertPost", post.get(i).getName_user());
+                values.put("accId", post.get(i).getAccId());
 
                 getWritableDatabase().insert(TABLE_POSTS, null, values);
             }
@@ -161,6 +162,7 @@ public class DaoPosts extends SQLiteOpenHelper {
                 post.setPost_images(Collections.singletonList(cursor.getString(10)));
                 post.setPost_comments_amount(cursor.getString(11));
                 post.setPost_topic(cursor.getString(12));
+                post.setAccId(cursor.getString(13));
                 dtoPosts.add(post);
             }
         }

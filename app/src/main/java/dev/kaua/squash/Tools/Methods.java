@@ -306,9 +306,6 @@ public abstract class Methods extends MainActivity {
     public static final String OFFLINE = "offline";
     //  Method to set new user status for chat system
     public static void status_chat(String status, Context context){
-        Calendar c = Calendar.getInstance();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_date = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
-        String formattedDate = df_date.format(c.getTime());
         firebaseUser = myFirebaseHelper.getFirebaseUser();
         //noinspection ConstantConditions
         if(firebaseUser != null && firebaseUser.getUid() != null){
@@ -316,7 +313,7 @@ public abstract class Methods extends MainActivity {
             reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(firebaseUser.getUid());
             final HashMap<String, Object> hashMap = new HashMap<>();
             if(status.equals(OFFLINE))
-                hashMap.put("last_seen", formattedDate);
+                hashMap.put("last_seen", String.valueOf(System.currentTimeMillis()));
             hashMap.put("status_chat", status);
             hashMap.put("verification_level", EncryptHelper.encrypt(String.valueOf(getUserLevel(context))));
 

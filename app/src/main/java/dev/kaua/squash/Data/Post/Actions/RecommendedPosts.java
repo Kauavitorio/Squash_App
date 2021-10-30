@@ -78,6 +78,7 @@ public class RecommendedPosts extends MainFragment {
                                         daoFollowing.check_if_follow(MyPrefs.getUserInformation(context).getAccount_id(),
                                                 Long.parseLong(Objects.requireNonNull(EncryptHelper.decrypt(post.getAccount_id()))))
                                 && post.getActive() > DtoAccount.ACCOUNT_DISABLE){
+                                    post.setAccId(EncryptHelper.decrypt(post.getAccId()));
                                     post.setPost_id(EncryptHelper.decrypt(post.getPost_id()));
                                     post.setAccount_id(EncryptHelper.decrypt(post.getAccount_id()));
                                     post.setVerification_level(EncryptHelper.decrypt(post.getVerification_level()));
@@ -175,9 +176,10 @@ public class RecommendedPosts extends MainFragment {
                     if(!context.isDestroyed() && !context.isFinishing()){
                         arraylist.clear();
                         for(DataSnapshot snapshot: datasnapshot.getChildren()){
-                            DtoPost dtoPost = snapshot.getValue(DtoPost.class);
-                            DtoPost post = new DtoPost();
+                            final DtoPost dtoPost = snapshot.getValue(DtoPost.class);
+                            final DtoPost post = new DtoPost();
                             if(dtoPost != null && dtoPost.getAccount_id() != null && dtoPost.getActive() > DtoAccount.ACCOUNT_DISABLE){
+                                post.setAccId(EncryptHelper.decrypt(dtoPost.getAccId()));
                                 post.setPost_id(EncryptHelper.decrypt(dtoPost.getPost_id()));
                                 post.setAccount_id(EncryptHelper.decrypt(dtoPost.getAccount_id()));
                                 post.setVerification_level(EncryptHelper.decrypt(dtoPost.getVerification_level()));

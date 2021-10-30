@@ -45,4 +45,8 @@ public abstract class ErrorHelper {
     public static final String REQUEST_VERIFICATION_REQUEST = "38";
     public static final String REQUEST_VERIFICATION_FAILURE = "38/2";
     public static final String GOOGLE_TEST_FAILURE = "39";
+    public static final String UPDATE_PROFILE_IMAGE_FAILURE = "40-A";
+    public static final String UPDATE_PROFILE_IMAGE_SERVER_INFO = "40-i";
+    public static final String UPDATE_PROFILE_IMAGE_STORAGE = "40-S";
+    public static final String UPDATE_PROFILE_IMAGE_FIRE = "40-F";
 }
