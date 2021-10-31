@@ -90,16 +90,17 @@ public class ComposeActivity extends AppCompatActivity {
         btn_post.setOnClickListener(v -> {
             String compose_text = edit_compose_msg.getText().toString();
             if(post_image.size() > 0 || compose_text.length() > 0){
-                LoadingDialog loadingDialog = new LoadingDialog(this);
+                final LoadingDialog loadingDialog = new LoadingDialog(this);
                 loadingDialog.startLoading();
+
+                final String dateTimeLongStr = EncryptHelper.encrypt(String.valueOf(System.currentTimeMillis()));
 
                 //  Set on DtoPost post information
                 final DtoPost post = new DtoPost();
+                post.setAccId(EncryptHelper.encrypt(myFirebaseHelper.getFirebaseAuth().getUid()));
                 post.setAccount_id(EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
-                post.setPost_time(EncryptHelper.encrypt(Methods.parseTestDate(String.valueOf(System.currentTimeMillis()),
-                        Methods.MSG_TIME_MASK)));
-                post.setPost_date(EncryptHelper.encrypt(Methods.parseTestDate(String.valueOf(System.currentTimeMillis()),
-                        Methods.DEFAULT_MASK)));
+                post.setPost_time(dateTimeLongStr);
+                post.setPost_date(dateTimeLongStr);
                 compose_text = compose_text.trim();
                 post.setPost_content(EncryptHelper.encrypt(compose_text));
                 post.setPost_topic(EncryptHelper.encrypt(""));
@@ -118,10 +119,9 @@ public class ComposeActivity extends AppCompatActivity {
                                 final HashMap<String, Object> hashMap = new HashMap<>();
                                 hashMap.put("post_id", post_id);
                                 hashMap.put("account_id", EncryptHelper.encrypt(String.valueOf(userAccount.getAccount_id())));
-                                hashMap.put("post_time", EncryptHelper.encrypt(Methods.parseTestDate(String.valueOf(System.currentTimeMillis()),
-                                        Methods.MSG_TIME_MASK)));
-                                hashMap.put("post_date", EncryptHelper.encrypt(Methods.parseTestDate(String.valueOf(System.currentTimeMillis()),
-                                        Methods.DEFAULT_MASK)));
+                                hashMap.put("accId", EncryptHelper.encrypt(myFirebaseHelper.getFirebaseAuth().getUid()));
+                                hashMap.put("post_time", dateTimeLongStr);
+                                hashMap.put("post_date", dateTimeLongStr);
                                 hashMap.put("post_content", EncryptHelper.encrypt(finalCompose_text));
                                 hashMap.put("post_topic", EncryptHelper.encrypt(""));
                                 hashMap.put("post_images", post_image);

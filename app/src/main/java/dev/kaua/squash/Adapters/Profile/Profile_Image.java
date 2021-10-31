@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.animation.AnimationUtils;
@@ -12,25 +13,36 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.gms.tasks.Task;
-import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
 import java.util.Objects;
 
 import dev.kaua.squash.Activities.Medias.ViewMediaActivity;
 import dev.kaua.squash.Activities.Profile.EditProfileActivity;
+import dev.kaua.squash.Data.Account.AccountServices;
+import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Firebase.myFirebaseHelper;
+import dev.kaua.squash.Fragments.ProfileFragment;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.ErrorHelper;
 import dev.kaua.squash.Tools.LoadingDialog;
+import dev.kaua.squash.Tools.Methods;
+import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.Warnings;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -41,56 +53,119 @@ import dev.kaua.squash.Tools.Warnings;
 
 public class Profile_Image extends EditProfileActivity {
     private static Dialog dialog;
+    static final Retrofit retrofit = Methods.GetRetrofitBuilder();
 
-    public static void SendToCrop(Activity context, Uri filePath) {
-        LoadingDialog loadingDialog = new LoadingDialog(context);
+    public static void SendToCrop(Activity mContext, Uri filePath) {
+        final LoadingDialog loadingDialog = new LoadingDialog(mContext);
         loadingDialog.startLoading();
         try {
             //getting image from gallery
             if(filePath != null) {
-                ic_edit_ProfileUser.setCircleBackgroundColor(context.getColor(R.color.black));
+                final String mId = myFirebaseHelper.getFirebaseAuth().getUid();
+                if(mId != null){
+                    ic_edit_ProfileUser.setCircleBackgroundColor(mContext.getColor(R.color.black));
 
-                Bitmap bitmapImage = MediaStore.Images.Media.getBitmap(context.getContentResolver(), filePath);
-                int nh = (int) ( bitmapImage.getHeight() * (512.0 / bitmapImage.getWidth()) );
-                Bitmap scaled = Bitmap.createScaledBitmap(bitmapImage, 512, nh, true);
-                ic_edit_ProfileUser.setImageBitmap(scaled);
-                ic_edit_ProfileUser.setDrawingCacheEnabled(true);
-                ic_edit_ProfileUser.buildDrawingCache();
+                    final Bitmap bitmapImage = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), filePath);
+                    int nh = (int) ( bitmapImage.getHeight() * (512.0 / bitmapImage.getWidth()) );
+                    Bitmap scaled = Bitmap.createScaledBitmap(bitmapImage, 512, nh, true);
+                    ic_edit_ProfileUser.setImageBitmap(scaled);
+                    ic_edit_ProfileUser.setDrawingCacheEnabled(true);
+                    ic_edit_ProfileUser.buildDrawingCache();
 
-                ByteArrayOutputStream aOutStream = new ByteArrayOutputStream();
-                scaled.compress(Bitmap.CompressFormat.PNG, 100, aOutStream);
-                byte[] dataUpload = aOutStream.toByteArray();
+                    ByteArrayOutputStream aOutStream = new ByteArrayOutputStream();
+                    scaled.compress(Bitmap.CompressFormat.PNG, 100, aOutStream);
+                    byte[] dataUpload = aOutStream.toByteArray();
 
-                ic_edit_ProfileUser.setCircleBackgroundColor(context.getColor(R.color.base_color));
-                storageReference = myFirebaseHelper.getFirebaseStorage().child(myFirebaseHelper.USERS_REFERENCE).child(myFirebaseHelper.PROFILE_REFERENCE).child("User_" + user.getAccount_id() +
-                        "_" + myFirebaseHelper.getFirebaseAuth().getUid());
-                storageReference.putBytes(dataUpload).addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        loadingDialog.dismissDialog();
-                        Log.d("DEBUG_CHAT", Objects.requireNonNull(task.getException()).toString());
-                    }
-                    if (task.getResult().getMetadata() != null) {
-                        if (task.getResult().getMetadata().getReference() != null) {
-                            final Task<Uri> result = task.getResult().getStorage().getDownloadUrl();
-                            result.addOnSuccessListener(uri -> {
-                                loadingDialog.dismissDialog();
-                                String imageUrl = uri.toString();
-                                new_image = imageUrl;
-                                Log.d("DEBUG_CHAT",  imageUrl);
-                                Picasso.get().load(imageUrl).into(ic_edit_ProfileUser);
-                            });
-                        }else
+                    ic_edit_ProfileUser.setCircleBackgroundColor(mContext.getColor(R.color.base_color));
+                    storageReference = myFirebaseHelper.getFirebaseStorage()
+                            .child(myFirebaseHelper.PROFILE_REFERENCE).child(mId);
+                    storageReference.putBytes(dataUpload).addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
                             loadingDialog.dismissDialog();
-                    }
-                });
+                            Log.d("DEBUG_CHAT", Objects.requireNonNull(task.getException()).toString());
+                            Warnings.showWeHaveAProblem(mContext, ErrorHelper.UPDATE_PROFILE_IMAGE_STORAGE);
+                        }
+                        if (task.getResult().getMetadata() != null) {
+                            if (task.getResult().getMetadata().getReference() != null) {
+                                final Task<Uri> result = task.getResult().getStorage().getDownloadUrl();
+                                result.addOnSuccessListener(uri -> {
+                                    loadingDialog.dismissDialog();
+                                    new_image = uri.toString();
+                                    Log.d("DEBUG_CHAT",  new_image);
+
+                                    if(!MyPrefs.getUserInformation(mContext).getProfile_image()
+                                            .contains(myFirebaseHelper.USERS_REFERENCE)){
+
+                                        //  Update image on API
+                                        AccountServices services = retrofit.create(AccountServices.class);
+
+                                        final LoadingDialog lgDialog = new LoadingDialog(mContext);
+                                        lgDialog.startLoading();
+
+                                        final DtoAccount new_profilePicture = new DtoAccount();
+                                        new_profilePicture.setProfile_image(EncryptHelper.encrypt(new_image));
+                                        new_profilePicture.setAccount_id_cry(EncryptHelper.encrypt(String.valueOf(MyPrefs
+                                                .getUserInformation(mContext).getAccount_id())));
+
+                                        services.update_profile_picture(new_profilePicture)
+                                                .enqueue(new Callback<DtoAccount>() {
+                                                    @Override
+                                                    public void onResponse(@NonNull Call<DtoAccount> call, @NonNull Response<DtoAccount> response) {
+                                                        if(response.code() == 200){
+                                                            final HashMap<String, Object> hashMap = new HashMap<>();
+                                                            hashMap.put("imageURL", new_image);
+                                                            myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE)
+                                                                    .child(myFirebaseHelper.getFirebaseAuth().getUid()).updateChildren(hashMap).addOnCompleteListener(task1 -> {
+                                                                lgDialog.dismissDialog();
+                                                                if(task1.isSuccessful()) {
+                                                                    Log.d(TAG, "Update in Realtime database Successful");
+
+                                                                    MyPrefs.updateProfileImage(mContext, EncryptHelper.encrypt(new_image));
+
+                                                                    Glide.with(mContext).load(new_image)
+                                                                            .signature(new ObjectKey(MyPrefs.getUserInformation(mContext).getProfile_image()))
+                                                                            .into(ic_edit_ProfileUser);
+
+                                                                    new Handler().postDelayed(() -> {
+                                                                        try {
+                                                                            ProfileFragment.getInstance().GetUserInfo(mContext);
+                                                                            Warnings.showProfilePicUpdated(mContext);
+                                                                        }catch (Exception ignore){}
+                                                                    }, 350);
+                                                                }else Warnings.showWeHaveAProblem(mContext, ErrorHelper.UPDATE_PROFILE_IMAGE_FIRE);
+                                                            });
+                                                        }else{
+                                                            lgDialog.dismissDialog();
+                                                            Warnings.showWeHaveAProblem(mContext, ErrorHelper.UPDATE_PROFILE_IMAGE_SERVER_INFO);
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(@NonNull Call<DtoAccount> call, @NonNull Throwable t) {
+                                                        lgDialog.dismissDialog();
+                                                        Warnings.showWeHaveAProblem(mContext, ErrorHelper.UPDATE_PROFILE_IMAGE_FAILURE);
+                                                        Log.d(TAG, t.getMessage());
+                                                    }
+                                                });
+                                    }else{
+                                        Glide.with(mContext).load(new_image)
+                                                .signature(new ObjectKey(MyPrefs.getUserInformation(mContext).getProfile_image()))
+                                                .into(ic_edit_ProfileUser);
+                                    }
+                                });
+                            }else
+                                loadingDialog.dismissDialog();
+                        }
+                    });
+                }else Warnings.showWeHaveAProblem(mContext, ErrorHelper.PROFILE_NO_ID);
             }
             else{
-                ToastHelper.toast(context, context.getString(R.string.select_an_image), 0);
+                ToastHelper.toast(mContext, mContext.getString(R.string.select_an_image), ToastHelper.SHORT_DURATION);
                 loadingDialog.dismissDialog();
             }
         } catch (Exception ex) {
             loadingDialog.dismissDialog();
-            Warnings.showWeHaveAProblem(context, ErrorHelper.PROFILE_IMAGE_UPLOAD);
+            Warnings.showWeHaveAProblem(mContext, ErrorHelper.PROFILE_IMAGE_UPLOAD);
             Log.d("MediaUpload", ex.toString());
         }
     }
@@ -123,5 +198,4 @@ public class Profile_Image extends EditProfileActivity {
             ToastHelper.toast(mContext, ex.getMessage(), ToastHelper.SHORT_DURATION);
         }
     }
-
 }

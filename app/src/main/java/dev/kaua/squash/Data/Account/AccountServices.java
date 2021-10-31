@@ -18,6 +18,9 @@ public interface AccountServices {
     @POST(ROTE + "/edit")
     Call<DtoAccount> edit (@Body DtoAccount account);
 
+    @POST(ROTE + "/edit-profile-image")
+    Call<DtoAccount> update_profile_picture (@Body DtoAccount account);
+
     @POST(ROTE + "/account/active/google")
     Call<DtoAccount> active_google_login (@Body DtoAccount account);
 

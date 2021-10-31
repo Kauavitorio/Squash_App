@@ -187,9 +187,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
                 if(LayoutType == MSG_TYPE_LEFT_MEDIA || LayoutType == MSG_TYPE_RIGHT_MEDIA){
                     if(viewHolder.container_msg != null) viewHolder.container_msg.setVisibility(View.VISIBLE);
-                    viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
+                    if(viewHolder.container_media_img_chat != null)
+                        viewHolder.container_media_img_chat.setVisibility(View.VISIBLE);
                     viewHolder.media_img.setVisibility(View.VISIBLE);
-                    Glide.with(context).load(message.getMedia().get(0)).dontAnimate().diskCacheStrategy(DiskCacheStrategy.ALL).thumbnail(0.5f).into(holder.media_img);
+                    Glide.with(context).load(message.getMedia().get(0)).dontAnimate()
+                            .error(R.drawable.ic_plus)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL).thumbnail(0.5f)
+                            .into(holder.media_img);
 
                     viewHolder.container_media_img_chat.setOnClickListener(v -> {
                         if(viewHolder.container_media_img_chat != null) viewHolder.container_media_img_chat.startAnimation(myAnim);

@@ -30,6 +30,7 @@ public abstract class ErrorHelper {
     public static final String BACKGROUND_HELPER_UPLOAD = "26";
     public static final String COMMENT_LIKE_ACTION = "27";
     public static final String FOLLOWING_FOLLOWERS_CLICK = "28";
+    public static final String PROFILE_NO_ID = "29-ID";
     public static final String PROFILE_IMAGE_UPLOAD = "29";
     public static final String FOLLOWING_SHOW_LIST = "30";
     public static final String LOGIN_ACTION = "31";
@@ -44,4 +45,8 @@ public abstract class ErrorHelper {
     public static final String REQUEST_VERIFICATION_REQUEST = "38";
     public static final String REQUEST_VERIFICATION_FAILURE = "38/2";
     public static final String GOOGLE_TEST_FAILURE = "39";
+    public static final String UPDATE_PROFILE_IMAGE_FAILURE = "40-A";
+    public static final String UPDATE_PROFILE_IMAGE_SERVER_INFO = "40-i";
+    public static final String UPDATE_PROFILE_IMAGE_STORAGE = "40-S";
+    public static final String UPDATE_PROFILE_IMAGE_FIRE = "40-F";
 }

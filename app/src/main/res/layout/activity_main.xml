@@ -108,9 +108,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_centerInParent="true"
-                tools:src="@drawable/logo_no_bg"
                 app:civ_border_color="@color/base_color"
-                app:civ_border_width="0dp" />
+                app:civ_border_width="0dp"
+                tools:src="@drawable/logo_no_bg" />
 
         </RelativeLayout>
 

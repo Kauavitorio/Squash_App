@@ -673,9 +673,6 @@ public class MessageActivity extends AppCompatActivity {
             }
             hashMap.put(DtoMessage.MESSAGE, EncryptHelper.encrypt(message.trim()));
             hashMap.put(DtoMessage.IS_SEEN, DtoMessage.NOT_SEEN);
-
-            // Future update
-            // EncryptHelper.encrypt(String.valueOf(System.currentTimeMillis()))
             hashMap.put(DtoMessage.TIME, EncryptHelper.encrypt(formattedDate));
 
             hashMap.put(DtoMessage.MEDIA, medias_pin);

@@ -40,6 +40,7 @@ public class DtoPost implements Comparable<DtoPost>{
     private String name_user;
     private String username;
     private String profile_image;
+    private String accId;
     private String post_date;
     private String post_time;
     private String post_content;
@@ -64,6 +65,14 @@ public class DtoPost implements Comparable<DtoPost>{
 
     public void setImage_loaded(boolean image_loaded) {
         this.image_loaded = image_loaded;
+    }
+
+    public String getAccId() {
+        return accId;
+    }
+
+    public void setAccId(String accId) {
+        this.accId = accId;
     }
 
     public boolean isInfo_loaded() {

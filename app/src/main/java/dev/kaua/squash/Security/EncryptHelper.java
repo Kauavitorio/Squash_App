@@ -62,7 +62,8 @@ public class EncryptHelper {
                     else
                         // base64(ascii) -> bytes --> decrypt -> bytes -> str(utf8)
                         return new String(decrypt(Base64.getDecoder()
-                                .decode(str.getBytes(StandardCharsets.ISO_8859_1))), StandardCharsets.UTF_8);
+                                .decode(StorageKeys.removeKeySocial(str)
+                                        .getBytes(StandardCharsets.ISO_8859_1))), StandardCharsets.UTF_8);
                 }
             }
         } catch (Exception e) {
