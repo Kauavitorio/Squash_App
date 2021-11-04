@@ -194,7 +194,6 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     void DoRegister() {
-        btn_signUp.startAnimation(myAnim);
         if(!policy_and_privacy) ToastHelper.toast(this, getString(R.string.required_to_accept_the_privacy_policy_term), 0);
         else{
 

@@ -3,7 +3,6 @@ package dev.kaua.squash.Activities.Auth;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -13,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.LoadingDialog;
+import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 
 /**
@@ -27,7 +27,6 @@ public class TermsAccountActivity extends AppCompatActivity {
     private ImageView btn_back_terms;
     private Button btn_next_terms;
     private LoadingDialog loadingDialog;
-    private final Handler timer = new Handler();
     private SharedPreferences mPrefs;
     private String terms_list = "Terms 01";
 
@@ -40,21 +39,29 @@ public class TermsAccountActivity extends AppCompatActivity {
         btn_back_terms.setOnClickListener(v -> finish());
 
         btn_next_terms.setOnClickListener(v -> {
-            loadingDialog.startLoading();
-            SignUpActivity.getInstance().EnableSignUpButton();
-            mPrefs = getSharedPreferences(MyPrefs.PREFS_TERMS, MODE_PRIVATE);
-            SharedPreferences.Editor editor = mPrefs.edit();
-            editor.putString("terms_list", terms_list);
-            editor.apply();
-            loadingDialog.dismissDialog();
-            finish();
+            try {
+                loadingDialog.startLoading();
+                SignUpActivity.getInstance().EnableSignUpButton();
+                mPrefs = getSharedPreferences(MyPrefs.PREFS_TERMS, MODE_PRIVATE);
+                SharedPreferences.Editor editor = mPrefs.edit();
+                editor.putString("terms_list", terms_list);
+                editor.apply();
+                loadingDialog.dismissDialog();
+                finish();
+            }catch (Exception ignore) {
+                loadingDialog.dismissDialog();
+                finish();
+            }
         });
     }
 
     private void Ids() {
+        getWindow().setStatusBarColor(getColor(R.color.base_color));
         loadingDialog = new LoadingDialog(this);
         btn_back_terms = findViewById(R.id.btn_back_terms);
         btn_next_terms = findViewById(R.id.btn_next_terms);
+
+        findViewById(R.id.accordance_experience_txt).setOnClickListener(v -> Methods.browseTo(this, getString(R.string.privacy_policy_url)));
     }
 
     @Override

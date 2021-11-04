@@ -20,7 +20,7 @@
 
         <!-- Icon App Header -->
         <ImageView
-            android:id="@+id/ic_logo_signin"
+            android:id="@+id/ic_logo_signUp"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:src="@drawable/logo_with_name"
@@ -60,7 +60,7 @@
                 android:layout_centerHorizontal="true"
                 android:text="@string/create_your_account"
                 android:textColor="@color/black"
-                android:textSize="24sp"
+                android:textSize="23sp"
                 android:textStyle="bold" />
 
             <!-- Edit Text Name -->
@@ -84,7 +84,9 @@
                     android:hint="@string/name"
                     android:inputType="textPersonName|textCapSentences"
                     android:maxLength="25"
-                    android:minHeight="50dp"
+                    android:minHeight="40dp"
+                    android:textSize="17sp"
+                    tools:text="Kaua Lima"
                     android:textColor="@color/black"
                     android:textColorHint="@color/hint" />
 
@@ -107,8 +109,11 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/hint"
                     android:hint="@string/email_address"
+                    android:maxLength="320"
                     android:inputType="textEmailAddress|textMultiLine"
-                    android:minHeight="50dp"
+                    android:minHeight="40dp"
+                    android:textSize="17sp"
+                    tools:text="squash@gmai.com"
                     android:textColor="@color/black"
                     android:textColorHint="@color/hint" />
 
@@ -132,7 +137,9 @@
                     android:backgroundTint="@color/hint"
                     android:hint="@string/phone"
                     android:inputType="phone"
-                    android:minHeight="50dp"
+                    android:textSize="16sp"
+                    tools:text="+55 11 111111111"
+                    android:minHeight="40dp"
                     android:textColor="@color/black"
                     android:textColorHint="@color/hint" />
 
@@ -157,7 +164,9 @@
                     android:focusable="false"
                     android:hint="@string/date_of_birth"
                     android:inputType="date"
-                    android:minHeight="50dp"
+                    android:textSize="17sp"
+                    tools:text="31/05/2004"
+                    android:minHeight="40dp"
                     android:textColor="@color/black"
                     android:textColorHint="@color/hint" />
 
@@ -185,6 +194,7 @@
                     android:hint="@string/password"
                     android:inputType="textPassword"
                     android:minHeight="50dp"
+                    android:maxLength="128"
                     android:textColor="@color/black"
                     android:textColorHint="@color/hint" />
 
@@ -221,14 +231,14 @@
                 android:id="@+id/btn_signUp_signUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="200dp"
-                android:minHeight="50dp"
-                android:padding="2dp"
                 android:layout_below="@+id/container_Privacy_Policy"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="1dp"
                 android:background="@drawable/custom_button_next"
+                android:minWidth="200dp"
+                android:minHeight="50dp"
+                android:padding="2dp"
                 android:text="@string/create_account"
                 android:textColor="@color/white"
                 android:textStyle="bold"

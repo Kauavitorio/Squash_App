@@ -496,7 +496,6 @@ public class EditProfileActivity extends AppCompatActivity {
         RunEditWatcher();
     }
 
-
     void loadDefaultBackground(){
         final ScrollView scrollView = findViewById(R.id.scrollView_EditProfile);
         final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) scrollView
@@ -505,7 +504,8 @@ public class EditProfileActivity extends AppCompatActivity {
         layoutParams.setMargins(scrollView.getPaddingLeft(), Methods.getStatusBarHeight(this), scrollView.getPaddingRight(), 10);
         scrollView.setLayoutParams(layoutParams);
 
-        Glide.with(this).asBitmap().load(R.drawable.background_intro)
+        Glide.with(this).asBitmap().load(R.drawable.bg_color_explosion)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {

@@ -14,7 +14,7 @@
         android:id="@+id/edit_profile_image_background"
         android:layout_width="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/background_intro"
+        android:src="@drawable/bg_color_explosion"
         android:layout_height="match_parent"
         android:fillViewport="true"
         tools:ignore="ContentDescription" />
@@ -32,7 +32,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <!-- Header -->
             <androidx.constraintlayout.widget.ConstraintLayout

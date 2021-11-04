@@ -332,4 +332,6 @@
     <string name="you_can_change_your_username_again_at">Você pode alterar seu nome de usuário novamente em %1$s</string>
     <string name="verified_username_change_desc">Verificamos que houve uma alteração no seu nome de usuário, se você aplicar essa alteração, só poderá alterá-lo novamente após 1 mês.</string>
     <string name="okay_change">Okay, alterar</string>
+    <string name="squash_user_generated_content">Conteúdo gerado pelo usuário Squash</string>
+    <string name="my_experience_is_accordance">Minha experiência está de acordo com os termos com os quais concordei na <a href="&privacy_policy_direct;">política de privacidade da Squash</a>.</string>
 </resources>
