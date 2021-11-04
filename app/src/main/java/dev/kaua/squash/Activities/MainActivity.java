@@ -1,14 +1,17 @@
 package dev.kaua.squash.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -36,6 +39,7 @@ import dev.kaua.squash.Security.Login;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.SheetHelper;
 import dev.kaua.squash.Tools.ShortCutsHelper;
 import dev.kaua.squash.Tools.ToastHelper;
 
@@ -257,6 +261,16 @@ public class MainActivity extends AppCompatActivity {
         bundle_Analytics.putString(FirebaseAnalytics.Param.ITEM_NAME, EncryptHelper.decrypt(account.getUsername()));
         bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle_Analytics);
+    }
+
+    @Nullable
+    @Override
+    protected Dialog onCreateDialog(int id, Bundle args) {
+        Dialog dialog = super.onCreateDialog(id, args);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1)
+            SheetHelper.setWhiteNavigationBar(this, dialog, R.color.BarColor);
+
+        return dialog;
     }
 
     @SuppressWarnings("unchecked")

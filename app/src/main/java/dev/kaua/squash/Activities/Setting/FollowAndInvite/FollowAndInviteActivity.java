@@ -1,12 +1,23 @@
 package dev.kaua.squash.Activities.Setting.FollowAndInvite;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import dev.kaua.squash.Firebase.myFirebaseHelper;
@@ -15,6 +26,7 @@ import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
 import dev.kaua.squash.Tools.ToastHelper;
+import jp.wasabeef.blurry.Blurry;
 
 public class FollowAndInviteActivity extends AppCompatActivity {
 
@@ -24,6 +36,7 @@ public class FollowAndInviteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_follow_and_invite);
+        loadDefaultBackground();
         invite_by_whatsapp = findViewById(R.id.invite_by_whatsapp);
         invite_by_email = findViewById(R.id.invite_by_email);
         invite_by_choose = findViewById(R.id.invite_by_choose);
@@ -77,5 +90,22 @@ public class FollowAndInviteActivity extends AppCompatActivity {
             bundle_Analytics.putString(FirebaseAnalytics.Param.CONTENT_TYPE, MyPrefs.getUserInformation(this).getName_user());
             myFirebaseHelper.getFirebaseAnalytics(this).logEvent(FirebaseAnalytics.Event.SHARE, bundle_Analytics);
         }
+    }
+
+    void loadDefaultBackground(){
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+        Glide.with(this).asBitmap().load(R.drawable.bg_invite_friends)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        Blurry.with(FollowAndInviteActivity.this).radius(10).sampling(8)
+                                .color(Color.argb(66, 5, 5, 5))
+                                .from(resource).into(findViewById(R.id.invite_follow_image_background));
+                    }
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {}
+                });
     }
 }
