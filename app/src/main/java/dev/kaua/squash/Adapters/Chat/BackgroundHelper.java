@@ -40,10 +40,10 @@ public abstract class BackgroundHelper extends MessageActivity {
         bottomSheetDialog.setCancelable(false);
         //  Creating View for SheetMenu
         View sheetView = LayoutInflater.from(instance).inflate(R.layout.adapter_sheet_menu_base,
-                instance.findViewById(R.id.sheet_menu_base));
+                instance.findViewById(R.id.sheet_menu_base_layout));
         LinearLayout btn_negative_sheet = sheetView.findViewById(R.id.btn_negative_sheet);
         btn_negative_sheet.setVisibility(View.VISIBLE);
-        TextView txt_positive_button_sheet = sheetView.findViewById(R.id.txt_positive_button_sheet);
+        TextView txt_positive_button_sheet = sheetView.findViewById(R.id.txt_positive_button_sheet_base);
         txt_positive_button_sheet.setText(instance.getString(R.string.yes));
 
         //  Set Main Message

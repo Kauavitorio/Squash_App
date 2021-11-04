@@ -115,7 +115,7 @@ public class MainFragment extends Fragment {
                 if(account_follow.getFollowing() != null && following != Long.parseLong(account_follow.getFollowing())) {
                     following = Long.parseLong(account_follow.getFollowing());
                     RefreshRecycler();
-                    readStory();
+                    //readStory();
                 }
             }
         }
@@ -250,7 +250,7 @@ public class MainFragment extends Fragment {
         recyclerView_Story.setAdapter(storyAdapter);
 
         RefreshRecycler();
-        readStory();
+        //readStory();
         Check_Notification();
         shortCutsHelper.launchShortcuts();
     }

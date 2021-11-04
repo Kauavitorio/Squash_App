@@ -329,4 +329,7 @@
     <string name="your_google_account_has_been_linked_squash">Sua conta do Google foi vinculada à sua conta do Squash.</string>
     <string name="updated_photo">Foto Atualizada</string>
     <string name="updated_photo_desc_time">Pode levar até 2 dias para que a imagem seja atualizada em toda a plataforma.</string>
+    <string name="you_can_change_your_username_again_at">Você pode alterar seu nome de usuário novamente em %1$s</string>
+    <string name="verified_username_change_desc">Verificamos que houve uma alteração no seu nome de usuário, se você aplicar essa alteração, só poderá alterá-lo novamente após 1 mês.</string>
+    <string name="okay_change">Okay, alterar</string>
 </resources>

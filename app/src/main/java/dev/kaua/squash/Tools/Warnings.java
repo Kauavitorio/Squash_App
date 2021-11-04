@@ -99,10 +99,10 @@ public class Warnings {
         bottomSheetDialog.setCancelable(cancelable);
         //  Creating View for SheetMenu
         View sheetView = LayoutInflater.from(context).inflate(R.layout.adapter_sheet_menu_base,
-                context.findViewById(R.id.sheet_menu_base));
+                context.findViewById(R.id.sheet_menu_base_layout));
         LinearLayout btn_negative_sheet = sheetView.findViewById(R.id.btn_negative_sheet);
         btn_negative_sheet.setVisibility(View.GONE);
-        TextView txt_positive_button_sheet = sheetView.findViewById(R.id.txt_positive_button_sheet);
+        TextView txt_positive_button_sheet = sheetView.findViewById(R.id.txt_positive_button_sheet_base);
         txt_positive_button_sheet.setText(context.getString(R.string.ok));
 
         //  Set Main Message
@@ -160,8 +160,8 @@ public class Warnings {
         bottomSheetDialog = new BottomSheetDialog(context, R.style.BottomSheetTheme);
         //  Creating View for SheetMenu
         View sheetView = LayoutInflater.from(context).inflate(R.layout.adapter_sheet_menu_base,
-                context.findViewById(R.id.sheet_menu_base));
-        TextView txt_positive_button_sheet = sheetView.findViewById(R.id.txt_positive_button_sheet);
+                context.findViewById(R.id.sheet_menu_base_layout));
+        TextView txt_positive_button_sheet = sheetView.findViewById(R.id.txt_positive_button_sheet_base);
         txt_positive_button_sheet.setText(context.getString(R.string.yes));
 
         //  Set Main Message
@@ -188,8 +188,8 @@ public class Warnings {
         bottomSheetDialog.setCancelable(false);
         //  Creating View for SheetMenu
         View sheetView = LayoutInflater.from(context).inflate(R.layout.adapter_sheet_menu_base,
-                context.findViewById(R.id.sheet_menu_base));
-        TextView txt_positive_button_sheet = sheetView.findViewById(R.id.txt_positive_button_sheet);
+                context.findViewById(R.id.sheet_menu_base_layout));
+        TextView txt_positive_button_sheet = sheetView.findViewById(R.id.txt_positive_button_sheet_base);
         txt_positive_button_sheet.setText(context.getString(R.string.yes));
 
         //  Set Main Message

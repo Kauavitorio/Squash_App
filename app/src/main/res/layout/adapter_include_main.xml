@@ -91,7 +91,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="visible"
+                    tools:visibility="visible"
+                    android:visibility="gone"
                     android:layout_marginBottom="1dp"
                     app:layout_constraintBottom_toBottomOf="parent">
 
@@ -130,6 +131,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
                     android:background="@color/dividing_line_main"/>
 
                 <androidx.recyclerview.widget.RecyclerView
