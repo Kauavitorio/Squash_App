@@ -48,6 +48,7 @@ public abstract class MyPrefs {
         account.setJoined_date(EncryptHelper.decrypt(sp.getString("pref_joined_date", null)));
         account.setPassword(EncryptHelper.decrypt(sp.getString("pref_password", null)));
         account.setToken(EncryptHelper.decrypt(sp.getString("pref_token", null)));
+        account.setLastUserChange(EncryptHelper.decrypt(sp.getString("pref_lastUserChange", null)));
         String account_level = EncryptHelper.decrypt(sp.getString("pref_verification_level", null));
         if(account_level == null) account_level = String.valueOf(DtoAccount.NORMAL_ACCOUNT);
         account.setVerification_level(account_level);
@@ -71,6 +72,15 @@ public abstract class MyPrefs {
         editor.putLong("pref_privacyPolicy", version);
         editor.apply();
         return true;
+    }
+
+    public static void setLastUserChange(@NonNull Context context, String dateTime){
+        sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
+
+        //  Add Request prefs
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("pref_lastUserChange", dateTime);
+        editor.apply();
     }
 
     public static void updateProfileImage(@NonNull Context context, String img){

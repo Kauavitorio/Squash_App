@@ -20,7 +20,9 @@
     <!-- Start BottomSheet Theme -->
     <style name="BottomSheetTheme" parent="Theme.Design.BottomSheetDialog">
 
+        <item name="android:windowIsFloating">false</item>
         <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
 
     </style>
 

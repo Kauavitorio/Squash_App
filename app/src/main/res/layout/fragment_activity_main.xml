@@ -90,9 +90,10 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <include layout="@layout/adapter_include_main"
-        android:layout_height="match_parent"
+    <include
+        layout="@layout/adapter_include_main"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@+id/bar_main" />
 
 </RelativeLayout>

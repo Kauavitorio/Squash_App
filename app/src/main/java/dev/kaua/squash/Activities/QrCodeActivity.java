@@ -5,6 +5,7 @@ import static dev.kaua.squash.Activities.Chat.MessageActivity.OPEN_CAMERA;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
@@ -12,16 +13,17 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -52,6 +54,7 @@ import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.UserPermissions;
 import dev.kaua.squash.Tools.Warnings;
+import jp.wasabeef.blurry.Blurry;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -143,6 +146,7 @@ public class QrCodeActivity extends AppCompatActivity {
     }
 
     void Ids(){
+        loadDefaultBackground();
         myAnim = AnimationUtils.loadAnimation(this, R.anim.click_anim);
         btn_close = findViewById(R.id.btn_close_qr_code);
         img_qr_code = findViewById(R.id.img_qr_code);
@@ -221,17 +225,29 @@ public class QrCodeActivity extends AppCompatActivity {
             super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
+    void loadDefaultBackground(){
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+        final ConstraintLayout container_qr_code_info = findViewById(R.id.container_qr_code_info);
+        final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) container_qr_code_info
+                .getLayoutParams();
+
+        layoutParams.setMargins(container_qr_code_info.getPaddingLeft(),
+                Methods.getStatusBarHeight(this),
+                container_qr_code_info.getPaddingRight(), 10);
+        container_qr_code_info.setLayoutParams(layoutParams);
+
+        Glide.with(this).asBitmap().load(R.drawable.background_intro)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        Blurry.with(QrCodeActivity.this).radius(10).sampling(8)
+                                .color(Color.argb(66, 5, 5, 5))
+                                .from(resource).into(findViewById(R.id.qr_code_image_background));
+                    }
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {}
+                });
     }
 }

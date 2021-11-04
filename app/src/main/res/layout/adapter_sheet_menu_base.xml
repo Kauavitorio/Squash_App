@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/sheet_menu_base"
+    android:id="@+id/sheet_menu_base_layout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="20dp"
@@ -38,7 +38,7 @@
 
         <!-- Text Yes -->
         <TextView
-            android:id="@+id/txt_positive_button_sheet"
+            android:id="@+id/txt_positive_button_sheet_base"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -58,17 +58,18 @@
         android:layout_marginBottom="10dp"
         android:minWidth="130dp"
         android:minHeight="50dp"
-        android:background="@drawable/background_continue_intro"
+        android:background="@drawable/background_disable_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
+            android:id="@+id/txt_negative_button_sheet_base"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:textColor="@color/hint"
+            android:textColor="@color/white"
             android:textSize="17sp"
             android:text="@string/no"/>
 

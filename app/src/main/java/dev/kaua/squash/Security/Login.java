@@ -148,6 +148,7 @@ public abstract class Login extends SignInActivity{
                         editor.putString("pref_verification_level", response.body().getVerification_level());
                         editor.putLong("pref_active", response.body().getActive());
                         editor.putString("pref_type_acc", response.body().getType_acc());
+                        MyPrefs.setLastUserChange(mContext, response.body().getLastUserChange());
                         editor.apply();
 
                         //  Getting Followers and Followings
@@ -382,6 +383,7 @@ public abstract class Login extends SignInActivity{
                                 editor.putString("pref_verification_level", response.body().getVerification_level());
                                 editor.putLong("pref_active", response.body().getActive());
                                 editor.putString("pref_type_acc", response.body().getType_acc());
+                                MyPrefs.setLastUserChange(context, response.body().getLastUserChange());
                                 editor.apply();
 
                                 //  Getting Followers and Followings

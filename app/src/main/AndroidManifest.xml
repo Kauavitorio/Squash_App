@@ -109,7 +109,9 @@
         <activity android:name=".Activities.Setting.SettingActivity" />
         <activity android:name=".Activities.Medias.WebActivity" />
         <activity android:name=".Activities.Posts.PostDetailsActivity" />
-        <activity android:name=".Activities.Profile.EditProfileActivity" />
+        <activity android:name=".Activities.Profile.EditProfileActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity android:name=".Activities.Posts.ComposeActivity" />
         <activity android:name=".Activities.Chat.MessageActivity" />
         <activity android:name=".Activities.Auth.SignInActivity" />

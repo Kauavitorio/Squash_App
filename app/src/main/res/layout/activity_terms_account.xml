@@ -5,9 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:fillViewport="true"
-    android:scrollbarSize="1dp"
-    android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
     tools:context=".Activities.Auth.TermsAccountActivity">
 
     <!-- Header -->
@@ -15,7 +12,7 @@
         android:id="@+id/container_header_terms"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="70dp"
+        android:minHeight="55dp"
         android:background="@drawable/background_common_top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,8 +21,8 @@
         <!-- Img Arrow -->
         <ImageView
             android:id="@+id/btn_back_terms"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:src="@drawable/ic_arrow_back"
             android:layout_marginStart="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -41,7 +38,7 @@
             android:maxWidth="280dp"
             android:text="@string/customize_your_experience"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:layout_marginStart="20dp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -52,91 +49,141 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
+    <!-- Main Container -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
         android:padding="20dp"
+        android:fillViewport="true"
+        android:scrollbarSize="1dp"
+        android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
         app:layout_constraintBottom_toTopOf="@+id/container_bottom_terms"
         app:layout_constraintTop_toBottomOf="@+id/container_header_terms">
 
-        <!-- Title Get more out -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="@string/get_more_out_to_squash"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <!-- Container Get more out -->
+        <!-- Info Container -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp">
+            android:orientation="vertical">
 
-            <!-- Text Receive Email -->
+            <!-- Title Squash User Generated Content -->
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxWidth="250dp"
-                android:text="@string/receive_email_terms"
-                android:textSize="18sp" />
-
-            <!-- CheckBox Receive Email -->
-            <CheckBox
-                android:id="@+id/checkbox_receive_email"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="20dp"
-                android:checked="true"
-                android:onClick="DoPreferences"
-                android:textColor="@color/hint" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/squash_user_generated_content"
+                android:textColor="@color/black"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <!-- User Generated Content -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <!-- Text User Generated Content -->
+                <TextView
+                    android:id="@+id/accordance_experience_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="250dp"
+                    android:clickable="true"
+                    android:text="@string/my_experience_is_accordance"
+                    android:textSize="17sp" />
+
+                <!-- CheckBox User Generated Content -->
+                <CheckBox
+                    android:id="@+id/checkbox_user_generated_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    android:checked="true"
+                    android:clickable="false"
+                    android:textColor="@color/hint" />
+
+            </LinearLayout>
+
+            <!-- Title Get more out -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/get_more_out_to_squash"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Get more out -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <!-- Text Receive Email -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="250dp"
+                    android:text="@string/receive_email_terms"
+                    android:textSize="18sp" />
+
+                <!-- CheckBox Receive Email -->
+                <CheckBox
+                    android:id="@+id/checkbox_receive_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    android:checked="true"
+                    android:onClick="DoPreferences"
+                    android:textColor="@color/hint" />
+
+            </LinearLayout>
+
+            <!-- Title Personalize based on your inferred -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="15dp"
+                android:gravity="start"
+                android:text="@string/personalize_based_on_your_inferred"
+                android:textColor="@color/black"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <!-- Personalize based on your inferred -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp">
+
+                <!-- Text Receive Email -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="260dp"
+                    android:text="@string/desc_personalize_based_inferred"
+                    android:textSize="18sp" />
+
+                <!-- CheckBox Receive Email -->
+                <CheckBox
+                    android:id="@+id/checkbox_personalize_inferred"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    android:onClick="DoPreferences"
+                    android:textColor="@color/hint" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Title Personalize based on your inferred -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="15dp"
-            android:gravity="start"
-            android:text="@string/personalize_based_on_your_inferred"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <!-- Container Personalize based on your inferred -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp">
-
-            <!-- Text Receive Email -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxWidth="260dp"
-                android:text="@string/desc_personalize_based_inferred"
-                android:textSize="18sp" />
-
-            <!-- CheckBox Receive Email -->
-            <CheckBox
-                android:id="@+id/checkbox_personalize_inferred"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="20dp"
-                android:onClick="DoPreferences"
-                android:textColor="@color/hint" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
+    </ScrollView>
 
     <!-- Container Bottom -->
     <androidx.constraintlayout.widget.ConstraintLayout

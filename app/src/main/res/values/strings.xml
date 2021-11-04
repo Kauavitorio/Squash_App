@@ -357,4 +357,9 @@
     <string name="your_google_account_has_been_linked_squash">Your Google account has been linked with your Squash account.</string>
     <string name="updated_photo">Updated Photo</string>
     <string name="updated_photo_desc_time">It may take up to 2 days for the image to update across the entire platform.</string>
+    <string name="you_can_change_your_username_again_at">You can change your username again at %1$s</string>
+    <string name="verified_username_change_desc">We verified that there was a change in your username, if you apply this change, you can only change it again after 1 month.</string>
+    <string name="okay_change">Okay, change</string>
+    <string name="squash_user_generated_content">Squash User Generated Content</string>
+    <string name="my_experience_is_accordance">My experience is in accordance with the terms I agreed to in <a href="&privacy_policy_direct;">Squash\'s privacy policy</a>.</string>
 </resources>

@@ -26,7 +26,7 @@
             android:layout_above="@id/container_input_signIn"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/logo_with_name"
+            android:src="@drawable/logo_with_name_no_bg"
             tools:ignore="ContentDescription" />
 
         <!-- Inputs Container -->
@@ -62,7 +62,7 @@
                 android:text="@string/login_to_squash"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="22sp"
+                android:textSize="21sp"
                 android:textStyle="bold" />
 
             <!-- Edit Text Login Method -->
@@ -82,8 +82,9 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/hint"
                     android:hint="@string/email_or_username"
-                    android:inputType="text"
+                    android:inputType="text|textMultiLine"
                     android:minHeight="50dp"
+                    android:maxLength="320"
                     android:textColor="@color/hint"
                     android:textColorHint="@color/hint"
                     android:textSize="18sp" />
@@ -111,6 +112,7 @@
                     android:hint="@string/password"
                     android:inputType="textPassword"
                     android:minHeight="50dp"
+                    android:maxLength="128"
                     android:textColor="@color/hint"
                     android:textColorHint="@color/hint"
                     android:textSize="18sp" />

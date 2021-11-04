@@ -38,7 +38,6 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -337,6 +336,16 @@ public abstract class Methods extends MainActivity {
        }
     }
 
+    public static long parseLongTime(String value){
+        try {
+            if(value == null || value.length() <= 0)
+                return DtoAccount.NORMAL_ACCOUNT;
+            else return Long.parseLong(value);
+        }catch (Exception ex){
+            return DtoAccount.NORMAL_ACCOUNT;
+        }
+    }
+
     public static int parseUserLevel(String value){
         try {
             if(value == null) return DtoAccount.NORMAL_ACCOUNT;
@@ -564,6 +573,15 @@ public abstract class Methods extends MainActivity {
         }else ToastHelper.toast(mContext, mContext.getString(R.string.you_are_without_internet), ToastHelper.SHORT_DURATION);
     }
 
+    public static int getStatusBarHeight(final Activity mActivity) {
+        if(mActivity == null) return 10;
+        int result = 0;
+        int resourceId = mActivity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0)
+            result = mActivity.getResources().getDimensionPixelSize(resourceId);
+        return result;
+    }
+
     public static int loadUserImageLevel(long level) {
         if (level == DtoAccount.VERIFY_ACCOUNT)
             return R.drawable.ic_verified_account;
@@ -572,12 +590,4 @@ public abstract class Methods extends MainActivity {
         else
             return R.drawable.ic_verified_account;
     }
-
-    // This method can be used in the future
-    /*public boolean isValidPhone(String phone) {
-        if (!phone.matches("^[+]?[0-9]{10,13}$"))
-            return false;
-        else
-            return android.util.Patterns.PHONE.matcher(phone).matches();
-    }*/
 }

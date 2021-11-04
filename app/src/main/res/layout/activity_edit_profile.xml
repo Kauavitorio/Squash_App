@@ -1,233 +1,264 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/base_color"
-    android:padding="10dp"
-    android:scrollbarSize="1dp"
     android:theme="@style/EditsLoginAndSignUp"
-    android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical"
     tools:context=".Activities.Profile.EditProfileActivity">
 
-    <!-- Main Container -->
-    <RelativeLayout
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/edit_profile_image_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_color_explosion"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        tools:ignore="ContentDescription" />
 
-        <!-- Header -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/header_edit_profile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+    <!-- Main Container -->
+    <ScrollView
+        android:id="@+id/scrollView_EditProfile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarSize="1dp"
+        android:paddingTop="25dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:scrollbarThumbVertical="@drawable/custom_scroll_style_vertical">
 
-            <!-- btn Close -->
-            <ImageView
-                android:id="@+id/close_edit_profile"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_close_simple_white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="ContentDescription" />
-
-            <!-- Edit Text Tittle -->
-            <TextView
-                android:id="@+id/txt_header_edit_profile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/edit_profile"
-                android:textColor="@color/white"
-                android:textSize="23sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btn_edit_profile"
-                app:layout_constraintStart_toEndOf="@+id/close_edit_profile"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Button SignUp -->
-            <Button
-                android:id="@+id/btn_edit_profile"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_centerHorizontal="true"
-                android:background="@drawable/ic_check_mark"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- Inputs Container -->
         <RelativeLayout
-            android:id="@+id/container_input_signIn"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="0dp"
-            android:layout_below="@+id/header_edit_profile"
-            android:background="@drawable/container_signin"
-            android:padding="18dp">
+            android:layout_height="wrap_content">
 
-            <!-- Container User Profile -->
+            <!-- Header -->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/container_profile_img_edit"
-                android:layout_width="wrap_content"
+                android:id="@+id/header_edit_profile"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_centerHorizontal="true"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:orientation="horizontal">
 
-                <!-- Img User Story -->
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/ic_edit_ProfileUser"
-                    android:layout_width="95dp"
-                    android:layout_height="95dp"
-                    android:layout_gravity="center"
-                    tools:src="@drawable/ic_logo"
-                    app:layout_constraintEnd_toEndOf="parent"
+                <!-- btn Close -->
+                <ImageView
+                    android:id="@+id/close_edit_profile"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_close_simple_white"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription" />
+
+                <!-- Edit Text Tittle -->
+                <TextView
+                    android:id="@+id/txt_header_edit_profile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/edit_profile"
+                    android:textColor="@color/white"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_edit_profile"
+                    app:layout_constraintStart_toEndOf="@+id/close_edit_profile"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- Btn Add new Story -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    app:cardBackgroundColor="@color/base_color"
-                    app:cardCornerRadius="10dp"
+                <!-- Button SignUp -->
+                <Button
+                    android:id="@+id/btn_edit_profile"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/ic_check_mark"
+                    android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <!-- Img Add Icon -->
-                    <ImageView
-                        android:layout_width="10dp"
-                        android:layout_height="10dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_edit"
-                        tools:ignore="ContentDescription,TooDeepLayout" />
-
-
-                </androidx.cardview.widget.CardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Edit Text Name -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/name_tl_edit_profile"
+            <!-- Inputs Container -->
+            <RelativeLayout
+                android:id="@+id/container_input_signIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/container_profile_img_edit"
                 android:layout_marginTop="10dp"
-                android:maxWidth="320dp"
-                android:layout_centerHorizontal="true"
-                android:minWidth="320dp"
-                app:counterTextColor="@color/hint"
-                app:hintTextColor="@color/hint">
+                android:layout_marginEnd="0dp"
+                android:layout_below="@+id/header_edit_profile"
+                android:background="@drawable/container_signin"
+                android:padding="18dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:backgroundTint="@color/hint"
-                    android:hint="@string/name"
-                    android:inputType="textPersonName|textCapSentences"
-                    android:maxLength="25"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/hint" />
+                <!-- Container User Profile -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/container_profile_img_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <!-- Img User Story -->
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/ic_edit_ProfileUser"
+                        android:layout_width="95dp"
+                        android:layout_height="95dp"
+                        android:layout_gravity="center"
+                        tools:src="@drawable/ic_logo"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Edit Text Username -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/username_tl_edit_profile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/name_tl_edit_profile"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
-                android:maxWidth="320dp"
-                android:minWidth="320dp"
-                app:counterTextColor="@color/hint"
-                app:hintTextColor="@color/hint">
+                    <!-- Btn Add new Story -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        app:cardBackgroundColor="@color/base_color"
+                        app:cardCornerRadius="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_username"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:backgroundTint="@color/hint"
-                    android:hint="@string/username"
-                    android:digits="0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
-                    android:inputType="textPersonName|textCapSentences"
-                    android:maxLength="20"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/hint" />
+                        <!-- Img Add Icon -->
+                        <ImageView
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_edit"
+                            tools:ignore="ContentDescription,TooDeepLayout" />
 
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Edit Text Bio -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/bio_tl_edit_profile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/username_tl_edit_profile"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
-                android:maxWidth="320dp"
-                android:minWidth="320dp"
-                app:counterEnabled="true"
-                app:counterMaxLength="150"
-                app:counterTextColor="@color/hint"
-                app:hintTextColor="@color/hint">
+                    </androidx.cardview.widget.CardView>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_bio"
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Edit Text Name -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/name_tl_edit_profile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/hint"
-                    android:hint="@string/bio"
-                    android:inputType="textPersonName|textCapSentences|textMultiLine"
-                    android:maxLength="150"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/hint" />
+                    android:layout_below="@id/container_profile_img_edit"
+                    android:layout_marginTop="10dp"
+                    android:maxWidth="320dp"
+                    android:layout_centerHorizontal="true"
+                    android:minWidth="320dp"
+                    app:counterTextColor="@color/hint"
+                    app:hintTextColor="@color/hint">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="@color/hint"
+                        android:hint="@string/name"
+                        android:inputType="textPersonName|textCapSentences"
+                        android:maxLength="25"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/hint" />
 
-            <!-- Dividing line -->
-            <LinearLayout
-                android:id="@+id/dividing_line_edit_profile_more_info"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="3dp"
-                android:layout_below="@+id/bio_tl_edit_profile"
-                android:layout_centerHorizontal="true"
-                android:background="@color/tab_indicator_gray"
-                android:visibility="gone"
-                android:orientation="horizontal" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- More Info Container -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:visibility="gone"
-                android:layout_below="@+id/dividing_line_edit_profile_more_info"
-                android:layout_centerHorizontal="true">
+                <!-- Edit Text Username -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/username_tl_edit_profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/name_tl_edit_profile"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="5dp"
+                    android:maxWidth="320dp"
+                    android:minWidth="320dp"
+                    app:counterTextColor="@color/hint"
+                    app:hintTextColor="@color/hint">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="@color/hint"
+                        android:hint="@string/username"
+                        android:digits="0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
+                        android:inputType="textPersonName|textCapSentences"
+                        android:maxLength="20"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/hint" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Txt cant change now just in -->
+                <TextView
+                    android:id="@+id/txt_cant_change_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/username_tl_edit_profile"
+                    android:textColor="@color/base_color"
+                    android:textSize="15sp"
+                    android:visibility="gone"
+                    tools:text="@string/you_can_change_your_username_again_at"
+                    tools:visibility="visible" />
+
+                <!-- Edit Text Bio -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/bio_tl_edit_profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txt_cant_change_username"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
+                    android:maxWidth="320dp"
+                    android:minWidth="320dp"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="150"
+                    app:counterTextColor="@color/hint"
+                    app:hintTextColor="@color/hint">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_bio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/hint"
+                        android:hint="@string/bio"
+                        android:inputType="textPersonName|textCapSentences|textMultiLine"
+                        android:maxLength="150"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/hint" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Dividing line -->
+                <LinearLayout
+                    android:id="@+id/dividing_line_edit_profile_more_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_below="@+id/bio_tl_edit_profile"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/tab_indicator_gray"
+                    android:visibility="gone"
+                    android:orientation="horizontal" />
+
+                <!-- More Info Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:visibility="gone"
+                    android:layout_below="@+id/dividing_line_edit_profile_more_info"
+                    android:layout_centerHorizontal="true">
 
 
 
-            </LinearLayout>
+                </LinearLayout>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 
-    </RelativeLayout>
+    </ScrollView>
 
-</ScrollView>
+</RelativeLayout>

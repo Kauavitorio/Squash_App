@@ -1,109 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="5dp"
     tools:context=".Activities.Setting.FollowAndInvite.FollowAndInviteActivity">
 
-    <!-- Invite in WhatsApp -->
-    <LinearLayout
-        android:id="@+id/invite_by_whatsapp"
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/invite_follow_image_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        tools:ignore="UseCompoundDrawables">
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_invite_friends"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        tools:ignore="ContentDescription" />
 
-        <!-- Invite Logo -->
-        <ImageView
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:src="@drawable/ic_whatsapp"
-            tools:ignore="ContentDescription" />
+    <!-- info container -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="15dp">
 
-        <!-- Invite Text -->
-        <TextView
+        <!-- Card info -->
+        <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="17sp"
-            android:textColor="@color/black"
-            android:layout_marginStart="10dp"
-            android:text="@string/invite_friends_by_whatsapp"/>
+            android:layout_centerInParent="true"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <!-- Invite in WhatsApp -->
+                <LinearLayout
+                    android:id="@+id/invite_by_whatsapp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <!-- Invite Logo -->
+                    <ImageView
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:src="@drawable/ic_whatsapp"
+                        tools:ignore="ContentDescription" />
+
+                    <!-- Invite Text -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/invite_friends_by_whatsapp"
+                        android:textColor="@color/black"
+                        android:textSize="17sp" />
 
 
-    </LinearLayout>
+                </LinearLayout>
 
-    <!-- Invite in Email -->
-    <LinearLayout
-        android:id="@+id/invite_by_email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        tools:ignore="UseCompoundDrawables">
+                <!-- Invite in Email -->
+                <LinearLayout
+                    android:id="@+id/invite_by_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    tools:ignore="UseCompoundDrawables">
 
-        <!-- Invite Logo -->
-        <ImageView
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:src="@drawable/ic_email"
-            tools:ignore="ContentDescription" />
+                    <!-- Invite Logo -->
+                    <ImageView
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:src="@drawable/ic_email"
+                        tools:ignore="ContentDescription" />
 
-        <!-- Invite Text -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="17sp"
-            android:textColor="@color/black"
-            android:layout_marginStart="10dp"
-            android:text="@string/invite_friends_by_email"/>
-
-
-    </LinearLayout>
-
-    <!-- Invite in ... -->
-    <LinearLayout
-        android:id="@+id/invite_by_choose"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        tools:ignore="UseCompoundDrawables">
-
-        <!-- Invite Logo -->
-        <ImageView
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-                android:src="@drawable/ic_share_post"
-            tools:ignore="ContentDescription" />
-
-        <!-- Invite Text -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="17sp"
-            android:textColor="@color/black"
-            android:layout_marginStart="10dp"
-            android:text="@string/invite_friends_by_choose"/>
+                    <!-- Invite Text -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/invite_friends_by_email"
+                        android:textColor="@color/black"
+                        android:textSize="17sp" />
 
 
-    </LinearLayout>
+                </LinearLayout>
 
-    <!-- Share Desc -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/share_app_desc"
-        android:textColor="@color/hint"
-        android:textSize="15sp"
-        android:layout_marginTop="10dp"
-        android:padding="20dp"
-        android:textAlignment="center"/>
+                <!-- Invite in ... -->
+                <LinearLayout
+                    android:id="@+id/invite_by_choose"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    tools:ignore="UseCompoundDrawables">
 
-</LinearLayout>
+                    <!-- Invite Logo -->
+                    <ImageView
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:src="@drawable/ic_share_post"
+                        tools:ignore="ContentDescription" />
+
+                    <!-- Invite Text -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/invite_friends_by_choose"
+                        android:textColor="@color/black"
+                        android:textSize="17sp" />
+
+
+                </LinearLayout>
+
+                <!-- Share Desc -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:padding="20dp"
+                    android:text="@string/share_app_desc"
+                    android:textAlignment="center"
+                    android:textColor="@color/hint"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+
+</RelativeLayout>
