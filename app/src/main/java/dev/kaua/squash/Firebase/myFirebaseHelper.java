@@ -21,6 +21,7 @@ public class myFirebaseHelper {
     public static final String VERIFICATION_REFERENCE = "Verification";
     public static final String POINTS_REFERENCE = "Points";
     public static final String PROFILE_REFERENCE = "Profile";
+    public static final String CHAT_PREF_REFERENCE = "ChatPref";
     public static final String PUBLISHED_CHILD = "Published";
     public static final String CHATS_REFERENCE = "Chats";
     public static final String TOKENS_REFERENCE = "Tokens";

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE resources [<!ENTITY privacy_policy_direct "https://cloud.squashc.com/privacy/direct/">]>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources [<!ENTITY privacy_policy_direct "https://cloud.squashc.com/privacy/direct/">]>
 <resources>
 
     <!-- Natural Text -->
@@ -362,4 +361,8 @@
     <string name="okay_change">Okay, change</string>
     <string name="squash_user_generated_content">Squash User Generated Content</string>
     <string name="my_experience_is_accordance">My experience is in accordance with the terms I agreed to in <a href="&privacy_policy_direct;">Squash\'s privacy policy</a>.</string>
+    <string name="details">Details</string>
+    <string name="mute_messages">Mute Messages</string>
+    <string name="no_media_were_found_in_this_chat">No media were found in this conversation.</string>
+    <string name="account">Account</string>
 </resources>

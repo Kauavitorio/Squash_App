@@ -17,7 +17,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -28,7 +27,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -85,11 +83,13 @@ import dev.kaua.squash.Notifications.Token;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Security.EncryptHelper;
 import dev.kaua.squash.Tools.AudioRecord;
+import dev.kaua.squash.Tools.Chat.UserChatHelper;
 import dev.kaua.squash.Tools.ConnectionHelper;
 import dev.kaua.squash.Tools.KeyboardUtils;
 import dev.kaua.squash.Tools.LoadingDialog;
 import dev.kaua.squash.Tools.Methods;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ShortCutsHelper;
 import dev.kaua.squash.Tools.ToastHelper;
 import dev.kaua.squash.Tools.UserPermissions;
 import retrofit2.Call;
@@ -109,9 +109,8 @@ public class MessageActivity extends AppCompatActivity {
 
     private CircleImageView profile_image;
     public static ConstraintLayout container_no_message_yet;
-    public static ImageView background_chat;
-    public static ImageView btn_more_medias;
-    public static LinearLayout container_edit_text;
+    public static ImageView btn_more_medias, btn_close_message;
+    public static LinearLayout container_edit_text, btn_info_user;
     public static MessageActivity instance;
     private static TextView txt_user_name, txt_isOnline_chat, txtQuotedMsg;
     private static RecyclerView recycler_view_msg;
@@ -135,7 +134,7 @@ public class MessageActivity extends AppCompatActivity {
     static MessageAdapter messageAdapter;
     private static List<DtoMessage> mMessage = new ArrayList<>();
     private List<String> medias_pin = new ArrayList<>();
-    private static String userId;
+    public static String userId;
     private static String chat_id;
     String another_user_image = "";
     public static Animation myAnim;
@@ -178,11 +177,7 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message);
         Ids();
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        btn_close_message.setOnClickListener(v -> finish());
 
         apiService = Client.getClient(Methods.FCM_URL).create(APIService.class);
 
@@ -193,10 +188,6 @@ public class MessageActivity extends AppCompatActivity {
 
         CheckShared();
         GenerateChatID();
-
-        String img = chatDB.get_BG("bg_" + fUser.getUid() + "_"
-                + userId);
-        if(img != null) BackgroundHelper.LoadBackground(img);
 
         //  Send msg click
         btn_send.setOnClickListener(v -> {
@@ -298,6 +289,9 @@ public class MessageActivity extends AppCompatActivity {
 
         //  Profile Image click
         profile_image.setOnClickListener(v -> OpenUserProfile());
+
+        //  User that user is talking details click
+        btn_info_user.setOnClickListener(v -> UserChatHelper.openProfileDetail());
 
         //  Rec audio click
         btn_rec_audio.setOnTouchListener((view, motionEvent) -> AudioRecord.RecordAudio(motionEvent, view));
@@ -582,10 +576,14 @@ public class MessageActivity extends AppCompatActivity {
 
     static LinearLayoutManager linearLayoutManager;
     void Ids() {
+        getWindow().setStatusBarColor(getColor(R.color.message_header));
+
         myAnim = AnimationUtils.loadAnimation(this,R.anim.click_anim);
         instance = MessageActivity.this;
         chatDB = new DaoChat(MessageActivity.this);
-        profile_image = findViewById(R.id.profile_image_chat);
+        profile_image = findViewById(R.id.profile_image_chat_MSG_ac);
+        btn_info_user = findViewById(R.id.btn_info_user_message_ac);
+        btn_close_message = findViewById(R.id.btn_close_message_ac);
         recordPanel = findViewById(R.id.record_panel);
         recordTimeText = findViewById(R.id.recording_time_text);
         btn_more_medias = findViewById(R.id.btn_more_medias);
@@ -598,7 +596,6 @@ public class MessageActivity extends AppCompatActivity {
         txt_isOnline_chat = findViewById(R.id.txt_isOnline_chat);
         btn_rec_audio = findViewById(R.id.container_btn_rec_audio);
         reply_layout = findViewById(R.id.reply_layout);
-        background_chat = findViewById(R.id.background_chat);
         container_edit_text = findViewById(R.id.container_edit_text_chat);
         txtQuotedMsg = findViewById(R.id.txtQuotedMsg);
         cancelButton = findViewById(R.id.cancelButton);
@@ -612,7 +609,6 @@ public class MessageActivity extends AppCompatActivity {
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
         recycler_view_msg.setLayoutManager(linearLayoutManager);
-        getWindow().setStatusBarColor(getColor(R.color.black_intro));
         recordPanel.setVisibility(View.GONE);
         container_edit_text.setVisibility(View.VISIBLE);
     }
@@ -928,28 +924,7 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.see_profile:
-                OpenUserProfile();
-                return true;
-            case R.id.medias_profile:
-                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
-                return true;
-            case R.id.pin_message:
-                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
-                return true;
-            case R.id.wallpaper_profile:
-                ToastHelper.toast(this, getString(R.string.under_development), ToastHelper.SHORT_DURATION);
-                //BackgroundHelper.OpenGallery();
-                return true;
-        }
-        return false;
-    }
-
-    private void OpenUserProfile(){
+    public void OpenUserProfile(){
         finish();
         try {
             Bundle bundle = new Bundle();
@@ -959,20 +934,24 @@ public class MessageActivity extends AppCompatActivity {
             MainActivity.getInstance().CallProfile();
             ProfileFragment.getInstance().LoadAnotherUser();
         }catch (Exception ex){
-            Intent goto_main = new Intent(this, MainActivity.class);
-            goto_main.putExtra("shortcut", 0);
-            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go);
-            ActivityCompat.startActivity(this, goto_main, activityOptionsCompat.toBundle());
+
+            //  This will be called only if the user has
+            //  opened the chat from the notification.
+
+            final Intent goto_main = new Intent(this, MainActivity.class);
+            goto_main.putExtra(ShortCutsHelper.SHORTCUT_TAG, ShortCutsHelper.NONE_SHORT);
+            ActivityCompat.startActivity(this, goto_main,
+                    ActivityOptionsCompat.makeCustomAnimation(getApplicationContext(), R.anim.move_to_left_go, R.anim.move_to_right_go).toBundle());
             finishAffinity();
-            Handler timer = new Handler();
-            timer.postDelayed(() -> {
-                Bundle bundle_profile = new Bundle();
+
+            new Handler().postDelayed(() -> {
+                final Bundle bundle_profile = new Bundle();
                 bundle_profile.putString("account_id", EncryptHelper.decrypt(user_im_chat.getAccount_id_cry()));
-                bundle_profile.putInt("control", 0);
+                bundle_profile.putInt("control", ShortCutsHelper.NONE_SHORT);
                 MainActivity.getInstance().GetBundleProfile(bundle_profile);
                 MainActivity.getInstance().CallProfile();
                 ProfileFragment.getInstance().LoadAnotherUser();
-            },500);
+            },550);
         }
     }
 
