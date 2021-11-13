@@ -334,4 +334,8 @@
     <string name="okay_change">Okay, alterar</string>
     <string name="squash_user_generated_content">Conteúdo gerado pelo usuário Squash</string>
     <string name="my_experience_is_accordance">Minha experiência está de acordo com os termos com os quais concordei na <a href="&privacy_policy_direct;">política de privacidade da Squash</a>.</string>
+    <string name="details">Detalhes</string>
+    <string name="mute_messages">Silenciar mensagens</string>
+    <string name="no_media_were_found_in_this_chat">Nenhuma mídia foi encontrada nesta conversa.</string>
+    <string name="account">Conta</string>
 </resources>

@@ -120,7 +120,7 @@ public class DaoNotification extends SQLiteOpenHelper {
         String command = "SELECT * FROM " + TABLE + " WHERE sender = ? and type = ?";
         String[] params = {data.getUser(), data.getType()};
         @SuppressLint("Recycle") Cursor cursor = getWritableDatabase().rawQuery(command, params);
-        return cursor.moveToFirst();
+        return !cursor.moveToFirst();
     }
 
     public List<Data> getNotifications(){

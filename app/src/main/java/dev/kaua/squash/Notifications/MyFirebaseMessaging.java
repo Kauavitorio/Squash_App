@@ -8,17 +8,16 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -47,32 +46,26 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
     }
 
     private void updateToken(String newToken) {
-        FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
-        if(firebaseUser != null){
-            DatabaseReference reference = myFirebaseHelper.getFirebaseDatabase().getReference("Tokens");
-            Token token = new Token(newToken);
-            reference.child(firebaseUser.getUid()).setValue(token);
-        }
+        final FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
+        if(firebaseUser != null)
+            myFirebaseHelper.getFirebaseDatabase()
+                    .getReference(myFirebaseHelper.TOKENS_REFERENCE)
+                    .child(firebaseUser.getUid()).setValue(new Token(newToken));
     }
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        Map<String, String> data_notify = remoteMessage.getData();
+        final Map<String, String> data_notify = remoteMessage.getData();
 
-        String user = remoteMessage.getData().get(Data.TAG_USER);
+        final String user = remoteMessage.getData().get(Data.TAG_USER);
 
-        String currentUser = MyPrefs.getCurrentUser(this);
-        Log.d("Current", currentUser);
+        final String currentUser = MyPrefs.getCurrentUser(this);
 
-        FirebaseUser firebaseUser = myFirebaseHelper.getFirebaseUser();
-
-        if (firebaseUser != null && data_notify.size() > 0) {
-            if (!currentUser.equals(user)) {
-                Log.d("Current", user);
+        if (myFirebaseHelper.getFirebaseUser() != null && data_notify.size() > 0) {
+            if (!currentUser.equals(user))
                 sendOreoNotification(remoteMessage);
-            }
         }
     }
 
@@ -81,21 +74,19 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         int type = 0;
         final Data data = new Data();
         final DaoNotification daoNotification = new DaoNotification(this);
-        final Calendar c = Calendar.getInstance();
-        final @SuppressLint("SimpleDateFormat") SimpleDateFormat format_notification = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
-        String time_notification = format_notification.format(c.getTime());
+        String time_notification = String.valueOf(System.currentTimeMillis());
 
-        String user = remoteMessage.getData().get(Data.TAG_USER);
-        String type_str = remoteMessage.getData().get(Data.TAG_TYPE);
+        final String user = remoteMessage.getData().get(Data.TAG_USER);
+        final String type_str = remoteMessage.getData().get(Data.TAG_TYPE);
+        final String chat_id = remoteMessage.getData().get(Data.TAG_CHAT_ID);
         String title = remoteMessage.getData().get(Data.TAG_TITLE);
-        String chat_id = remoteMessage.getData().get(Data.TAG_CHAT_ID);
         String body = remoteMessage.getData().get(Data.TAG_BODY);
 
         if(type_str != null)
             type = Integer.parseInt(type_str);
 
         if(user != null && type != Data.NO_TYPE){
-            boolean can_show = false;
+            boolean can_show;
             data.setUser(user);
             data.setType(String.valueOf(type));
             data.setChat_id(chat_id);
@@ -104,8 +95,9 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
             if(type == Data.TYPE_FOLLOW)
                 can_show = daoNotification.Test_Notification(data);
+            else can_show = checkBlockOrMute(data, user, type);
 
-            if(!can_show){
+            if(can_show){
 
                 RemoteMessage.Notification notification  = remoteMessage.getNotification();
 
@@ -140,7 +132,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
                     data.setTitle(title);
                     Register_Notification(data, daoNotification, type);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
+                    @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
 
                     Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -154,6 +146,14 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
                 }
             }
         }
+    }
+
+    boolean checkBlockOrMute(Data data, String user, int type){
+        final ArrayList<String> muteList = MyPrefs.getMutedUsers(this);
+        if(type == Data.TYPE_MESSAGE)
+            return !muteList.contains(user);
+
+        return true;
     }
 
     void Register_Notification(Data data, DaoNotification daoNotification, int type){

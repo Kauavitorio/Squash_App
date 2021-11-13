@@ -3,6 +3,7 @@ package dev.kaua.squash.Tools;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import dev.kaua.squash.Data.Account.DtoAccount;
 import dev.kaua.squash.Security.EncryptHelper;
@@ -11,15 +12,23 @@ import static android.content.Context.MODE_PRIVATE;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.Gson;
+
 import org.jetbrains.annotations.Contract;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class MyPrefs {
     public static final String PREFS_USER = "myPrefs";
     public static final String PREFS_NETWORK_USAGE = "myPrefsNetWorkUsage";
     public static final String PREFS_CONFIG = "myPrefsConfiguration";
+    public static final String PREFS_CHAT = "myPrefsChat";
     public static final String PREFS_BASE = "myPrefsBASE01";
     public static final String PREFS_UPDATES = "myPrefsUpdates";
     public static final String PREFS_NOTIFICATION = "myPrefsNotify";
@@ -160,14 +169,21 @@ public abstract class MyPrefs {
         //  Clear User Prefs
         sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
         sp.edit().clear().apply();
+
         //  Clear User Config Prefs
         sp = context.getSharedPreferences(PREFS_CONFIG, MODE_PRIVATE);
         sp.edit().clear().apply();
+
         //  Clear User Notification Config Prefs
         sp = context.getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
         sp.edit().clear().apply();
+
         //  Clear User Terms Prefs
         sp = context.getSharedPreferences(PREFS_TERMS, MODE_PRIVATE);
+        sp.edit().clear().apply();
+
+        //  Clear User Chat Prefs
+        sp = context.getSharedPreferences(PREFS_CHAT, MODE_PRIVATE);
         sp.edit().clear().apply();
     }
 
@@ -191,5 +207,26 @@ public abstract class MyPrefs {
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean("pref_story_tutorial", status);
         editor.apply();
+    }
+
+    public static void setMutedUsers(Context mContext, final List<String> mutedUsers){
+        sp = mContext.getSharedPreferences(PREFS_CHAT, MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sp.edit();
+
+        Gson gson = new Gson();
+        List<String> textList = new ArrayList<>(mutedUsers);
+        String jsonText = gson.toJson(textList);
+        editor.putString("mutedUser", jsonText);
+        editor.apply();
+    }
+
+    public static ArrayList<String> getMutedUsers(Context mContext){
+        sp = mContext.getSharedPreferences(PREFS_CHAT, MODE_PRIVATE);
+
+        final Gson gson = new Gson();
+        final String jsonText = sp.getString("mutedUser", null);
+        final String[] res = gson.fromJson(jsonText, String[].class);
+        if(res == null) return new ArrayList<>();
+        return new ArrayList<>(Arrays.asList(res));
     }
 }

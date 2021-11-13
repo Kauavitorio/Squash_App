@@ -85,7 +85,6 @@ public abstract class BackgroundHelper extends MessageActivity {
                 }).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
-                        LoadBackground(downloadUri.toString());
                         DaoChat daoChat = new DaoChat(instance);
                         daoChat.REGISTER_BG("bg_" + fUser.getUid() + "_"
                                 + user_im_chat.getId(), downloadUri.toString());
@@ -135,11 +134,6 @@ public abstract class BackgroundHelper extends MessageActivity {
                     loadingDialog.dismissDialog();
             }
         });*/
-    }
-
-    public static void LoadBackground(String imageUrl) {
-        Log.d("DEBUG_CHAT",  imageUrl);
-        Glide.with(instance).load(imageUrl).into(background_chat);
     }
 
 }

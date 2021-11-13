@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/message_header"
+    android:padding="5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Arrow back -->
+    <ImageView
+        android:id="@+id/btn_close_message_ac"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:minWidth="40dp"
+        android:src="@drawable/ic_arrow_back"
+        tools:ignore="ContentDescription" />
+
+    <!-- Info Container -->
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:layout_marginStart="10dp">
+
+        <!-- Profile Image -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image_chat_MSG_ac"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            tools:src="@mipmap/ic_launcher"
+            android:layout_gravity="center" />
+
+        <!-- Container User info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Username And Verification -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content"
+                tools:ignore="UseCompoundDrawables">
+
+                <!-- Text Username -->
+                <TextView
+                    android:id="@+id/txt_username_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    tools:text="@string/app_name"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <!-- Image Verification Level -->
+                <ImageView
+                    android:id="@+id/verification_ic_message"
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:src="@drawable/ic_verified_account"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+            <!-- Text Online Status -->
+            <TextView
+                android:id="@+id/txt_isOnline_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="bottom"
+                tools:text="@string/online"
+                android:textColor="@color/replyBackground"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Info Icon -->
+    <LinearLayout
+        android:id="@+id/btn_info_user_message_ac"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:layout_gravity="center">
+
+        <!-- Info icon -->
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_info_white"
+            tools:ignore="ContentDescription" />
+
+    </LinearLayout>
+
+</LinearLayout>

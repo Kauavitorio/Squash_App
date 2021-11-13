@@ -62,6 +62,16 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Header_White" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:background">@color/white</item>
+        <item name="android:textColorSecondary">@color/black</item>
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/black</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="ToolbarColored" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:textColorSecondary">@color/white</item>
     </style>

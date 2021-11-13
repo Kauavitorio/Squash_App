@@ -21,13 +21,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Objects;
@@ -332,7 +332,7 @@ public abstract class Login extends SignInActivity{
                         if(response.body().getActive() > DtoAccount.ACCOUNT_DISABLE){
 
                             //  Update active info
-                            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(Objects.requireNonNull(myFirebaseHelper.getFirebaseAuth().getUid()));
+                            reference = myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE).child(myFirebaseHelper.getFirebaseUser().getUid());
                             HashMap<String, Object> hashMap = new HashMap<>();
                             hashMap.put("active", response.body().getActive());
                             hashMap.put("verification_level", response.body().getVerification_level());
@@ -342,10 +342,10 @@ public abstract class Login extends SignInActivity{
                             });
 
                             //  Update all user posts
-                            DatabaseReference ref = myFirebaseHelper.getFirebaseDatabase().getReference();
-                            Query applesQuery = ref.child(myFirebaseHelper.POSTS_REFERENCE).child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("account_id")
-                                    .equalTo(EncryptHelper.encrypt(String.valueOf(MyPrefs.getUserInformation(context).getAccount_id())));
-                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                            myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.POSTS_REFERENCE)
+                                    .child(myFirebaseHelper.PUBLISHED_CHILD).orderByChild("account_id")
+                                    .equalTo(EncryptHelper.encrypt(String.valueOf(MyPrefs.getUserInformation(context).getAccount_id())))
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
                                     for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
@@ -385,6 +385,26 @@ public abstract class Login extends SignInActivity{
                                 editor.putString("pref_type_acc", response.body().getType_acc());
                                 MyPrefs.setLastUserChange(context, response.body().getLastUserChange());
                                 editor.apply();
+
+                                //  Get Muted Users
+                                myFirebaseHelper.getFirebaseDatabase().getReference(myFirebaseHelper.USERS_REFERENCE)
+                                        .child(myFirebaseHelper.getFirebaseUser().getUid())
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                final DataSnapshot snapshotMuted = snapshot.child(myFirebaseHelper.CHAT_PREF_REFERENCE);
+                                                if(snapshotMuted.exists()){
+                                                    final ArrayList<String> usersMuted = new ArrayList<>();
+                                                    for (DataSnapshot user: snapshotMuted.getChildren()){
+                                                        usersMuted.add(user.getKey());
+                                                    }
+                                                    if(usersMuted.size() > 0)
+                                                        MyPrefs.setMutedUsers(context, usersMuted);
+                                                }
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {}
+                                        });
 
                                 //  Getting Followers and Followings
                                 Methods.LoadFollowersAndFollowing(context, 1);

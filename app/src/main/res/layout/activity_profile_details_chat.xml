@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activities.Chat.ProfileDetailsChatActivity">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="45dp"
+        android:padding="5dp"
+        android:background="@color/background_menu_sheet"
+        android:orientation="horizontal">
+
+        <!-- Arrow back -->
+        <ImageView
+            android:id="@+id/btn_close_profile_details_chat_ac"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:minWidth="40dp"
+            android:src="@drawable/ic_arrow_back"
+            tools:ignore="ContentDescription" />
+
+        <!-- Details -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="@string/details"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Body -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        android:fillViewport="true">
+
+        <!-- Main Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Mute Messages -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <!-- Action Text -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:text="@string/mute_messages"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <!-- Action Switch -->
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/mute_message_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:thumb="@drawable/custom_thumb_switch"
+                    app:track="@drawable/custom_track_switch" />
+
+            </LinearLayout>
+
+            <!-- Media Info -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Title -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:text="@string/media"/>
+
+                <!-- Media adapter -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- No Medias Found -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no_media_were_found_in_this_chat"
+                        android:textColor="@color/black"
+                        android:visibility="visible"
+                        android:textAlignment="center"
+                        android:textSize="15sp"
+                        android:padding="5dp"/>
+
+                    <!-- recycler -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_medias_profile_details_ac"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- User -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Title -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:text="@string/account"/>
+
+                <!-- User Info -->
+                <LinearLayout
+                    android:id="@+id/base_user_profile_details_ac"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="3dp"
+                    android:orientation="horizontal">
+
+                    <!-- Profile Image -->
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/profile_details_user_img_ac"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        tools:src="@mipmap/ic_launcher"
+                        android:layout_gravity="center" />
+
+                    <!-- Container User info -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="vertical">
+
+                        <!-- Username And Verification -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_height="wrap_content"
+                            tools:ignore="UseCompoundDrawables">
+
+                            <!-- Text Username -->
+                            <TextView
+                                android:id="@+id/txt_profile_details_user_username"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                tools:text="@string/app_name"
+                                android:layout_marginStart="8dp"
+                                android:textColor="@color/black"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <!-- Image Verification Level -->
+                            <ImageView
+                                android:id="@+id/profile_details_user_verification_ic_message"
+                                android:layout_width="17dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:src="@drawable/ic_verified_account"
+                                tools:ignore="ContentDescription" />
+
+                        </LinearLayout>
+
+                        <!-- Text User Name -->
+                        <TextView
+                            android:id="@+id/profile_details_user_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:gravity="bottom"
+                            tools:text="@string/online"
+                            android:textColor="@color/third_or_plus_img"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
