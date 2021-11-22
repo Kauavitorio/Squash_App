@@ -13,7 +13,7 @@ public class DaoSystem extends SQLiteOpenHelper {
     private final String TABLE = "TBL_SYSTEM_INFO";
 
     public DaoSystem(@Nullable Context context) {
-        super(context, "DB_SYSTEM_INFO", null, 18);
+        super(context, "DB_SYSTEM_INFO", null, 19);
     }
 
     @Override
