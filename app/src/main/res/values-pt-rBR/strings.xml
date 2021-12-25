@@ -338,4 +338,7 @@
     <string name="mute_messages">Silenciar mensagens</string>
     <string name="no_media_were_found_in_this_chat">Nenhuma mídia foi encontrada nesta conversa.</string>
     <string name="account">Conta</string>
+    <string name="push_notification">Notificações push</string>
+    <string name="pause_all">Pausar Tudo</string>
+    <string name="from">De</string>
 </resources>

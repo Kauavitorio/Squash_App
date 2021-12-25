@@ -165,28 +165,6 @@ public abstract class MyPrefs {
         return sp.getString("pref_start_time", null);
     }
 
-    public static void logOut(@NonNull Context context){
-        //  Clear User Prefs
-        sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
-        sp.edit().clear().apply();
-
-        //  Clear User Config Prefs
-        sp = context.getSharedPreferences(PREFS_CONFIG, MODE_PRIVATE);
-        sp.edit().clear().apply();
-
-        //  Clear User Notification Config Prefs
-        sp = context.getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
-        sp.edit().clear().apply();
-
-        //  Clear User Terms Prefs
-        sp = context.getSharedPreferences(PREFS_TERMS, MODE_PRIVATE);
-        sp.edit().clear().apply();
-
-        //  Clear User Chat Prefs
-        sp = context.getSharedPreferences(PREFS_CHAT, MODE_PRIVATE);
-        sp.edit().clear().apply();
-    }
-
     public static final String NONE_USER = "none";
     public static final String CURRENT_USER = "currentUser";
     public static void currentUser(Context context, String userId){
@@ -228,5 +206,42 @@ public abstract class MyPrefs {
         final String[] res = gson.fromJson(jsonText, String[].class);
         if(res == null) return new ArrayList<>();
         return new ArrayList<>(Arrays.asList(res));
+    }
+
+    public static final String IS_NOTIFICATION = "is_notification";
+    public static boolean isNotificationActive(Context mContext){
+        sp = mContext.getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
+        return sp.getBoolean(IS_NOTIFICATION, true);
+    }
+
+    public static void setNotificationActive(@NonNull Context context, boolean status){
+        sp = context.getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
+
+        //  Add Request prefs
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(IS_NOTIFICATION, status);
+        editor.apply();
+    }
+
+    public static void logOut(@NonNull Context context){
+        //  Clear User Prefs
+        sp = context.getSharedPreferences(PREFS_USER, MODE_PRIVATE);
+        sp.edit().clear().apply();
+
+        //  Clear User Config Prefs
+        sp = context.getSharedPreferences(PREFS_CONFIG, MODE_PRIVATE);
+        sp.edit().clear().apply();
+
+        //  Clear User Notification Config Prefs
+        sp = context.getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
+        sp.edit().clear().apply();
+
+        //  Clear User Terms Prefs
+        sp = context.getSharedPreferences(PREFS_TERMS, MODE_PRIVATE);
+        sp.edit().clear().apply();
+
+        //  Clear User Chat Prefs
+        sp = context.getSharedPreferences(PREFS_CHAT, MODE_PRIVATE);
+        sp.edit().clear().apply();
     }
 }

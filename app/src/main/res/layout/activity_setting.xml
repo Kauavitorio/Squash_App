@@ -8,61 +8,73 @@
     tools:context=".Activities.Setting.SettingActivity">
 
     <!-- Header -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/bar_layout"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
+        android:padding="5dp"
+        android:background="@color/background_menu_sheet"
+        android:orientation="vertical">
 
-        <!-- Toolbar for actions and User info -->
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_setting"
-            app:theme="@style/ToolbarColored"
+        <!-- Arrow back -->
+        <ImageView
+            android:id="@+id/btn_close_setting_ac"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:minWidth="50dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_arrow_back"
+            tools:ignore="ContentDescription" />
+
+        <!-- Info Container -->
+        <LinearLayout
+            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/background_menu_sheet"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/MenuStyle">
+            android:layout_height="0dp"
+            android:padding="3dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="5dp">
 
-            <!-- Container -->
+            <!-- Profile Image -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_image_setting"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                tools:src="@mipmap/ic_launcher"
+                android:layout_gravity="center" />
+
+            <!-- Container User info -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
 
-                <!-- Profile Image -->
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/profile_image_setting"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center" />
-
-                <!-- Container User info -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center"
+                <!-- Text Username -->
+                <TextView
+                    android:id="@+id/txt_username_setting"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:gravity="center"
+                    tools:text="@string/app_name"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
 
-                    <!-- Text Username -->
-                    <TextView
-                        android:id="@+id/txt_username_setting"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/app_name"
-                        android:layout_marginStart="10dp"
-                        android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
+                <!-- Text Name -->
+                <TextView
+                    android:id="@+id/txt_name_user_setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    tools:text="@string/app_name"
+                    android:textColor="@color/replyBackground"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
-        </androidx.appcompat.widget.Toolbar>
+        </LinearLayout>
 
-    </com.google.android.material.appbar.AppBarLayout>
+    </LinearLayout>
 
     <!-- Setting Info -->
     <include layout="@layout/content_setting"/>
