@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources [<!ENTITY privacy_policy_direct "https://cloud.squashc.com/privacy/direct/">]>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources [<!ENTITY privacy_policy_direct "https://cloud.uspery.com/privacy/direct/">]>
 <resources>
 
     <!-- Natural Text -->
@@ -9,7 +9,7 @@
     <string name="or">Or</string><!-- End Natural Text -->
 
     <!-- Privacy Policy -->
-    <string name="privacy_policy_url">https://cloud.squashc.com/privacy/</string>
+    <string name="privacy_policy_url">https://cloud.uspery.com/privacy/</string>
 
     <!-- ADS -->
     <string name="main_banner" translatable="false">ca-app-pub-5161149668539506/1257131065</string>

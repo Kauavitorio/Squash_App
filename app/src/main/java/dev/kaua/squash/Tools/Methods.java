@@ -81,11 +81,10 @@ public abstract class Methods extends MainActivity {
     public static final String SQUASH_ORIGINAL_USERNAME = "squash";
     public static final String PAYPAL_DONATE = "https://www.paypal.com/donate?hosted_button_id=PRKZAKGHHKA7S";
     public static final String GOOGLE_PLAY_APP_LINK = "https://play.google.com/store/apps/details?id=dev.kaua.squash";
-    public static final String GOOGLE_PLAY_APP_LINK_SHORT = "https://squashc.com/url/app";
+    public static final String GOOGLE_PLAY_APP_LINK_SHORT = "https://uspery.com/url/squashapp";
     public static final String BASE_URL_HTTPS = "https://squash-social.herokuapp.com/";
     public static final String BASE_URL_HTTP = "http://squash-social.herokuapp.com/";
     public static final String FCM_URL = "https://fcm.googleapis.com/";
-    public static final String DOMAIN_SHORT_DYNAMIC_LINKS = "https://squashc.com/url/";
     public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?_&.;])[A-Za-z\\d@$!%*#_?&.;]{8,}$";
     private static FirebaseUser firebaseUser;
     private static DatabaseReference reference;

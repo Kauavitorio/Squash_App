@@ -3,15 +3,15 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 32
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "dev.kaua.squash"
         minSdkVersion 26
-        targetSdkVersion 30
-        versionCode 64
-        versionName "2.3.8-STAFF"
+        targetSdkVersion 32
+        versionCode 70
+        versionName "2.3.9"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

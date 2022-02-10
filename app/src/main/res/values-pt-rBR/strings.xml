@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE resources [<!ENTITY privacy_policy_direct "https://cloud.squashc.com/privacy/direct/">]>
+<!DOCTYPE resources [<!ENTITY privacy_policy_direct "https://cloud.uspery.com/privacy/direct/">]>
 <resources>
     <string name="language_tag">pt-BR</string>
-    <string name="privacy_policy_url">https://cloud.squashc.com/privacy/</string>
+    <string name="privacy_policy_url">https://cloud.uspery.com/privacy/</string>
     <string name="intro_description">ESCOLHA UMA MANEIRA DE COMEÇAR.</string>
     <string name="create_account">Criar Conta</string>
     <string name="have_an_account_already"><font color='#504F4F'>Já possui uma conta?</font> <font color='#10ace0'>Conecte-se</font></string>
