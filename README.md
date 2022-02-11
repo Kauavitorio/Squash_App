@@ -1,48 +1,30 @@
 # Squash App
 
-Squash app is an application for practice your knowledge and non-profit.
+Squash App is Squash's Social Squash platform that is nothing more than a social media where you can make posts, follow other users, post stories and chat in private with a friend.
 
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### Prerequisites
 
-To install and run that project you just need android studio and a mobile with android 8.0 or +.
-
-```c#
-This project run with minSdkVersion 26.
-Sdk 26 - Android 8.0 (Oreo)
-```
-
-### How to use
-
-1- Clone this repository <br/>
-2- Open with Android Studio <br/>
-3- Run :) <br/>
-<div>
-<img title="Clone this repository" src="https://media.discordapp.net/attachments/756546249901211749/871820560290709504/unknown.png" width="250"/>
-<img title="Open with Android Studio" src="https://media.discordapp.net/attachments/756546249901211749/871820839417442314/unknown.png" width="250"/>
-</div>
+With the code available, it is not possible to run the application, as it will be necessary to enter a encryption keys,
+so you can use the base code for your own application `with your own key`, it is worth noting that the owner and application code is [Kauã Vitório](https://github.com/Kauavitorio),
+if there is a copy of this code without the indications of use of it, subject to recourse to `copyright request`.
 
 ## Built with
 
-* [Java JDK 11](https://developer.android.com/studio/releases/gradle-plugin#4.2-bundled-jdk-11) - The programming language used
+* [Java JDK](https://developer.android.com/studio/releases/gradle-plugin#4.2-bundled-jdk-11) - The programming language used
 * [Figma](https://www.figma.com/) - Design Software
 * No external libraries were used in this project
 
-## Author
+## Team
 
 * **Kauã Vitorio** - [kauavitorio.com](https://www.kauavitorio.com)
 
 * **Matheus Souza** - [Theus03](https://github.com/Theus03) - Designer
 
-* **Yuri Dantas** - [YDangg](https://github.com/YDangg) - Front End
-
-See also the list of [contributors](https://github.com/Kauavitorio/Squash_App/contributors) who participated in this project.
-
-<a href = "https://github.com/Kauavitorio/PalacePetz/graphs/contributors">
-  <img src = "https://contrib.rocks/image?repo=Kauavitorio/PalacePetz"/>
+<a href = "https://github.com/Kauavitorio/Squash_App/graphs/contributors">
+  <img src = "https://contrib.rocks/image?repo=Kauavitorio/Squash_App"/>
 </a>
 
 ## License
