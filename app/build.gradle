@@ -10,15 +10,15 @@ android {
         applicationId "dev.kaua.squash"
         minSdkVersion 26
         targetSdkVersion 32
-        versionCode 70
-        versionName "2.3.9"
+        versionCode 71
+        versionName "2.4.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

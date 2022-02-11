@@ -150,25 +150,6 @@ public class MainActivity extends AppCompatActivity {
             public void onPageScrollStateChanged(int state) {}
         });
 
-        ReviewManager manager = ReviewManagerFactory.create(this);
-        Task<ReviewInfo> request = manager.requestReviewFlow();
-        request.addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                // We can get the ReviewInfo object
-                ReviewInfo reviewInfo = task.getResult();
-                Task<Void> flow = manager.launchReviewFlow(this, reviewInfo);
-                flow.addOnCompleteListener(tasks -> {
-                    // The flow has finished. The API does not indicate whether the user
-                    // reviewed or not, or even whether the review dialog was shown. Thus, no
-                    // matter the result, we continue our app flow.
-                });
-            } else {
-                // There was some problem, log or handle the error code.
-                ToastHelper.toast(this, task.toString(), ToastHelper.SHORT_DURATION);
-                Log.d(TAG, task.toString());
-            }
-        });
-
     }
 
     private void StartNavigation() {
