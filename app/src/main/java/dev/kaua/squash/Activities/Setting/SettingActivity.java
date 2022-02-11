@@ -36,11 +36,11 @@ import dev.kaua.squash.Tools.MyPrefs;
  **/
 
 public class SettingActivity extends AppCompatActivity {
-    TextView txt_username;
+    TextView txt_username, txt_name_user;
     CircleImageView profile_image;
     TextView txt_app_version;
     private LinearLayout btn_follow_and_invite, btn_account, btn_data, btn_logout;
-    private LinearLayout btn_policy_and_Privacy, btn_support_ad;
+    private LinearLayout btn_policy_and_Privacy, btn_support_ad, btn_notifications;
     private Animation myAnim;
 
     @Override
@@ -48,12 +48,6 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         Ids();
-
-        Toolbar toolbar = findViewById(R.id.toolbar_setting);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(v -> finish());
 
         btn_data.setOnClickListener(v -> {
             btn_data.startAnimation(myAnim);
@@ -79,6 +73,11 @@ public class SettingActivity extends AppCompatActivity {
         btn_follow_and_invite.setOnClickListener( v -> {
             btn_follow_and_invite.startAnimation(myAnim);
             StartAnIntent(FollowAndInviteActivity.class);
+        });
+
+        btn_notifications.setOnClickListener( v -> {
+            btn_notifications.startAnimation(myAnim);
+            StartAnIntent(NotificationSettingActivity.class);
         });
 
         //  Logout click
@@ -112,16 +111,20 @@ public class SettingActivity extends AppCompatActivity {
         txt_app_version = findViewById(R.id.txt_app_version);
         btn_logout = findViewById(R.id.btn_logout);
         txt_username = findViewById(R.id.txt_username_setting);
+        txt_name_user = findViewById(R.id.txt_name_user_setting);
         btn_data = findViewById(R.id.btn_data);
         btn_policy_and_Privacy = findViewById(R.id.btn_policy_and_privacy);
         btn_support_ad = findViewById(R.id.btn_support_ad);
         profile_image = findViewById(R.id.profile_image_setting);
         btn_follow_and_invite = findViewById(R.id.btn_follow_and_invite);
+        btn_notifications = findViewById(R.id.btn_notifications);
+        findViewById(R.id.btn_close_setting_ac).setOnClickListener(v -> finish());
 
         //  Set text with app version and system info
         txt_app_version.setText(getString(R.string.squash_for_mobile, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE) + " " + Build.SUPPORTED_ABIS[0]);
 
         txt_username.setText(mAccount.getName_user());
+        txt_name_user.setText(mAccount.getName_user());
         Glide.with(this).load(mAccount.getProfile_image()).into(profile_image);
     }
 }

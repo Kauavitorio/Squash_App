@@ -16,9 +16,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Map;
 
 import dev.kaua.squash.Activities.MainActivity;
@@ -29,6 +27,7 @@ import dev.kaua.squash.LocalDataBase.DaoChat;
 import dev.kaua.squash.LocalDataBase.Notification.DaoNotification;
 import dev.kaua.squash.R;
 import dev.kaua.squash.Tools.MyPrefs;
+import dev.kaua.squash.Tools.ShortCutsHelper;
 
 /**
  *  Copyright (c) 2021 Kauã Vitório
@@ -57,15 +56,17 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        final Map<String, String> data_notify = remoteMessage.getData();
+        if(MyPrefs.isNotificationActive(this)){
+            final Map<String, String> data_notify = remoteMessage.getData();
 
-        final String user = remoteMessage.getData().get(Data.TAG_USER);
+            final String user = remoteMessage.getData().get(Data.TAG_USER);
 
-        final String currentUser = MyPrefs.getCurrentUser(this);
+            final String currentUser = MyPrefs.getCurrentUser(this);
 
-        if (myFirebaseHelper.getFirebaseUser() != null && data_notify.size() > 0) {
-            if (!currentUser.equals(user))
-                sendOreoNotification(remoteMessage);
+            if (myFirebaseHelper.getFirebaseUser() != null && data_notify.size() > 0) {
+                if (!currentUser.equals(user))
+                    sendOreoNotification(remoteMessage);
+            }
         }
     }
 
@@ -95,7 +96,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
             if(type == Data.TYPE_FOLLOW)
                 can_show = daoNotification.Test_Notification(data);
-            else can_show = checkBlockOrMute(data, user, type);
+            else can_show = checkBlockOrMute(user, type);
 
             if(can_show){
 
@@ -113,15 +114,15 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
                     intent = new Intent(this, MainActivity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putInt("shortcut", 0);
-                    bundle.putInt("shared", 0);
+                    bundle.putInt(ShortCutsHelper.SHORTCUT_TAG, ShortCutsHelper.NONE_SHORT);
+                    bundle.putInt(MessageActivity.SHARE_ID, 0);
                     intent.putExtras(bundle);
                 }else if(type == Data.TYPE_MESSAGE) {
                     title = getString(R.string.new_message);
                     intent = new Intent(this, MessageActivity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putString("userId", user);
-                    bundle.putString("chat_id", chat_id);
+                    bundle.putString(MessageActivity.USER_ID, user);
+                    bundle.putString(MessageActivity.CHAT_ID, chat_id);
                     intent.putExtras(bundle);
 
                     if(body != null)
@@ -148,7 +149,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         }
     }
 
-    boolean checkBlockOrMute(Data data, String user, int type){
+    boolean checkBlockOrMute(String user, int type){
         final ArrayList<String> muteList = MyPrefs.getMutedUsers(this);
         if(type == Data.TYPE_MESSAGE)
             return !muteList.contains(user);
@@ -161,15 +162,15 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
     }
 
     private void Update_Last_chat(String user, String body) {
-        DaoChat daoChat = new DaoChat(this);
-        DtoAccount account = new DtoAccount();
-        Calendar c = Calendar.getInstance();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df_time_last_chat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        account.setId(user);
-        account.setLast_chat(df_time_last_chat.format(c.getTime()));
-        account.setStatus_chat(getString(R.string.waiting_for_reply));
-        String[] split = body.split(":");
-        if(split.length > 0) account.setName_user(split[0]);
-        daoChat.UPDATE_A_CHAT(account, 0);
+        try {
+            final DaoChat daoChat = new DaoChat(this);
+            final DtoAccount account = new DtoAccount();
+            account.setId(user);
+            account.setLast_chat(String.valueOf(System.currentTimeMillis()));
+            account.setStatus_chat(getString(R.string.waiting_for_reply));
+            final String[] split = body.split(":");
+            if(split.length > 0) account.setName_user(split[0]);
+            daoChat.UPDATE_A_CHAT(account, 0);
+        }catch (Exception ignore){}
     }
 }
