@@ -594,7 +594,12 @@ public class ProfileFragment extends Fragment {
     }
 
     void SearchStory(long userId, final DtoAccount account){
-        if(ic_ProfileUser_profile != null) {
+        ic_ProfileUser_profile.setEnabled(true);
+        ic_ProfileUser_profile.setBorderWidth(0);
+
+        ic_ProfileUser_profile.setOnClickListener(v -> Profile_Image.showUserProfile(requireActivity(),
+                account.getProfile_image(), account.getUsername()));
+        /*if(ic_ProfileUser_profile != null) {
             ic_ProfileUser_profile.setEnabled(false);
             ic_ProfileUser_profile.setBorderWidth(0);
         }
@@ -666,7 +671,7 @@ public class ProfileFragment extends Fragment {
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {}
                     });
-        }
+        }*/
     }
 
     @Override

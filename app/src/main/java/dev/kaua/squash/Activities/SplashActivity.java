@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,8 +45,10 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        getWindow().setStatusBarColor(getColor(R.color.base_color));
-        getWindow().setNavigationBarColor(getColor(R.color.base_color));
+        final TextView txt_from = findViewById(R.id.txt_from_splash);
+        txt_from.setText(txt_from.getText().toString().toLowerCase());
+        getWindow().setStatusBarColor(getColor(R.color.base_color_splash_bg));
+        getWindow().setNavigationBarColor(getColor(R.color.base_color_splash_bg));
 
         SharedPreferences sp_network = getSharedPreferences(MyPrefs.PREFS_NETWORK_USAGE, MODE_PRIVATE);
         if (!sp_network.contains("pref_start_time")) MyPrefs.InsertNetworkCount(this);

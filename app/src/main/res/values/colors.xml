@@ -38,6 +38,7 @@
     <color name="shape_switch_track">#C6C6C6</color>
     <color name="BarColor">#DDDADA</color>
     <color name="base_color">#FF6C26</color>
+    <color name="base_color_splash_bg">#C5521C</color>
     <color name="message_header">#CF6635</color>
     <color name="base_color_disable_btn">#CDFF6C26</color>
     <color name="color_hover">#46FF6C26</color>

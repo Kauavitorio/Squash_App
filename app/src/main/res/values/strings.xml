@@ -16,6 +16,7 @@
     <string name="main_rewarded" translatable="false">ca-app-pub-5161149668539506/2830793531</string>
 
     <string name="app_name" translatable="false">Squash</string>
+    <string name="uspery" translatable="false">Uspery</string>
     <string name="intro_description">Choose a way to start.</string>
     <string name="create_account">Create account</string>
     <string name="have_an_account_already"><font color='#504F4F'>Have an account already?</font> <font color='#10ace0'>Log in</font></string>
@@ -365,4 +366,7 @@
     <string name="mute_messages">Mute Messages</string>
     <string name="no_media_were_found_in_this_chat">No media were found in this conversation.</string>
     <string name="account">Account</string>
+    <string name="push_notification">Push Notification</string>
+    <string name="pause_all">Pause All</string>
+    <string name="from">From</string>
 </resources>

@@ -29,6 +29,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -325,14 +326,16 @@ public class Posts_Adapters extends RecyclerView.Adapter<Posts_Adapters.MyHolder
             }else holder.ic_account_badge.setVisibility(View.GONE);
 
             if(hasIndex(position)){
-                if(!mPostList.get(position).isProfile_img_load() ||  !postInfo.getProfile_image().equals(mPostList.get(position).getProfile_image())){
-                    mPostList.get(position).setProfile_image(postInfo.getProfile_image());
+                final String imgUrl = postInfo.getProfile_image();
+                if(!mPostList.get(position).isProfile_img_load() ||  !imgUrl.equals(mPostList.get(position).getProfile_image())){
+                    mPostList.get(position).setProfile_image(imgUrl);
                     mPostList.get(position).setProfile_img_load(true);
                     try {
                         if(!mContext.isDestroyed() && !mContext.isFinishing())
                             Glide.with(mContext).asBitmap()
-                                    .apply(myOptions).load(postInfo.getProfile_image())
-                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                    .apply(myOptions).load(imgUrl)
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                    .signature(new ObjectKey(imgUrl))
                                     .into(holder.icon_user_profile_post);
                     }catch (Exception ignore){}
                 }
