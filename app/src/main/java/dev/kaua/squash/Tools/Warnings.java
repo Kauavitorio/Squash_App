@@ -344,13 +344,11 @@ public class Warnings {
                 context.findViewById(R.id.adapter_sheet_menu_profile));
         sheetView.findViewById(R.id.close_ic_profile_sheet).setElevation(0);
 
+        sheetView.findViewById(R.id.btn_report_profile).setVisibility(View.GONE);
         if(id == MyPrefs.getUserInformation(context).getAccount_id()){
-            sheetView.findViewById(R.id.btn_report_profile).setVisibility(View.GONE);
             sheetView.findViewById(R.id.btn_your_activity_profile).setVisibility(View.VISIBLE);
-        }else{
-            sheetView.findViewById(R.id.btn_report_profile).setVisibility(View.VISIBLE);
+        }else
             sheetView.findViewById(R.id.btn_your_activity_profile).setVisibility(View.GONE);
-        }
 
         if(Methods.getUserLevel(context) == DtoAccount.ACCOUNT_IS_STAFF)
             sheetView.findViewById(R.id.btn_options_profile).setVisibility(View.VISIBLE);

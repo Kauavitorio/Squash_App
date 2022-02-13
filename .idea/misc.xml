@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Mobile Dev/Squash_App/app/src/main/res/layout/adapter_menu_profile_sheet.xml" value="0.20416666666666666" />
+        <entry key="..\:/Mobile Dev/Squash_App/app/src/main/res/layout/fragment_activity_profile.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.28615384615384615" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_adapter_search.xml" value="0.290625" />
         <entry key="..\:/Users/kauav/Desktop/Squash_App/app/src/main/res/drawable/background_audio_chat.xml" value="0.290625" />
